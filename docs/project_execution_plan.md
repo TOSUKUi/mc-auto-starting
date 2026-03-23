@@ -171,6 +171,12 @@
 
 - `provisioning/ready/failed/degraded/unpublished/deleting` 等の遷移を定義する
 - route 失敗時と実行基盤失敗時の状態分離を決める
+- 初期遷移方針:
+  - provider create 完了 + route apply 成功で `provisioning -> ready`
+  - provider create 失敗で `provisioning -> failed`
+  - route apply 失敗で `provisioning/ready/degraded -> unpublished`
+  - provider 状態不整合や backend 劣化で `ready/starting/stopping/restarting -> degraded`
+  - 削除要求受付後は各状態から `deleting` を許可し、完了時は物理削除する
 - 完了条件:
   - 状態遷移表が定まり実装可能になる
 

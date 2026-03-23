@@ -13,6 +13,12 @@ class MinecraftServerTest < ActiveSupport::TestCase
     assert MinecraftServer.statuses.key?("failed")
   end
 
+  test "defines allowed status transitions" do
+    assert_includes MinecraftServer::STATUS_TRANSITIONS[:provisioning], :ready
+    assert_includes MinecraftServer::STATUS_TRANSITIONS[:ready], :restarting
+    assert_includes MinecraftServer::STATUS_TRANSITIONS[:degraded], :unpublished
+  end
+
   test "requires core provisioning attributes" do
     server = MinecraftServer.new(owner: users(:one))
 
@@ -66,6 +72,37 @@ class MinecraftServerTest < ActiveSupport::TestCase
     server = minecraft_servers(:one)
 
     assert_equal "main-survival.mc.tosukui.xyz:42434", server.connection_target
+  end
+
+  test "allows valid status transitions" do
+    server = minecraft_servers(:one)
+    server.status = :restarting
+
+    assert server.valid?
+  end
+
+  test "rejects invalid status transitions" do
+    server = minecraft_servers(:one)
+    server.status = :provisioning
+
+    assert_not server.valid?
+    assert_includes server.errors[:status], "cannot transition from ready to provisioning"
+  end
+
+  test "transition_to! persists a valid transition" do
+    server = minecraft_servers(:two)
+
+    server.transition_to!(:ready)
+
+    assert_equal "ready", server.reload.status
+  end
+
+  test "transition_to! raises for an invalid transition" do
+    server = minecraft_servers(:one)
+
+    error = assert_raises(ArgumentError) { server.transition_to!(:provisioning) }
+
+    assert_equal "invalid status transition: ready -> provisioning", error.message
   end
 
   test "validates numeric resource fields" do

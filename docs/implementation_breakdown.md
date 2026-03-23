@@ -411,6 +411,19 @@ app/frontend/
 8. 削除フローと route 削除実装
 9. 監査ログ記録実装
 
+### フェーズ 4 補足: status 遷移
+
+- `provisioning -> ready/failed/unpublished/deleting`
+- `ready -> starting/stopping/restarting/degraded/unpublished/deleting/failed`
+- `stopped -> starting/deleting/failed`
+- `starting -> ready/failed/degraded/stopping`
+- `stopping -> stopped/failed/degraded`
+- `restarting -> ready/failed/degraded`
+- `degraded -> ready/restarting/stopping/unpublished/failed/deleting`
+- `unpublished -> provisioning/ready/deleting/failed`
+- `failed -> provisioning/deleting`
+- `deleting` からの通常遷移はなし
+
 ### フェーズ 5: mc-router 連携
 
 1. route 定義モデル整理
