@@ -1,10 +1,9 @@
 import { Badge, Code, Group, Paper, Stack, Text, Title } from '@mantine/core'
 import { Head, Link } from '@inertiajs/react'
-import AppLayout from '../../layouts/AppLayout'
 
 export default function ServersIndex({ servers }) {
   return (
-    <AppLayout>
+    <>
       <Head title="Servers" />
 
       <Stack gap="xl">
@@ -39,6 +38,6 @@ export default function ServersIndex({ servers }) {
           ))}
         </Stack>
       </Stack>
-    </AppLayout>
+    </>
   )
 }

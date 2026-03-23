@@ -45,5 +45,6 @@ This file tells any contributor or agent where to find authoritative information
 - `RouterRoute` baseline is installed through `T-104`.
 - `AuditLog` baseline is installed through `T-105`.
 - Server visibility scopes and request protections are installed through `T-107`.
+- The authenticated layout shell is installed through `T-600`.
 - The critical path is currently blocked on `T-300` pending execution-provider API confirmation.
-- The next unblocked implementation entry point is `T-600` for the authenticated layout shell.
+- The next unblocked implementation entry point is `T-601` for the login page UI.
