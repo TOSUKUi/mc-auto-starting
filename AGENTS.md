@@ -13,7 +13,7 @@ This repository now has a generated Rails 8 application skeleton plus planning a
 - `docs/task_board.md`
 - `docs/context_map.md`
 
-A Rails app skeleton has already been generated in-place. Environment cleanup, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`. Authentication now uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`. Authorization now uses a Pundit baseline through `T-106`. The `MinecraftServer` model baseline is in place through `T-102`, hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are fixed through `T-203`, the `ServerMember` model baseline is installed through `T-103`, the `RouterRoute` baseline is installed through `T-104`, and the `AuditLog` baseline is installed through `T-105`. The next active task on the critical path is `T-107` for server visibility scopes and request protections.
+A Rails app skeleton has already been generated in-place. Environment cleanup, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`. Authentication now uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`. Authorization now uses a Pundit baseline through `T-106`, and server visibility/request protection is installed through `T-107`. The `MinecraftServer` model baseline is in place through `T-102`, hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are fixed through `T-203`, the `ServerMember` model baseline is installed through `T-103`, the `RouterRoute` baseline is installed through `T-104`, and the `AuditLog` baseline is installed through `T-105`. The critical path is currently blocked on `T-300` pending execution-provider API confirmation. The next unblocked implementation target is `T-600` for the authenticated layout shell.
 
 ## Locked Technical Decisions
 These are already decided and should be treated as defaults unless explicitly changed.
@@ -163,5 +163,5 @@ If no other instruction is given, start from Phase 0 on the critical path.
 1. Confirm Docker bootstrap files are intact.
 2. Build the app container.
 3. Confirm the Vite + Inertia + React + Mantine baseline still boots cleanly.
-4. Continue from `T-107` with server visibility scopes and request protections, keeping Rails built-in authentication and Pundit as the current authorization baseline.
+4. Critical path work is blocked on `T-300`; if continuing implementation without that dependency, move to `T-600` for the authenticated layout shell while keeping Rails built-in authentication and Pundit as the current baseline.
 5. Keep MariaDB bootstrap SQL and Docker-first commands as the default local workflow.

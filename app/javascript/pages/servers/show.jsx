@@ -1,0 +1,50 @@
+import { Badge, Code, Group, Paper, Stack, Text, Title } from '@mantine/core'
+import { Head, Link } from '@inertiajs/react'
+import AppLayout from '../../layouts/AppLayout'
+
+export default function ServersShow({ server }) {
+  return (
+    <AppLayout>
+      <Head title={server.name} />
+
+      <Stack gap="xl">
+        <Stack gap={4}>
+          <Text component={Link} href="/servers" size="sm">
+            Back to servers
+          </Text>
+          <Group justify="space-between">
+            <Stack gap={0}>
+              <Title order={1}>{server.name}</Title>
+              <Text c="dimmed">{server.fqdn}</Text>
+            </Stack>
+            <Group gap="xs">
+              <Badge color="blue" variant="light">
+                {server.access_role}
+              </Badge>
+              <Badge color="teal" variant="light">
+                {server.status}
+              </Badge>
+            </Group>
+          </Group>
+        </Stack>
+
+        <Paper p="lg" radius="md" shadow="sm" withBorder>
+          <Stack gap="sm">
+            <Text>
+              Connection target: <Code>{server.connection_target}</Code>
+            </Text>
+            <Text>
+              Version: <Code>{server.minecraft_version}</Code>
+            </Text>
+            <Text>
+              Template: <Code>{server.template_kind}</Code>
+            </Text>
+            <Text>
+              Provider: <Code>{server.provider_name}</Code>
+            </Text>
+          </Stack>
+        </Paper>
+      </Stack>
+    </AppLayout>
+  )
+}

@@ -44,4 +44,6 @@ This file tells any contributor or agent where to find authoritative information
 - `ServerMember` baseline is installed through `T-103`.
 - `RouterRoute` baseline is installed through `T-104`.
 - `AuditLog` baseline is installed through `T-105`.
-- The next active entry point on the critical path is `T-107` for server visibility scopes and request protections.
+- Server visibility scopes and request protections are installed through `T-107`.
+- The critical path is currently blocked on `T-300` pending execution-provider API confirmation.
+- The next unblocked implementation entry point is `T-600` for the authenticated layout shell.

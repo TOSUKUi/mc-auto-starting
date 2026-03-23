@@ -30,7 +30,7 @@
 | T-104 | P1 | Generate `RouterRoute` model and migration | T-102 | done | Route state can be persisted |
 | T-105 | P1 | Generate `AuditLog` model and migration | T-101 | done | Audit events can be recorded |
 | T-106 | P1 | Add authorization framework and policies | T-101,T-102,T-103 | done | Owner/member visibility rules are enforced |
-| T-107 | P1 | Add server visibility scopes and request protections | T-106 | todo | Users cannot fetch other users' servers |
+| T-107 | P1 | Add server visibility scopes and request protections | T-106 | done | Users cannot fetch other users' servers |
 | T-200 | P2 | Define hostname normalization rules | T-102 | done | Allowed characters, lowercase rule, reserved words documented and coded |
 | T-201 | P2 | Add hostname unique index and validations | T-200 | done | Duplicate hostname cannot persist |
 | T-202 | P2 | Define fqdn and `hostname:port` generation rules | T-200 | done | Shared formatting logic exists |

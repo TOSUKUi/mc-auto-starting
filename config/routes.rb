@@ -3,6 +3,7 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy", as: :logout
   resources :passwords, param: :token
+  resources :servers, only: %i[index show]
   root "home#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
