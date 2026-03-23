@@ -8,3 +8,230 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+:root {
+  --auth-bg: #f2efe8;
+  --auth-surface: rgba(255, 252, 246, 0.86);
+  --auth-ink: #1f2721;
+  --auth-muted: #5a655d;
+  --auth-line: rgba(46, 62, 51, 0.14);
+  --auth-accent: #295f4e;
+  --auth-accent-strong: #1d473a;
+  --auth-warn-bg: #fce8e5;
+  --auth-warn-text: #9f2d1f;
+  --auth-note-bg: #e4f0ea;
+  --auth-note-text: #21513f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--auth-ink);
+  background:
+    radial-gradient(circle at top left, rgba(214, 171, 105, 0.28), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(70, 122, 102, 0.2), transparent 30%),
+    linear-gradient(135deg, #f7f2e7 0%, #ebe5d8 52%, #e2eadf 100%);
+  font-family: "IBM Plex Sans", "Hiragino Sans", "Yu Gothic", sans-serif;
+  min-height: 100vh;
+}
+
+code {
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(320px, 1.05fr) minmax(360px, 0.95fr);
+}
+
+.auth-panel {
+  padding: 56px 48px;
+}
+
+.auth-panel--brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+
+.auth-panel--brand h1 {
+  margin: 0;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-size: clamp(2.4rem, 4vw, 4.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  max-width: 11ch;
+}
+
+.auth-eyebrow,
+.auth-kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--auth-accent);
+}
+
+.auth-copy {
+  margin: 0;
+  max-width: 58ch;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--auth-muted);
+}
+
+.auth-feature-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 12px;
+  max-width: 62ch;
+  color: var(--auth-ink);
+}
+
+.auth-panel--form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card {
+  width: min(100%, 480px);
+  padding: 36px;
+  border: 1px solid var(--auth-line);
+  border-radius: 28px;
+  background: var(--auth-surface);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 30px 70px rgba(50, 61, 54, 0.14);
+}
+
+.auth-card__header {
+  margin-bottom: 28px;
+}
+
+.auth-card__header h2 {
+  margin: 8px 0 6px;
+  font-size: 2rem;
+}
+
+.auth-card__header p:last-child {
+  margin: 0;
+  color: var(--auth-muted);
+  line-height: 1.6;
+}
+
+.auth-form {
+  display: grid;
+  gap: 18px;
+}
+
+.auth-field {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-field label {
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.auth-field input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgba(47, 63, 53, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--auth-ink);
+  font: inherit;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--auth-accent);
+  box-shadow: 0 0 0 4px rgba(41, 95, 78, 0.12);
+  transform: translateY(-1px);
+}
+
+.auth-field__label_row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.auth-inline-link {
+  color: var(--auth-accent);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-inline-link:hover {
+  text-decoration: underline;
+}
+
+.auth-submit {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--auth-accent) 0%, var(--auth-accent-strong) 100%);
+  color: white;
+  padding: 15px 20px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 18px 36px rgba(32, 78, 63, 0.22);
+}
+
+.auth-submit:hover {
+  transform: translateY(-1px);
+}
+
+.auth-submit:focus {
+  outline: 3px solid rgba(41, 95, 78, 0.2);
+  outline-offset: 3px;
+}
+
+.auth-flash {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.auth-flash--alert {
+  background: var(--auth-warn-bg);
+  color: var(--auth-warn-text);
+}
+
+.auth-flash--notice {
+  background: var(--auth-note-bg);
+  color: var(--auth-note-text);
+}
+
+@media (max-width: 900px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-panel {
+    padding: 32px 20px;
+  }
+
+  .auth-panel--brand {
+    padding-bottom: 8px;
+  }
+
+  .auth-card {
+    padding: 24px;
+    border-radius: 22px;
+  }
+}
