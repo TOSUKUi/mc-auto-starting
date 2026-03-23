@@ -28,6 +28,7 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Cache / queue support candidate: Redis `7`
 - Frontend architecture: Rails + Inertia.js + React
 - UI library: Mantine `8.3.1`
+- UI language policy: default `ja`, optional `en`, with Rails I18n as the source of truth
 - Frontend bundler: `vite_rails` + Vite
 - Public routing: `mc-router`
 - Public DNS model: wildcard `*.mc.tosukui.xyz`
@@ -83,6 +84,7 @@ Follow these rules unless the user overrides them.
 - Preserve the single-public-port model.
 - Route rejection for unknown hostnames is mandatory.
 - Do not add shortcut implementations that violate the architecture just to move faster.
+- UI copy should default to Japanese, while remaining compatible with English via shared locale handling.
 
 ## Build and Bootstrap Commands
 Use these as the default command set.

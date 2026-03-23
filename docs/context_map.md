@@ -32,6 +32,7 @@ This file tells any contributor or agent where to find authoritative information
 - Docker bootstrap exists.
 - MariaDB `10.11.16` is the chosen database runtime.
 - Mantine version target is `8.3.1`.
+- UI language policy is `ja` by default with optional `en`, backed by Rails I18n.
 - Frontend bundler choice is `Vite` via `vite_rails`.
 - The development `app` container is expected to run as the host UID/GID.
 - `bin/dev` now works in Docker without `foreman` by falling back to direct Rails + Vite startup.

@@ -6,6 +6,7 @@
 - 現時点ではリポジトリに既存アプリケーションは存在しないため、新規 Rails アプリケーションとして構成する前提で整理する。
 - Minecraft サーバーの実行責務は外部の既存実行基盤に委譲し、本アプリケーションは control plane として振る舞う。
 - DNS の追加・削除は行わず、`*.mc.tosukui.xyz` と単一公開ポートを前提とする。
+- UI 文言は Rails I18n を正本とし、既定 locale は日本語、英語は切替対応とする。
 
 ## 2. 画面一覧
 
@@ -327,6 +328,7 @@ app/frontend/
 - 認可は Pundit 系を第一候補とする。
 - 非同期処理は Active Job を前提とし、Queue backend は Sidekiq か Solid Queue を後で選定する。
 - mc-router 設定反映は service object と job に分離し、controller から直接 shell 実行しない。
+- locale は `ja` を default とし、`en` 切替時も Rails view と Inertia page が同じ方針で翻訳されるようにする。
 
 ## 5. ドメインモデル補足
 

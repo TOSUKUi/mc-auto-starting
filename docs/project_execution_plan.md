@@ -36,6 +36,7 @@
 - UI 骨組みは controller 契約確定後に並行可能
 - 監視画面は整合性チェック job の出力形式が固まれば並行可能
 - ドキュメント整備、監査ログ event 設計、テスト雛形は一部並行可能
+- UI 文言は Rails I18n を正本とし、既定 locale は日本語、英語は切替対応とする
 
 ## 5. 詳細タスクリスト
 
@@ -78,6 +79,7 @@
 - DB 接続設定を MariaDB ベースに合わせる
 - queue adapter を選定する
 - linter / formatter 導入方針を決める
+- locale 方針は `ja` を default、`en` を optional とし、frontend は共有 locale を参照する
 - 完了条件:
   - `bin/rails db:prepare` が通る
   - 開発時の必須環境変数一覧が決まる
@@ -318,6 +320,7 @@
 - 認証済みレイアウト
 - ナビゲーション
 - フラッシュメッセージ
+- locale 切替時も UI 文言が破綻しないこと
 - 完了条件:
   - 全ページで共通 shell が使える
 
