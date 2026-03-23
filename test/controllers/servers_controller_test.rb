@@ -16,6 +16,37 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ minecraft_servers(:two).id, minecraft_servers(:one).id ], response.parsed_body.fetch("servers").map { |server| server.fetch("id") }
   end
 
+  test "index returns server summary fields for the listing UI" do
+    sign_in_as(users(:two))
+
+    get servers_url(format: :json)
+
+    assert_response :success
+
+    summary = response.parsed_body.fetch("summary")
+    assert_equal 2, summary.fetch("total")
+    assert_equal 1, summary.fetch("owned")
+    assert_equal 1, summary.fetch("member")
+    assert_equal 1, summary.fetch("ready")
+    assert_equal 1, summary.fetch("attention_needed")
+
+    visible_server = response.parsed_body.fetch("servers").detect { |server| server.fetch("id") == minecraft_servers(:one).id }
+
+    assert_equal "main-survival", visible_server.fetch("hostname")
+    assert_equal "main-survival.mc.tosukui.xyz", visible_server.fetch("fqdn")
+    assert_equal "main-survival.mc.tosukui.xyz:42434", visible_server.fetch("connection_target")
+    assert_equal "1.21.4", visible_server.fetch("minecraft_version")
+    assert_equal users(:one).email_address, visible_server.fetch("owner_email_address")
+    assert_equal "viewer", visible_server.fetch("access_role")
+    assert_equal "success", visible_server.fetch("route").fetch("last_apply_status")
+    assert_equal "healthy", visible_server.fetch("route").fetch("last_healthcheck_status")
+    assert_equal true, visible_server.fetch("route").fetch("enabled")
+    assert_equal "stub_provider", visible_server.fetch("execution").fetch("provider_name")
+    assert_equal "srv-001", visible_server.fetch("execution").fetch("provider_server_id")
+    assert_equal "10.0.0.21", visible_server.fetch("execution").fetch("backend_host")
+    assert_equal 25_565, visible_server.fetch("execution").fetch("backend_port")
+  end
+
   test "show allows visible server for member" do
     sign_in_as(users(:three))
 
