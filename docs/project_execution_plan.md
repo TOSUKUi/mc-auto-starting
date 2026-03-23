@@ -123,6 +123,8 @@
 
 - generator で model / migration を作成する
 - `enabled`、apply 状態、healthcheck 状態を持たせる
+- 初期実装では `minecraft_server` と 1:1 で保持し、`last_applied_at` と `last_healthchecked_at` も持たせる
+- `last_apply_status` は `pending/success/failed`、`last_healthcheck_status` は `unknown/healthy/unreachable/rejected` を採用する
 - 完了条件:
   - サーバーと 1 対 1 または明確な関連で route 情報を保持できる
 

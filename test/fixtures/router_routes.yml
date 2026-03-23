@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  minecraft_server: one
+  enabled: true
+  last_apply_status: success
+  last_applied_at: 2026-03-24 10:00:00
+  last_healthcheck_status: healthy
+  last_healthchecked_at: 2026-03-24 10:05:00
+
+two:
+  minecraft_server: two
+  enabled: false
+  last_apply_status: pending
+  last_applied_at:
+  last_healthcheck_status: unknown
+  last_healthchecked_at:

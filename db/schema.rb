@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_102001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_102002) do
   create_table "minecraft_servers", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "backend_host"
     t.integer "backend_port"
@@ -30,6 +30,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_102001) do
     t.index ["owner_id"], name: "index_minecraft_servers_on_owner_id"
     t.index ["provider_name", "provider_server_id"], name: "idx_on_provider_name_provider_server_id_01d0332424"
     t.index ["status"], name: "index_minecraft_servers_on_status"
+  end
+
+  create_table "router_routes", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: false, null: false
+    t.datetime "last_applied_at"
+    t.string "last_apply_status", default: "pending", null: false
+    t.string "last_healthcheck_status", default: "unknown", null: false
+    t.datetime "last_healthchecked_at"
+    t.bigint "minecraft_server_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["enabled"], name: "index_router_routes_on_enabled"
+    t.index ["last_apply_status"], name: "index_router_routes_on_last_apply_status"
+    t.index ["last_healthcheck_status"], name: "index_router_routes_on_last_healthcheck_status"
+    t.index ["minecraft_server_id"], name: "index_router_routes_on_minecraft_server_id", unique: true
   end
 
   create_table "server_members", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
@@ -61,6 +76,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_102001) do
   end
 
   add_foreign_key "minecraft_servers", "users", column: "owner_id"
+  add_foreign_key "router_routes", "minecraft_servers"
   add_foreign_key "server_members", "minecraft_servers"
   add_foreign_key "server_members", "users"
   add_foreign_key "sessions", "users"

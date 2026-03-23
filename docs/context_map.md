@@ -41,4 +41,5 @@ This file tells any contributor or agent where to find authoritative information
 - `MinecraftServer` baseline is installed through `T-102`.
 - Hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are installed through `T-203`.
 - `ServerMember` baseline is installed through `T-103`.
-- The next active entry point on the critical path is `T-104` for the `RouterRoute` model and migration.
+- `RouterRoute` baseline is installed through `T-104`.
+- The next active entry point on the critical path is `T-105` for the `AuditLog` model and migration.
