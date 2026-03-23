@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_102002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_102003) do
+  create_table "audit_logs", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.bigint "actor_id"
+    t.datetime "created_at", null: false
+    t.string "event_type", null: false
+    t.bigint "minecraft_server_id", null: false
+    t.text "payload", size: :long, default: "{}", null: false, collation: "utf8mb4_bin"
+    t.datetime "updated_at", null: false
+    t.index ["actor_id", "created_at"], name: "index_audit_logs_on_actor_id_and_created_at"
+    t.index ["actor_id"], name: "index_audit_logs_on_actor_id"
+    t.index ["minecraft_server_id", "created_at"], name: "index_audit_logs_on_minecraft_server_id_and_created_at"
+    t.index ["minecraft_server_id", "event_type"], name: "index_audit_logs_on_minecraft_server_id_and_event_type"
+    t.index ["minecraft_server_id"], name: "index_audit_logs_on_minecraft_server_id"
+    t.check_constraint "json_valid(`payload`)", name: "payload"
+  end
+
   create_table "minecraft_servers", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "backend_host"
     t.integer "backend_port"
@@ -75,6 +90,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_102002) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "audit_logs", "minecraft_servers"
+  add_foreign_key "audit_logs", "users", column: "actor_id"
   add_foreign_key "minecraft_servers", "users", column: "owner_id"
   add_foreign_key "router_routes", "minecraft_servers"
   add_foreign_key "server_members", "minecraft_servers"

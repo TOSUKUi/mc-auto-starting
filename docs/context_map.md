@@ -42,4 +42,5 @@ This file tells any contributor or agent where to find authoritative information
 - Hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are installed through `T-203`.
 - `ServerMember` baseline is installed through `T-103`.
 - `RouterRoute` baseline is installed through `T-104`.
-- The next active entry point on the critical path is `T-105` for the `AuditLog` model and migration.
+- `AuditLog` baseline is installed through `T-105`.
+- The next active entry point on the critical path is `T-106` for the authorization framework and policies.

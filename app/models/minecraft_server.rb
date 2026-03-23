@@ -13,6 +13,7 @@ class MinecraftServer < ApplicationRecord
   }.freeze
 
   belongs_to :owner, class_name: "User", inverse_of: :owned_minecraft_servers
+  has_many :audit_logs, dependent: :destroy
   has_one :router_route, dependent: :destroy
   has_many :server_members, dependent: :destroy
   has_many :member_users, through: :server_members, source: :user

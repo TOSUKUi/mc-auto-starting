@@ -28,7 +28,7 @@
 | T-102 | P1 | Generate `MinecraftServer` model and migration | T-101 | done | Server model stores owner, status, backend, provider identifiers |
 | T-103 | P1 | Generate `ServerMember` model and migration | T-102 | done | Membership and role model works |
 | T-104 | P1 | Generate `RouterRoute` model and migration | T-102 | done | Route state can be persisted |
-| T-105 | P1 | Generate `AuditLog` model and migration | T-101 | todo | Audit events can be recorded |
+| T-105 | P1 | Generate `AuditLog` model and migration | T-101 | done | Audit events can be recorded |
 | T-106 | P1 | Add authorization framework and policies | T-101,T-102,T-103 | todo | Owner/member visibility rules are enforced |
 | T-107 | P1 | Add server visibility scopes and request protections | T-106 | todo | Users cannot fetch other users' servers |
 | T-200 | P2 | Define hostname normalization rules | T-102 | done | Allowed characters, lowercase rule, reserved words documented and coded |

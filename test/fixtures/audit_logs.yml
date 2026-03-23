@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  minecraft_server: one
+  actor: one
+  event_type: server.created
+  payload: '{"provider_name":"stub_provider","provider_server_id":"srv-001"}'
+
+two:
+  minecraft_server: one
+  actor:
+  event_type: route.healthcheck_failed
+  payload: '{"reason":"backend unreachable"}'

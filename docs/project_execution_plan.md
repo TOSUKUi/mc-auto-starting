@@ -132,6 +132,8 @@
 
 - generator で model / migration を作成する
 - event_type と payload schema の方針を決める
+- 初期実装では `minecraft_server` を必須、`actor` は system event 用に optional とする
+- `payload` は JSON で保持し、空 object を default にする
 - 完了条件:
   - 重要操作を監査ログとして保存できる
 
