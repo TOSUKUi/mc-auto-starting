@@ -22,6 +22,14 @@ class MinecraftServer < ApplicationRecord
   validates :memory_mb, :disk_mb, numericality: { only_integer: true, greater_than: 0 }
   validates :backend_port, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 65_535 }, allow_nil: true
 
+  def fqdn
+    MinecraftPublicEndpoint.fqdn_for(hostname)
+  end
+
+  def connection_target
+    MinecraftPublicEndpoint.connection_target_for(hostname)
+  end
+
   private
     def normalize_hostname
       self.hostname = hostname.to_s.strip.downcase

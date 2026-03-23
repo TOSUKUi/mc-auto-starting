@@ -33,7 +33,7 @@
 | T-107 | P1 | Add server visibility scopes and request protections | T-106 | todo | Users cannot fetch other users' servers |
 | T-200 | P2 | Define hostname normalization rules | T-102 | done | Allowed characters, lowercase rule, reserved words documented and coded |
 | T-201 | P2 | Add hostname unique index and validations | T-200 | done | Duplicate hostname cannot persist |
-| T-202 | P2 | Define fqdn and `hostname:port` generation rules | T-200 | todo | Shared formatting logic exists |
+| T-202 | P2 | Define fqdn and `hostname:port` generation rules | T-200 | done | Shared formatting logic exists |
 | T-203 | P2 | Define server status transition model | T-102 | todo | State machine or equivalent rules are documented and coded |
 | T-300 | P3 | Confirm external execution-provider API contract | T-102,T-200 | blocked | Endpoints, auth, and backend discovery are known |
 | T-301 | P3 | Implement provider base client interface | T-300 | todo | Unified create/delete/start/stop/restart/status contract exists |

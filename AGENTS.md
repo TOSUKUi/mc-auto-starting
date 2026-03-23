@@ -13,7 +13,7 @@ This repository now has a generated Rails 8 application skeleton plus planning a
 - `docs/task_board.md`
 - `docs/context_map.md`
 
-A Rails app skeleton has already been generated in-place. Environment cleanup, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`. Authentication now uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`. The `MinecraftServer` model baseline is in place through `T-102`, and hostname normalization and uniqueness rules are fixed through `T-201`. The next active task on the critical path is `T-202` for shared `fqdn` and connection-target formatting.
+A Rails app skeleton has already been generated in-place. Environment cleanup, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`. Authentication now uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`. The `MinecraftServer` model baseline is in place through `T-102`, and hostname normalization, uniqueness, and shared endpoint formatting rules are fixed through `T-202`. The next active task on the critical path is `T-203` for server status transition rules.
 
 ## Locked Technical Decisions
 These are already decided and should be treated as defaults unless explicitly changed.
@@ -163,5 +163,5 @@ If no other instruction is given, start from Phase 0 on the critical path.
 1. Confirm Docker bootstrap files are intact.
 2. Build the app container.
 3. Confirm the Vite + Inertia + React + Mantine baseline still boots cleanly.
-4. Continue from `T-202` with shared `fqdn` and `hostname:port` formatting rules, keeping Rails built-in authentication and Pundit-first authorization as the current baseline.
+4. Continue from `T-203` with server status transition rules, keeping Rails built-in authentication and Pundit-first authorization as the current baseline.
 5. Keep MariaDB bootstrap SQL and Docker-first commands as the default local workflow.

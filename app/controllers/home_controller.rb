@@ -2,7 +2,8 @@ class HomeController < InertiaController
   def index
     render inertia: "home/index", props: {
       app_name: "Minecraft Server Control Plane",
-      public_port: 42_434,
+      public_port: MinecraftPublicEndpoint.public_port,
+      public_domain: MinecraftPublicEndpoint.public_domain,
       stack: [
         "Rails 8.1.2",
         "Inertia.js",

@@ -163,6 +163,7 @@
 - `fqdn = hostname + domain` ルールを固定する
 - `hostname:port` 表示値を生成する
 - `public_port` を system-wide 定数として扱う
+- 初期値は `domain = mc.tosukui.xyz`、`public_port = 42434` とし、shared formatter から参照する
 - 完了条件:
   - UI と backend で同一ロジックを参照できる
 

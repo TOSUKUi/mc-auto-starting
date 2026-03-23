@@ -386,6 +386,7 @@ app/frontend/
    - 先頭末尾ハイフンは禁止
    - 最大長は 63 文字とする
 2. 予約語バリデータ実装
+3. `fqdn = "#{hostname}.mc.tosukui.xyz"`、接続先表示 = `"#{fqdn}:42434"` を shared formatter に集約
 3. DB ユニーク制約追加
 4. モデルバリデーション追加
 5. 作成 UI に即時エラー表示追加

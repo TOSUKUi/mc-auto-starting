@@ -56,6 +56,18 @@ class MinecraftServerTest < ActiveSupport::TestCase
     assert_includes server.errors[:hostname], "has already been taken"
   end
 
+  test "builds fqdn from hostname and shared public domain" do
+    server = minecraft_servers(:one)
+
+    assert_equal "main-survival.mc.tosukui.xyz", server.fqdn
+  end
+
+  test "builds connection target from fqdn and shared public port" do
+    server = minecraft_servers(:one)
+
+    assert_equal "main-survival.mc.tosukui.xyz:42434", server.connection_target
+  end
+
   test "validates numeric resource fields" do
     server = minecraft_servers(:one)
     server.memory_mb = 0

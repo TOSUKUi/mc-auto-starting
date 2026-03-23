@@ -2,7 +2,7 @@ import { Code, List, Paper, Stack, Text, ThemeIcon, Title } from '@mantine/core'
 import { Head } from '@inertiajs/react'
 import { IconCheck } from '@tabler/icons-react'
 
-export default function HomeIndex({ app_name, public_port, stack }) {
+export default function HomeIndex({ app_name, public_domain, public_port, stack }) {
   return (
     <Stack gap="xl">
       <Head title={app_name} />
@@ -18,7 +18,7 @@ export default function HomeIndex({ app_name, public_port, stack }) {
         <Stack gap="md">
           <Title order={3}>Current baseline</Title>
           <Text>
-            Public Minecraft endpoints will be shown to users as <Code>hostname:{public_port}</Code>.
+            Public Minecraft endpoints will be shown to users as <Code>hostname.{public_domain}:{public_port}</Code>.
           </Text>
           <List
             icon={

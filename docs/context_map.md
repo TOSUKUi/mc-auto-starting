@@ -39,5 +39,5 @@ This file tells any contributor or agent where to find authoritative information
 - `T-004` is complete.
 - Authentication baseline is installed with the Rails 8 built-in authentication generator through `T-100` and `T-101`.
 - `MinecraftServer` baseline is installed through `T-102`.
-- Hostname normalization and uniqueness rules are installed through `T-201`.
-- The next active entry point on the critical path is `T-202` for shared `fqdn` and connection-target formatting.
+- Hostname normalization, uniqueness, and shared endpoint formatting rules are installed through `T-202`.
+- The next active entry point on the critical path is `T-203` for server status transition rules.
