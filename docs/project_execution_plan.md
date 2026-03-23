@@ -142,6 +142,8 @@
 - Pundit などの認可基盤を導入する
 - owner / operator / viewer の権限制御を定義する
 - 一覧 API / 詳細取得 / 更新 / 削除を保護する
+- 初期実装では Pundit を採用し、`MinecraftServerPolicy`、`ServerMemberPolicy`、`MonitoringPolicy` を置く
+- owner は管理系を許可、operator は lifecycle 操作を許可、viewer は参照のみ許可とする
 - 完了条件:
   - 他人の server ID を指定しても取得できない
 

@@ -57,5 +57,6 @@ group :test do
 end
 
 gem "inertia_rails", "~> 3.18"
+gem "pundit", "~> 2.5"
 
 gem "vite_rails", "~> 3.10"

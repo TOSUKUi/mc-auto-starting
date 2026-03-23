@@ -39,8 +39,9 @@ This file tells any contributor or agent where to find authoritative information
 - `T-004` is complete.
 - Authentication baseline is installed with the Rails 8 built-in authentication generator through `T-100` and `T-101`.
 - `MinecraftServer` baseline is installed through `T-102`.
+- Authorization baseline is installed with Pundit through `T-106`.
 - Hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are installed through `T-203`.
 - `ServerMember` baseline is installed through `T-103`.
 - `RouterRoute` baseline is installed through `T-104`.
 - `AuditLog` baseline is installed through `T-105`.
-- The next active entry point on the critical path is `T-106` for the authorization framework and policies.
+- The next active entry point on the critical path is `T-107` for server visibility scopes and request protections.
