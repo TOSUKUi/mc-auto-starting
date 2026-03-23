@@ -40,4 +40,5 @@ This file tells any contributor or agent where to find authoritative information
 - Authentication baseline is installed with the Rails 8 built-in authentication generator through `T-100` and `T-101`.
 - `MinecraftServer` baseline is installed through `T-102`.
 - Hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are installed through `T-203`.
-- The next active entry point on the critical path is `T-103` for the `ServerMember` model and migration.
+- `ServerMember` baseline is installed through `T-103`.
+- The next active entry point on the critical path is `T-104` for the `RouterRoute` model and migration.

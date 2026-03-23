@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_24_102000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_24_102001) do
   create_table "minecraft_servers", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "backend_host"
     t.integer "backend_port"
@@ -32,6 +32,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_102000) do
     t.index ["status"], name: "index_minecraft_servers_on_status"
   end
 
+  create_table "server_members", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "minecraft_server_id", null: false
+    t.string "role", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["minecraft_server_id", "user_id"], name: "index_server_members_on_minecraft_server_id_and_user_id", unique: true
+    t.index ["minecraft_server_id"], name: "index_server_members_on_minecraft_server_id"
+    t.index ["user_id"], name: "index_server_members_on_user_id"
+  end
+
   create_table "sessions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -50,5 +61,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_24_102000) do
   end
 
   add_foreign_key "minecraft_servers", "users", column: "owner_id"
+  add_foreign_key "server_members", "minecraft_servers"
+  add_foreign_key "server_members", "users"
   add_foreign_key "sessions", "users"
 end

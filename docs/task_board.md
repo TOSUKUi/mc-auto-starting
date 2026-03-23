@@ -26,7 +26,7 @@
 | T-100 | P1 | Choose and add authentication library | T-003 | done | Login/logout flow path is fixed and installed |
 | T-101 | P1 | Generate `User` model and migration | T-100 | done | User model persists required attributes |
 | T-102 | P1 | Generate `MinecraftServer` model and migration | T-101 | done | Server model stores owner, status, backend, provider identifiers |
-| T-103 | P1 | Generate `ServerMember` model and migration | T-102 | todo | Membership and role model works |
+| T-103 | P1 | Generate `ServerMember` model and migration | T-102 | done | Membership and role model works |
 | T-104 | P1 | Generate `RouterRoute` model and migration | T-102 | todo | Route state can be persisted |
 | T-105 | P1 | Generate `AuditLog` model and migration | T-101 | todo | Audit events can be recorded |
 | T-106 | P1 | Add authorization framework and policies | T-101,T-102,T-103 | todo | Owner/member visibility rules are enforced |

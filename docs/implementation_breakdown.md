@@ -355,7 +355,7 @@ app/frontend/
 - role 候補:
   - `viewer`
   - `operator`
-  - `owner`
+- owner は `minecraft_servers.owner_id` を正本とし、`server_members` には重複保持しない
 
 ## 6. 実装タスク分解
 

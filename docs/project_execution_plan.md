@@ -115,6 +115,7 @@
 - generator で model / migration を作成する
 - role を定義する
 - owner との重複ルールを決める
+- 初期実装では `server_members` に owner を重複保持せず、role は `viewer` と `operator` のみを持つ
 - 完了条件:
   - メンバー付与と権限参照ができる
 
