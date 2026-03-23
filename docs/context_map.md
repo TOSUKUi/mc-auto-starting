@@ -32,4 +32,12 @@ This file tells any contributor or agent where to find authoritative information
 - Docker bootstrap exists.
 - MariaDB `10.11.16` is the chosen database runtime.
 - Mantine version target is `8.3.1`.
-- Bootstrap is complete through `T-005`; the next active entry point is `T-004` for frontend baseline work.
+- Frontend bundler choice is `Vite` via `vite_rails`.
+- The development `app` container is expected to run as the host UID/GID.
+- `bin/dev` now works in Docker without `foreman` by falling back to direct Rails + Vite startup.
+- Bootstrap is complete through `T-005`.
+- `T-004` is complete.
+- Authentication baseline is installed with the Rails 8 built-in authentication generator through `T-100` and `T-101`.
+- `MinecraftServer` baseline is installed through `T-102`.
+- Hostname normalization and uniqueness rules are installed through `T-201`.
+- The next active entry point on the critical path is `T-202` for shared `fqdn` and connection-target formatting.

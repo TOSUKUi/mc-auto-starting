@@ -3,12 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     working_dir: /app
     volumes:
       - .:/app
-      - bundle_data:/usr/local/bundle
     environment:
-      BUNDLE_PATH: /usr/local/bundle
+      HOME: /tmp
+      BUNDLE_PATH: /app/vendor/bundle
       DB_HOST: db
       DB_PORT: 3306
       DB_USERNAME: app
@@ -49,6 +50,5 @@ services:
       - redis_data:/data
 
 volumes:
-  bundle_data:
   mariadb_data:
   redis_data:

@@ -13,20 +13,21 @@ This repository now has a generated Rails 8 application skeleton plus planning a
 - `docs/task_board.md`
 - `docs/context_map.md`
 
-A Rails app skeleton has already been generated in-place, and the next focus is environment cleanup, DB readiness, and frontend baseline setup.
+A Rails app skeleton has already been generated in-place. Environment cleanup, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`. Authentication now uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`. The `MinecraftServer` model baseline is in place through `T-102`, and hostname normalization and uniqueness rules are fixed through `T-201`. The next active task on the critical path is `T-202` for shared `fqdn` and connection-target formatting.
 
 ## Locked Technical Decisions
 These are already decided and should be treated as defaults unless explicitly changed.
 
 - App role: Rails control plane for Minecraft server lifecycle and publication management
 - Runtime: Docker-first workflow
+- Dev container user mapping: the `app` container runs as the host UID/GID in local development
 - Ruby: `3.4.9`
 - Rails: `8.1.2`
 - Database: MariaDB `10.11.16` (via `mysql2` adapter)
 - Cache / queue support candidate: Redis `7`
 - Frontend architecture: Rails + Inertia.js + React
 - UI library: Mantine `8.3.1`
-- JS bundling direction: Rails 8-compatible setup, planned around `esbuild`
+- Frontend bundler: `vite_rails` + Vite
 - Public routing: `mc-router`
 - Public DNS model: wildcard `*.mc.tosukui.xyz`
 - Public connection format: `hostname:port`
@@ -85,13 +86,19 @@ Follow these rules unless the user overrides them.
 ## Build and Bootstrap Commands
 Use these as the default command set.
 
+- `export LOCAL_UID=$(id -u) LOCAL_GID=$(id -g)` if your host user is not `1000:1000`
 - `docker compose build app`
 - `docker compose up --build`
 - `docker compose run --rm --no-deps app rails new . --database=mariadb-mysql --javascript=esbuild --skip-git --skip-docker --skip-ci --skip-kamal --skip-devcontainer --skip-thruster --skip-solid`
+- `docker compose run --rm app bundle add vite_rails`
+- `docker compose run --rm app bin/rails vite:install`
+- `docker compose run --rm -p 3000:3000 -p 3036:3036 app bin/dev`
 - `docker compose run --rm app bin/rails db:prepare`
 - `docker compose run --rm app bin/rails test`
 
 Do not install Ruby gems on the host unless there is an explicit exception.
+Keep gems in `vendor/bundle` inside the workspace so the mapped app user can write them.
+`bin/dev` includes a fallback path that starts Rails and Vite directly when `foreman` is not installed in the container.
 
 ## Coding and Naming Conventions
 - Indentation: 2 spaces for Ruby, YAML, ERB, JS, and TS
@@ -114,6 +121,10 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 - Minimum sync set after each progress step: `AGENTS.md`, `docs/task_board.md`, `docs/context_map.md`
 - Update `docs/project_execution_plan.md` when dependencies, ordering, or critical path change
 - Update `.local/session_context.md` for temporary restart notes that should not be committed
+- After each meaningful progress step, create a git commit unless the user explicitly says not to
+- Each progress-step commit must include both the implementation change and the matching restart-doc updates for that step
+- Commit messages should reference the task ID first, for example: `T-201 Add hostname uniqueness enforcement`
+- Do not batch unrelated task progress into one commit when separate commits are practical
 - Do not leave the repository in a state where the current task status and the restart docs disagree
 
 ## Persistent vs Ephemeral Context
@@ -151,6 +162,6 @@ If no other instruction is given, start from Phase 0 on the critical path.
 
 1. Confirm Docker bootstrap files are intact.
 2. Build the app container.
-3. Configure Inertia + React + Mantine baseline on top of the generated Rails app.
-4. Then choose auth and authorization foundations and start model generators.
+3. Confirm the Vite + Inertia + React + Mantine baseline still boots cleanly.
+4. Continue from `T-202` with shared `fqdn` and `hostname:port` formatting rules, keeping Rails built-in authentication and Pundit-first authorization as the current baseline.
 5. Keep MariaDB bootstrap SQL and Docker-first commands as the default local workflow.

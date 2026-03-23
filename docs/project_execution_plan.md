@@ -46,6 +46,7 @@
 - `compose.yaml` を整備する
 - `Dockerfile` を整備する
 - MariaDB / Redis コンテナを定義する
+- 開発用 `app` コンテナをホスト UID/GID で動かす
 - `.dockerignore` を整備する
 - 完了条件:
   - `docker compose build app` が通る
@@ -65,10 +66,11 @@
 - Inertia.js 導入方針を確定する
 - React 導入を行う
 - Mantine 導入を行う
-- esbuild か現行 Rails 8 標準構成との整合を取る
+- `vite_rails` と Vite を導入する
 - 完了条件:
   - Inertia ページを 1 枚表示できる
   - Mantine の共通レイアウトが描画できる
+  - Vite 経由で frontend asset を開発・本番ビルドできる
 
 #### P0-4 開発用共通設定
 
@@ -87,6 +89,7 @@
 - 初期版は email/password 認証で開始するかを確定する
 - 認証ライブラリを選定する
 - ログイン / ログアウト導線を実装する
+- 初期実装は Rails 8 built-in authentication generator を採用し、`/login` と `/logout` を固定ルートにする
 - 完了条件:
   - 認証必須画面へ未ログインで到達できない
 

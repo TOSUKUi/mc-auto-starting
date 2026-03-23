@@ -21,18 +21,18 @@
 | T-001 | P0 | Build app container | T-000 | done | `docker compose build app` succeeds |
 | T-002 | P0 | Generate Rails app skeleton with MariaDB-compatible adapter | T-001 | done | Rails app skeleton exists and bootstrap docs were preserved |
 | T-003 | P0 | Boot Rails app in Docker | T-002 | done | Rails boots and `bin/rails about` succeeds |
-| T-004 | P0 | Configure Inertia + React + Mantine | T-003 | todo | One Inertia page renders with Mantine provider |
-| T-005 | P0 | Configure DB, Redis, env handling, queue baseline | T-003 | done | `bin/rails db:prepare` succeeds and env approach is documented |
-| T-100 | P1 | Choose and add authentication library | T-003 | todo | Login/logout flow path is fixed and installed |
-| T-101 | P1 | Generate `User` model and migration | T-100 | todo | User model persists required attributes |
-| T-102 | P1 | Generate `MinecraftServer` model and migration | T-101 | todo | Server model stores owner, status, backend, provider identifiers |
+| T-004 | P0 | Configure Vite + Inertia + React + Mantine | T-003 | done | One Inertia page renders with Mantine provider through Vite |
+| T-005 | P0 | Configure DB, Redis, env handling, queue baseline | T-003 | done | `bin/rails db:prepare` succeeds, env approach is documented, and dev UID/GID mapping is defined |
+| T-100 | P1 | Choose and add authentication library | T-003 | done | Login/logout flow path is fixed and installed |
+| T-101 | P1 | Generate `User` model and migration | T-100 | done | User model persists required attributes |
+| T-102 | P1 | Generate `MinecraftServer` model and migration | T-101 | done | Server model stores owner, status, backend, provider identifiers |
 | T-103 | P1 | Generate `ServerMember` model and migration | T-102 | todo | Membership and role model works |
 | T-104 | P1 | Generate `RouterRoute` model and migration | T-102 | todo | Route state can be persisted |
 | T-105 | P1 | Generate `AuditLog` model and migration | T-101 | todo | Audit events can be recorded |
 | T-106 | P1 | Add authorization framework and policies | T-101,T-102,T-103 | todo | Owner/member visibility rules are enforced |
 | T-107 | P1 | Add server visibility scopes and request protections | T-106 | todo | Users cannot fetch other users' servers |
-| T-200 | P2 | Define hostname normalization rules | T-102 | todo | Allowed characters, lowercase rule, reserved words documented and coded |
-| T-201 | P2 | Add hostname unique index and validations | T-200 | todo | Duplicate hostname cannot persist |
+| T-200 | P2 | Define hostname normalization rules | T-102 | done | Allowed characters, lowercase rule, reserved words documented and coded |
+| T-201 | P2 | Add hostname unique index and validations | T-200 | done | Duplicate hostname cannot persist |
 | T-202 | P2 | Define fqdn and `hostname:port` generation rules | T-200 | todo | Shared formatting logic exists |
 | T-203 | P2 | Define server status transition model | T-102 | todo | State machine or equivalent rules are documented and coded |
 | T-300 | P3 | Confirm external execution-provider API contract | T-102,T-200 | blocked | Endpoints, auth, and backend discovery are known |

@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  owner: one
+  name: Main Survival
+  hostname: main-survival
+  status: ready
+  provider_name: stub_provider
+  provider_server_id: srv-001
+  backend_host: 10.0.0.21
+  backend_port: 25565
+  minecraft_version: 1.21.4
+  memory_mb: 4096
+  disk_mb: 20480
+  template_kind: paper
+
+two:
+  owner: two
+  name: Event Server
+  hostname: event-server
+  status: provisioning
+  provider_name: stub_provider
+  provider_server_id:
+  backend_host:
+  backend_port:
+  minecraft_version: 1.21.4
+  memory_mb: 6144
+  disk_mb: 30720
+  template_kind: velocity

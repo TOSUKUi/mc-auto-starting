@@ -1,11 +1,37 @@
 #!/usr/bin/env sh
 
-if gem list --no-installed --exact --silent foreman; then
-  echo "Installing foreman..."
-  gem install foreman
-fi
-
-# Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
-exec foreman start -f Procfile.dev --env /dev/null "$@"
+if command -v overmind 1> /dev/null 2>&1
+then
+  overmind start -f Procfile.dev "$@"
+  exit $?
+fi
+
+if command -v hivemind 1> /dev/null 2>&1
+then
+  echo "Hivemind is installed. Running the application with Hivemind..."
+  exec hivemind Procfile.dev "$@"
+  exit $?
+fi
+
+if command -v foreman 1> /dev/null 2>&1
+then
+  exec foreman start -f Procfile.dev "$@"
+fi
+
+echo "foreman not found. Falling back to direct Rails + Vite startup..."
+
+bin/rails server -b 0.0.0.0 -p "$PORT" &
+web_pid=$!
+
+bin/vite dev &
+vite_pid=$!
+
+cleanup() {
+  kill "$web_pid" "$vite_pid" 2>/dev/null || true
+}
+
+trap cleanup INT TERM EXIT
+
+wait "$web_pid" "$vite_pid"
