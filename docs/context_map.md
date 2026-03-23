@@ -47,5 +47,6 @@ This file tells any contributor or agent where to find authoritative information
 - Server visibility scopes and request protections are installed through `T-107`.
 - The authenticated layout shell is installed through `T-600`.
 - The login page UI is installed through `T-601`.
+- Development seed login is available as `dev@example.com` / `password`.
 - The critical path is currently blocked on `T-300` pending execution-provider API confirmation.
 - The next unblocked implementation entry point is `T-602` for the server index page UI.

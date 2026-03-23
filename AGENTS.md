@@ -14,6 +14,7 @@ This repository now has a generated Rails 8 application skeleton plus planning a
 - `docs/context_map.md`
 
 A Rails app skeleton has already been generated in-place. Environment cleanup, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`. Authentication now uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`, and the login page UI is installed through `T-601`. Authorization now uses a Pundit baseline through `T-106`, server visibility/request protection is installed through `T-107`, and the authenticated layout shell is installed through `T-600`. The `MinecraftServer` model baseline is in place through `T-102`, hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are fixed through `T-203`, the `ServerMember` model baseline is installed through `T-103`, the `RouterRoute` baseline is installed through `T-104`, and the `AuditLog` baseline is installed through `T-105`. The critical path is currently blocked on `T-300` pending execution-provider API confirmation. The next unblocked implementation target is `T-602` for the server index page UI.
+Development seed login is available as `dev@example.com` / `password`.
 
 ## Locked Technical Decisions
 These are already decided and should be treated as defaults unless explicitly changed.
