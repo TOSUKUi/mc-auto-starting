@@ -1,0 +1,28 @@
+# MariaDB via the mysql2 adapter.
+#
+# Install the mysql2 driver:
+#   gem install mysql2
+#
+# Provide connection settings through environment variables when possible.
+#
+default: &default
+  adapter: mysql2
+  encoding: utf8mb4
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV.fetch("DB_USERNAME") { "app" } %>
+  password: <%= ENV.fetch("DB_PASSWORD") { "password" } %>
+  host: <%= ENV.fetch("DB_HOST") { "127.0.0.1" } %>
+  port: <%= ENV.fetch("DB_PORT") { 3306 } %>
+
+development:
+  <<: *default
+  database: <%= ENV.fetch("DB_NAME_DEVELOPMENT") { "mc_auto_starting_development" } %>
+
+test:
+  <<: *default
+  database: <%= ENV.fetch("DB_NAME_TEST") { "mc_auto_starting_test" } %>
+
+production:
+  <<: *default
+  database: <%= ENV.fetch("DB_NAME_PRODUCTION") { "mc_auto_starting_production" } %>
+  password: <%= ENV["APP_DATABASE_PASSWORD"] || ENV.fetch("DB_PASSWORD") %>

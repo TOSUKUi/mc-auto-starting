@@ -1,0 +1,54 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app
+    volumes:
+      - .:/app
+      - bundle_data:/usr/local/bundle
+    environment:
+      BUNDLE_PATH: /usr/local/bundle
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USERNAME: app
+      DB_PASSWORD: password
+    command: bash -lc "sleep infinity"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    image: mariadb:10.11.16
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: mc_auto_starting_development
+      MARIADB_USER: app
+      MARIADB_PASSWORD: password
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -uroot -prootpassword --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./docker/mariadb/init:/docker-entrypoint-initdb.d:ro
+
+  redis:
+    image: redis:7
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    volumes:
+      - redis_data:/data
+
+volumes:
+  bundle_data:
+  mariadb_data:
+  redis_data:
