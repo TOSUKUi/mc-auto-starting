@@ -209,6 +209,8 @@
 - backend_host / backend_port をどこから取得するか決める
 - 完了条件:
   - Rails 側から provider 差し替え可能な interface になる
+- 進捗メモ:
+  - `T-301` 完了。`ExecutionProvider::BaseClient`、`CreateServerRequest`、結果オブジェクト、例外クラス、`ExecutionProvider.build_client` の土台を追加済み。
 
 #### P3-3 具体 client 実装
 
@@ -224,6 +226,8 @@
 - provider 名、token、endpoint を設定可能にする
 - 完了条件:
   - 環境別に provider を切り替えられる
+- 進捗メモ:
+  - `T-303` 完了。initializer では `config.x.execution_provider` に静的設定のみを保持し、アプリコード側で `ExecutionProvider::Configuration` に解決する。
 
 ### Phase 4: mc-router 連携
 

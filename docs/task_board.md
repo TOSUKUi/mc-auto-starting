@@ -36,9 +36,9 @@
 | T-202 | P2 | Define fqdn and `hostname:port` generation rules | T-200 | done | Shared formatting logic exists |
 | T-203 | P2 | Define server status transition model | T-102 | done | State machine or equivalent rules are documented and coded |
 | T-300 | P3 | Confirm external execution-provider API contract | T-102,T-200 | done | Endpoints, auth, and backend discovery are known |
-| T-301 | P3 | Implement provider base client interface | T-300 | todo | Unified create/delete/start/stop/restart/status contract exists |
+| T-301 | P3 | Implement provider base client interface | T-300 | done | Unified create/delete/start/stop/restart/status contract exists |
 | T-302 | P3 | Implement concrete provider client | T-301 | todo | Provider client can talk to target API or a stubbed equivalent |
-| T-303 | P3 | Add provider config and initialization | T-301 | todo | Environment-driven provider selection works |
+| T-303 | P3 | Add provider config and initialization | T-301 | done | Environment-driven provider selection works |
 | T-400 | P4 | Confirm mc-router config and reload contract | T-200 | blocked | Input format and reload mechanism are known |
 | T-401 | P4 | Implement route definition builder | T-400,T-104 | todo | Route definition can be built from DB state |
 | T-402 | P4 | Implement config renderer | T-401 | todo | Whole router config can be rendered |
