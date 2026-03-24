@@ -193,8 +193,12 @@
 
 #### P3-1 実行基盤選定情報の確定
 
-- 対象 API 仕様を収集する
-- 認証方式、エンドポイント、戻り値を確定する
+- 実行基盤は `Pterodactyl Panel + Wings` を採用する
+- API は Application API と Client API の 2 面に分けて扱う
+- 認証方式:
+  - create/delete/metadata は Application API key
+  - lifecycle/status は Client API key
+- backend 情報は選択した node allocation の IP/alias + port を正本にする
 - 完了条件:
   - interface 設計に必要な外部仕様が揃う
 

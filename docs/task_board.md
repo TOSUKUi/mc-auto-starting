@@ -35,7 +35,7 @@
 | T-201 | P2 | Add hostname unique index and validations | T-200 | done | Duplicate hostname cannot persist |
 | T-202 | P2 | Define fqdn and `hostname:port` generation rules | T-200 | done | Shared formatting logic exists |
 | T-203 | P2 | Define server status transition model | T-102 | done | State machine or equivalent rules are documented and coded |
-| T-300 | P3 | Confirm external execution-provider API contract | T-102,T-200 | blocked | Endpoints, auth, and backend discovery are known |
+| T-300 | P3 | Confirm external execution-provider API contract | T-102,T-200 | done | Endpoints, auth, and backend discovery are known |
 | T-301 | P3 | Implement provider base client interface | T-300 | todo | Unified create/delete/start/stop/restart/status contract exists |
 | T-302 | P3 | Implement concrete provider client | T-301 | todo | Provider client can talk to target API or a stubbed equivalent |
 | T-303 | P3 | Add provider config and initialization | T-301 | todo | Environment-driven provider selection works |
@@ -77,5 +77,4 @@ The main critical path currently is:
 `T-000 -> T-001 -> T-002 -> T-003 -> T-100 -> T-101 -> T-102 -> T-200 -> T-201 -> T-300 -> T-301 -> T-302 -> T-400 -> T-401 -> T-402 -> T-403 -> T-500 -> T-501 -> T-700/T-701/T-702 -> T-602/T-603/T-604 -> T-803`
 
 ## Known Blockers
-- `T-300`: final execution-provider API contract is not confirmed
 - `T-400`: final mc-router config/reload contract is not confirmed

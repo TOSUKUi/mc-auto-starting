@@ -9,6 +9,8 @@ This file tells any contributor or agent where to find authoritative information
 ## Architecture and Implementation Design
 - `docs/implementation_breakdown.md`
   Use for planned screens, routes, directory structure, and initial implementation decomposition.
+- `docs/provider_api_contract.md`
+  Use for the fixed Pterodactyl/Wings execution-provider contract, auth split, endpoint set, and backend discovery rules.
 
 ## Full Project Plan and Critical Path
 - `docs/project_execution_plan.md`
@@ -50,7 +52,8 @@ This file tells any contributor or agent where to find authoritative information
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
 - The members management page UI is installed through `T-605`.
-- The server creation page UI is in progress under `T-603`; form and endpoint preview scaffolding are installed, but request execution remains blocked on `T-500`/`T-300`.
+- The server creation page UI is in progress under `T-603`; form and endpoint preview scaffolding are installed, but real provisioning now needs the `T-300` contract and the follow-up `T-301` provider interface.
 - Development seed login is available as `dev@example.com` / `password`.
-- The critical path is currently blocked on `T-300` pending execution-provider API confirmation.
-- The active unblocked implementation entry point is `T-603` for the server creation page UI.
+- The execution-provider contract is fixed through `T-300` using a Pterodactyl/Wings baseline.
+- The critical path is now unblocked into `T-301` for the provider base client interface.
+- `T-400` remains blocked on the mc-router config and reload contract.
