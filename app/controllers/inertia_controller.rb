@@ -8,6 +8,10 @@ class InertiaController < ApplicationController
         { name: "Home", href: "/" },
         { name: "Servers", href: "/servers" },
       ],
+      flash: {
+        notice: flash[:notice],
+        alert: flash[:alert],
+      },
     }
   }
 end

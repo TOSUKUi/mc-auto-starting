@@ -1,4 +1,4 @@
-import { Badge, Code, Group, Paper, Stack, Text, Title } from '@mantine/core'
+import { Badge, Button, Code, Group, Paper, Stack, Text, Title } from '@mantine/core'
 import { Head, Link } from '@inertiajs/react'
 
 export default function ServersShow({ server }) {
@@ -17,6 +17,11 @@ export default function ServersShow({ server }) {
               <Text c="dimmed">{server.fqdn}</Text>
             </Stack>
             <Group gap="xs">
+              {server.can_manage_members ? (
+                <Button component={Link} href={`/servers/${server.id}/members`} variant="light">
+                  Members
+                </Button>
+              ) : null}
               <Badge color="blue" variant="light">
                 {server.access_role}
               </Badge>

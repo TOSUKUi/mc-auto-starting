@@ -49,6 +49,7 @@ This file tells any contributor or agent where to find authoritative information
 - The authenticated layout shell is installed through `T-600`.
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
+- The members management page UI is installed through `T-605`.
 - Development seed login is available as `dev@example.com` / `password`.
 - The critical path is currently blocked on `T-300` pending execution-provider API confirmation.
-- The next unblocked implementation entry point is `T-605` for the members management page UI.
+- The next unblocked implementation entry point is `T-603` for the server creation page UI.

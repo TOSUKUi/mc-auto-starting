@@ -1,0 +1,74 @@
+require "test_helper"
+
+class ServerMembersControllerTest < ActionDispatch::IntegrationTest
+  test "owner can view memberships for owned server" do
+    sign_in_as(users(:one))
+
+    get server_members_url(minecraft_servers(:one), format: :json)
+
+    assert_response :success
+    assert_equal minecraft_servers(:one).id, response.parsed_body.fetch("server").fetch("id")
+    assert_equal [ server_members(:two).id, server_members(:one).id ], response.parsed_body.fetch("memberships").map { |membership| membership.fetch("id") }
+  end
+
+  test "non owner cannot view memberships page" do
+    sign_in_as(users(:two))
+
+    get server_members_url(minecraft_servers(:one), format: :json)
+
+    assert_response :forbidden
+  end
+
+  test "owner can add an existing user as a member by email address" do
+    sign_in_as(users(:two))
+
+    post server_members_url(minecraft_servers(:two), format: :json), params: {
+      server_member: {
+        email_address: " three@example.com ",
+        role: "viewer",
+      },
+    }
+
+    assert_response :success
+
+    membership = minecraft_servers(:two).server_members.find_by!(user: users(:three))
+    assert_equal "viewer", membership.role
+  end
+
+  test "adding a missing user returns validation errors" do
+    sign_in_as(users(:two))
+
+    post server_members_url(minecraft_servers(:two), format: :json), params: {
+      server_member: {
+        email_address: "missing@example.com",
+        role: "viewer",
+      },
+    }
+
+    assert_response :unprocessable_entity
+    assert_includes response.parsed_body.fetch("errors").fetch("user"), "User must exist"
+  end
+
+  test "owner can update a membership role" do
+    sign_in_as(users(:one))
+
+    patch server_member_url(minecraft_servers(:one), server_members(:one), format: :json), params: {
+      server_member: {
+        role: "operator",
+      },
+    }
+
+    assert_response :success
+    assert_equal "operator", server_members(:one).reload.role
+  end
+
+  test "owner can remove a membership" do
+    sign_in_as(users(:one))
+
+    assert_difference("ServerMember.count", -1) do
+      delete server_member_url(minecraft_servers(:one), server_members(:two), format: :json)
+    end
+
+    assert_response :success
+  end
+end

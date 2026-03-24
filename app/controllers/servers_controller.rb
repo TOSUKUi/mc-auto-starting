@@ -76,6 +76,7 @@ class ServersController < InertiaController
         minecraft_version: server.minecraft_version,
         template_kind: server.template_kind,
         owner_id: server.owner_id,
+        can_manage_members: policy(server).manage_members?,
       )
     end
 

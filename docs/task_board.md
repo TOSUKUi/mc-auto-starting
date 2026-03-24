@@ -55,7 +55,7 @@
 | T-602 | P6 | Build server index page | T-107,T-600 | done | User sees only owned/member servers |
 | T-603 | P6 | Build server creation page | T-500,T-600,T-202 | todo | User can submit create request and see status |
 | T-604 | P6 | Build server detail page | T-504,T-600 | todo | User can inspect and operate server |
-| T-605 | P6 | Build members management page | T-103,T-106,T-600 | todo | Owner can manage memberships |
+| T-605 | P6 | Build members management page | T-103,T-106,T-600 | done | Owner can manage memberships |
 | T-606 | P6 | Build audit log page | T-105,T-505,T-600 | todo | User can read relevant event history |
 | T-607 | P6 | Build monitoring page | T-700,T-701,T-702,T-703,T-704,T-600 | todo | Admin can inspect platform health |
 | T-700 | P7 | Implement mc-router process and port health monitoring | T-403 | todo | Router liveness is detectable |

@@ -1,11 +1,13 @@
-import { AppShell, Badge, Button, Container, Group, NavLink, Paper, Stack, Text, Title } from '@mantine/core'
+import { Alert, AppShell, Badge, Button, Container, Group, NavLink, Paper, Stack, Text, Title } from '@mantine/core'
 import { Head, Link, usePage } from '@inertiajs/react'
+import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-react'
 
 export default function AppLayout({ children }) {
   const page = usePage()
   const { app = {} } = page.props
   const navigation = app.navigation ?? []
   const currentUser = app.current_user
+  const flash = app.flash ?? {}
 
   return (
     <>
@@ -66,7 +68,21 @@ export default function AppLayout({ children }) {
         </AppShell.Navbar>
 
         <AppShell.Main>
-          <Container size="lg">{children}</Container>
+          <Container size="lg">
+            <Stack gap="md">
+              {flash.notice ? (
+                <Alert color="teal" icon={<IconCircleCheck size={16} />} radius="md" variant="light">
+                  {flash.notice}
+                </Alert>
+              ) : null}
+              {flash.alert ? (
+                <Alert color="red" icon={<IconAlertCircle size={16} />} radius="md" variant="light">
+                  {flash.alert}
+                </Alert>
+              ) : null}
+              {children}
+            </Stack>
+          </Container>
         </AppShell.Main>
       </AppShell>
     </>
