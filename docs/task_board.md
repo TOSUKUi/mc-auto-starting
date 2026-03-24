@@ -39,10 +39,10 @@
 | T-301 | P3 | Implement provider base client interface | T-300 | done | Unified create/delete/start/stop/restart/status contract exists |
 | T-302 | P3 | Implement concrete provider client | T-301 | done | Provider client can talk to target API or a stubbed equivalent |
 | T-303 | P3 | Add provider config and initialization | T-301 | done | Environment-driven provider selection works |
-| T-400 | P4 | Confirm mc-router config and reload contract | T-200 | blocked | Input format and reload mechanism are known |
-| T-401 | P4 | Implement route definition builder | T-400,T-104 | todo | Route definition can be built from DB state |
-| T-402 | P4 | Implement config renderer | T-401 | todo | Whole router config can be rendered |
-| T-403 | P4 | Implement config applier and reload | T-402 | todo | Config can be written and reload triggered safely |
+| T-400 | P4 | Confirm mc-router config and reload contract | T-200 | done | Input format and reload mechanism are known |
+| T-401 | P4 | Implement route definition builder | T-400,T-104 | done | Route definition can be built from DB state |
+| T-402 | P4 | Implement config renderer | T-401 | done | Whole router config can be rendered |
+| T-403 | P4 | Implement config applier and reload | T-402 | done | Config can be written and reload triggered safely |
 | T-404 | P4 | Implement route health checking | T-403 | todo | Route/application health can be persisted |
 | T-500 | P5 | Implement server create controller flow | T-102,T-106,T-201,T-301 | done | Create request stores provisional record and queues work |
 | T-501 | P5 | Implement create job end-to-end | T-500,T-302,T-403 | todo | Provider create, backend save, route apply, ready transition all work |
@@ -74,7 +74,7 @@
 ## Critical Path Tasks
 The main remaining critical path currently is:
 
-`T-400 -> T-401 -> T-402 -> T-403 -> T-501 -> T-700/T-701/T-702 -> T-604 -> T-803`
+`T-501 -> T-700/T-701/T-702 -> T-604 -> T-803`
 
 ## Known Blockers
-- `T-400`: final mc-router config/reload contract is not confirmed
+- No active blockers are recorded on the current critical path.

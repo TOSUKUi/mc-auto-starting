@@ -1,0 +1,63 @@
+# mc-router Contract
+
+## Purpose
+This document fixes the initial mc-router integration contract for Phase 4 tasks `T-400` through `T-403`.
+
+## Upstream Baseline
+- Target project: `itzg/mc-router`
+- Confirmation date: `2026-03-25`
+- Primary source: upstream README on the default branch
+
+## Confirmed Upstream Capabilities
+- `mc-router` supports a JSON routes config file via `-routes-config` / `ROUTES_CONFIG`.
+- The file shape is:
+
+```json
+{
+  "default-server": null,
+  "mappings": {
+    "alpha.mc.tosukui.xyz": "10.0.0.10:25565"
+  }
+}
+```
+
+- `default-server` may be `null` or omitted.
+- Sending `SIGHUP` reloads the routes config from disk.
+- Setting `-routes-config-watch` / `ROUTES_CONFIG_WATCH=true` makes mc-router watch the config file and reload automatically when the file changes.
+- A REST API also exists:
+  - `GET /routes`
+  - `POST /routes`
+  - `POST /defaultRoute`
+  - `DELETE /routes/{serverAddress}`
+
+## Locked Integration Decision For This App
+- Rails uses the JSON routes config file as the authoritative publication output for the initial implementation.
+- The config file stores the full desired route set, not incremental diffs.
+- `default-server` stays `null`.
+  This preserves the project requirement that unknown hostnames must be rejected.
+- Each mapping key is the normalized public FQDN generated from `MinecraftServer#fqdn`.
+- Each mapping value is the execution-provider backend target in `backend_host:backend_port` form.
+- Initial reload strategy is file-watch driven:
+  - mc-router should run with `ROUTES_CONFIG_WATCH=true`
+  - Rails writes the config atomically
+  - the file change itself is the reload trigger
+- Optional fallback strategies may be configured later:
+  - explicit reload command after write
+  - operational use of the REST API for inspection or emergency intervention
+
+## Rails Configuration Contract
+- `MC_ROUTER_ROUTES_CONFIG_PATH`
+  Absolute or app-visible path to the rendered routes JSON file.
+- `MC_ROUTER_RELOAD_STRATEGY`
+  One of `watch`, `command`, `manual`.
+- `MC_ROUTER_RELOAD_COMMAND`
+  Required only when `MC_ROUTER_RELOAD_STRATEGY=command`.
+- `MC_ROUTER_API_URL`
+  Optional future-facing base URL for router inspection or operational tooling.
+
+## Implementation Notes
+- `T-401` builds one route definition from `RouterRoute` + `MinecraftServer`.
+- `T-402` renders the whole config as deterministic JSON with sorted mappings.
+- `T-403` writes the config atomically and triggers reload according to the configured strategy.
+- Disabled routes are omitted from the rendered config.
+- Enabled routes without backend coordinates are treated as invalid input and should fail fast.

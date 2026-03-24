@@ -11,6 +11,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for planned screens, routes, directory structure, and initial implementation decomposition.
 - `docs/provider_api_contract.md`
   Use for the fixed Pterodactyl/Wings execution-provider contract, auth split, endpoint set, and backend discovery rules.
+- `docs/router_api_contract.md`
+  Use for the fixed mc-router file format, unknown-host rejection policy, and reload strategy baseline.
 
 ## Full Project Plan and Critical Path
 - `docs/project_execution_plan.md`
@@ -57,4 +59,6 @@ This file tells any contributor or agent where to find authoritative information
 - The execution-provider contract is fixed through `T-300` using a Pterodactyl/Wings baseline.
 - The provider base client contract, concrete Pterodactyl client, and env-driven provider initialization are installed through `T-301`, `T-302`, and `T-303`.
 - The server create intake flow is installed through `T-500`; create requests now persist provisional server state, create an initial pending `RouterRoute`, and enqueue `CreateServerJob`.
-- The current critical path is blocked at `T-400` on the mc-router config and reload contract; `T-501` remains pending behind `T-403`.
+- The mc-router contract is fixed through `T-400` in `docs/router_api_contract.md`.
+- The route definition builder, config renderer, and config applier baselines are installed through `T-401`, `T-402`, and `T-403`.
+- The current critical path now resumes at `T-501` for the create job end-to-end flow.

@@ -240,6 +240,8 @@
 - 未登録 hostname reject 方法を確認する
 - 完了条件:
   - route renderer と applier の入力仕様が定まる
+- 進捗メモ:
+  - `T-400` 完了。`docs/router_api_contract.md` に `routes-config` JSON 形式、`default-server = null` による unknown hostname reject、`ROUTES_CONFIG_WATCH=true` を前提にした file-watch reload 方針、補助的な REST API の存在を固定した。
 
 #### P4-2 route definition builder
 
@@ -247,6 +249,8 @@
 - backend target の文字列表現を固定する
 - 完了条件:
   - 1 server 分の route 定義を生成できる
+- 進捗メモ:
+  - `T-401` 完了。`Router::RouteDefinitionBuilder` が `RouterRoute` と `MinecraftServer` から `fqdn => backend_host:backend_port` を生成する。
 
 #### P4-3 config renderer
 
@@ -254,6 +258,8 @@
 - テンプレートまたは serializer を決める
 - 完了条件:
   - config 文字列を生成できる
+- 進捗メモ:
+  - `T-402` 完了。`Router::ConfigRenderer` が enabled route のみを deterministic な JSON にレンダリングし、`default-server` は `null` 固定とした。
 
 #### P4-4 config applier
 
@@ -262,6 +268,8 @@
 - reload 実行処理を実装する
 - 完了条件:
   - route 反映処理が 1 service call で完結する
+- 進捗メモ:
+  - `T-403` 完了。`Router::ConfigApplier` が config を atomic write し、`watch` / `command` / `manual` の reload 戦略を扱う。
 
 #### P4-5 route health check
 
