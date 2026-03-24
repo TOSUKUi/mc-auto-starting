@@ -219,6 +219,8 @@
 - タイムアウトとリトライ方針を決める
 - 完了条件:
   - ダミーまたは実環境向け疎通確認ができる
+- 進捗メモ:
+  - `T-302` 完了。`Net::HTTP` ベースで Application API と Client API を分けた `ExecutionProvider::PterodactylClient` を追加し、create/delete/fetch/power/status の JSON 契約と例外マッピングをテスト付きで実装済み。
 
 #### P3-4 provider 設定管理
 

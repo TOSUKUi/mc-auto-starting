@@ -55,6 +55,6 @@ This file tells any contributor or agent where to find authoritative information
 - The server creation page UI is in progress under `T-603`; form and endpoint preview scaffolding are installed, but real provisioning now needs the `T-300` contract and the follow-up `T-301` provider interface.
 - Development seed login is available as `dev@example.com` / `password`.
 - The execution-provider contract is fixed through `T-300` using a Pterodactyl/Wings baseline.
-- The provider base client contract and env-driven provider initialization are installed through `T-301` and `T-303`.
-- The critical path is now unblocked into `T-302` for the concrete Pterodactyl client.
+- The provider base client contract, concrete Pterodactyl client, and env-driven provider initialization are installed through `T-301`, `T-302`, and `T-303`.
+- The critical path is now unblocked into `T-500` and the dependent `T-603` reshape for real server provisioning.
 - `T-400` remains blocked on the mc-router config and reload contract.

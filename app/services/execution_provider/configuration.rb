@@ -36,7 +36,7 @@ module ExecutionProvider
     end
 
     def with_overrides(**overrides)
-      self.class.new(**to_h.merge(overrides.compact))
+      self.class.new(**to_h.merge(overrides))
     end
 
     def to_h
