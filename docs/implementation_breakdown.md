@@ -83,7 +83,6 @@
   - router route 状態
   - backend 情報
   - 最終ヘルスチェック結果
-  - 監査イベント概要
 - 操作:
   - 起動
   - 停止
@@ -199,7 +198,6 @@ app/
     minecraft_server.rb
     server_member.rb
     router_route.rb
-    audit_log.rb
 
   policies/
     application_policy.rb
@@ -373,7 +371,7 @@ app/frontend/
 6. route 反映成功時に `ready` 遷移
 7. 失敗時ロールバック実装
 8. 削除フローと route 削除実装
-9. 監査ログ記録実装
+9. 必要になった場合のみ内部イベント記録を再検討
 
 ### フェーズ 4 補足: status 遷移
 
@@ -414,12 +412,11 @@ app/frontend/
 3. サーバー作成画面
 4. サーバー詳細画面
 5. メンバー管理画面
-6. 監査ログ画面
-7. エラー通知と copy UI 整備
+6. エラー通知と copy UI 整備
 
 ### フェーズ 8: 運用補強
 
-1. 監査ログ保持方針反映
+1. 監査イベントは現時点で product scope 外
 2. 管理者向け運用補助権限制御
 3. リトライ戦略
 4. タイムアウト / circuit breaker 検討

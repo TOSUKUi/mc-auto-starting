@@ -137,7 +137,7 @@
 - 初期実装では `minecraft_server` を必須、`actor` は system event 用に optional とする
 - `payload` は JSON で保持し、空 object を default にする
 - 完了条件:
-  - 重要操作を監査ログとして保存できる
+  - 監査ログ基盤自体は存在するが、初期版 product scope では積極利用しない
 
 #### P1-7 認可ポリシー
 
@@ -328,12 +328,12 @@
 - 完了条件:
   - 各操作後に状態が UI に反映される
 
-#### P5-6 監査ログ記録
+#### P5-6 監査イベント
 
-- create / delete / start / stop / restart / reapply-route を記録する
-- 異常イベントも記録する
+- 初期版 product scope では実装しない
+- 必要になった場合のみ、create / delete / lifecycle 操作の最小限イベント保存を再検討する
 - 完了条件:
-  - 重要イベントが検索可能な形で残る
+  - 未実装で進める判断が docs と task board に反映されている
 
 ### Phase 6: Web UI
 
