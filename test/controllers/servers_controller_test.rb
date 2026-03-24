@@ -135,4 +135,41 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.parsed_body.fetch("errors").keys, "hostname"
     assert_includes response.parsed_body.fetch("errors").keys, "memory_mb"
   end
+
+  test "owner can delete a server" do
+    sign_in_as(users(:one))
+    server = minecraft_servers(:one)
+    original_new = Servers::DestroyServer.method(:new)
+    fake_service = Object.new
+    fake_service.define_singleton_method(:call) do
+      server.destroy!
+    end
+
+    Servers::DestroyServer.define_singleton_method(:new) do |*|
+      fake_service
+    end
+
+    assert_difference("MinecraftServer.count", -1) do
+      assert_difference("RouterRoute.count", -1) do
+        delete server_url(server, format: :json)
+      end
+    end
+
+    assert_response :no_content
+    assert_not MinecraftServer.exists?(server.id)
+  ensure
+    Servers::DestroyServer.define_singleton_method(:new, original_new)
+  end
+
+  test "non-owner cannot delete a visible server" do
+    sign_in_as(users(:three))
+
+    assert_no_difference("MinecraftServer.count") do
+      assert_no_difference("RouterRoute.count") do
+        delete server_url(minecraft_servers(:one), format: :json)
+      end
+    end
+
+    assert_response :forbidden
+  end
 end

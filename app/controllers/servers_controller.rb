@@ -85,6 +85,33 @@ class ServersController < InertiaController
     end
   end
 
+  def destroy
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :destroy?
+
+    Servers::DestroyServer.new(server: server).call
+
+    respond_to do |format|
+      format.html do
+        redirect_to servers_path, notice: "Server deletion completed."
+      end
+
+      format.json do
+        head :no_content
+      end
+    end
+  rescue ExecutionProvider::Error, Router::ApplyError => error
+    respond_to do |format|
+      format.html do
+        redirect_to server_path(server), alert: "Server deletion failed: #{error.message}"
+      end
+
+      format.json do
+        render json: { error: error.message }, status: :unprocessable_entity
+      end
+    end
+  end
+
   private
     def new_server_page_props(form_values: {})
       hostname = normalized_hostname(form_values[:hostname])
@@ -167,6 +194,7 @@ class ServersController < InertiaController
         template_kind: server.template_kind,
         owner_id: server.owner_id,
         can_manage_members: policy(server).manage_members?,
+        can_destroy: policy(server).destroy?,
       )
     end
 

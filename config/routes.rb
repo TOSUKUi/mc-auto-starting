@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy", as: :logout
   resources :passwords, param: :token
-  resources :servers, only: %i[index new create show] do
+  resources :servers, only: %i[index new create show destroy] do
     resources :members, controller: "server_members", only: %i[index create update destroy]
   end
   root "home#index"

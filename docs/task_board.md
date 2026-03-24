@@ -47,7 +47,7 @@
 | T-500 | P5 | Implement server create controller flow | T-102,T-106,T-201,T-301 | done | Create request stores provisional record and queues work |
 | T-501 | P5 | Implement create job end-to-end | T-500,T-302,T-403 | done | Provider create, backend save, route apply, ready transition all work |
 | T-502 | P5 | Implement rollback and failure-state handling | T-501 | done | Failed create does not leave inconsistent publication state |
-| T-503 | P5 | Implement delete flow | T-403,T-302,T-106 | todo | Deletion removes route and updates DB state |
+| T-503 | P5 | Implement delete flow | T-403,T-302,T-106 | done | Deletion removes route and updates DB state |
 | T-504 | P5 | Implement start/stop/restart/sync flows | T-302,T-106 | todo | Lifecycle operations update status correctly |
 | T-505 | P5 | Drop audit event recording from product scope | T-105,T-500 | done | Project docs explicitly keep audit event recording out of scope |
 | T-600 | P6 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
@@ -74,7 +74,7 @@
 ## Critical Path Tasks
 The main remaining critical path currently is:
 
-`T-503/T-504 -> T-604 -> T-803`
+`T-504 -> T-604 -> T-803`
 
 ## Known Blockers
 - No active blockers are recorded on the current critical path.

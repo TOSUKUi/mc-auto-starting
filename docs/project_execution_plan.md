@@ -321,6 +321,8 @@
 - DB 更新
 - 完了条件:
   - 削除時に route が残らない
+- 進捗メモ:
+  - `T-503` 完了。`Servers::DestroyServer` と `ServersController#destroy` を追加し、owner 認可のもとで `deleting` 遷移、route の unpublish + router apply、provider delete、DB レコード削除までをテスト付きで固定した。
 
 #### P5-5 起動 / 停止 / 再起動 / 同期
 

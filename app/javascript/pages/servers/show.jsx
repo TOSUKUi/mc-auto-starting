@@ -22,6 +22,11 @@ export default function ServersShow({ server }) {
                   Members
                 </Button>
               ) : null}
+              {server.can_destroy ? (
+                <Button component={Link} href={`/servers/${server.id}`} method="delete" as="button" color="red" variant="light">
+                  Delete
+                </Button>
+              ) : null}
               <Badge color="blue" variant="light">
                 {server.access_role}
               </Badge>
