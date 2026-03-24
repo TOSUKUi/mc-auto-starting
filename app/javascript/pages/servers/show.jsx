@@ -22,6 +22,26 @@ export default function ServersShow({ server }) {
                   Members
                 </Button>
               ) : null}
+              {server.can_start ? (
+                <Button component={Link} href={`/servers/${server.id}/start`} method="post" as="button" variant="light">
+                  Start
+                </Button>
+              ) : null}
+              {server.can_stop ? (
+                <Button component={Link} href={`/servers/${server.id}/stop`} method="post" as="button" variant="light">
+                  Stop
+                </Button>
+              ) : null}
+              {server.can_restart ? (
+                <Button component={Link} href={`/servers/${server.id}/restart`} method="post" as="button" variant="light">
+                  Restart
+                </Button>
+              ) : null}
+              {server.can_sync ? (
+                <Button component={Link} href={`/servers/${server.id}/sync`} method="post" as="button" variant="default">
+                  Sync
+                </Button>
+              ) : null}
               {server.can_destroy ? (
                 <Button component={Link} href={`/servers/${server.id}`} method="delete" as="button" color="red" variant="light">
                   Delete

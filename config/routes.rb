@@ -4,6 +4,13 @@ Rails.application.routes.draw do
   delete "logout", to: "sessions#destroy", as: :logout
   resources :passwords, param: :token
   resources :servers, only: %i[index new create show destroy] do
+    member do
+      post :start
+      post :stop
+      post :restart
+      post :sync
+    end
+
     resources :members, controller: "server_members", only: %i[index create update destroy]
   end
   root "home#index"

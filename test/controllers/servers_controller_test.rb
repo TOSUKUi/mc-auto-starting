@@ -172,4 +172,54 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :forbidden
   end
+
+  test "operator can start a visible server" do
+    sign_in_as(users(:three))
+    server = minecraft_servers(:one)
+    original_new = Servers::StartServer.method(:new)
+    fake_service = Object.new
+    fake_service.define_singleton_method(:call) do
+      server.update!(status: :starting)
+    end
+
+    Servers::StartServer.define_singleton_method(:new) do |*|
+      fake_service
+    end
+
+    post start_server_url(server, format: :json)
+
+    assert_response :success
+    assert_equal "starting", response.parsed_body.fetch("server").fetch("status")
+  ensure
+    Servers::StartServer.define_singleton_method(:new, original_new)
+  end
+
+  test "viewer cannot stop a server" do
+    sign_in_as(users(:two))
+
+    post stop_server_url(minecraft_servers(:one), format: :json)
+
+    assert_response :forbidden
+  end
+
+  test "owner can sync a server state" do
+    sign_in_as(users(:one))
+    server = minecraft_servers(:one)
+    original_new = Servers::SyncServerState.method(:new)
+    fake_service = Object.new
+    fake_service.define_singleton_method(:call) do
+      server.update!(status: :degraded)
+    end
+
+    Servers::SyncServerState.define_singleton_method(:new) do |*|
+      fake_service
+    end
+
+    post sync_server_url(server, format: :json)
+
+    assert_response :success
+    assert_equal "degraded", response.parsed_body.fetch("server").fetch("status")
+  ensure
+    Servers::SyncServerState.define_singleton_method(:new, original_new)
+  end
 end

@@ -331,6 +331,8 @@
 - 状態同期ジョブを実装する
 - 完了条件:
   - 各操作後に状態が UI に反映される
+- 進捗メモ:
+  - `T-504` 完了。`ServersController` に start/stop/restart/sync endpoint を追加し、`Servers::StartServer` / `StopServer` / `RestartServer` / `SyncServerState` を通して Client API 側の lifecycle/status 操作を `provider_server_identifier` 基準で実行し、Rails status を更新するようにした。
 
 #### P5-6 監査イベント
 

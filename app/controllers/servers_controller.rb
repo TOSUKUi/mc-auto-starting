@@ -112,6 +112,46 @@ class ServersController < InertiaController
     end
   end
 
+  def start
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :start?
+
+    Servers::StartServer.new(server: server).call
+    respond_with_server_action(server, notice: "Server start accepted.")
+  rescue ExecutionProvider::Error => error
+    respond_with_server_error(server, error)
+  end
+
+  def stop
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :stop?
+
+    Servers::StopServer.new(server: server).call
+    respond_with_server_action(server, notice: "Server stop accepted.")
+  rescue ExecutionProvider::Error => error
+    respond_with_server_error(server, error)
+  end
+
+  def restart
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :restart?
+
+    Servers::RestartServer.new(server: server).call
+    respond_with_server_action(server, notice: "Server restart accepted.")
+  rescue ExecutionProvider::Error => error
+    respond_with_server_error(server, error)
+  end
+
+  def sync
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :sync?
+
+    Servers::SyncServerState.new(server: server).call
+    respond_with_server_action(server, notice: "Server status synchronized.")
+  rescue ExecutionProvider::Error => error
+    respond_with_server_error(server, error)
+  end
+
   private
     def new_server_page_props(form_values: {})
       hostname = normalized_hostname(form_values[:hostname])
@@ -195,6 +235,10 @@ class ServersController < InertiaController
         owner_id: server.owner_id,
         can_manage_members: policy(server).manage_members?,
         can_destroy: policy(server).destroy?,
+        can_start: policy(server).start?,
+        can_stop: policy(server).stop?,
+        can_restart: policy(server).restart?,
+        can_sync: policy(server).sync?,
       )
     end
 
@@ -212,5 +256,29 @@ class ServersController < InertiaController
         ready: servers.count(&:status_ready?),
         attention_needed: servers.count { |server| !server.status_ready? || server.router_route&.last_apply_status == "failed" },
       }
+    end
+
+    def respond_with_server_action(server, notice:)
+      respond_to do |format|
+        format.html do
+          redirect_to server_path(server), notice: notice
+        end
+
+        format.json do
+          render json: { server: server_detail(server.reload) }
+        end
+      end
+    end
+
+    def respond_with_server_error(server, error)
+      respond_to do |format|
+        format.html do
+          redirect_to server_path(server), alert: "Server operation failed: #{error.message}"
+        end
+
+        format.json do
+          render json: { error: error.message }, status: :unprocessable_entity
+        end
+      end
     end
 end
