@@ -64,8 +64,16 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     get server_url(minecraft_servers(:one), format: :json)
 
     assert_response :success
-    assert_equal minecraft_servers(:one).id, response.parsed_body.fetch("server").fetch("id")
-    assert_equal "operator", response.parsed_body.fetch("server").fetch("access_role")
+    server = response.parsed_body.fetch("server")
+
+    assert_equal minecraft_servers(:one).id, server.fetch("id")
+    assert_equal "operator", server.fetch("access_role")
+    assert_equal "abc12345", server.fetch("provider_server_identifier")
+    assert_equal true, server.fetch("can_start")
+    assert_equal true, server.fetch("can_stop")
+    assert_equal true, server.fetch("can_restart")
+    assert_equal true, server.fetch("can_sync")
+    assert_equal false, server.fetch("can_destroy")
   end
 
   test "show returns not found for invisible server" do

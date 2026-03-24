@@ -390,6 +390,8 @@
 - 操作ボタン
 - 完了条件:
   - 運用に必要な情報が 1 画面で見える
+- 進捗メモ:
+  - `T-604` 完了。server detail 画面は connection target、route apply/health 状態、provider backend 情報、identifier、lifecycle action ボタンを 1 画面に集約し、controller JSON でも detail props を補完した。
 
 #### P6-6 メンバー管理画面
 

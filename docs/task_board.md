@@ -54,7 +54,7 @@
 | T-601 | P6 | Build login page | T-100,T-004 | done | UI login works |
 | T-602 | P6 | Build server index page | T-107,T-600 | done | User sees only owned/member servers |
 | T-603 | P6 | Build server creation page | T-500,T-600,T-202 | done | User can submit create request and see status |
-| T-604 | P6 | Build server detail page | T-504,T-600 | todo | User can inspect and operate server |
+| T-604 | P6 | Build server detail page | T-504,T-600 | done | User can inspect and operate server |
 | T-605 | P6 | Build members management page | T-103,T-106,T-600 | done | Owner can manage memberships |
 | T-606 | P6 | Drop audit log page from product scope | T-105,T-505,T-600 | done | Project docs explicitly keep audit-log browsing UI out of scope |
 | T-607 | P6 | Drop monitoring and reconciliation dashboard from product scope | T-700,T-701,T-702,T-703,T-600 | done | Project docs explicitly keep monitoring/reconciliation dashboards out of scope |
@@ -74,7 +74,7 @@
 ## Critical Path Tasks
 The main remaining critical path currently is:
 
-`T-604 -> T-803`
+`T-803`
 
 ## Known Blockers
 - No active blockers are recorded on the current critical path.

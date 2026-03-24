@@ -230,6 +230,7 @@ class ServersController < InertiaController
       server_summary(server).merge(
         fqdn: server.fqdn,
         provider_name: server.provider_name,
+        provider_server_identifier: server.provider_server_identifier,
         minecraft_version: server.minecraft_version,
         template_kind: server.template_kind,
         owner_id: server.owner_id,
