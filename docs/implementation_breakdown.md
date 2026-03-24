@@ -126,32 +126,12 @@
   - 権限更新
   - 削除
 
-### 2.7 イベント・監査
+### 2.7 監査・監視の扱い
 
-#### 操作履歴画面
-
-- パス: `/servers/:id/audit-logs`
-- 目的: 対象サーバーの操作・異常履歴を確認
-- 表示項目:
-  - 実行者
-  - event_type
-  - payload 要約
-  - 発生日時
-
-### 2.8 運用補助
-
-#### 管理用整合性画面
-
-- パス: 任意、必要性が固まるまで未確定
-- 目的: publication / provider の不整合が増えた場合に管理者が確認する
-- 表示候補:
-  - DB にある / router にない route
-  - router にある / DB にない route
-  - DB にある / 実行基盤にない server
-  - 実行基盤にある / DB で管理されていない server
-- 備考:
-  - 初期版では必須画面にしない
-  - mc-router の死活や listen ポートは Docker / runtime health check に委譲する
+- 監査ログ閲覧画面は初期版スコープに含めない
+- 監視 / 整合性ダッシュボードも初期版スコープに含めない
+- unknown hostname の reject は mc-router 契約で担保し、Rails 側では集計・可視化しない
+- mc-router の死活や listen ポートは Docker / runtime health check に委譲する
 
 ## 3. URL 設計
 
@@ -180,8 +160,6 @@ GET    /servers/:id/members
 POST   /servers/:id/members
 PATCH  /servers/:id/members/:user_id
 DELETE /servers/:id/members/:user_id
-
-GET    /servers/:id/audit-logs
 
 GET    /health
 ```
@@ -213,7 +191,6 @@ app/
     sessions_controller.rb
     servers_controller.rb
     server_members_controller.rb
-    audit_logs_controller.rb
     api/
       server_statuses_controller.rb
 
@@ -287,7 +264,6 @@ app/frontend/
       show.tsx
       edit.tsx
       members.tsx
-      audit-logs.tsx
 
   components/
     servers/

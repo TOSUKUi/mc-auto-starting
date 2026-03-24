@@ -56,13 +56,13 @@
 | T-603 | P6 | Build server creation page | T-500,T-600,T-202 | done | User can submit create request and see status |
 | T-604 | P6 | Build server detail page | T-504,T-600 | todo | User can inspect and operate server |
 | T-605 | P6 | Build members management page | T-103,T-106,T-600 | done | Owner can manage memberships |
-| T-606 | P6 | Build audit log page | T-105,T-505,T-600 | todo | User can read relevant event history |
-| T-607 | P6 | Build admin reconciliation page | T-701,T-702,T-703,T-600 | todo | Admin can inspect publication and provider inconsistencies when needed |
+| T-606 | P6 | Drop audit log page from product scope | T-105,T-505,T-600 | done | Project docs explicitly keep audit-log browsing UI out of scope |
+| T-607 | P6 | Drop monitoring and reconciliation dashboard from product scope | T-700,T-701,T-702,T-703,T-600 | done | Project docs explicitly keep monitoring/reconciliation dashboards out of scope |
 | T-700 | P7 | Defer mc-router liveness checks to Docker health checks | T-403 | done | Project docs explicitly treat router liveness as infrastructure responsibility, not app UI scope |
 | T-701 | P7 | Implement DB vs router consistency check | T-403,T-104 | todo | Missing/extraneous routes are detectable |
 | T-702 | P7 | Implement DB vs execution-provider consistency check | T-302,T-102 | todo | Missing/extraneous provider servers are detectable |
 | T-703 | P7 | Implement backend connectivity checks | T-302,T-102 | todo | Backend reachability is persisted |
-| T-704 | P7 | Keep unknown hostname rejection at router-contract level | T-400 | done | The app relies on mc-router contract/config for unknown-host rejection and does not build an in-app detector |
+| T-704 | P7 | Keep unknown hostname rejection at router-contract level only | T-400 | done | The app relies on mc-router contract/config for unknown-host rejection and does not build analytics or an in-app detector |
 | T-800 | P8 | Add model tests | T-101,T-102,T-103,T-104,T-105,T-201,T-203 | todo | Core domain logic is covered |
 | T-801 | P8 | Add request and authorization tests | T-106,T-107,T-500,T-503,T-504 | todo | Access control regressions are caught |
 | T-802 | P8 | Add service and job tests | T-301,T-302,T-403,T-501,T-701,T-702 | todo | Critical async and service paths are covered |
