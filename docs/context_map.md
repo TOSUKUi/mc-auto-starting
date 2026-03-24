@@ -52,9 +52,9 @@ This file tells any contributor or agent where to find authoritative information
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
 - The members management page UI is installed through `T-605`.
-- The server creation page UI is in progress under `T-603`; form and endpoint preview scaffolding are installed, but real provisioning now needs the `T-300` contract and the follow-up `T-301` provider interface.
+- The server creation page UI is installed through `T-603`; the form now submits real create requests, shows validation errors, and redirects into the server detail status view after intake.
 - Development seed login is available as `dev@example.com` / `password`.
 - The execution-provider contract is fixed through `T-300` using a Pterodactyl/Wings baseline.
 - The provider base client contract, concrete Pterodactyl client, and env-driven provider initialization are installed through `T-301`, `T-302`, and `T-303`.
-- The critical path is now unblocked into `T-500` and the dependent `T-603` reshape for real server provisioning.
-- `T-400` remains blocked on the mc-router config and reload contract.
+- The server create intake flow is installed through `T-500`; create requests now persist provisional server state, create an initial pending `RouterRoute`, and enqueue `CreateServerJob`.
+- The current critical path is blocked at `T-400` on the mc-router config and reload contract; `T-501` remains pending behind `T-403`.

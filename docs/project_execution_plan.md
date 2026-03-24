@@ -279,6 +279,8 @@
 - job を enqueue する
 - 完了条件:
   - UI から create 要求を受付できる
+- 進捗メモ:
+  - `T-500` 完了。`ServersController#create` から `Servers::CreateRequest` を通して provisional な `MinecraftServer` と pending `RouterRoute` を保存し、`CreateServerJob` を enqueue して詳細画面へ遷移する intake フローを追加済み。
 
 #### P5-2 CreateServerJob
 
@@ -358,6 +360,8 @@
 - route 状態表示
 - 完了条件:
   - create 要求後の進行状態が分かる
+- 進捗メモ:
+  - `T-603` 完了。create form は実 submit と validation error 表示に対応し、受付後は server detail へ遷移して `provisioning` 状態を確認できる。
 
 #### P6-5 サーバー詳細画面
 

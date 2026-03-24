@@ -16,19 +16,32 @@ class ServersController < InertiaController
   def create
     authorize MinecraftServer, :create?
 
-    respond_to do |format|
-      format.html do
-        render inertia: "servers/new", props: new_server_page_props(
-          form_values: create_server_params.to_h,
-          blocker_message: "Server create requests are not wired yet. T-500 remains blocked by the provider contract in T-300.",
-        ), status: :not_implemented
-      end
+    server = Servers::CreateRequest.new(
+      actor: Current.user,
+      attributes: create_server_params.to_h,
+    ).call
 
-      format.json do
-        render json: new_server_page_props(
-          form_values: create_server_params.to_h,
-          blocker_message: "Server create requests are not wired yet. T-500 remains blocked by the provider contract in T-300.",
-        ), status: :not_implemented
+    if server.persisted?
+      respond_to do |format|
+        format.html do
+          redirect_to server_path(server), notice: "Server create request accepted. Provisioning is running in the background."
+        end
+
+        format.json do
+          render json: { server: server_detail(server) }, status: :created
+        end
+      end
+    else
+      respond_to do |format|
+        format.html do
+          render inertia: "servers/new", props: new_server_page_props(
+            form_values: create_server_params.to_h,
+          ), status: :unprocessable_entity
+        end
+
+        format.json do
+          render json: { errors: server.errors.to_hash(true) }, status: :unprocessable_entity
+        end
       end
     end
   end
@@ -73,13 +86,13 @@ class ServersController < InertiaController
   end
 
   private
-    def new_server_page_props(form_values: {}, blocker_message: nil)
+    def new_server_page_props(form_values: {})
       hostname = normalized_hostname(form_values[:hostname])
 
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
         template_options: template_options,
-        blocker_message: blocker_message,
+        provider_name: ExecutionProvider.config.provider_name,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,

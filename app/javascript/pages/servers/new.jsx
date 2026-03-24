@@ -1,5 +1,4 @@
 import {
-  Alert,
   Button,
   Code,
   Divider,
@@ -17,7 +16,7 @@ import {
   ThemeIcon,
 } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { IconCircleCheck, IconPlugConnected, IconRouteAltLeft, IconServer2, IconSparkles } from '@tabler/icons-react'
+import { IconCircleCheck, IconPlugConnected, IconServer2, IconSparkles } from '@tabler/icons-react'
 
 function normalizeHostname(value) {
   return value.trim().toLowerCase()
@@ -33,7 +32,7 @@ function endpointPreview(hostname, publicEndpoint) {
   }
 }
 
-export default function ServersNew({ blocker_message, form_defaults, public_endpoint, template_options }) {
+export default function ServersNew({ form_defaults, provider_name, public_endpoint, template_options }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
@@ -77,8 +76,8 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                 </Group>
                 <Title order={1}>New server</Title>
                 <Text c="dimmed" maw={760}>
-                  The request shape is ready, but the actual provider call is still blocked. Build the draft here, preview the
-                  public endpoint, and keep the operator flow honest.
+                  Submit the create request here, preview the public endpoint before commit, and hand provisioning off to the
+                  background worker.
                 </Text>
               </Stack>
 
@@ -107,10 +106,10 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     Create status
                   </Text>
                   <Text fw={800} size="lg">
-                    Blocked by `T-300`
+                    Queue-backed intake
                   </Text>
                   <Text c="dimmed" size="sm">
-                    This screen collects intent only until provider wiring lands.
+                    The provisional record is stored immediately, then provisioning continues asynchronously.
                   </Text>
                 </Stack>
               </Paper>
@@ -120,22 +119,16 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     Current baseline
                   </Text>
                   <Text fw={800} size="lg">
-                    Pterodactyl + Wings
+                    {provider_name}
                   </Text>
                   <Text c="dimmed" size="sm">
-                    The provider contract is fixed, so this UI stays aligned with the eventual API shape.
+                    The provider client is configured centrally, so this page stays aligned with the active backend.
                   </Text>
                 </Stack>
               </Paper>
             </SimpleGrid>
           </Stack>
         </Paper>
-
-        {blocker_message ? (
-          <Alert color="orange" icon={<IconRouteAltLeft size={16} />} radius="md" variant="light">
-            {blocker_message}
-          </Alert>
-        ) : null}
 
         <Grid gutter="lg">
           <Grid.Col span={{ base: 12, md: 8 }}>
@@ -145,11 +138,12 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                   <Stack gap={4}>
                     <Title order={3}>Request details</Title>
                     <Text c="dimmed" size="sm">
-                      Fill the metadata first. Backend provisioning will stay disabled until `T-500` is ready.
+                      Fill in the operator-facing metadata first. Valid requests are accepted now and move into provisioning.
                     </Text>
                   </Stack>
 
                   <TextInput
+                    error={form.errors.name}
                     label="Server name"
                     onChange={(event) => form.setData('name', event.currentTarget.value)}
                     placeholder="Main Survival"
@@ -162,6 +156,7 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                         ? `Normalized preview: ${normalizedHostname || 'empty'}`
                         : 'Lowercase letters, numbers, and internal hyphens only.'
                     }
+                    error={form.errors.hostname}
                     label="Hostname prefix"
                     onChange={(event) => form.setData('hostname', event.currentTarget.value)}
                     placeholder="main-survival"
@@ -171,6 +166,7 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                   <Grid gutter="md">
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <TextInput
+                        error={form.errors.minecraft_version}
                         label="Minecraft version"
                         onChange={(event) => form.setData('minecraft_version', event.currentTarget.value)}
                         required
@@ -180,6 +176,7 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <Select
                         data={template_options}
+                        error={form.errors.template_kind}
                         label="Template"
                         onChange={(value) => form.setData('template_kind', value ?? form_defaults.template_kind)}
                         required
@@ -191,6 +188,7 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <NumberInput
                         allowDecimal={false}
+                        error={form.errors.memory_mb}
                         label="Memory (MB)"
                         min={512}
                         onChange={(value) => form.setData('memory_mb', value || 0)}
@@ -202,6 +200,7 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <NumberInput
                         allowDecimal={false}
+                        error={form.errors.disk_mb}
                         label="Disk (MB)"
                         min={1024}
                         onChange={(value) => form.setData('disk_mb', value || 0)}
@@ -249,7 +248,7 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     <Title order={3}>Endpoint preview</Title>
                   </Group>
                   <Text c="dimmed" size="sm">
-                    This preview is the only public target users should ever see.
+                    This is the only public target users should ever see. Backend coordinates stay hidden behind mc-router.
                   </Text>
                   <Paper p="md" radius="lg" style={{ background: 'rgba(25, 135, 84, 0.08)' }} withBorder>
                     <Stack gap={3}>
@@ -284,13 +283,13 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     <Title order={4}>Current scope</Title>
                   </Group>
                   <Text c="dimmed" size="sm">
-                    The form is intentionally incomplete. Provider orchestration, route creation, and success handling stay
-                    behind the `T-300` and `T-500` gates.
+                    The create intake is live now. Provider orchestration and route apply still continue behind the background
+                    worker boundary.
                   </Text>
                   <List spacing="xs" size="sm" icon={<IconCircleCheck size={14} />}>
-                    <List.Item>Request draft stays local to the UI flow.</List.Item>
+                    <List.Item>Accepted requests persist a provisional server record immediately.</List.Item>
                     <List.Item>Preview always uses the shared public endpoint.</List.Item>
-                    <List.Item>No fake success state is shown.</List.Item>
+                    <List.Item>The detail page becomes the source of truth for `provisioning` progress.</List.Item>
                   </List>
                 </Stack>
               </Paper>

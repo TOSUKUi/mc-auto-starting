@@ -44,7 +44,7 @@
 | T-402 | P4 | Implement config renderer | T-401 | todo | Whole router config can be rendered |
 | T-403 | P4 | Implement config applier and reload | T-402 | todo | Config can be written and reload triggered safely |
 | T-404 | P4 | Implement route health checking | T-403 | todo | Route/application health can be persisted |
-| T-500 | P5 | Implement server create controller flow | T-102,T-106,T-201,T-301 | todo | Create request stores provisional record and queues work |
+| T-500 | P5 | Implement server create controller flow | T-102,T-106,T-201,T-301 | done | Create request stores provisional record and queues work |
 | T-501 | P5 | Implement create job end-to-end | T-500,T-302,T-403 | todo | Provider create, backend save, route apply, ready transition all work |
 | T-502 | P5 | Implement rollback and failure-state handling | T-501 | todo | Failed create does not leave inconsistent publication state |
 | T-503 | P5 | Implement delete flow | T-403,T-302,T-106 | todo | Deletion removes route and updates DB state |
@@ -53,7 +53,7 @@
 | T-600 | P6 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
 | T-601 | P6 | Build login page | T-100,T-004 | done | UI login works |
 | T-602 | P6 | Build server index page | T-107,T-600 | done | User sees only owned/member servers |
-| T-603 | P6 | Build server creation page | T-500,T-600,T-202 | in_progress | User can submit create request and see status |
+| T-603 | P6 | Build server creation page | T-500,T-600,T-202 | done | User can submit create request and see status |
 | T-604 | P6 | Build server detail page | T-504,T-600 | todo | User can inspect and operate server |
 | T-605 | P6 | Build members management page | T-103,T-106,T-600 | done | Owner can manage memberships |
 | T-606 | P6 | Build audit log page | T-105,T-505,T-600 | todo | User can read relevant event history |
@@ -72,9 +72,9 @@
 | T-902 | P9 | Document release, migration, and rollback procedure | T-803 | todo | Release workflow is written and reviewable |
 
 ## Critical Path Tasks
-The main critical path currently is:
+The main remaining critical path currently is:
 
-`T-000 -> T-001 -> T-002 -> T-003 -> T-100 -> T-101 -> T-102 -> T-200 -> T-201 -> T-300 -> T-301 -> T-302 -> T-400 -> T-401 -> T-402 -> T-403 -> T-500 -> T-501 -> T-700/T-701/T-702 -> T-602/T-603/T-604 -> T-803`
+`T-400 -> T-401 -> T-402 -> T-403 -> T-501 -> T-700/T-701/T-702 -> T-604 -> T-803`
 
 ## Known Blockers
 - `T-400`: final mc-router config/reload contract is not confirmed

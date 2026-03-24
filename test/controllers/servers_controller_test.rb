@@ -1,6 +1,17 @@
 require "test_helper"
 
 class ServersControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
+  setup do
+    ActiveJob::Base.queue_adapter = :test
+    clear_enqueued_jobs
+  end
+
+  teardown do
+    clear_enqueued_jobs
+  end
+
   test "redirects unauthenticated users to login for index" do
     get servers_url
 
@@ -63,5 +74,65 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     get server_url(minecraft_servers(:two), format: :json)
 
     assert_response :not_found
+  end
+
+  test "create stores a provisional server and enqueues provisioning job" do
+    sign_in_as(users(:two))
+
+    assert_difference("MinecraftServer.count", 1) do
+      assert_difference("RouterRoute.count", 1) do
+        assert_enqueued_jobs 1, only: CreateServerJob do
+          post servers_url, params: {
+            minecraft_server: {
+              name: "Creative Build",
+              hostname: "Creative-Build",
+              minecraft_version: "1.21.4",
+              memory_mb: 8192,
+              disk_mb: 40960,
+              template_kind: "paper",
+            },
+          }
+        end
+      end
+    end
+
+    server = MinecraftServer.order(:id).last
+
+    assert_redirected_to server_path(server)
+    assert_equal users(:two).id, server.owner_id
+    assert_equal "creative-build", server.hostname
+    assert_equal "provisioning", server.status
+    assert_equal ExecutionProvider.config.provider_name, server.provider_name
+    assert_nil server.provider_server_id
+    assert_nil server.backend_host
+    assert_nil server.backend_port
+    assert_equal "paper", server.template_kind
+    assert_equal false, server.router_route.enabled
+    assert_equal "pending", server.router_route.last_apply_status
+    assert_equal "unknown", server.router_route.last_healthcheck_status
+  end
+
+  test "create returns validation errors without storing a server" do
+    sign_in_as(users(:one))
+
+    assert_no_difference("MinecraftServer.count") do
+      assert_no_difference("RouterRoute.count") do
+        post servers_url(format: :json), params: {
+          minecraft_server: {
+            name: "",
+            hostname: "bad host",
+            minecraft_version: "1.21.4",
+            memory_mb: 0,
+            disk_mb: 0,
+            template_kind: "",
+          },
+        }
+      end
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes response.parsed_body.fetch("errors").keys, "name"
+    assert_includes response.parsed_body.fetch("errors").keys, "hostname"
+    assert_includes response.parsed_body.fetch("errors").keys, "memory_mb"
   end
 end
