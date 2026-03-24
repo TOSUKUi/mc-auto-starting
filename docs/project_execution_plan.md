@@ -130,14 +130,12 @@
 - 完了条件:
   - サーバーと 1 対 1 または明確な関連で route 情報を保持できる
 
-#### P1-6 audit_logs テーブルとモデル
+#### P1-6 監査ログ方針
 
-- generator で model / migration を作成する
-- event_type と payload schema の方針を決める
-- 初期実装では `minecraft_server` を必須、`actor` は system event 用に optional とする
-- `payload` は JSON で保持し、空 object を default にする
+- 初期版 product scope では監査ログの model / table / UI を持たない
+- 将来必要になった場合のみ監査ログを再導入する
 - 完了条件:
-  - 監査ログ基盤自体は存在するが、初期版 product scope では積極利用しない
+  - 現行コードベースに audit 専用 model / policy / UI が残っていない
 - 将来メモ:
   - 監査ログを再導入する場合は custom 実装を増やさず、`audited` gem を優先候補にする
 
@@ -146,7 +144,7 @@
 - Pundit などの認可基盤を導入する
 - owner / operator / viewer の権限制御を定義する
 - 一覧 API / 詳細取得 / 更新 / 削除を保護する
-- 初期実装では Pundit を採用し、`MinecraftServerPolicy`、`ServerMemberPolicy`、`MonitoringPolicy` を置く
+- 初期実装では Pundit を採用し、`MinecraftServerPolicy` と `ServerMemberPolicy` を置く
 - owner は管理系を許可、operator は lifecycle 操作を許可、viewer は参照のみ許可とする
 - 完了条件:
   - 他人の server ID を指定しても取得できない

@@ -48,7 +48,7 @@ class MinecraftServerTest < ActiveSupport::TestCase
 
   test "rejects reserved hostname" do
     server = minecraft_servers(:one)
-    server.hostname = "monitoring"
+    server.hostname = "admin"
 
     assert_not server.valid?
     assert_includes server.errors[:hostname], "is reserved"

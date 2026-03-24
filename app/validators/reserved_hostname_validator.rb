@@ -6,8 +6,6 @@ class ReservedHostnameValidator < ActiveModel::EachValidator
     health
     internal
     mc-router
-    monitor
-    monitoring
     root
     status
     support

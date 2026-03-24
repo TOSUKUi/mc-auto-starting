@@ -1,8 +1,12 @@
-class CreateAuditLogs < ActiveRecord::Migration[8.1]
-  def change
+class DropAuditLogs < ActiveRecord::Migration[8.1]
+  def up
+    drop_table :audit_logs, if_exists: true
+  end
+
+  def down
     create_table :audit_logs do |t|
       t.references :minecraft_server, null: false, foreign_key: true
-      t.references :actor, foreign_key: { to_table: :users }
+      t.references :actor, null: true, foreign_key: { to_table: :users }
       t.string :event_type, null: false
       t.json :payload, null: false, default: {}
 

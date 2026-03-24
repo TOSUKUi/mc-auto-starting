@@ -23,10 +23,6 @@ class MinecraftServerPolicy < ApplicationPolicy
     owner?
   end
 
-  def read_audit_logs?
-    visible_to_user?
-  end
-
   def start?
     owner? || operator?
   end

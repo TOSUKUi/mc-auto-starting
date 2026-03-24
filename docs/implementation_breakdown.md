@@ -336,7 +336,7 @@ app/frontend/
 2. `minecraft_servers` 作成
 3. `server_members` 作成
 4. `router_routes` 作成
-5. `audit_logs` 作成
+5. 監査ログは initial scope から外す
 6. モデル関連付け定義
 7. 所有者 / メンバー可視性制御実装
 8. サーバー一覧のスコープ実装

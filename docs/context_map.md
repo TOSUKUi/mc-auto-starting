@@ -48,7 +48,6 @@ This file tells any contributor or agent where to find authoritative information
 - Hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are installed through `T-203`.
 - `ServerMember` baseline is installed through `T-103`.
 - `RouterRoute` baseline is installed through `T-104`.
-- `AuditLog` baseline is installed through `T-105`.
 - Server visibility scopes and request protections are installed through `T-107`.
 - The authenticated layout shell is installed through `T-600`.
 - The login page UI is installed through `T-601`.
@@ -62,6 +61,7 @@ This file tells any contributor or agent where to find authoritative information
 - The mc-router contract is fixed through `T-400` in `docs/router_api_contract.md`.
 - The route definition builder, config renderer, and config applier baselines are installed through `T-401`, `T-402`, and `T-403`.
 - The provider-backed create job flow is installed through `T-501`; provisioning now resolves template config, creates the provider server, persists backend identifiers, applies router config, and transitions to `ready` on success.
+- Out-of-scope audit-log and monitoring code has been removed from the app codebase.
 - Application scope is centered on server lifecycle and publication consistency; mc-router liveness is handled outside the app via Docker health checks.
 - Monitoring dashboards, audit-log viewing pages, audit event recording, and unknown-hostname analytics are currently out of scope.
 - If audit logging returns in a future phase, the preferred implementation baseline is the `audited` gem.

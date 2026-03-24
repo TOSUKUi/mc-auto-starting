@@ -28,7 +28,7 @@
 | T-102 | P1 | Generate `MinecraftServer` model and migration | T-101 | done | Server model stores owner, status, backend, provider identifiers |
 | T-103 | P1 | Generate `ServerMember` model and migration | T-102 | done | Membership and role model works |
 | T-104 | P1 | Generate `RouterRoute` model and migration | T-102 | done | Route state can be persisted |
-| T-105 | P1 | Generate `AuditLog` model and migration | T-101 | done | Audit events can be recorded |
+| T-105 | P1 | Remove out-of-scope audit log baseline | T-101 | done | AuditLog model, tests, and DB table are no longer part of the active app baseline |
 | T-106 | P1 | Add authorization framework and policies | T-101,T-102,T-103 | done | Owner/member visibility rules are enforced |
 | T-107 | P1 | Add server visibility scopes and request protections | T-106 | done | Users cannot fetch other users' servers |
 | T-200 | P2 | Define hostname normalization rules | T-102 | done | Allowed characters, lowercase rule, reserved words documented and coded |
@@ -63,7 +63,7 @@
 | T-702 | P7 | Implement DB vs execution-provider consistency check | T-302,T-102 | todo | Missing/extraneous provider servers are detectable |
 | T-703 | P7 | Implement backend connectivity checks | T-302,T-102 | todo | Backend reachability is persisted |
 | T-704 | P7 | Keep unknown hostname rejection at router-contract level only | T-400 | done | The app relies on mc-router contract/config for unknown-host rejection and does not build analytics or an in-app detector |
-| T-800 | P8 | Add model tests | T-101,T-102,T-103,T-104,T-105,T-201,T-203 | todo | Core domain logic is covered |
+| T-800 | P8 | Add model tests | T-101,T-102,T-103,T-104,T-201,T-203 | todo | Core domain logic is covered |
 | T-801 | P8 | Add request and authorization tests | T-106,T-107,T-500,T-503,T-504 | todo | Access control regressions are caught |
 | T-802 | P8 | Add service and job tests | T-301,T-302,T-403,T-501,T-701,T-702 | todo | Critical async and service paths are covered |
 | T-803 | P8 | Add acceptance checks for requirement criteria | T-403,T-501,T-503,T-504 | todo | Main acceptance conditions are verifiable |

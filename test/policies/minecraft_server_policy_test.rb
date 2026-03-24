@@ -8,7 +8,6 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert policy.update?
     assert policy.destroy?
     assert policy.manage_members?
-    assert policy.read_audit_logs?
     assert policy.start?
     assert policy.stop?
     assert policy.restart?
@@ -19,7 +18,6 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     policy = MinecraftServerPolicy.new(users(:three), minecraft_servers(:one))
 
     assert policy.show?
-    assert policy.read_audit_logs?
     assert policy.start?
     assert policy.stop?
     assert policy.restart?
@@ -33,7 +31,6 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     policy = MinecraftServerPolicy.new(users(:two), minecraft_servers(:one))
 
     assert policy.show?
-    assert policy.read_audit_logs?
     assert_not policy.start?
     assert_not policy.update?
     assert_not policy.destroy?
@@ -44,7 +41,6 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     policy = MinecraftServerPolicy.new(users(:three), minecraft_servers(:two))
 
     assert_not policy.show?
-    assert_not policy.read_audit_logs?
     assert_not policy.start?
   end
 
