@@ -147,8 +147,8 @@ Additional rule:
 - `T-301`: define the Ruby interface around the split Application/Client API model
 - `T-302`: implement the concrete Pterodactyl client(s)
 - `T-303`: configure both application and client credentials
-- `T-500` and `T-603`: reshape server creation flow around required Pterodactyl provisioning fields
-- `T-400`: still blocked independently on mc-router contract
+- `T-502`: harden rollback and failure-state handling around partial provisioning or route-apply failures
+- `T-504`: use the persisted provider server identifier for client-API lifecycle operations
 
 ## Sources
 - Official site: https://pterodactyl.io/

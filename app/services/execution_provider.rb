@@ -14,6 +14,7 @@ module ExecutionProvider
         read_timeout: raw_config.read_timeout,
         write_timeout: raw_config.write_timeout,
         client_class_name: raw_config.client_class_name,
+        provisioning_templates: raw_config.provisioning_templates,
       )
     end
 

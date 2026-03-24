@@ -34,6 +34,7 @@ class MinecraftServer < ApplicationRecord
   before_validation :normalize_hostname
 
   validates :name, :hostname, :status, :provider_name, :minecraft_version, :template_kind, presence: true
+  validates :provider_server_identifier, presence: true, if: -> { provider_server_id.present? }
   validates :hostname, hostname_format: true, reserved_hostname: true
   validates :hostname, uniqueness: true
   validates :memory_mb, :disk_mb, numericality: { only_integer: true, greater_than: 0 }

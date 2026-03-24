@@ -18,6 +18,7 @@ class Router::ConfigRendererTest < ActiveSupport::TestCase
       status: :ready,
       provider_name: "stub_provider",
       provider_server_id: "srv-alpha",
+      provider_server_identifier: "alpha1234",
       backend_host: "10.0.0.30",
       backend_port: 25565,
       minecraft_version: "1.21.4",

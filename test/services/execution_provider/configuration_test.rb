@@ -75,4 +75,19 @@ class ExecutionProvider::ConfigurationTest < ActiveSupport::TestCase
     assert_equal "pterodactyl", client.configuration.provider_name
     assert_equal ExecutionProvider.config.to_h, client.configuration.to_h
   end
+
+  test "stores provisioning template config" do
+    configuration = ExecutionProvider::Configuration.new(
+      provider_name: "pterodactyl",
+      provisioning_templates: {
+        paper: {
+          owner_id: 40,
+          node_id: 2,
+        },
+      },
+    )
+
+    assert_equal 40, configuration.provisioning_templates.dig(:paper, :owner_id)
+    assert_equal 2, configuration.provisioning_templates.dig(:paper, :node_id)
+  end
 end

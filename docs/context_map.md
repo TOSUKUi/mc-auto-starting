@@ -61,4 +61,5 @@ This file tells any contributor or agent where to find authoritative information
 - The server create intake flow is installed through `T-500`; create requests now persist provisional server state, create an initial pending `RouterRoute`, and enqueue `CreateServerJob`.
 - The mc-router contract is fixed through `T-400` in `docs/router_api_contract.md`.
 - The route definition builder, config renderer, and config applier baselines are installed through `T-401`, `T-402`, and `T-403`.
-- The current critical path now resumes at `T-501` for the create job end-to-end flow.
+- The provider-backed create job flow is installed through `T-501`; provisioning now resolves template config, creates the provider server, persists backend identifiers, applies router config, and transitions to `ready` on success.
+- The current critical path now moves into `T-700`, `T-701`, and `T-702`, while `T-502` remains pending for rollback hardening.

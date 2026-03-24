@@ -5,8 +5,6 @@ class CreateServerJob < ApplicationJob
     server = MinecraftServer.find_by(id: server_id)
     return if server.nil?
 
-    # T-500 only guarantees request intake plus enqueue.
-    # T-501 will replace this placeholder with provider provisioning and route apply.
-    server
+    Servers::ProvisionServer.new(server: server).call
   end
 end

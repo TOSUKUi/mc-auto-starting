@@ -299,6 +299,8 @@
 - success 時に `ready` へ遷移する
 - 完了条件:
   - 1 件の create が end-to-end で処理される
+- 進捗メモ:
+  - `T-501` 完了。`CreateServerJob` は `Servers::ProvisionServer` を通して provisioning template 解決、Pterodactyl create、`provider_server_id` と `provider_server_identifier` を含む backend 情報保存、mc-router config apply、成功時の `ready` 遷移まで処理する。
 
 #### P5-3 失敗時ロールバック
 

@@ -7,7 +7,8 @@ module ExecutionProvider
       :open_timeout,
       :read_timeout,
       :write_timeout,
-      :client_class_name
+      :client_class_name,
+      :provisioning_templates
 
     def initialize(
       provider_name:,
@@ -17,7 +18,8 @@ module ExecutionProvider
       open_timeout: 5,
       read_timeout: 30,
       write_timeout: 30,
-      client_class_name: nil
+      client_class_name: nil,
+      provisioning_templates: {}
     )
       @provider_name = provider_name.to_s
       @panel_url = panel_url.presence
@@ -27,6 +29,7 @@ module ExecutionProvider
       @read_timeout = Integer(read_timeout)
       @write_timeout = Integer(write_timeout)
       @client_class_name = (client_class_name.presence || default_client_class_name_for(@provider_name))
+      @provisioning_templates = provisioning_templates.deep_symbolize_keys
     end
 
     def client_class
@@ -49,6 +52,7 @@ module ExecutionProvider
         read_timeout: read_timeout,
         write_timeout: write_timeout,
         client_class_name: client_class_name,
+        provisioning_templates: provisioning_templates,
       }
     end
 

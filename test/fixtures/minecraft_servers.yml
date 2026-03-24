@@ -7,6 +7,7 @@ one:
   status: ready
   provider_name: stub_provider
   provider_server_id: srv-001
+  provider_server_identifier: abc12345
   backend_host: 10.0.0.21
   backend_port: 25565
   minecraft_version: 1.21.4
@@ -21,6 +22,7 @@ two:
   status: provisioning
   provider_name: stub_provider
   provider_server_id:
+  provider_server_identifier:
   backend_host:
   backend_port:
   minecraft_version: 1.21.4

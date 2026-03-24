@@ -6,3 +6,6 @@ Rails.application.config.x.execution_provider.open_timeout = ENV.fetch("EXECUTIO
 Rails.application.config.x.execution_provider.read_timeout = ENV.fetch("EXECUTION_PROVIDER_READ_TIMEOUT", 30)
 Rails.application.config.x.execution_provider.write_timeout = ENV.fetch("EXECUTION_PROVIDER_WRITE_TIMEOUT", 30)
 Rails.application.config.x.execution_provider.client_class_name = ENV["EXECUTION_PROVIDER_CLIENT_CLASS"]
+Rails.application.config.x.execution_provider.provisioning_templates = JSON.parse(
+  ENV.fetch("EXECUTION_PROVIDER_PROVISIONING_TEMPLATES", "{}")
+)
