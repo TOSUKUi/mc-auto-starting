@@ -50,6 +50,7 @@ This file tells any contributor or agent where to find authoritative information
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
 - The members management page UI is installed through `T-605`.
+- The server creation page UI is in progress under `T-603`; form and endpoint preview scaffolding are installed, but request execution remains blocked on `T-500`/`T-300`.
 - Development seed login is available as `dev@example.com` / `password`.
 - The critical path is currently blocked on `T-300` pending execution-provider API confirmation.
-- The next unblocked implementation entry point is `T-603` for the server creation page UI.
+- The active unblocked implementation entry point is `T-603` for the server creation page UI.

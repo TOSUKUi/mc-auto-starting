@@ -1,4 +1,38 @@
 class ServersController < InertiaController
+  def new
+    authorize MinecraftServer, :create?
+
+    respond_to do |format|
+      format.html do
+        render inertia: "servers/new", props: new_server_page_props
+      end
+
+      format.json do
+        render json: new_server_page_props
+      end
+    end
+  end
+
+  def create
+    authorize MinecraftServer, :create?
+
+    respond_to do |format|
+      format.html do
+        render inertia: "servers/new", props: new_server_page_props(
+          form_values: create_server_params.to_h,
+          blocker_message: "Server create requests are not wired yet. T-500 remains blocked by the provider contract in T-300.",
+        ), status: :not_implemented
+      end
+
+      format.json do
+        render json: new_server_page_props(
+          form_values: create_server_params.to_h,
+          blocker_message: "Server create requests are not wired yet. T-500 remains blocked by the provider contract in T-300.",
+        ), status: :not_implemented
+      end
+    end
+  end
+
   def index
     servers = policy_scope(MinecraftServer)
       .includes(:owner, :router_route, :server_members)
@@ -39,6 +73,49 @@ class ServersController < InertiaController
   end
 
   private
+    def new_server_page_props(form_values: {}, blocker_message: nil)
+      hostname = normalized_hostname(form_values[:hostname])
+
+      {
+        form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
+        template_options: template_options,
+        blocker_message: blocker_message,
+        public_endpoint: {
+          public_domain: MinecraftPublicEndpoint.public_domain,
+          public_port: MinecraftPublicEndpoint.public_port,
+          fqdn: hostname.present? ? MinecraftPublicEndpoint.fqdn_for(hostname) : nil,
+          connection_target: hostname.present? ? MinecraftPublicEndpoint.connection_target_for(hostname) : nil,
+        },
+      }
+    end
+
+    def default_new_server_form
+      {
+        name: "",
+        hostname: "",
+        minecraft_version: "1.21.4",
+        memory_mb: 4096,
+        disk_mb: 20480,
+        template_kind: "paper",
+      }
+    end
+
+    def template_options
+      [
+        { value: "paper", label: "Paper" },
+        { value: "fabric", label: "Fabric" },
+        { value: "velocity", label: "Velocity" },
+      ]
+    end
+
+    def create_server_params
+      params.expect(minecraft_server: [ :name, :hostname, :minecraft_version, :memory_mb, :disk_mb, :template_kind ])
+    end
+
+    def normalized_hostname(value)
+      value.to_s.strip.downcase.presence
+    end
+
     def server_summary(server)
       route = server.router_route
 

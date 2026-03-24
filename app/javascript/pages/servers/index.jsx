@@ -147,7 +147,7 @@ export default function ServersIndex({ servers, summary }) {
                 </Text>
               </Stack>
 
-              <Button component={Link} disabled href="/servers/new" variant="light">
+              <Button component={Link} href="/servers/new" variant="light">
                 New server
               </Button>
             </Group>
