@@ -18,7 +18,7 @@ module Servers
       server.transition_to!(:ready) unless server.status_ready?
       server
     rescue ExecutionProvider::Error => error
-      mark_provider_failure!(error)
+      rollback_provider_failure!(error)
       raise
     rescue Router::ApplyError => error
       mark_route_failure!(error)
@@ -71,9 +71,8 @@ module Servers
         )
       end
 
-      def mark_provider_failure!(error)
-        server.router_route.update!(last_apply_status: :failed)
-        server.transition_to!(:failed) if server.can_transition_to?(:failed)
+      def rollback_provider_failure!(error)
+        server.destroy! if server.persisted?
         Rails.logger.error("CreateServerJob provider provisioning failed for server=#{server.id}: #{error.class}: #{error.message}")
       end
 

@@ -7,6 +7,12 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     end
   end
 
+  FailingProviderClient = Struct.new(:error) do
+    def create_server(_request)
+      raise error
+    end
+  end
+
   FakeRouterApplier = Struct.new(:calls) do
     def call(routes:)
       calls << routes
@@ -71,6 +77,25 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal 1, router_applier.calls.size
   end
 
+  test "removes the provisional server record when provider provisioning fails" do
+    server = minecraft_servers(:two)
+    server.update!(template_kind: "paper")
+    provider_error = ExecutionProvider::RequestError.new("provider unavailable")
+
+    assert_difference("MinecraftServer.count", -1) do
+      assert_difference("RouterRoute.count", -1) do
+        assert_raises(ExecutionProvider::RequestError) do
+          Servers::ProvisionServer.new(
+            server: server,
+            provider_client: FailingProviderClient.new(provider_error),
+          ).call
+        end
+      end
+    end
+
+    assert_not MinecraftServer.exists?(server.id)
+  end
+
   test "marks the server unpublished when route apply fails" do
     server = minecraft_servers(:two)
     server.update!(template_kind: "paper")
@@ -101,6 +126,8 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     server.reload
 
     assert_equal "unpublished", server.status
+    assert_equal "321", server.provider_server_id
+    assert_equal "abcd1234", server.provider_server_identifier
     assert_equal false, server.router_route.enabled
     assert_equal "failed", server.router_route.last_apply_status
   end
