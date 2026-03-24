@@ -2,18 +2,22 @@ import {
   Alert,
   Button,
   Code,
+  Divider,
   Grid,
   Group,
+  List,
   NumberInput,
   Paper,
   Select,
+  SimpleGrid,
   Stack,
   Text,
   TextInput,
   Title,
+  ThemeIcon,
 } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { IconPlugConnected, IconRouteAltLeft } from '@tabler/icons-react'
+import { IconCircleCheck, IconPlugConnected, IconRouteAltLeft, IconServer2, IconSparkles } from '@tabler/icons-react'
 
 function normalizeHostname(value) {
   return value.trim().toLowerCase()
@@ -31,7 +35,14 @@ function endpointPreview(hostname, publicEndpoint) {
 
 export default function ServersNew({ blocker_message, form_defaults, public_endpoint, template_options }) {
   const form = useForm(form_defaults)
+  const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
+  const hasTouchedHostname = form.data.hostname.trim().length > 0
+  const resourceHints = [
+    { label: 'Memory', value: `${form.data.memory_mb.toLocaleString()} MB` },
+    { label: 'Disk', value: `${form.data.disk_mb.toLocaleString()} MB` },
+    { label: 'Template', value: template_options.find((item) => item.value === form.data.template_kind)?.label ?? 'Paper' },
+  ]
 
   const submit = (event) => {
     event.preventDefault()
@@ -43,16 +54,82 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
       <Head title="New Server" />
 
       <Stack gap="xl">
-        <Stack gap={4}>
-          <Text component={Link} href="/servers" size="sm">
-            Back to servers
-          </Text>
-          <Title order={1}>New server</Title>
-          <Text c="dimmed" maw={720}>
-            Prepare the requested hostname, template, and resource sizing first. The actual create request is still blocked
-            until the external execution-provider contract is confirmed.
-          </Text>
-        </Stack>
+        <Paper
+          p="xl"
+          radius="xl"
+          shadow="sm"
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(13,110,253,0.10) 0%, rgba(25,135,84,0.08) 42%, rgba(248,249,250,0.95) 100%)',
+          }}
+          withBorder
+        >
+          <Stack gap="lg">
+            <Group align="flex-start" justify="space-between">
+              <Stack gap={6}>
+                <Group gap="xs">
+                  <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
+                    <IconServer2 size={18} />
+                  </ThemeIcon>
+                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">
+                    Server creation
+                  </Text>
+                </Group>
+                <Title order={1}>New server</Title>
+                <Text c="dimmed" maw={760}>
+                  The request shape is ready, but the actual provider call is still blocked. Build the draft here, preview the
+                  public endpoint, and keep the operator flow honest.
+                </Text>
+              </Stack>
+
+              <Button component={Link} href="/servers" variant="light">
+                Back to servers
+              </Button>
+            </Group>
+
+            <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+              <Paper p="md" radius="lg" withBorder>
+                <Stack gap={4}>
+                  <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                    Preview target
+                  </Text>
+                  <Text fw={800} size="lg">
+                    hostname:port
+                  </Text>
+                  <Text c="dimmed" size="sm">
+                    Users will connect through the shared public edge, not a direct backend port.
+                  </Text>
+                </Stack>
+              </Paper>
+              <Paper p="md" radius="lg" withBorder>
+                <Stack gap={4}>
+                  <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                    Create status
+                  </Text>
+                  <Text fw={800} size="lg">
+                    Blocked by `T-300`
+                  </Text>
+                  <Text c="dimmed" size="sm">
+                    This screen collects intent only until provider wiring lands.
+                  </Text>
+                </Stack>
+              </Paper>
+              <Paper p="md" radius="lg" withBorder>
+                <Stack gap={4}>
+                  <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                    Current baseline
+                  </Text>
+                  <Text fw={800} size="lg">
+                    Pterodactyl + Wings
+                  </Text>
+                  <Text c="dimmed" size="sm">
+                    The provider contract is fixed, so this UI stays aligned with the eventual API shape.
+                  </Text>
+                </Stack>
+              </Paper>
+            </SimpleGrid>
+          </Stack>
+        </Paper>
 
         {blocker_message ? (
           <Alert color="orange" icon={<IconRouteAltLeft size={16} />} radius="md" variant="light">
@@ -62,9 +139,16 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
 
         <Grid gutter="lg">
           <Grid.Col span={{ base: 12, md: 8 }}>
-            <Paper p="lg" radius="lg" withBorder>
+            <Paper p="lg" radius="lg" shadow="sm" withBorder>
               <form onSubmit={submit}>
                 <Stack gap="md">
+                  <Stack gap={4}>
+                    <Title order={3}>Request details</Title>
+                    <Text c="dimmed" size="sm">
+                      Fill the metadata first. Backend provisioning will stay disabled until `T-500` is ready.
+                    </Text>
+                  </Stack>
+
                   <TextInput
                     label="Server name"
                     onChange={(event) => form.setData('name', event.currentTarget.value)}
@@ -73,7 +157,11 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     value={form.data.name}
                   />
                   <TextInput
-                    description="Lowercase letters, numbers, and internal hyphens only."
+                    description={
+                      hasTouchedHostname
+                        ? `Normalized preview: ${normalizedHostname || 'empty'}`
+                        : 'Lowercase letters, numbers, and internal hyphens only.'
+                    }
                     label="Hostname prefix"
                     onChange={(event) => form.setData('hostname', event.currentTarget.value)}
                     placeholder="main-survival"
@@ -124,8 +212,24 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
                     </Grid.Col>
                   </Grid>
 
+                  <Divider label="Draft summary" labelPosition="center" />
+                  <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+                    {resourceHints.map((item) => (
+                      <Paper key={item.label} p="md" radius="lg" withBorder>
+                        <Stack gap={2}>
+                          <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                            {item.label}
+                          </Text>
+                          <Text fw={800} size="lg">
+                            {item.value}
+                          </Text>
+                        </Stack>
+                      </Paper>
+                    ))}
+                  </SimpleGrid>
+
                   <Group justify="flex-end">
-                    <Button loading={form.processing} type="submit">
+                    <Button loading={form.processing} type="submit" variant="gradient" gradient={{ from: 'blue', to: 'cyan' }}>
                       Submit create request
                     </Button>
                   </Group>
@@ -136,37 +240,58 @@ export default function ServersNew({ blocker_message, form_defaults, public_endp
 
           <Grid.Col span={{ base: 12, md: 4 }}>
             <Stack gap="lg">
-              <Paper p="lg" radius="lg" withBorder>
-                <Stack gap="sm">
+              <Paper p="lg" radius="lg" shadow="sm" withBorder>
+                <Stack gap="md">
                   <Group gap="xs">
-                    <IconPlugConnected size={18} />
+                    <ThemeIcon color="cyan" radius="xl" size={32} variant="light">
+                      <IconPlugConnected size={16} />
+                    </ThemeIcon>
                     <Title order={3}>Endpoint preview</Title>
                   </Group>
                   <Text c="dimmed" size="sm">
-                    Users will always connect with the public shared endpoint.
+                    This preview is the only public target users should ever see.
                   </Text>
-                  <Text size="sm">
-                    Public port <Code>{public_endpoint.public_port}</Code>
-                  </Text>
-                  <Text size="sm">
-                    Domain <Code>{public_endpoint.public_domain}</Code>
-                  </Text>
-                  <Text size="sm">
-                    FQDN <Code>{preview?.fqdn ?? 'hostname.mc.tosukui.xyz'}</Code>
-                  </Text>
-                  <Text size="sm">
-                    Target <Code>{preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434'}</Code>
-                  </Text>
+                  <Paper p="md" radius="lg" style={{ background: 'rgba(25, 135, 84, 0.08)' }} withBorder>
+                    <Stack gap={3}>
+                      <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                        Connection target
+                      </Text>
+                      <Text fw={900} size="xl">
+                        {preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434'}
+                      </Text>
+                    </Stack>
+                  </Paper>
+                  <Stack gap={6}>
+                    <Text size="sm">
+                      FQDN <Code>{preview?.fqdn ?? 'hostname.mc.tosukui.xyz'}</Code>
+                    </Text>
+                    <Text size="sm">
+                      Public port <Code>{public_endpoint.public_port}</Code>
+                    </Text>
+                    <Text size="sm">
+                      Domain <Code>{public_endpoint.public_domain}</Code>
+                    </Text>
+                  </Stack>
                 </Stack>
               </Paper>
 
-              <Paper p="lg" radius="lg" withBorder>
+              <Paper p="lg" radius="lg" shadow="sm" withBorder>
                 <Stack gap="sm">
-                  <Title order={4}>Current scope</Title>
+                  <Group gap="xs">
+                    <ThemeIcon color="teal" radius="xl" size={32} variant="light">
+                      <IconSparkles size={16} />
+                    </ThemeIcon>
+                    <Title order={4}>Current scope</Title>
+                  </Group>
                   <Text c="dimmed" size="sm">
-                    This screen is in place first so the request shape, preview data, and operator flow can stabilize before
-                    provider orchestration lands.
+                    The form is intentionally incomplete. Provider orchestration, route creation, and success handling stay
+                    behind the `T-300` and `T-500` gates.
                   </Text>
+                  <List spacing="xs" size="sm" icon={<IconCircleCheck size={14} />}>
+                    <List.Item>Request draft stays local to the UI flow.</List.Item>
+                    <List.Item>Preview always uses the shared public endpoint.</List.Item>
+                    <List.Item>No fake success state is shown.</List.Item>
+                  </List>
                 </Stack>
               </Paper>
             </Stack>

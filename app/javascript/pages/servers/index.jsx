@@ -145,9 +145,13 @@ export default function ServersIndex({ servers, summary }) {
                   Owned and shared Minecraft servers visible to the current user. Connection targets are always shown in the
                   public `hostname:port` format.
                 </Text>
+                <Text c="dimmed" size="sm">
+                  Search stays local. Creation is routed through the new server draft screen, but the provider call is still
+                  blocked behind `T-500`.
+                </Text>
               </Stack>
 
-              <Button component={Link} href="/servers/new" variant="light">
+              <Button component={Link} href="/servers/new" variant="gradient" gradient={{ from: 'blue', to: 'cyan' }}>
                 New server
               </Button>
             </Group>
@@ -171,9 +175,14 @@ export default function ServersIndex({ servers, summary }) {
               value={query}
               w={{ base: '100%', sm: 360 }}
             />
-            <Text c="dimmed" size="sm">
-              Showing {filteredServers.length} of {servers.length}
-            </Text>
+            <Stack align="flex-end" gap={2}>
+              <Text c="dimmed" size="sm">
+                Showing {filteredServers.length} of {servers.length}
+              </Text>
+              <Text c="dimmed" size="xs">
+                Connection target is always `hostname:port`.
+              </Text>
+            </Stack>
           </Group>
         </Paper>
 
