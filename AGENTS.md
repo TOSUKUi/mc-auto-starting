@@ -88,6 +88,7 @@ Follow these rules unless the user overrides them.
 - Preserve the single-public-port model.
 - Route rejection for unknown hostnames is mandatory.
 - Do not add monitoring dashboards, audit-log browsing screens, audit event recording, or unknown-hostname analytics unless the user explicitly reintroduces them.
+- If audit logging is reintroduced later, prefer the `audited` gem instead of custom audit-trail implementation.
 - Do not add shortcut implementations that violate the architecture just to move faster.
 - UI copy should default to Japanese, while remaining compatible with English via shared locale handling.
 

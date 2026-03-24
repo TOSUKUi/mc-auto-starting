@@ -131,6 +131,7 @@
 - 監視 / 整合性ダッシュボードも初期版スコープに含めない
 - unknown hostname の reject は mc-router 契約で担保し、Rails 側では集計・可視化しない
 - mc-router の死活や listen ポートは Docker / runtime health check に委譲する
+- 将来もし監査ログを戻すなら、custom 実装ではなく `audited` gem を優先する
 
 ## 3. URL 設計
 

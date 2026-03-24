@@ -138,6 +138,8 @@
 - `payload` は JSON で保持し、空 object を default にする
 - 完了条件:
   - 監査ログ基盤自体は存在するが、初期版 product scope では積極利用しない
+- 将来メモ:
+  - 監査ログを再導入する場合は custom 実装を増やさず、`audited` gem を優先候補にする
 
 #### P1-7 認可ポリシー
 
@@ -334,6 +336,8 @@
 - 必要になった場合のみ、create / delete / lifecycle 操作の最小限イベント保存を再検討する
 - 完了条件:
   - 未実装で進める判断が docs と task board に反映されている
+- 将来メモ:
+  - 再導入時は `audited` gem ベースで要件を再整理する
 
 ### Phase 6: Web UI
 
