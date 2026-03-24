@@ -138,21 +138,20 @@
   - payload 要約
   - 発生日時
 
-### 2.8 監視
+### 2.8 運用補助
 
-#### 監視状態画面
+#### 管理用整合性画面
 
-- パス: `/monitoring`
-- 目的: 全体の router / 実行基盤 / 整合チェック結果を可視化
-- 表示項目:
-  - mc-router 死活
-  - listen ポート状態
-  - route 生成成否
-  - reload 成否
-  - 不整合件数
-  - 未登録 hostname アクセス件数
+- パス: 任意、必要性が固まるまで未確定
+- 目的: publication / provider の不整合が増えた場合に管理者が確認する
+- 表示候補:
+  - DB にある / router にない route
+  - router にある / DB にない route
+  - DB にある / 実行基盤にない server
+  - 実行基盤にある / DB で管理されていない server
 - 備考:
-  - 一般ユーザーには見せず、管理者向け画面とするのが妥当
+  - 初期版では必須画面にしない
+  - mc-router の死活や listen ポートは Docker / runtime health check に委譲する
 
 ## 3. URL 設計
 
@@ -184,7 +183,6 @@ DELETE /servers/:id/members/:user_id
 
 GET    /servers/:id/audit-logs
 
-GET    /monitoring
 GET    /health
 ```
 
@@ -195,7 +193,6 @@ GET    /health
   - 非同期状態ポーリング
   - route 反映状態再取得
   - 実行基盤状態取得
-  - 監視メトリクス取得
 
 #### JSON endpoint 候補
 
@@ -203,7 +200,6 @@ GET    /health
 GET /api/servers/:id/status
 GET /api/servers/:id/route-status
 GET /api/servers/:id/execution-status
-GET /api/monitoring/summary
 ```
 
 ## 4. Rails / Inertia ディレクトリ構成
@@ -218,10 +214,8 @@ app/
     servers_controller.rb
     server_members_controller.rb
     audit_logs_controller.rb
-    monitoring_controller.rb
     api/
       server_statuses_controller.rb
-      monitoring_summaries_controller.rb
 
   models/
     user.rb
@@ -234,7 +228,6 @@ app/
     application_policy.rb
     minecraft_server_policy.rb
     server_member_policy.rb
-    monitoring_policy.rb
 
   services/
     execution_provider/
@@ -254,7 +247,6 @@ app/
       sync_server_state.rb
     monitoring/
       consistency_checker.rb
-      unregistered_hostname_detector.rb
 
   jobs/
     create_server_job.rb
@@ -265,7 +257,6 @@ app/
 
   presenters/
     minecraft_server_presenter.rb
-    monitoring_summary_presenter.rb
 
   validators/
     hostname_format_validator.rb
@@ -297,8 +288,6 @@ app/frontend/
       edit.tsx
       members.tsx
       audit-logs.tsx
-    monitoring/
-      index.tsx
 
   components/
     servers/
@@ -308,9 +297,6 @@ app/frontend/
       route-status-panel.tsx
       execution-status-panel.tsx
       members-table.tsx
-    monitoring/
-      monitoring-summary-cards.tsx
-      inconsistencies-table.tsx
     common/
       app-shell.tsx
       copyable-text.tsx
@@ -437,16 +423,13 @@ app/frontend/
 7. 未登録 hostname reject 方針固定
 8. route 反映状態保存
 
-### フェーズ 6: 監視と整合性チェック
+### フェーズ 6: 整合性チェック
 
-1. mc-router プロセス死活チェック
-2. listen ポート死活チェック
-3. hostname ごとの route 存在確認
-4. backend 疎通確認
-5. 実行基盤状態取得ジョブ
-6. DB / router / 実行基盤突合ジョブ
-7. 未登録 hostname アクセス検知
-8. 異常状態遷移定義
+1. hostname ごとの route 存在確認
+2. backend 疎通確認
+3. 実行基盤状態取得ジョブ
+4. DB / router / 実行基盤突合ジョブ
+5. 異常状態遷移定義
 
 ### フェーズ 7: UI 実装
 
@@ -456,13 +439,12 @@ app/frontend/
 4. サーバー詳細画面
 5. メンバー管理画面
 6. 監査ログ画面
-7. 監視画面
-8. エラー通知と copy UI 整備
+7. エラー通知と copy UI 整備
 
 ### フェーズ 8: 運用補強
 
 1. 監査ログ保持方針反映
-2. 管理者向け監視権限制御
+2. 管理者向け運用補助権限制御
 3. リトライ戦略
 4. タイムアウト / circuit breaker 検討
 5. ドキュメント整備
@@ -511,4 +493,4 @@ app/frontend/
 3. サーバー一覧と作成画面の骨組みを先に出す
 4. 実行基盤 API クライアントの interface を固定する
 5. route 生成と apply を service 化する
-6. 非同期ジョブと監視ジョブを追加する
+6. 非同期ジョブと整合性チェックジョブを追加する
