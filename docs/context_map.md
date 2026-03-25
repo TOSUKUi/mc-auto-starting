@@ -11,6 +11,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for planned screens, routes, directory structure, and initial implementation decomposition.
 - `docs/provider_api_contract.md`
   Use for the fixed Pterodactyl/Wings execution-provider contract, auth split, endpoint set, and backend discovery rules.
+- `docs/provider_template_env_setup.md`
+  Use for the required `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` JSON shape, per-template required fields, and local/provider setup checks.
 - `docs/router_api_contract.md`
   Use for the fixed mc-router file format, unknown-host rejection policy, and reload strategy baseline.
 
@@ -57,7 +59,7 @@ This file tells any contributor or agent where to find authoritative information
 - Development seed login is available as `dev@example.com` / `password`.
 - The execution-provider contract is fixed through `T-300` using a Pterodactyl/Wings baseline.
 - The provider base client contract, concrete Pterodactyl client, and env-driven provider initialization are installed through `T-301`, `T-302`, and `T-303`.
-- `T-304` is the remaining provider-config operations task for provisioning template env setup; without it, real provisioning can still fail even though the create UI now hides unavailable templates.
+- `T-304` is complete in docs via `docs/provider_template_env_setup.md`; real provisioning still depends on the target environment actually setting those env values before Rails boots.
 - The server create intake flow is installed through `T-500`; create requests now persist provisional server state, create an initial pending `RouterRoute`, and enqueue `CreateServerJob`.
 - The mc-router contract is fixed through `T-400` in `docs/router_api_contract.md`.
 - The route definition builder, config renderer, and config applier baselines are installed through `T-401`, `T-402`, and `T-403`.

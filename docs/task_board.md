@@ -39,7 +39,7 @@
 | T-301 | P3 | Implement provider base client interface | T-300 | done | Unified create/delete/start/stop/restart/status contract exists |
 | T-302 | P3 | Implement concrete provider client | T-301 | done | Provider client can talk to target API or a stubbed equivalent |
 | T-303 | P3 | Add provider config and initialization | T-301 | done | Environment-driven provider selection works |
-| T-304 | P3 | Define and document provisioning template environment setup | T-303,T-501 | todo | Active environments have a documented `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` baseline for every exposed create-form template |
+| T-304 | P3 | Define and document provisioning template environment setup | T-303,T-501 | done | Active environments have a documented `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` baseline for every exposed create-form template |
 | T-400 | P4 | Confirm mc-router config and reload contract | T-200 | done | Input format and reload mechanism are known |
 | T-401 | P4 | Implement route definition builder | T-400,T-104 | done | Route definition can be built from DB state |
 | T-402 | P4 | Implement config renderer | T-401 | done | Whole router config can be rendered |
@@ -80,4 +80,3 @@ The main remaining critical path currently is:
 ## Known Blockers
 - No active blockers are recorded on the current critical path.
 - Operational note for `T-803`: before launching another Dockerized browser-check target, first verify whether an existing reachable app process is already serving the MCP-visible URL.
-- Operational gap tracked by `T-304`: if `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` is missing or incomplete, real provisioning will still fail even though the create UI now hides unavailable templates.
