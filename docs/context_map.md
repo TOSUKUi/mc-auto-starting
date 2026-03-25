@@ -57,6 +57,7 @@ This file tells any contributor or agent where to find authoritative information
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
 - `T-608` is the remaining Phase 6 UI task for Japanese-first copy cleanup across the current screens.
+- `T-609` is the planned Phase 6 simplification task for a Paper-only create baseline with no template selector in the UI.
 - The members management page UI is installed through `T-605`.
 - The server creation page UI is installed through `T-603`; the form now submits real create requests, shows validation errors, redirects into the server detail status view after intake, and wraps correctly on smartphone widths.
 - Development seed login is available as `dev@example.com` / `password`.

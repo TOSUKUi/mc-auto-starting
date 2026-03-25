@@ -430,6 +430,15 @@
   - 既定 locale `ja` で主要 UI が日本語表示される
   - optional な `en` 切替余地を壊さない
 
+#### P6-9 Paper 固定の create 簡略化
+
+- create UI から template 選択を外す
+- runtime baseline を `paper` 固定にする
+- provider template の docs と UI 前提を `paper` 基準へ寄せる
+- 完了条件:
+  - create form は `disk` / `memory` / `minecraft version` を中心に受け付ける
+  - `paper` は内部固定値として扱われ、operator が選択しない
+
 ### Phase 7: 整合性チェック
 
 #### P7-1 route 整合性チェック
