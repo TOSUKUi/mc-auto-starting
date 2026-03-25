@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Code,
   Divider,
@@ -16,7 +17,7 @@ import {
   ThemeIcon,
 } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { IconCircleCheck, IconPlugConnected, IconServer2, IconSparkles } from '@tabler/icons-react'
+import { IconAlertCircle, IconCircleCheck, IconPlugConnected, IconServer2, IconSparkles } from '@tabler/icons-react'
 
 function normalizeHostname(value) {
   return value.trim().toLowerCase()
@@ -34,17 +35,19 @@ function endpointPreview(hostname, publicEndpoint) {
 
 export default function ServersNew({ form_defaults, provider_name, public_endpoint, template_options }) {
   const form = useForm(form_defaults)
+  const hasConfiguredTemplates = template_options.length > 0
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const resourceHints = [
     { label: 'Memory', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: 'Disk', value: `${form.data.disk_mb.toLocaleString()} MB` },
-    { label: 'Template', value: template_options.find((item) => item.value === form.data.template_kind)?.label ?? 'Paper' },
+    { label: 'Template', value: template_options.find((item) => item.value === form.data.template_kind)?.label ?? 'Not configured' },
   ]
 
   const submit = (event) => {
     event?.preventDefault()
+    if (!hasConfiguredTemplates) return
     form.transform((data) => ({ minecraft_server: data }))
     form.post('/servers')
   }
@@ -141,6 +144,13 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
             <Paper p="lg" radius="lg" shadow="sm" withBorder>
               <form onSubmit={submit}>
                 <Stack gap="md">
+                  {!hasConfiguredTemplates ? (
+                    <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="Provider template missing" variant="light">
+                      The active execution provider has no provisioning templates configured yet. Add template entries before
+                      submitting a server create request.
+                    </Alert>
+                  ) : null}
+
                   <Stack gap={4}>
                     <Title order={3}>Request details</Title>
                     <Text c="dimmed" size="sm">
@@ -185,8 +195,10 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                         error={form.errors.template_kind}
                         label="Template"
                         onChange={(value) => form.setData('template_kind', value ?? form_defaults.template_kind)}
+                        placeholder={hasConfiguredTemplates ? undefined : 'No configured templates'}
                         required
                         value={form.data.template_kind}
+                        disabled={!hasConfiguredTemplates}
                       />
                     </Grid.Col>
                   </Grid>
@@ -235,6 +247,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
 
                   <Group justify="flex-end">
                     <Button
+                      disabled={!hasConfiguredTemplates}
                       fullWidth
                       loading={form.processing}
                       onClick={submit}

@@ -170,22 +170,25 @@ class ServersController < InertiaController
     end
 
     def default_new_server_form
+      default_template_kind = template_options.first&.fetch(:value, "")
+
       {
         name: "",
         hostname: "",
         minecraft_version: "1.21.4",
         memory_mb: 4096,
         disk_mb: 20480,
-        template_kind: "paper",
+        template_kind: default_template_kind,
       }
     end
 
     def template_options
-      [
-        { value: "paper", label: "Paper" },
-        { value: "fabric", label: "Fabric" },
-        { value: "velocity", label: "Velocity" },
-      ]
+      ExecutionProvider.config.provisioning_templates.keys.sort.map do |template_kind|
+        {
+          value: template_kind.to_s,
+          label: template_kind.to_s.humanize.titleize,
+        }
+      end
     end
 
     def create_server_params
