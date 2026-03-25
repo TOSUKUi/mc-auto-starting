@@ -7,6 +7,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       HOME: /tmp
       BUNDLE_PATH: /app/vendor/bundle
@@ -14,6 +15,13 @@ services:
       DB_PORT: 3306
       DB_USERNAME: app
       DB_PASSWORD: password
+      DOCKER_ENGINE_SOCKET_PATH: /var/run/docker.sock
+      MINECRAFT_PUBLIC_DOMAIN: mc.tosukui.xyz
+      MINECRAFT_PUBLIC_PORT: 42434
+      MINECRAFT_RUNTIME_IMAGE: itzg/minecraft-server
+      MINECRAFT_RUNTIME_NETWORK_NAME: mc_router_net
+      MC_ROUTER_ROUTES_CONFIG_PATH: /app/tmp/mc-router/routes.json
+      MC_ROUTER_RELOAD_STRATEGY: watch
     ports:
       - "3000:3000"
       - "3036:3036"

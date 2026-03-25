@@ -143,6 +143,13 @@
   - create/delete 前後で router 設定が正しく反映される
   - route enable/disable, config apply, and apply failure rollback are centralized in one service
 
+#### P3-2.5 direct-Docker env contract
+
+- Docker transport, public endpoint, runtime image, and shared network defaultsを env 契約として固定する
+- router file path / reload 設定を app 側から一貫して参照できるようにする
+- 完了条件:
+  - create flow が参照する image/network/public endpoint/router path の基準値が文書とコードで一致する
+
 #### P3-3 create flow 実装
 
 - DB レコード作成
@@ -248,6 +255,6 @@
 
 1. Pivot 方針の文書を固定する
 2. Docker socket の compose 方針を固める
-3. `T-303` と `T-304` で router publication と env contract を固める
+3. `T-303` と `T-304` は完了
 4. `T-400` 以降で direct-Docker create / lifecycle / delete を実装する
 5. そのあとに provider coupling cleanup を進める

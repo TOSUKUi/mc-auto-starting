@@ -40,7 +40,7 @@
 | T-301 | P2 | Define Docker naming and label conventions | T-300,T-200 | done | Container names, volume names, and labels are fixed |
 | T-302 | P2 | Implement Docker Engine client wrapper | T-300 | done | Rails can create/inspect/start/stop/restart/remove managed containers |
 | T-303 | P2 | Implement `mc-router` publication update flow | T-200,T-204,T-300 | done | Route enable/disable + config apply is centralized so create/delete can reuse one publication path |
-| T-304 | P2 | Define direct-Docker environment contract | T-300,T-301 | todo | Required env such as image baseline, public domain, shared public port, and router paths are documented |
+| T-304 | P2 | Define direct-Docker environment contract | T-300,T-301 | done | Required env such as image baseline, public domain, shared public port, shared network, and router paths are documented and wired into app defaults |
 | T-400 | P3 | Implement direct-Docker create flow | T-200,T-201,T-202,T-203,T-302,T-303 | todo | Create request persists a server, creates Docker resources, updates router publication, and stores identifiers |
 | T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | todo | Delete removes managed container resources and unpublishes the router route |
 | T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | todo | Lifecycle operations update Docker state and Rails status correctly |
@@ -88,3 +88,4 @@ The current critical path is:
 - `T-204`: `RouterRoute` now derives its published server address and backend from the related `MinecraftServer`.
 - `T-303`: route publication apply/rollback is centralized in `Router::PublicationSync` so create/delete flows share one `mc-router` update path.
 - `T-302`: Docker Engine access is wrapped behind Excon-based Unix socket transport with managed labels, names, and the minimal lifecycle API surface.
+- `T-304`: direct-Docker defaults are fixed through env-backed `MinecraftPublicEndpoint`, `MinecraftRuntime`, compose defaults, and the dedicated env contract doc.

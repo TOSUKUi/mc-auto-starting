@@ -1,15 +1,15 @@
 module MinecraftPublicEndpoint
-  PUBLIC_DOMAIN = "mc.tosukui.xyz".freeze
-  PUBLIC_PORT = 42_434
+  DEFAULT_PUBLIC_DOMAIN = "mc.tosukui.xyz".freeze
+  DEFAULT_PUBLIC_PORT = 42_434
 
   module_function
 
   def public_domain
-    PUBLIC_DOMAIN
+    config.public_domain.to_s.presence || DEFAULT_PUBLIC_DOMAIN
   end
 
   def public_port
-    PUBLIC_PORT
+    Integer(config.public_port.presence || DEFAULT_PUBLIC_PORT)
   end
 
   def fqdn_for(hostname)
@@ -24,5 +24,9 @@ module MinecraftPublicEndpoint
     return if fqdn.blank?
 
     "#{fqdn}:#{public_port}"
+  end
+
+  def config
+    Rails.application.config.x.minecraft_public_endpoint
   end
 end

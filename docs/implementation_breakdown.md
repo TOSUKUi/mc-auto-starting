@@ -7,6 +7,7 @@
 - Rails アプリは `/var/run/docker.sock` をマウントされた単一ホスト control plane として振る舞う。
 - 初期版の実行イメージは `itzg/minecraft-server` 系を前提とする。
 - 公開方式は `mc-router` による「単一公開ポート + FQDN ベース振り分け」とする。
+- Docker transport, public endpoint, runtime image, and shared network defaults are supplied through the direct-Docker env contract.
 - 接続先表示は `<server-fqdn>:<shared_public_port>` を正本とする。
 - UI 文言は Rails I18n を正本とし、既定 locale は日本語、英語は将来対応に留める。
 

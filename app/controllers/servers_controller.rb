@@ -159,7 +159,7 @@ class ServersController < InertiaController
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
         template_kind: fixed_template_kind,
-        runtime_image: "itzg/minecraft-server",
+        runtime_image: MinecraftRuntime.image,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,

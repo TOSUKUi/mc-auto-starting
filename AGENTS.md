@@ -10,6 +10,7 @@ Current important files:
 
 - `Dockerfile`
 - `compose.yaml`
+- `docs/direct_docker_env_contract.md`
 - `docs/implementation_breakdown.md`
 - `docs/project_execution_plan.md`
 - `docs/task_board.md`
@@ -29,7 +30,8 @@ Current baseline:
 - `T-201` through `T-204` are complete: normalized hostname slugs, FQDN/connection-target formatting, status-transition rules, and retained `router_routes` publication responsibilities are now codified in shared helpers and models.
 - `T-302` is complete: a minimal `DockerEngine` wrapper now talks to Docker over `/var/run/docker.sock` via Excon-based Unix socket HTTP transport.
 - `T-303` is complete: route publication apply/rollback is now centralized so create/delete flows share one `mc-router` update path.
-- The next implementation critical-path task is `T-304`.
+- `T-304` is complete: direct-Docker env defaults for Docker transport, public endpoint, runtime image/network, and router config are now fixed in code and docs.
+- The next implementation critical-path task is `T-400`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -83,6 +85,7 @@ The active system has four parts.
 3. `docs/project_execution_plan.md`
 4. `docs/task_board.md`
 5. `docs/implementation_breakdown.md`
+6. `docs/direct_docker_env_contract.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.
@@ -149,7 +152,6 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 ## Immediate Next Start Point
 If no other instruction is given, start from the current critical path:
 
-1. `T-200` through `T-302` are complete
-2. Implement the direct-Docker env contract through `T-304`
-3. Then implement the direct-Docker create/lifecycle/delete flows while keeping `mc-router`
-4. Remove provider coupling after the direct-Docker path is working end to end
+1. `T-200` through `T-304` are complete
+2. Implement the direct-Docker create/lifecycle/delete flows while keeping `mc-router`
+3. Remove provider coupling after the direct-Docker path is working end to end
