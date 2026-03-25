@@ -1,8 +1,8 @@
 module Servers
   class DestroyServer
-    def initialize(server:, provider_client: ExecutionProvider.build_client, router_applier: Router::ConfigApplier.new)
+    def initialize(server:, docker_client: DockerEngine.build_client, router_applier: Router::ConfigApplier.new)
       @server = server
-      @provider_client = provider_client
+      @docker_client = docker_client
       @router_publication_sync = Router::PublicationSync.new(
         router_route: server&.router_route,
         enabled: false,
@@ -15,27 +15,40 @@ module Servers
 
       server.transition_to!(:deleting) unless server.status_deleting?
       unpublish_route!
-      delete_provider_server!
+      remove_container!
+      remove_volume!
       server.destroy!
     rescue Router::ApplyError => error
       mark_route_failure!(error)
       raise
-    rescue ExecutionProvider::Error => error
-      log_provider_failure!(error)
+    rescue DockerEngine::Error => error
+      log_docker_failure!(error)
       raise
     end
 
     private
-      attr_reader :server, :provider_client, :router_publication_sync
+      attr_reader :server, :docker_client, :router_publication_sync
 
       def unpublish_route!
         router_publication_sync.call
       end
 
-      def delete_provider_server!
-        return if server.provider_server_id.blank?
+      def remove_container!
+        docker_client.remove_container(id: container_reference, force: true) if container_reference.present?
+      rescue DockerEngine::NotFoundError
+        true
+      end
 
-        provider_client.delete_server(server.provider_server_id)
+      def remove_volume!
+        return if server.volume_name.blank?
+
+        docker_client.remove_volume(name: server.volume_name)
+      rescue DockerEngine::NotFoundError
+        true
+      end
+
+      def container_reference
+        server.container_id.presence || server.container_name.presence
       end
 
       def mark_route_failure!(error)
@@ -43,8 +56,9 @@ module Servers
         Rails.logger.error("DestroyServer route apply failed for server=#{server.id}: #{error.class}: #{error.message}")
       end
 
-      def log_provider_failure!(error)
-        Rails.logger.error("DestroyServer provider delete failed for server=#{server.id}: #{error.class}: #{error.message}")
+      def log_docker_failure!(error)
+        server.update!(last_error_message: error.message)
+        Rails.logger.error("DestroyServer docker cleanup failed for server=#{server.id}: #{error.class}: #{error.message}")
       end
   end
 end

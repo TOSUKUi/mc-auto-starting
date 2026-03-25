@@ -65,4 +65,5 @@ This file tells any contributor or agent where to find authoritative information
 - `T-304` is complete: Docker transport, public endpoint, runtime image/network, and router file/reload defaults are fixed in env-backed helpers and docs.
 - `T-400` is complete: the create job now provisions managed Docker resources, persists runtime state, and publishes the `mc-router` mapping.
 - The direct-Docker lifecycle/delete contract is now fixed in `docs/direct_docker_lifecycle_contract.md` ahead of service replacement work.
-- The next implementation critical path starts at `T-402`.
+- `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
+- The next implementation critical path starts at `T-500`.

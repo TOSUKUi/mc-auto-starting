@@ -258,5 +258,5 @@
 1. Pivot 方針の文書を固定する
 2. Docker socket の compose 方針を固める
 3. `T-303` と `T-304` は完了
-4. `T-400` は完了し、direct-Docker lifecycle/delete 契約も文書化済みで、次は `T-402` / `T-401` で service 実装へ入る
+4. `T-400` と `T-401` / `T-402` は完了し、次は `T-500` / `T-501` で create/detail UI を direct-Docker 前提へ簡素化する
 5. そのあとに provider coupling cleanup を進める

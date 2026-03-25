@@ -5,11 +5,15 @@ require "tmpdir"
 class ServersAcceptanceTest < ActionDispatch::IntegrationTest
   class FakeDockerClient
     class << self
-      attr_accessor :calls, :error_on
+      attr_accessor :calls, :error_on, :inspect_result
 
       def reset!
         self.calls = []
         self.error_on = nil
+        self.inspect_result = {
+          "Id" => "container-acceptance-001",
+          "State" => { "Status" => "running" },
+        }
       end
     end
 
@@ -34,23 +38,38 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
       true
     end
 
+    def stop_container(**kwargs)
+      record(:stop_container, kwargs)
+      raise_error!(:stop_container)
+
+      true
+    end
+
+    def restart_container(**kwargs)
+      record(:restart_container, kwargs)
+      raise_error!(:restart_container)
+
+      true
+    end
+
     def inspect_container(**kwargs)
       record(:inspect_container, kwargs)
       raise_error!(:inspect_container)
 
-      {
-        "Id" => "container-acceptance-001",
-        "State" => { "Status" => "running" },
-      }
+      self.class.inspect_result
     end
 
     def remove_container(**kwargs)
       record(:remove_container, kwargs)
+      raise_error!(:remove_container)
+
       true
     end
 
     def remove_volume(**kwargs)
       record(:remove_volume, kwargs)
+      raise_error!(:remove_volume)
+
       true
     end
 
@@ -66,78 +85,12 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
       end
   end
 
-  class FakeExecutionProviderClient
-    class << self
-      attr_accessor :created_requests, :create_result, :create_error, :deleted_ids, :power_calls, :status_result
-
-      def reset!
-        self.created_requests = []
-        self.create_result = nil
-        self.create_error = nil
-        self.deleted_ids = []
-        self.power_calls = []
-        self.status_result = nil
-      end
-    end
-
-    def initialize(configuration:)
-      @configuration = configuration
-    end
-
-    def create_server(request)
-      self.class.created_requests << request
-      raise self.class.create_error if self.class.create_error
-
-      self.class.create_result || raise("FakeExecutionProviderClient.create_result must be configured")
-    end
-
-    def delete_server(provider_server_id)
-      self.class.deleted_ids << provider_server_id
-      true
-    end
-
-    def start_server(identifier)
-      self.class.power_calls << [ :start, identifier ]
-      lifecycle_result(identifier, "start")
-    end
-
-    def stop_server(identifier)
-      self.class.power_calls << [ :stop, identifier ]
-      lifecycle_result(identifier, "stop")
-    end
-
-    def restart_server(identifier)
-      self.class.power_calls << [ :restart, identifier ]
-      lifecycle_result(identifier, "restart")
-    end
-
-    def fetch_status(identifier)
-      self.class.power_calls << [ :sync, identifier ]
-      self.class.status_result || raise("FakeExecutionProviderClient.status_result must be configured")
-    end
-
-    private
-      attr_reader :configuration
-
-      def lifecycle_result(identifier, action)
-        ExecutionProvider::LifecycleResult.new(
-          provider_server_id: identifier,
-          action: action,
-          accepted: true,
-          raw: { provider_name: configuration.provider_name },
-        )
-      end
-  end
-
   setup do
-    @original_execution_provider_config = Rails.application.config.x.execution_provider
     @original_mc_router_config = Rails.application.config.x.mc_router
     @original_docker_build_client = DockerEngine.method(:build_client)
     @tmpdir = Dir.mktmpdir("servers-acceptance")
 
     FakeDockerClient.reset!
-    FakeExecutionProviderClient.reset!
-    Rails.application.config.x.execution_provider = acceptance_provider_config
     Rails.application.config.x.mc_router = Router::Configuration.new(
       routes_config_path: File.join(@tmpdir, "routes.json"),
       reload_strategy: "watch",
@@ -148,7 +101,6 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
   end
 
   teardown do
-    Rails.application.config.x.execution_provider = @original_execution_provider_config
     Rails.application.config.x.mc_router = @original_mc_router_config
     DockerEngine.define_singleton_method(:build_client, @original_docker_build_client)
     FileUtils.remove_entry(@tmpdir) if @tmpdir && File.exist?(@tmpdir)
@@ -281,7 +233,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     )
   end
 
-  test "owner delete request removes publication and provider record" do
+  test "owner delete request removes publication and Docker resources" do
     sign_in_as(users(:one))
 
     assert_difference("MinecraftServer.count", -1) do
@@ -291,7 +243,8 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :no_content
-    assert_equal [ "srv-001" ], FakeExecutionProviderClient.deleted_ids
+    assert_includes FakeDockerClient.calls, [ :remove_container, { id: "container-001", force: true } ]
+    assert_includes FakeDockerClient.calls, [ :remove_volume, { name: "mc-data-main-survival" } ]
 
     mappings = JSON.parse(File.read(File.join(@tmpdir, "routes.json"))).fetch("mappings")
     assert_not mappings.key?("main-survival.mc.tosukui.xyz")
@@ -300,13 +253,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
   test "operator can start a visible server and sync it back to ready" do
     sign_in_as(users(:three))
     server = minecraft_servers(:one)
-    server.update_columns(status: "stopped")
-    FakeExecutionProviderClient.status_result = ExecutionProvider::ServerStatus.new(
-      provider_server_id: server.provider_server_identifier,
-      state: "running",
-      rails_status: "ready",
-      raw: {},
-    )
+    server.update_columns(status: "stopped", container_state: "exited")
 
     post start_server_url(server, format: :json)
 
@@ -317,37 +264,17 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal "ready", response.parsed_body.fetch("server").fetch("status")
-    assert_equal [ [ :start, "abc12345" ], [ :sync, "abc12345" ] ], FakeExecutionProviderClient.power_calls
+    assert_equal(
+      [
+        [ :start_container, { id: "container-001" } ],
+        [ :inspect_container, { id_or_name: "container-001" } ],
+        [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
+      ],
+      FakeDockerClient.calls.last(3),
+    )
   end
 
   private
-    def acceptance_provider_config
-      ExecutionProvider::Configuration.new(
-        provider_name: "acceptance_stub",
-        client_class_name: "ServersAcceptanceTest::FakeExecutionProviderClient",
-        provisioning_templates: {
-          paper: {
-            owner_id: 40,
-            node_id: 2,
-            egg_id: 7,
-            allocation_id: 21,
-            environment: {
-              server_jarfile: "paper.jar",
-            },
-          },
-          velocity: {
-            owner_id: 40,
-            node_id: 2,
-            egg_id: 8,
-            allocation_id: 22,
-            environment: {
-              server_jarfile: "velocity.jar",
-            },
-          },
-        },
-      )
-    end
-
     def normalize_docker_calls(calls)
       calls.map do |name, payload|
         [

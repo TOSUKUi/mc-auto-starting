@@ -100,7 +100,7 @@ class ServersController < InertiaController
         head :no_content
       end
     end
-  rescue ExecutionProvider::Error, Router::ApplyError => error
+  rescue DockerEngine::Error, Router::ApplyError => error
     respond_to do |format|
       format.html do
         redirect_to server_path(server), alert: "Server deletion failed: #{error.message}"
@@ -118,7 +118,7 @@ class ServersController < InertiaController
 
     Servers::StartServer.new(server: server).call
     respond_with_server_action(server, notice: "Server start accepted.")
-  rescue ExecutionProvider::Error => error
+  rescue DockerEngine::Error => error
     respond_with_server_error(server, error)
   end
 
@@ -128,7 +128,7 @@ class ServersController < InertiaController
 
     Servers::StopServer.new(server: server).call
     respond_with_server_action(server, notice: "Server stop accepted.")
-  rescue ExecutionProvider::Error => error
+  rescue DockerEngine::Error => error
     respond_with_server_error(server, error)
   end
 
@@ -138,7 +138,7 @@ class ServersController < InertiaController
 
     Servers::RestartServer.new(server: server).call
     respond_with_server_action(server, notice: "Server restart accepted.")
-  rescue ExecutionProvider::Error => error
+  rescue DockerEngine::Error => error
     respond_with_server_error(server, error)
   end
 
@@ -148,7 +148,7 @@ class ServersController < InertiaController
 
     Servers::SyncServerState.new(server: server).call
     respond_with_server_action(server, notice: "Server status synchronized.")
-  rescue ExecutionProvider::Error => error
+  rescue DockerEngine::Error => error
     respond_with_server_error(server, error)
   end
 

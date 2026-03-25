@@ -1,32 +1,48 @@
 module Servers
   class SyncServerState
-    def initialize(server:, provider_client: ExecutionProvider.build_client)
+    def initialize(server:, docker_client: DockerEngine.build_client)
       @server = server
-      @provider_client = provider_client
+      @docker_client = docker_client
     end
 
     def call
       return if server.nil?
 
-      provider_status = provider_client.fetch_status(lifecycle_identifier)
-      apply_provider_status!(provider_status.rails_status)
+      inspection = docker_client.inspect_container(id_or_name: container_reference)
+      apply_runtime_state!(inspection)
       server
-    rescue ExecutionProvider::NotFoundError
-      transition_to_degraded!
+    rescue DockerEngine::NotFoundError => error
+      mark_missing_runtime!(error)
       server
     end
 
     private
-      attr_reader :server, :provider_client
+      DOCKER_STATE_TO_RAILS_STATUS = Servers::LifecycleOperation::DOCKER_STATE_TO_RAILS_STATUS
 
-      def lifecycle_identifier
-        server.provider_server_identifier.presence || raise(
-          ExecutionProvider::ValidationError,
-          "provider_server_identifier is required for lifecycle operations"
+      attr_reader :server, :docker_client
+
+      def container_reference
+        server.container_id.presence || server.container_name.presence || raise(
+          DockerEngine::ValidationError.new(
+            "managed container reference is required for lifecycle operations",
+          )
         )
       end
 
-      def apply_provider_status!(next_status)
+      def apply_runtime_state!(inspection)
+        container_state = inspection.dig("State", "Status").presence || "unknown"
+        mapped_status = DOCKER_STATE_TO_RAILS_STATUS.fetch(container_state, :degraded)
+
+        server.update!(
+          container_id: inspection.fetch("Id", server.container_id),
+          container_state: container_state,
+          last_error_message: nil,
+        )
+
+        apply_status!(mapped_status)
+      end
+
+      def apply_status!(next_status)
         next_status = next_status.to_sym
         return if server.status.to_sym == next_status
 
@@ -35,6 +51,15 @@ module Servers
         else
           transition_to_degraded!
         end
+      end
+
+      def mark_missing_runtime!(error)
+        server.update!(
+          container_id: nil,
+          container_state: nil,
+          last_error_message: error.message,
+        )
+        transition_to_degraded!
       end
 
       def transition_to_degraded!
