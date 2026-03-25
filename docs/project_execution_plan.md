@@ -304,13 +304,13 @@
 
 #### P5-3 失敗時ロールバック
 
-- 実行基盤 create 失敗時の仮レコード削除
+- 実行基盤 create 失敗時の failed 化
 - route 反映失敗時の `unpublished` 化
 - reload 失敗時の `failed` または route 無効化
 - 完了条件:
   - 中途半端な公開状態を残さない
 - 進捗メモ:
-  - `T-502` 完了。provider create が失敗した provisional server は dependent route ごと削除し、route apply 失敗時は route を disabled + `last_apply_status=failed` にして `unpublished` へ倒す挙動をテスト付きで固定した。
+  - `T-502` 完了。provider create が失敗した provisional server は詳細画面から追えるよう `failed` のまま保持しつつ route を disabled にし、route apply 失敗時は route を disabled + `last_apply_status=failed` にして `unpublished` へ倒す挙動をテスト付きで固定した。
 
 #### P5-4 削除フロー
 

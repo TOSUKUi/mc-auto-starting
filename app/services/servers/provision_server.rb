@@ -72,7 +72,11 @@ module Servers
       end
 
       def rollback_provider_failure!(error)
-        server.destroy! if server.persisted?
+        if server.persisted?
+          server.router_route.update!(enabled: false)
+          server.transition_to!(:failed) if server.can_transition_to?(:failed)
+        end
+
         Rails.logger.error("CreateServerJob provider provisioning failed for server=#{server.id}: #{error.class}: #{error.message}")
       end
 
