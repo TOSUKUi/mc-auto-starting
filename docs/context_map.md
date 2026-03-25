@@ -65,9 +65,10 @@ This file tells any contributor or agent where to find authoritative information
 - The delete flow is installed through `T-503`; owners can delete a server, the route is unpublished before provider deletion, and the DB records are removed on success.
 - Lifecycle actions and provider-status sync are installed through `T-504`; start/stop/restart/sync endpoints now use the persisted provider server identifier for Client API operations and update Rails status accordingly.
 - The server detail page UI is installed through `T-604`; operators can inspect connection, route, provider backend, and run lifecycle actions from a single screen.
-- `T-803` is now in progress; acceptance coverage includes Docker-run Rails acceptance tests plus Playwright-based real-browser checks for the main signed-in flows.
+- `T-803` is now in progress; acceptance coverage includes Docker-run Rails acceptance tests plus Playwright-based real-browser checks for login, server index, create, detail, members, and delete flows.
 - Playwright MCP reachability note: in the current Docker host setup, the working browser target was `http://172.17.0.1:3000`; `localhost`, `127.0.0.1`, and the Docker service name were not reliable from the MCP side.
 - Before launching a new Dockerized `bin/dev` process for browser verification, first check whether an existing reachable app instance is already serving the target URL and reuse it when healthy.
+- The server detail page no longer emits the previous invalid HTML nesting warning during browser verification because non-text detail values now render through a `div` wrapper instead of a nested paragraph.
 - Inertia local-development behavior is adjusted for the current Docker/LAN workflow; history encryption is disabled outside production, Mantine GET navigation uses `renderRoot` with Inertia `Link`, and the create form avoids chained `transform().post()` calls in React.
 - Out-of-scope audit-log and monitoring code has been removed from the app codebase.
 - Application scope is centered on server lifecycle and publication consistency; mc-router liveness is handled outside the app via Docker health checks.

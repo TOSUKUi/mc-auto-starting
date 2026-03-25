@@ -62,7 +62,7 @@ function DetailLine({ label, value }) {
       <Text c="dimmed" fw={600} size="xs" tt="uppercase">
         {label}
       </Text>
-      <Text>{value}</Text>
+      <Text component="div">{value}</Text>
     </Stack>
   )
 }
