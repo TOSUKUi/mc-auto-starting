@@ -67,6 +67,7 @@ This file tells any contributor or agent where to find authoritative information
 - The server detail page UI is installed through `T-604`; operators can inspect connection, route, provider backend, and run lifecycle actions from a single screen.
 - `T-803` is now in progress; acceptance coverage includes Docker-run Rails acceptance tests plus Playwright-based real-browser checks for the main signed-in flows.
 - Playwright MCP reachability note: in the current Docker host setup, the working browser target was `http://172.17.0.1:3000`; `localhost`, `127.0.0.1`, and the Docker service name were not reliable from the MCP side.
+- Before launching a new Dockerized `bin/dev` process for browser verification, first check whether an existing reachable app instance is already serving the target URL and reuse it when healthy.
 - Inertia local-development behavior is adjusted for the current Docker/LAN workflow; history encryption is disabled outside production, Mantine GET navigation uses `renderRoot` with Inertia `Link`, and the create form avoids chained `transform().post()` calls in React.
 - Out-of-scope audit-log and monitoring code has been removed from the app codebase.
 - Application scope is centered on server lifecycle and publication consistency; mc-router liveness is handled outside the app via Docker health checks.

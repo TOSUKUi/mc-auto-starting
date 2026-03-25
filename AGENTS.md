@@ -112,6 +112,7 @@ Keep gems in `vendor/bundle` inside the workspace so the mapped app user can wri
 
 ## Browser Verification Notes
 - For Playwright MCP quality checks, confirm reachability from the MCP runtime, not only from inside the `app` container.
+- Before starting a new Dockerized Rails/Vite dev process for browser checks, first confirm whether an existing reachable app instance is already serving the target URL and reuse it if healthy.
 - In the current Docker setup, the reliable browser target was `http://172.17.0.1:3000`.
 - If `localhost` or `127.0.0.1` fails in Playwright while Rails still answers in Docker, treat that first as an MCP/container network-path issue.
 - Vite dev websocket errors may still appear during browser checks even when page render and navigation succeed; separate websocket noise from base page-flow verification.

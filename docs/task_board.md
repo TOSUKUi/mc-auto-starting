@@ -78,3 +78,4 @@ The main remaining critical path currently is:
 
 ## Known Blockers
 - No active blockers are recorded on the current critical path.
+- Operational note for `T-803`: before launching another Dockerized browser-check target, first verify whether an existing reachable app process is already serving the MCP-visible URL.
