@@ -146,8 +146,8 @@ export default function ServersIndex({ servers, summary }) {
                   public `hostname:port` format.
                 </Text>
                 <Text c="dimmed" size="sm">
-                  Search stays local. Creation is routed through the new server draft screen, but the provider call is still
-                  blocked behind `T-500`.
+                  Search stays local. Create requests persist immediately, then provisioning, publication, and lifecycle updates
+                  continue through the control-plane flow.
                 </Text>
               </Stack>
 

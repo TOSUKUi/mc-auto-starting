@@ -464,8 +464,9 @@
 - hostname 別ルーティング
 - 未登録 hostname reject
 - route 削除確認
+- Playwright による実ブラウザ導線確認
 - 完了条件:
-  - 要件定義の受け入れ条件を検証できる
+  - 要件定義の受け入れ条件を automated acceptance test と実ブラウザ確認の両方で検証できる
 
 ### Phase 9: 運用・保守
 

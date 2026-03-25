@@ -66,7 +66,7 @@
 | T-800 | P8 | Add model tests | T-101,T-102,T-103,T-104,T-201,T-203 | todo | Core domain logic is covered |
 | T-801 | P8 | Add request and authorization tests | T-106,T-107,T-500,T-503,T-504 | todo | Access control regressions are caught |
 | T-802 | P8 | Add service and job tests | T-301,T-302,T-403,T-501,T-701,T-702 | todo | Critical async and service paths are covered |
-| T-803 | P8 | Add acceptance checks for requirement criteria | T-403,T-501,T-503,T-504 | todo | Main acceptance conditions are verifiable |
+| T-803 | P8 | Add acceptance checks for requirement criteria | T-403,T-501,T-503,T-504 | in_progress | Main acceptance conditions are verifiable by automated acceptance tests and Playwright-based real-browser checks |
 | T-900 | P9 | Document setup and local development workflow | T-003,T-004,T-005 | todo | New contributor can boot project locally |
 | T-901 | P9 | Document provider and router integration operations | T-403,T-501 | todo | Operational integration steps are written |
 | T-902 | P9 | Document release, migration, and rollback procedure | T-803 | todo | Release workflow is written and reviewable |

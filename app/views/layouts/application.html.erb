@@ -20,10 +20,12 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
-    <%= vite_react_refresh_tag %>
-    <%= vite_client_tag %>
-    <%= vite_javascript_tag "inertia.jsx" %>
-    <%= inertia_ssr_head %>
+    <% if controller.is_a?(InertiaController) %>
+      <%= vite_react_refresh_tag %>
+      <%= vite_client_tag %>
+      <%= vite_javascript_tag "inertia.jsx" %>
+      <%= inertia_ssr_head %>
+    <% end %>
   </head>
 
   <body>
