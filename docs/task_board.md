@@ -88,5 +88,6 @@ The current critical path is:
 - `T-204`: `RouterRoute` now derives its published server address and backend from the related `MinecraftServer`.
 - `T-303`: route publication apply/rollback is centralized in `Router::PublicationSync` so create/delete flows share one `mc-router` update path.
 - `T-302`: Docker Engine access is wrapped behind Excon-based Unix socket transport with managed labels, names, and the minimal lifecycle API surface.
+- `T-302`: the wrapper defaults to unversioned Engine API paths and only prefixes `/v1.xx` when `DOCKER_ENGINE_API_VERSION` is explicitly set.
 - `T-304`: direct-Docker defaults are fixed through env-backed `MinecraftPublicEndpoint`, `MinecraftRuntime`, compose defaults, and the dedicated env contract doc.
 - `T-400`: `Servers::ProvisionServer` now creates a managed volume/container through `DockerEngine`, starts it, persists runtime state, and then publishes the route.

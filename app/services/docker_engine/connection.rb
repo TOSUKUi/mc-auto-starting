@@ -29,7 +29,7 @@ module DockerEngine
 
       def excon_connection
         @excon_connection ||= Excon.new(
-          "http://localhost",
+          "unix:///",
           socket: configuration.socket_path,
           connect_timeout: configuration.open_timeout,
           read_timeout: configuration.read_timeout,

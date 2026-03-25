@@ -1,6 +1,12 @@
 require "test_helper"
 
 class DockerEngine::ConfigurationTest < ActiveSupport::TestCase
+  test "defaults api_version to nil" do
+    configuration = DockerEngine::Configuration.new(socket_path: "/var/run/docker.sock")
+
+    assert_nil configuration.api_version
+  end
+
   test "casts timeout values and supports overrides" do
     configuration = DockerEngine::Configuration.new(
       socket_path: "/var/run/docker.sock",

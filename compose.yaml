@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
+    group_add:
+      - "${DOCKER_SOCKET_GID:-65534}"
     working_dir: /app
     volumes:
       - .:/app

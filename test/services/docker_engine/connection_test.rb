@@ -83,4 +83,24 @@ class DockerEngine::ConnectionTest < ActiveSupport::TestCase
     assert_equal 404, error.status
     assert_equal "No such container", error.message
   end
+
+  test "uses unversioned paths when api_version is blank" do
+    fake_connection = FakeExconConnection.new(
+      response_or_error: FakeRawResponse.new(
+        status: 200,
+        headers: { "Content-Type" => "application/json" },
+        body: JSON.generate({ "Version" => "1.44" }),
+      ),
+      requests: [],
+    )
+
+    configuration = DockerEngine::Configuration.new(socket_path: "/var/run/docker.sock")
+
+    DockerEngine::Connection.new(
+      configuration: configuration,
+      excon_connection: fake_connection,
+    ).request(method: :get, path: "/version")
+
+    assert_equal "/version", fake_connection.requests.fetch(0).fetch(:path)
+  end
 end

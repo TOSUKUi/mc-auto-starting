@@ -55,6 +55,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-200` is complete: `minecraft_servers` now has direct-Docker baseline fields for managed container/volume identity and runtime state.
 - `T-201` through `T-204` are complete: hostname slug normalization, FQDN/public-port connection formatting, status transitions, and `router_routes` publication responsibilities are fixed in code.
 - `T-302` is complete: Docker Engine access is wrapped behind `DockerEngine::Connection`, `DockerEngine::Client`, `DockerEngine::ManagedLabels`, and `DockerEngine::ManagedName`.
+- `T-302` defaults to unversioned Docker Engine API paths so local daemons do not need to support a hard-coded minimum API version.
 - The active architecture is now `Rails + docker.sock + mc-router` for single-host Minecraft container management.
 - `Pterodactyl/Wings` are no longer the current target architecture, but `mc-router` remains active.
 - `mc-router` and app-managed Minecraft containers are expected to share one bridge network, with router backends addressed by container name.

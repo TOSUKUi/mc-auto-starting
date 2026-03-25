@@ -29,6 +29,7 @@ Current baseline:
 - `T-200` is complete: `minecraft_servers` now carries direct-Docker baseline fields such as `container_name`, `container_id`, `volume_name`, `container_state`, and `last_started_at`, while router ingress remains active.
 - `T-201` through `T-204` are complete: normalized hostname slugs, FQDN/connection-target formatting, status-transition rules, and retained `router_routes` publication responsibilities are now codified in shared helpers and models.
 - `T-302` is complete: a minimal `DockerEngine` wrapper now talks to Docker over `/var/run/docker.sock` via Excon-based Unix socket HTTP transport.
+- `T-302` defaults to unversioned Docker Engine API paths and only prefixes `/v1.xx` when `DOCKER_ENGINE_API_VERSION` is explicitly set.
 - `T-303` is complete: route publication apply/rollback is now centralized so create/delete flows share one `mc-router` update path.
 - `T-304` is complete: direct-Docker env defaults for Docker transport, public endpoint, runtime image/network, and router config are now fixed in code and docs.
 - `T-400` is complete: create requests now provision managed Docker volume/container resources, start the container, persist runtime identifiers, and publish the router route.
@@ -99,6 +100,7 @@ Follow these rules unless the user overrides them.
 - Show end users the exact connection target as `<server-fqdn>:<shared_public_port>`.
 - Restrict visibility so users only see servers they own or belong to.
 - Treat `/var/run/docker.sock` access as high risk and document it clearly.
+- Keep `DOCKER_ENGINE_API_VERSION` unset by default unless a deployment needs an explicit Engine API override.
 - When touching a flow that still references provider-specific concepts, prefer removing those references as part of the same progress step instead of leaving dead compatibility layers behind.
 - Preserve `mc-router`-based single-port routing unless the user explicitly instructs otherwise.
 - Do not add monitoring dashboards or audit-log screens unless the user explicitly reintroduces them.
@@ -107,7 +109,7 @@ Follow these rules unless the user overrides them.
 ## Build and Bootstrap Commands
 Use these as the default command set.
 
-- `export LOCAL_UID=$(id -u) LOCAL_GID=$(id -g)` if your host user is not `1000:1000`
+- `export LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) DOCKER_SOCKET_GID=$(stat -c '%g' /var/run/docker.sock)` if your host user is not `1000:1000` or the Docker socket group differs
 - `docker compose build app`
 - `docker compose up --build`
 - `docker compose run --rm app bin/rails db:prepare`

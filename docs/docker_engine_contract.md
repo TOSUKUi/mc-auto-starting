@@ -74,13 +74,13 @@ The wrapper does not expose:
 - `DockerEngine::Connection`
   - Handles Unix socket HTTP transport and response normalization.
 - `DockerEngine::Client`
-  - Owns versioned endpoint calls for the allowed Engine API surface.
+  - Owns the allowed Engine API surface and uses unversioned paths by default, with optional explicit version prefixing via configuration.
 - `DockerEngine::ManagedLabels`
   - Builds the required labels for app-managed resources.
 - `DockerEngine::ManagedName`
   - Builds container and volume names from normalized hostnames.
 - `DockerEngine::Configuration`
-  - Holds socket path, API version, and timeout settings for the wrapper.
+  - Holds socket path, optional API version override, and timeout settings for the wrapper.
 
 ## mc-router Backend Contract
 - `RouterRoute` publication resolves the backend to `<container_name>:25565`.

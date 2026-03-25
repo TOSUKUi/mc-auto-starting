@@ -7,7 +7,7 @@ This document fixes the initial environment and configuration contract for the d
 - `DOCKER_ENGINE_SOCKET_PATH`
   Path to the Docker Engine Unix socket visible from the Rails app. Default: `/var/run/docker.sock`.
 - `DOCKER_ENGINE_API_VERSION`
-  Docker Engine API version prefix used by the wrapper. Default: `v1.51`.
+  Optional Docker Engine API version prefix used by the wrapper. Default: unset, which keeps requests unversioned. Set it only when a deployment needs an explicit `/v1.xx` override.
 - `DOCKER_ENGINE_OPEN_TIMEOUT`
   Socket open timeout in seconds. Default: `5`.
 - `DOCKER_ENGINE_READ_TIMEOUT`
@@ -35,7 +35,9 @@ This document fixes the initial environment and configuration contract for the d
 
 ## Compose Baseline
 - The Rails `app` service mounts `/var/run/docker.sock`.
+- The Rails `app` service should join the host Docker socket group via `group_add`, typically by passing `DOCKER_SOCKET_GID=$(stat -c '%g' /var/run/docker.sock)` to Compose.
 - The Rails `app` service should export the direct-Docker defaults above unless deployment overrides them.
+- The Rails `app` service should leave `DOCKER_ENGINE_API_VERSION` unset unless the target daemon requires an explicit override.
 - The same `MINECRAFT_RUNTIME_NETWORK_NAME` value must be used by both Rails and the eventual `mc-router` service definition.
 
 ## App Usage Contract
