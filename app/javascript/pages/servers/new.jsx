@@ -44,7 +44,8 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
   ]
 
   const submit = (event) => {
-    event.preventDefault()
+    event?.preventDefault()
+    form.transform((data) => ({ minecraft_server: data }))
     form.post('/servers')
   }
 
@@ -81,7 +82,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                 </Text>
               </Stack>
 
-              <Button component={Link} href="/servers" variant="light">
+              <Button href="/servers" renderRoot={(props) => <Link {...props} href="/servers" />} variant="light">
                 Back to servers
               </Button>
             </Group>
@@ -228,7 +229,13 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                   </SimpleGrid>
 
                   <Group justify="flex-end">
-                    <Button loading={form.processing} type="submit" variant="gradient" gradient={{ from: 'blue', to: 'cyan' }}>
+                    <Button
+                      loading={form.processing}
+                      onClick={submit}
+                      type="submit"
+                      variant="gradient"
+                      gradient={{ from: 'blue', to: 'cyan' }}
+                    >
                       Submit create request
                     </Button>
                   </Group>

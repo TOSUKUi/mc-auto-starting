@@ -1,5 +1,5 @@
 import { Alert, AppShell, Badge, Button, Container, Group, NavLink, Paper, Stack, Text, Title } from '@mantine/core'
-import { Head, Link, usePage } from '@inertiajs/react'
+import { Head, Link, router, usePage } from '@inertiajs/react'
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-react'
 
 export default function AppLayout({ children }) {
@@ -38,10 +38,9 @@ export default function AppLayout({ children }) {
                     </Stack>
                     <Button
                       color="gray"
-                      component={Link}
-                      href="/logout"
-                      method="delete"
+                      onClick={() => router.delete('/logout')}
                       size="xs"
+                      type="button"
                       variant="light"
                     >
                       Logout
@@ -59,9 +58,9 @@ export default function AppLayout({ children }) {
               <NavLink
                 key={item.href}
                 active={page.url === item.href}
-                component={Link}
                 href={item.href}
                 label={item.name}
+                renderRoot={(props) => <Link {...props} href={item.href} />}
               />
             ))}
           </Stack>

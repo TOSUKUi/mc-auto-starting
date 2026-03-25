@@ -151,7 +151,12 @@ export default function ServersIndex({ servers, summary }) {
                 </Text>
               </Stack>
 
-              <Button component={Link} href="/servers/new" variant="gradient" gradient={{ from: 'blue', to: 'cyan' }}>
+              <Button
+                href="/servers/new"
+                renderRoot={(props) => <Link {...props} href="/servers/new" />}
+                variant="gradient"
+                gradient={{ from: 'blue', to: 'cyan' }}
+              >
                 New server
               </Button>
             </Group>
@@ -208,7 +213,12 @@ export default function ServersIndex({ servers, summary }) {
                   <Group align="flex-start" justify="space-between">
                     <Stack gap={4}>
                       <Group gap="sm">
-                        <Text component={Link} fw={700} href={`/servers/${server.id}`} size="lg">
+                        <Text
+                          href={`/servers/${server.id}`}
+                          fw={700}
+                          renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />}
+                          size="lg"
+                        >
                           {server.name}
                         </Text>
                         <Badge color="blue" variant="light">

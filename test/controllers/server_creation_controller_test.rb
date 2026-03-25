@@ -20,24 +20,29 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_nil response.parsed_body.fetch("public_endpoint").fetch("fqdn")
   end
 
-  test "create echoes submitted values and returns not implemented while backend flow is blocked" do
+  test "create accepts the request and returns the created server payload" do
     sign_in_as(users(:one))
 
-    post servers_url(format: :json), params: {
-      minecraft_server: {
-        name: "Sky Lab",
-        hostname: "  SKY-lab ",
-        minecraft_version: "1.21.5",
-        memory_mb: 6144,
-        disk_mb: 40960,
-        template_kind: "fabric",
-      },
-    }
+    assert_difference("MinecraftServer.count", 1) do
+      post servers_url(format: :json), params: {
+        minecraft_server: {
+          name: "Sky Lab",
+          hostname: "  SKY-lab ",
+          minecraft_version: "1.21.5",
+          memory_mb: 6144,
+          disk_mb: 40960,
+          template_kind: "fabric",
+        },
+      }
+    end
 
-    assert_response :not_implemented
-    assert_match "T-500", response.parsed_body.fetch("blocker_message")
-    assert_equal "  SKY-lab ", response.parsed_body.fetch("form_defaults").fetch("hostname")
-    assert_equal "sky-lab.mc.tosukui.xyz", response.parsed_body.fetch("public_endpoint").fetch("fqdn")
-    assert_equal "sky-lab.mc.tosukui.xyz:42434", response.parsed_body.fetch("public_endpoint").fetch("connection_target")
+    assert_response :created
+    server = response.parsed_body.fetch("server")
+
+    assert_equal "Sky Lab", server.fetch("name")
+    assert_equal "sky-lab", server.fetch("hostname")
+    assert_equal "sky-lab.mc.tosukui.xyz", server.fetch("fqdn")
+    assert_equal "sky-lab.mc.tosukui.xyz:42434", server.fetch("connection_target")
+    assert_equal "provisioning", server.fetch("status")
   end
 end

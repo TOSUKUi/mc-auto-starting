@@ -1,5 +1,5 @@
 import { Badge, Button, Code, Divider, Grid, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core'
-import { Head, Link } from '@inertiajs/react'
+import { Head, Link, router } from '@inertiajs/react'
 import {
   IconActivityHeartbeat,
   IconArrowBackUp,
@@ -85,7 +85,7 @@ export default function ServersShow({ server }) {
           <Stack gap="lg">
             <Group justify="space-between" align="flex-start">
               <Stack gap={8}>
-                <Text component={Link} href="/servers" size="sm">
+                <Text href="/servers" renderRoot={(props) => <Link {...props} href="/servers" />} size="sm">
                   <Group gap={6}>
                     <IconArrowBackUp size={14} />
                     <span>Back to servers</span>
@@ -121,32 +121,37 @@ export default function ServersShow({ server }) {
 
               <Group gap="xs" justify="flex-end">
                 {server.can_manage_members ? (
-                  <Button component={Link} href={`/servers/${server.id}/members`} leftSection={<IconUsers size={16} />} variant="light">
+                  <Button
+                    href={`/servers/${server.id}/members`}
+                    leftSection={<IconUsers size={16} />}
+                    renderRoot={(props) => <Link {...props} href={`/servers/${server.id}/members`} />}
+                    variant="light"
+                  >
                     Members
                   </Button>
                 ) : null}
                 {server.can_start ? (
-                  <Button component={Link} href={`/servers/${server.id}/start`} method="post" as="button" leftSection={<IconPlayerPlay size={16} />} variant="light">
+                  <Button leftSection={<IconPlayerPlay size={16} />} onClick={() => router.post(`/servers/${server.id}/start`)} type="button" variant="light">
                     Start
                   </Button>
                 ) : null}
                 {server.can_stop ? (
-                  <Button component={Link} href={`/servers/${server.id}/stop`} method="post" as="button" leftSection={<IconPlayerPause size={16} />} variant="light">
+                  <Button leftSection={<IconPlayerPause size={16} />} onClick={() => router.post(`/servers/${server.id}/stop`)} type="button" variant="light">
                     Stop
                   </Button>
                 ) : null}
                 {server.can_restart ? (
-                  <Button component={Link} href={`/servers/${server.id}/restart`} method="post" as="button" leftSection={<IconRefresh size={16} />} variant="light">
+                  <Button leftSection={<IconRefresh size={16} />} onClick={() => router.post(`/servers/${server.id}/restart`)} type="button" variant="light">
                     Restart
                   </Button>
                 ) : null}
                 {server.can_sync ? (
-                  <Button component={Link} href={`/servers/${server.id}/sync`} method="post" as="button" variant="default">
+                  <Button onClick={() => router.post(`/servers/${server.id}/sync`)} type="button" variant="default">
                     Sync
                   </Button>
                 ) : null}
                 {server.can_destroy ? (
-                  <Button component={Link} href={`/servers/${server.id}`} method="delete" as="button" color="red" leftSection={<IconTrash size={16} />} variant="light">
+                  <Button color="red" leftSection={<IconTrash size={16} />} onClick={() => router.delete(`/servers/${server.id}`)} type="button" variant="light">
                     Delete
                   </Button>
                 ) : null}

@@ -46,7 +46,7 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
 
       <Stack gap="xl">
         <Stack gap={4}>
-          <Text component={Link} href={`/servers/${server.id}`} size="sm">
+          <Text href={`/servers/${server.id}`} renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />} size="sm">
             Back to server
           </Text>
           <Group justify="space-between">

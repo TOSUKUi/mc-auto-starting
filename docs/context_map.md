@@ -65,6 +65,7 @@ This file tells any contributor or agent where to find authoritative information
 - The delete flow is installed through `T-503`; owners can delete a server, the route is unpublished before provider deletion, and the DB records are removed on success.
 - Lifecycle actions and provider-status sync are installed through `T-504`; start/stop/restart/sync endpoints now use the persisted provider server identifier for Client API operations and update Rails status accordingly.
 - The server detail page UI is installed through `T-604`; operators can inspect connection, route, provider backend, and run lifecycle actions from a single screen.
+- Inertia local-development behavior is adjusted for the current Docker/LAN workflow; history encryption is disabled outside production, Mantine GET navigation uses `renderRoot` with Inertia `Link`, and the create form avoids chained `transform().post()` calls in React.
 - Out-of-scope audit-log and monitoring code has been removed from the app codebase.
 - Application scope is centered on server lifecycle and publication consistency; mc-router liveness is handled outside the app via Docker health checks.
 - Monitoring dashboards, audit-log viewing pages, audit event recording, and unknown-hostname analytics are currently out of scope.

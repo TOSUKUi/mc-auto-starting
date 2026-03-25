@@ -14,7 +14,10 @@ services:
       DB_PORT: 3306
       DB_USERNAME: app
       DB_PASSWORD: password
-    command: bash -lc "sleep infinity"
+    ports:
+      - "3000:3000"
+      - "3036:3036"
+    command: bash -lc "bin/dev"
     depends_on:
       db:
         condition: service_healthy
