@@ -115,7 +115,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
               minecraft_version: "1.21.4",
               memory_mb: 8192,
               disk_mb: 40960,
-              template_kind: "paper",
+              template_kind: "velocity",
             },
           }
         end
@@ -150,7 +150,6 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
             minecraft_version: "1.21.4",
             memory_mb: 0,
             disk_mb: 0,
-            template_kind: "",
           },
         }
       end

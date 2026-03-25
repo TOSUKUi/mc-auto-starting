@@ -241,6 +241,7 @@
   - 設定不足時にどの env を足せばよいかが restart docs と運用 docs から辿れる
 - 進捗メモ:
   - `T-304` 完了。`docs/provider_template_env_setup.md` に required JSON shape、`fabric/paper/velocity` baseline 例、起動前チェック、失敗時の見方を追加済み。
+  - `T-609` 完了。create UI は `paper` 固定となり、Rails 側も create request で `template_kind = paper` を強制する。
 
 ### Phase 4: mc-router 連携
 

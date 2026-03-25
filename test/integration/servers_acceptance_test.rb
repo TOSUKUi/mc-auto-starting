@@ -103,7 +103,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
             minecraft_version: "1.21.4",
             memory_mb: 8192,
             disk_mb: 40960,
-            template_kind: "paper",
+            template_kind: "velocity",
           },
         }
       end
@@ -131,6 +131,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     create_request = FakeExecutionProviderClient.created_requests.last
     assert_equal "minecraft-server-#{server_id}", create_request.external_id
     assert_equal 8192, create_request.memory_mb
+    assert_equal "paper", MinecraftServer.find(server_id).template_kind
 
     mappings = JSON.parse(File.read(File.join(@tmpdir, "routes.json"))).fetch("mappings")
     assert_equal "wings.internal:25590", mappings.fetch("creative-build.mc.tosukui.xyz")
@@ -147,7 +148,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
         minecraft_version: "1.21.4",
         memory_mb: 4096,
         disk_mb: 20480,
-        template_kind: "paper",
+        template_kind: "velocity",
       },
     }
 

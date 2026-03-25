@@ -23,14 +23,15 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "1.21.4", response.parsed_body.fetch("form_defaults").fetch("minecraft_version")
     assert_equal 4096, response.parsed_body.fetch("form_defaults").fetch("memory_mb")
-    assert_equal "fabric", response.parsed_body.fetch("form_defaults").fetch("template_kind")
-    assert_equal %w[fabric paper velocity], response.parsed_body.fetch("template_options").map { |item| item.fetch("value") }
+    assert_equal "paper", response.parsed_body.fetch("form_defaults").fetch("template_kind")
+    assert_equal "paper", response.parsed_body.fetch("template_kind")
+    assert_equal true, response.parsed_body.fetch("template_available")
     assert_equal "mc.tosukui.xyz", response.parsed_body.fetch("public_endpoint").fetch("public_domain")
     assert_equal 42434, response.parsed_body.fetch("public_endpoint").fetch("public_port")
     assert_nil response.parsed_body.fetch("public_endpoint").fetch("fqdn")
   end
 
-  test "create accepts the request and returns the created server payload" do
+  test "create accepts the request and forces the paper template baseline" do
     sign_in_as(users(:one))
 
     assert_difference("MinecraftServer.count", 1) do
@@ -54,11 +55,25 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "sky-lab.mc.tosukui.xyz", server.fetch("fqdn")
     assert_equal "sky-lab.mc.tosukui.xyz:42434", server.fetch("connection_target")
     assert_equal "provisioning", server.fetch("status")
+    assert_equal "paper", server.fetch("template_kind")
   end
 
-  test "create rejects an unavailable template before provisioning starts" do
+  test "new marks the template as unavailable when paper is missing" do
     Rails.application.config.x.execution_provider.provisioning_templates = {
-      "paper" => @original_provisioning_templates.fetch("paper"),
+      "fabric" => @original_provisioning_templates.fetch("fabric"),
+    }
+
+    sign_in_as(users(:one))
+
+    get new_server_url(format: :json)
+
+    assert_response :success
+    assert_equal false, response.parsed_body.fetch("template_available")
+  end
+
+  test "create rejects the request when paper is not configured" do
+    Rails.application.config.x.execution_provider.provisioning_templates = {
+      "fabric" => @original_provisioning_templates.fetch("fabric"),
     }
 
     sign_in_as(users(:one))
@@ -71,7 +86,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
           minecraft_version: "1.21.5",
           memory_mb: 6144,
           disk_mb: 40960,
-          template_kind: "fabric",
+          template_kind: "paper",
         },
       }
     end

@@ -57,7 +57,7 @@ This file tells any contributor or agent where to find authoritative information
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
 - `T-608` is the remaining Phase 6 UI task for Japanese-first copy cleanup across the current screens.
-- `T-609` is the planned Phase 6 simplification task for a Paper-only create baseline with no template selector in the UI.
+- `T-609` is complete; the create page now uses a Paper-only baseline with no template selector in the UI, and Rails forces `template_kind = paper` for create requests.
 - The members management page UI is installed through `T-605`.
 - The server creation page UI is installed through `T-603`; the form now submits real create requests, shows validation errors, redirects into the server detail status view after intake, and wraps correctly on smartphone widths.
 - Development seed login is available as `dev@example.com` / `password`.
@@ -70,7 +70,7 @@ This file tells any contributor or agent where to find authoritative information
 - The route definition builder, config renderer, and config applier baselines are installed through `T-401`, `T-402`, and `T-403`.
 - The provider-backed create job flow is installed through `T-501`; provisioning now resolves template config, creates the provider server, persists backend identifiers, applies router config, and transitions to `ready` on success.
 - Create failure rollback handling is installed through `T-502`; provider create failures now keep the provisional record visible in `failed` with route publication disabled, route apply failures keep the server in `unpublished` with route publication disabled, and the latest provisioning failure reason is persisted on `MinecraftServer.last_error_message` for the detail UI.
-- The create page now exposes only template kinds configured on the active execution provider, and unavailable template kinds are rejected before a provisional record is created.
+- The create page is now fixed to the Paper runtime baseline; it disables submission when the active execution provider does not expose the required `paper` provisioning template, and unavailable Paper provisioning is rejected before a provisional record is created.
 - The delete flow is installed through `T-503`; owners can delete a server, the route is unpublished before provider deletion, and the DB records are removed on success.
 - Lifecycle actions and provider-status sync are installed through `T-504`; start/stop/restart/sync endpoints now use the persisted provider server identifier for Client API operations and update Rails status accordingly.
 - Lifecycle controls are now hidden unless `provider_server_identifier` is present, so the UI no longer offers invalid operations against unprovisioned records.

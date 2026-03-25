@@ -8,7 +8,6 @@ import {
   List,
   NumberInput,
   Paper,
-  Select,
   SimpleGrid,
   Stack,
   Text,
@@ -33,21 +32,20 @@ function endpointPreview(hostname, publicEndpoint) {
   }
 }
 
-export default function ServersNew({ form_defaults, provider_name, public_endpoint, template_options }) {
+export default function ServersNew({ form_defaults, provider_name, public_endpoint, template_available, template_kind }) {
   const form = useForm(form_defaults)
-  const hasConfiguredTemplates = template_options.length > 0
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const resourceHints = [
     { label: 'Memory', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: 'Disk', value: `${form.data.disk_mb.toLocaleString()} MB` },
-    { label: 'Template', value: template_options.find((item) => item.value === form.data.template_kind)?.label ?? 'Not configured' },
+    { label: 'Runtime', value: template_kind.toUpperCase() },
   ]
 
   const submit = (event) => {
     event?.preventDefault()
-    if (!hasConfiguredTemplates) return
+    if (!template_available) return
     form.transform((data) => ({ minecraft_server: data }))
     form.post('/servers')
   }
@@ -144,10 +142,10 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
             <Paper p="lg" radius="lg" shadow="sm" withBorder>
               <form onSubmit={submit}>
                 <Stack gap="md">
-                  {!hasConfiguredTemplates ? (
-                    <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="Provider template missing" variant="light">
-                      The active execution provider has no provisioning templates configured yet. Add template entries before
-                      submitting a server create request.
+                  {!template_available ? (
+                    <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="Paper template missing" variant="light">
+                      The active execution provider does not expose the required paper provisioning template yet. Add the
+                      paper entry before submitting a server create request.
                     </Alert>
                   ) : null}
 
@@ -180,7 +178,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     value={form.data.hostname}
                   />
                   <Grid gutter="md">
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                    <Grid.Col span={{ base: 12 }}>
                       <TextInput
                         error={form.errors.minecraft_version}
                         label="Minecraft version"
@@ -189,19 +187,21 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                         value={form.data.minecraft_version}
                       />
                     </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Select
-                        data={template_options}
-                        error={form.errors.template_kind}
-                        label="Template"
-                        onChange={(value) => form.setData('template_kind', value ?? form_defaults.template_kind)}
-                        placeholder={hasConfiguredTemplates ? undefined : 'No configured templates'}
-                        required
-                        value={form.data.template_kind}
-                        disabled={!hasConfiguredTemplates}
-                      />
-                    </Grid.Col>
                   </Grid>
+                  <Paper p="md" radius="lg" style={{ background: 'rgba(13, 110, 253, 0.06)' }} withBorder>
+                    <Stack gap={4}>
+                      <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                        Runtime baseline
+                      </Text>
+                      <Text fw={800} size="lg">
+                        Paper
+                      </Text>
+                      <Text c="dimmed" size="sm">
+                        This intake is fixed to the Paper baseline for now. Provider-side provisioning must expose the
+                        matching paper template.
+                      </Text>
+                    </Stack>
+                  </Paper>
                   <Grid gutter="md">
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <NumberInput
@@ -247,7 +247,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
 
                   <Group justify="flex-end">
                     <Button
-                      disabled={!hasConfiguredTemplates}
+                      disabled={!template_available}
                       fullWidth
                       loading={form.processing}
                       onClick={submit}
@@ -318,6 +318,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                   <List spacing="xs" size="sm" icon={<IconCircleCheck size={14} />}>
                     <List.Item>Accepted requests persist a provisional server record immediately.</List.Item>
                     <List.Item>Preview always uses the shared public endpoint.</List.Item>
+                    <List.Item>The create baseline is fixed to Paper until multi-template support is reintroduced deliberately.</List.Item>
                     <List.Item>The detail page becomes the source of truth for `provisioning` progress.</List.Item>
                   </List>
                 </Stack>

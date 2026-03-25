@@ -5,7 +5,7 @@ This document defines the operational baseline for `T-304`.
 
 `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` is the env entry that connects Rails-side `template_kind` values to real execution-provider provisioning settings.
 
-Without this env, or with missing template keys, the create UI can no longer expose those templates, and real provisioning cannot succeed for them.
+Without this env, or with missing template keys, the create UI cannot submit create requests successfully, and real provisioning cannot succeed.
 
 ## Source Env
 
@@ -45,25 +45,12 @@ Rails automatically merges `minecraft_version` into `environment`, so it does no
 
 ## Baseline Example
 
-The currently exposed create-form templates are:
+The current create-flow baseline is fixed to `paper`.
 
-- `fabric`
-- `paper`
-- `velocity`
-
-If those options should remain visible in the UI, the env should include all three keys.
+At minimum, the env must include the `paper` key. Additional keys can exist for future use, but the current UI does not expose them.
 
 ```json
 {
-  "fabric": {
-    "owner_id": 40,
-    "node_id": 2,
-    "egg_id": 9,
-    "allocation_id": 23,
-    "environment": {
-      "server_jarfile": "fabric-server-launch.jar"
-    }
-  },
   "paper": {
     "owner_id": 40,
     "node_id": 2,
@@ -72,23 +59,14 @@ If those options should remain visible in the UI, the env should include all thr
     "environment": {
       "server_jarfile": "paper.jar"
     }
-  },
-  "velocity": {
-    "owner_id": 40,
-    "node_id": 2,
-    "egg_id": 8,
-    "allocation_id": 22,
-    "environment": {
-      "server_jarfile": "velocity.jar"
-    }
   }
 }
 ```
 
 ## Operational Rules
 
-- Do not expose a create-form template unless the matching top-level key exists in `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES`.
-- Keep `template_kind` names aligned between UI and env keys.
+- The current create flow requires the `paper` top-level key in `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES`.
+- Rails now forces `template_kind = paper` for create requests; adding other top-level keys alone does not re-enable multi-template selection in the UI.
 - Treat `allocation_id` as the selected default allocation for provider create requests.
 - Treat `owner_id`, `node_id`, and `egg_id` as environment-specific operational data, not user input.
 
@@ -99,11 +77,11 @@ Before relying on real provisioning from the UI:
 1. Set `EXECUTION_PROVIDER_PANEL_URL`.
 2. Set `EXECUTION_PROVIDER_APPLICATION_API_KEY`.
 3. Set `EXECUTION_PROVIDER_CLIENT_API_KEY`.
-4. Set `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` with every template the UI should expose.
+4. Set `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` with at least the `paper` template entry.
 5. Restart the running Rails process so the initializer picks up the new env.
-6. Open `/servers/new` and confirm the expected template options are visible.
+6. Open `/servers/new` and confirm the Paper baseline notice is visible and the submit button is enabled.
 
-If `/servers/new` shows the provider-template warning or disables the submit button, check `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` first.
+If `/servers/new` shows the Paper-template warning or disables the submit button, check `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` first.
 
 ## Failure Interpretation
 
