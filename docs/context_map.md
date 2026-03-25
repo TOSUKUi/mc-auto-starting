@@ -56,4 +56,5 @@ This file tells any contributor or agent where to find authoritative information
 - The active architecture is now `Rails + docker.sock + mc-router` for single-host Minecraft container management.
 - `Pterodactyl/Wings` are no longer the current target architecture, but `mc-router` remains active.
 - `mc-router` and app-managed Minecraft containers are expected to share one bridge network, with router backends addressed by container name.
-- The next implementation critical path starts at `T-303`.
+- `T-303` is complete: route publication apply/rollback is centralized and reused by the existing create/delete-era services.
+- The next implementation critical path starts at `T-304`.

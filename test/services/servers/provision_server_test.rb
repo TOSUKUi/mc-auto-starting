@@ -69,7 +69,7 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal "ready", server.status
     assert_equal "321", server.provider_server_id
     assert_equal "abcd1234", server.provider_server_identifier
-    assert_equal "wings.internal", server.backend_host
+    assert_equal server.container_name, server.backend_host
     assert_equal 25565, server.backend_port
     assert_nil server.last_error_message
     assert_equal true, server.router_route.enabled

@@ -3,7 +3,11 @@ module Servers
     def initialize(server:, provider_client: ExecutionProvider.build_client, router_applier: Router::ConfigApplier.new)
       @server = server
       @provider_client = provider_client
-      @router_applier = router_applier
+      @router_publication_sync = Router::PublicationSync.new(
+        router_route: server&.router_route,
+        enabled: false,
+        applier: router_applier,
+      )
     end
 
     def call
@@ -22,19 +26,10 @@ module Servers
     end
 
     private
-      attr_reader :server, :provider_client, :router_applier
+      attr_reader :server, :provider_client, :router_publication_sync
 
       def unpublish_route!
-        return unless server.router_route
-
-        server.router_route.update!(enabled: false)
-
-        router_applier.call(routes: RouterRoute.includes(:minecraft_server).to_a)
-
-        server.router_route.update!(
-          last_apply_status: :success,
-          last_applied_at: Time.current,
-        )
+        router_publication_sync.call
       end
 
       def delete_provider_server!

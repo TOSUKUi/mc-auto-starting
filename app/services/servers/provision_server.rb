@@ -3,7 +3,11 @@ module Servers
     def initialize(server:, provider_client: ExecutionProvider.build_client, router_applier: Router::ConfigApplier.new)
       @server = server
       @provider_client = provider_client
-      @router_applier = router_applier
+      @router_publication_sync = Router::PublicationSync.new(
+        router_route: server&.router_route,
+        enabled: true,
+        applier: router_applier,
+      )
     end
 
     def call
@@ -13,9 +17,8 @@ module Servers
       provider_server = provider_client.create_server(build_create_request(profile))
 
       persist_provider_server!(provider_server)
-      apply_route!
-
       server.transition_to!(:ready) unless server.status_ready?
+      apply_route!
       server
     rescue ExecutionProvider::Error => error
       rollback_provider_failure!(error)
@@ -26,7 +29,7 @@ module Servers
     end
 
     private
-      attr_reader :server, :provider_client, :router_applier
+      attr_reader :server, :provider_client, :router_publication_sync
 
       def build_create_request(profile)
         ExecutionProvider::CreateServerRequest.new(
@@ -62,14 +65,7 @@ module Servers
       end
 
       def apply_route!
-        server.router_route.update!(enabled: true)
-
-        router_applier.call(routes: RouterRoute.includes(:minecraft_server).to_a)
-
-        server.router_route.update!(
-          last_apply_status: :success,
-          last_applied_at: Time.current,
-        )
+        router_publication_sync.call
       end
 
       def rollback_provider_failure!(error)

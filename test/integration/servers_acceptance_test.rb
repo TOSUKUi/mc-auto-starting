@@ -122,8 +122,8 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal "ready", server.fetch("status")
     assert_equal "creative-build", server.fetch("hostname")
     assert_equal "creative-build.mc.tosukui.xyz:42434", server.fetch("connection_target")
-    assert_equal "srv-900", server.fetch("execution").fetch("provider_server_id")
-    assert_equal "ident-900", server.fetch("provider_server_identifier")
+    assert_equal "mc-server-creative-build", server.fetch("runtime").fetch("container_name")
+    assert_equal "mc-server-creative-build:25565", server.fetch("runtime").fetch("backend")
     assert_equal true, server.fetch("route").fetch("enabled")
     assert_equal "success", server.fetch("route").fetch("last_apply_status")
     assert_nil server.fetch("last_error_message")
@@ -134,7 +134,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal "paper", MinecraftServer.find(server_id).template_kind
 
     mappings = JSON.parse(File.read(File.join(@tmpdir, "routes.json"))).fetch("mappings")
-    assert_equal "wings.internal:25590", mappings.fetch("creative-build.mc.tosukui.xyz")
+    assert_equal "mc-server-creative-build:25565", mappings.fetch("creative-build.mc.tosukui.xyz")
   end
 
   test "provider provisioning failure leaves the requested server inspectable in failed state" do
@@ -171,7 +171,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal "provider unavailable", server.fetch("last_error_message")
     assert_equal false, server.fetch("route").fetch("enabled")
     assert_equal "pending", server.fetch("route").fetch("last_apply_status")
-    assert_nil server.fetch("execution").fetch("provider_server_id")
+    assert_nil server.fetch("runtime").fetch("container_id")
   end
 
   test "owner delete request removes publication and provider record" do

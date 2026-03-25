@@ -141,6 +141,7 @@
 - create/delete 時の route 適用を安定化する
 - 完了条件:
   - create/delete 前後で router 設定が正しく反映される
+  - route enable/disable, config apply, and apply failure rollback are centralized in one service
 
 #### P3-3 create flow 実装
 
