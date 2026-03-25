@@ -231,6 +231,15 @@
 - 進捗メモ:
   - `T-303` 完了。initializer では `config.x.execution_provider` に静的設定のみを保持し、アプリコード側で `ExecutionProvider::Configuration` に解決する。
 
+#### P3-5 provisioning template 設定整備
+
+- `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` の JSON 形を確定する
+- create UI に露出する template_kind と provider 側 provisioning template を一致させる
+- 開発 / 検証環境で最低限必要な template baseline を文書化する
+- 完了条件:
+  - 露出中の各 template_kind に対して provider provisioning template 設定が用意されている
+  - 設定不足時にどの env を足せばよいかが restart docs と運用 docs から辿れる
+
 ### Phase 4: mc-router 連携
 
 #### P4-1 mc-router 設定方式の確定

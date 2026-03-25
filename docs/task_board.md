@@ -39,6 +39,7 @@
 | T-301 | P3 | Implement provider base client interface | T-300 | done | Unified create/delete/start/stop/restart/status contract exists |
 | T-302 | P3 | Implement concrete provider client | T-301 | done | Provider client can talk to target API or a stubbed equivalent |
 | T-303 | P3 | Add provider config and initialization | T-301 | done | Environment-driven provider selection works |
+| T-304 | P3 | Define and document provisioning template environment setup | T-303,T-501 | todo | Active environments have a documented `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` baseline for every exposed create-form template |
 | T-400 | P4 | Confirm mc-router config and reload contract | T-200 | done | Input format and reload mechanism are known |
 | T-401 | P4 | Implement route definition builder | T-400,T-104 | done | Route definition can be built from DB state |
 | T-402 | P4 | Implement config renderer | T-401 | done | Whole router config can be rendered |
@@ -66,7 +67,7 @@
 | T-800 | P8 | Add model tests | T-101,T-102,T-103,T-104,T-201,T-203 | todo | Core domain logic is covered |
 | T-801 | P8 | Add request and authorization tests | T-106,T-107,T-500,T-503,T-504 | todo | Access control regressions are caught |
 | T-802 | P8 | Add service and job tests | T-301,T-302,T-403,T-501,T-701,T-702 | todo | Critical async and service paths are covered |
-| T-803 | P8 | Add acceptance checks for requirement criteria | T-403,T-501,T-503,T-504 | in_progress | Main acceptance conditions are verifiable by automated acceptance tests and Playwright-based real-browser checks covering login, server index, create, detail, members, and delete flows, including create-form behavior that reflects configured execution-provider templates |
+| T-803 | P8 | Add acceptance checks for requirement criteria | T-304,T-403,T-501,T-503,T-504 | in_progress | Main acceptance conditions are verifiable by automated acceptance tests and Playwright-based real-browser checks covering login, server index, create, detail, members, and delete flows, including create-form behavior that reflects configured execution-provider templates |
 | T-900 | P9 | Document setup and local development workflow | T-003,T-004,T-005 | todo | New contributor can boot project locally |
 | T-901 | P9 | Document provider and router integration operations | T-403,T-501 | todo | Operational integration steps are written |
 | T-902 | P9 | Document release, migration, and rollback procedure | T-803 | todo | Release workflow is written and reviewable |
@@ -79,3 +80,4 @@ The main remaining critical path currently is:
 ## Known Blockers
 - No active blockers are recorded on the current critical path.
 - Operational note for `T-803`: before launching another Dockerized browser-check target, first verify whether an existing reachable app process is already serving the MCP-visible URL.
+- Operational gap tracked by `T-304`: if `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` is missing or incomplete, real provisioning will still fail even though the create UI now hides unavailable templates.
