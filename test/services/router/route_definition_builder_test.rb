@@ -5,14 +5,16 @@ class Router::RouteDefinitionBuilderTest < ActiveSupport::TestCase
     definition = Router::RouteDefinitionBuilder.new(router_route: router_routes(:one)).call
 
     assert_equal "main-survival.mc.tosukui.xyz", definition.server_address
-    assert_equal "10.0.0.21:25565", definition.backend
+    assert_equal "mc-server-main-survival:25565", definition.backend
   end
 
-  test "rejects routes without backend coordinates" do
+  test "rejects routes without a managed container name" do
+    minecraft_servers(:two).update_columns(container_name: "")
+
     error = assert_raises(ArgumentError) do
       Router::RouteDefinitionBuilder.new(router_route: router_routes(:two)).call
     end
 
-    assert_equal "minecraft_server backend_host is required", error.message
+    assert_equal "minecraft_server container_name is required", error.message
   end
 end

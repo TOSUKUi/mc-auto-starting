@@ -26,7 +26,6 @@ class RouterRouteTest < ActiveSupport::TestCase
       name: "Snapshot Server",
       hostname: "snapshot-server",
       status: :provisioning,
-      provider_name: "stub_provider",
       minecraft_version: "1.21.4",
       memory_mb: 2048,
       disk_mb: 10240,

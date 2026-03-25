@@ -5,7 +5,10 @@ one:
   name: Main Survival
   hostname: main-survival
   status: ready
-  provider_name: stub_provider
+  container_name: mc-server-main-survival
+  container_id: container-001
+  volume_name: mc-data-main-survival
+  container_state: running
   provider_server_id: srv-001
   provider_server_identifier: abc12345
   backend_host: 10.0.0.21
@@ -20,7 +23,10 @@ two:
   name: Event Server
   hostname: event-server
   status: provisioning
-  provider_name: stub_provider
+  container_name: mc-server-event-server
+  container_id:
+  volume_name: mc-data-event-server
+  container_state:
   provider_server_id:
   provider_server_identifier:
   backend_host:

@@ -159,8 +159,7 @@ class ServersController < InertiaController
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
         template_kind: fixed_template_kind,
-        template_available: template_available?,
-        provider_name: ExecutionProvider.config.provider_name,
+        runtime_image: "itzg/minecraft-server",
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,
@@ -195,10 +194,6 @@ class ServersController < InertiaController
       "paper"
     end
 
-    def template_available?
-      ExecutionProvider.config.provisioning_templates.key?(fixed_template_kind.to_sym)
-    end
-
     def server_summary(server)
       route = server.router_route
 
@@ -220,11 +215,12 @@ class ServersController < InertiaController
           last_applied_at: route&.last_applied_at&.iso8601,
           last_healthchecked_at: route&.last_healthchecked_at&.iso8601,
         },
-        execution: {
-          provider_name: server.provider_name,
-          provider_server_id: server.provider_server_id,
-          backend_host: server.backend_host,
-          backend_port: server.backend_port,
+        runtime: {
+          container_name: server.container_name,
+          container_id: server.container_id,
+          container_state: server.container_state,
+          volume_name: server.volume_name,
+          backend: server.backend,
         },
       }
     end
@@ -232,11 +228,10 @@ class ServersController < InertiaController
     def server_detail(server)
       server_summary(server).merge(
         fqdn: server.fqdn,
-        provider_name: server.provider_name,
-        provider_server_identifier: server.provider_server_identifier,
         minecraft_version: server.minecraft_version,
         template_kind: server.template_kind,
         last_error_message: server.last_error_message,
+        last_started_at: server.last_started_at&.iso8601,
         owner_id: server.owner_id,
         can_manage_members: policy(server).manage_members?,
         can_destroy: policy(server).destroy?,

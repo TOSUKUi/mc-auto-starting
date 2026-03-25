@@ -54,9 +54,9 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert_empty MinecraftServerPolicy::Scope.new(nil, MinecraftServer).resolve
   end
 
-  test "lifecycle actions are blocked when the provider identifier is missing" do
+  test "lifecycle actions are blocked when the container id is missing" do
     server = minecraft_servers(:one)
-    server.update_columns(provider_server_identifier: nil)
+    server.update_columns(container_id: nil)
 
     policy = MinecraftServerPolicy.new(users(:one), server)
 

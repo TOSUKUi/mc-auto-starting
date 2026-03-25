@@ -7,7 +7,6 @@ module Servers
 
     def call
       server = actor.owned_minecraft_servers.build(server_attributes)
-      validate_template_kind(server)
       return server if server.errors.any?
       return server unless server.save
 
@@ -24,15 +23,7 @@ module Servers
       def server_attributes
         attributes.symbolize_keys.merge(
           status: :provisioning,
-          provider_name: ExecutionProvider.config.provider_name,
         )
-      end
-
-      def validate_template_kind(server)
-        return if server.template_kind.blank?
-        return if ExecutionProvider.config.provisioning_templates.key?(server.template_kind.to_sym)
-
-        server.errors.add(:template_kind, "is not configured for the active execution provider")
       end
   end
 end

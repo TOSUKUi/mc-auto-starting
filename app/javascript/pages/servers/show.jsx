@@ -196,12 +196,12 @@ export default function ServersShow({ server }) {
                     <ThemeIcon color="teal" radius="xl" size={28} variant="light">
                       <IconActivityHeartbeat size={15} />
                     </ThemeIcon>
-                    <Text fw={700}>Execution Backend</Text>
+                    <Text fw={700}>Container Backend</Text>
                   </Group>
                   <Text c="dimmed" size="sm">
-                    Provider-side target currently bound to this record.
+                    mc-router が参照するコンテナ backend です。
                   </Text>
-                  <Code block>{server.execution.backend_host && server.execution.backend_port ? `${server.execution.backend_host}:${server.execution.backend_port}` : 'Provisioning pending'}</Code>
+                  <Code block>{server.runtime.backend ?? 'Provisioning pending'}</Code>
                 </Stack>
               </Paper>
             </SimpleGrid>
@@ -223,9 +223,10 @@ export default function ServersShow({ server }) {
                 <DetailLine label="Hostname" value={<Code>{server.fqdn}</Code>} />
                 <DetailLine label="Minecraft Version" value={<Code>{server.minecraft_version}</Code>} />
                 <DetailLine label="Template" value={<Code>{server.template_kind}</Code>} />
-                <DetailLine label="Provider" value={<Code>{server.provider_name}</Code>} />
-                <DetailLine label="Provider Server ID" value={<Code>{server.execution.provider_server_id ?? 'Not assigned'}</Code>} />
-                <DetailLine label="Provider Identifier" value={<Code>{server.provider_server_identifier ?? 'Not assigned'}</Code>} />
+                <DetailLine label="Container Name" value={<Code>{server.runtime.container_name}</Code>} />
+                <DetailLine label="Container ID" value={<Code>{server.runtime.container_id ?? 'Not assigned'}</Code>} />
+                <DetailLine label="Volume Name" value={<Code>{server.runtime.volume_name}</Code>} />
+                <DetailLine label="Container State" value={<Code>{server.runtime.container_state ?? 'Unknown'}</Code>} />
               </Stack>
             </Paper>
           </Grid.Col>
@@ -250,12 +251,11 @@ export default function ServersShow({ server }) {
                 <Text fw={700}>Operator Notes</Text>
                 <Divider />
                 <Text c="dimmed" size="sm">
-                  `start` / `stop` / `restart` send lifecycle requests to the execution provider client API. `sync` fetches the latest
-                  provider runtime state and reconciles this record. Route publication stays on the single shared public port.
+                  `start` / `stop` / `restart` は Docker 上の managed container を対象にします。`sync` は runtime state を再取得し、
+                  この record と route publication を突き合わせます。
                 </Text>
                 <Text c="dimmed" size="sm">
-                  If provider state goes missing or conflicts with the local transition graph, this server is marked `degraded`
-                  instead of pretending the old DB state is still correct.
+                  container 実体や route publication と DB 状態がずれた場合は、古い値を正しいものとして扱わず `degraded` などへ落とします。
                 </Text>
               </Stack>
             </Paper>

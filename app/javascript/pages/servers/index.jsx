@@ -64,13 +64,13 @@ function routeLabel(route) {
   return `${labelize(route.last_apply_status)} / ${labelize(route.last_healthcheck_status)}`
 }
 
-function executionLabel(execution) {
-  if (execution.backend_host && execution.backend_port) {
-    return `${execution.backend_host}:${execution.backend_port}`
+function runtimeLabel(runtime) {
+  if (runtime.backend) {
+    return runtime.backend
   }
 
-  if (execution.provider_server_id) {
-    return `Provider id ${execution.provider_server_id}`
+  if (runtime.container_name) {
+    return runtime.container_name
   }
 
   return 'Provisioning pending'
@@ -263,9 +263,9 @@ export default function ServersIndex({ servers, summary }) {
                             </Badge>
                           </Group>
                         </Table.Td>
-                        <Table.Th>Execution</Table.Th>
+                        <Table.Th>Runtime</Table.Th>
                         <Table.Td>
-                          <Code>{executionLabel(server.execution)}</Code>
+                          <Code>{runtimeLabel(server.runtime)}</Code>
                         </Table.Td>
                       </Table.Tr>
                       <Table.Tr>

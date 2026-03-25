@@ -30,7 +30,7 @@
 | T-106 | P1 | Add authorization framework and policies | T-101,T-102,T-103 | done | Owner/member visibility rules are enforced |
 | T-107 | P1 | Add server visibility scopes and request protections | T-106 | done | Users cannot fetch other users' servers |
 | T-110 | P0 | Pivot planning docs to direct Docker control | T-005 | done | Restart docs, design, plan, and task board reflect the `Rails + docker.sock` single-host approach |
-| T-200 | P1 | Redesign `minecraft_servers` for direct Docker management with `mc-router` | T-110,T-102 | todo | Direct-Docker fields and migration strategy are fixed without removing router-based ingress |
+| T-200 | P1 | Redesign `minecraft_servers` for direct Docker management with `mc-router` | T-110,T-102 | done | Direct-Docker fields and migration strategy are fixed without removing router-based ingress |
 | T-201 | P1 | Define slug normalization and uniqueness rules | T-200 | todo | `slug` format and DB uniqueness are enforceable |
 | T-202 | P1 | Define FQDN + single-public-port connection rules | T-200 | todo | Shared formatting logic is fixed for `hostname.public_domain:shared_public_port` access |
 | T-203 | P1 | Define server status transition model | T-200 | todo | Direct-Docker state machine is documented and coded |
@@ -67,7 +67,7 @@
 
 The current critical path is:
 
-`T-110 -> T-200 -> T-201 -> T-202 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-900 -> T-901 -> T-902`
+`T-110 -> T-201 -> T-202 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-900 -> T-901 -> T-902`
 
 ## Known Blockers
 
@@ -81,3 +81,4 @@ The current critical path is:
 - `T-300`: `mc-router` and app-managed Minecraft containers share one bridge network.
 - `T-301`: router backends use `<container_name>:25565`.
 - `T-301`: managed container names use `mc-server-<hostname>` and managed volume names use `mc-data-<hostname>`.
+- `T-200`: `minecraft_servers` stores direct-Docker runtime identity in `container_name`, `container_id`, `volume_name`, `container_state`, and `last_started_at`, while provider columns remain as cleanup debt.

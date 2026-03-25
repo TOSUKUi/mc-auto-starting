@@ -247,6 +247,6 @@
 
 1. Pivot 方針の文書を固定する
 2. Docker socket の compose 方針を固める
-3. `minecraft_servers` の direct-Docker + router 向けフィールド設計を決める
-4. Docker naming / labels / hostname / route publication を決める
+3. `hostname` / FQDN / shared-public-port の正本ルールを `T-201` と `T-202` で固定する
+4. retained `router_routes` の責務と publication ルールを `T-204` で固定する
 5. そのあとに Docker client wrapper 実装へ入る

@@ -25,7 +25,8 @@ Current baseline:
 - Existing `mc-router` code remains part of the active architecture and should not be removed unless the user explicitly changes that decision.
 - The selected Docker integration path is direct Engine API access via `/var/run/docker.sock` with a minimal Rails wrapper, not `docker` CLI orchestration.
 - The planning pivot through `T-110` is complete.
-- The next implementation critical-path task is `T-200`.
+- `T-200` is complete: `minecraft_servers` now carries direct-Docker baseline fields such as `container_name`, `container_id`, `volume_name`, `container_state`, and `last_started_at`, while router ingress remains active.
+- The next implementation critical-path task is `T-201`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -147,5 +148,5 @@ If no other instruction is given, start from the current critical path:
 
 1. Start from `T-200` and redesign `minecraft_servers` for direct Docker management
 2. Define hostname/FQDN, shared-public-port connection target, and state rules through `T-201` to `T-203`
-3. Fix docker.sock safety boundary and Docker naming / label rules through `T-300` and `T-301`
+3. Define retained `router_routes` responsibilities through `T-204`
 4. Then implement the Docker client wrapper, provider removal, and create flow while keeping `mc-router`

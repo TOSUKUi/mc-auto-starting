@@ -25,7 +25,6 @@ class MinecraftServerTest < ActiveSupport::TestCase
     assert_not server.valid?
     assert_includes server.errors[:name], "can't be blank"
     assert_includes server.errors[:hostname], "can't be blank"
-    assert_includes server.errors[:provider_name], "can't be blank"
     assert_includes server.errors[:minecraft_version], "can't be blank"
     assert_includes server.errors[:template_kind], "can't be blank"
   end
@@ -74,6 +73,37 @@ class MinecraftServerTest < ActiveSupport::TestCase
     assert_equal "main-survival.mc.tosukui.xyz:42434", server.connection_target
   end
 
+  test "derives managed Docker resource names from hostname" do
+    server = MinecraftServer.new(
+      owner: users(:one),
+      name: "Builder",
+      hostname: "  Build-Node  ",
+      status: :provisioning,
+      minecraft_version: "1.21.4",
+      memory_mb: 4096,
+      disk_mb: 20_480,
+      template_kind: "paper"
+    )
+
+    assert server.valid?
+    assert_equal "build-node", server.hostname
+    assert_equal "mc-server-build-node", server.container_name
+    assert_equal "mc-data-build-node", server.volume_name
+  end
+
+  test "uses container name as router backend host on the shared network" do
+    server = minecraft_servers(:one)
+
+    assert_equal "mc-server-main-survival", server.backend_host
+    assert_equal 25_565, server.backend_port
+    assert_equal "mc-server-main-survival:25565", server.backend
+  end
+
+  test "lifecycle becomes ready only after the container id is assigned" do
+    assert_equal true, minecraft_servers(:one).lifecycle_ready?
+    assert_equal false, minecraft_servers(:two).lifecycle_ready?
+  end
+
   test "allows valid status transitions" do
     server = minecraft_servers(:one)
     server.status = :restarting
@@ -109,11 +139,9 @@ class MinecraftServerTest < ActiveSupport::TestCase
     server = minecraft_servers(:one)
     server.memory_mb = 0
     server.disk_mb = -1
-    server.backend_port = 70_000
 
     assert_not server.valid?
     assert_includes server.errors[:memory_mb], "must be greater than 0"
     assert_includes server.errors[:disk_mb], "must be greater than 0"
-    assert_includes server.errors[:backend_port], "must be less than or equal to 65535"
   end
 end

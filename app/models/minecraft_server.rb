@@ -1,4 +1,6 @@
 class MinecraftServer < ApplicationRecord
+  MANAGED_CONTAINER_PORT = 25_565
+
   STATUS_TRANSITIONS = {
     provisioning: %i[ready failed unpublished deleting],
     ready: %i[starting stopping restarting degraded unpublished deleting failed],
@@ -31,13 +33,13 @@ class MinecraftServer < ApplicationRecord
   }, prefix: true
 
   before_validation :normalize_hostname
+  before_validation :assign_managed_resource_names
 
-  validates :name, :hostname, :status, :provider_name, :minecraft_version, :template_kind, presence: true
-  validates :provider_server_identifier, presence: true, if: -> { provider_server_id.present? }
+  validates :name, :hostname, :status, :minecraft_version, :template_kind, :container_name, :volume_name, presence: true
   validates :hostname, hostname_format: true, reserved_hostname: true
   validates :hostname, uniqueness: true
+  validates :container_name, :volume_name, uniqueness: true
   validates :memory_mb, :disk_mb, numericality: { only_integer: true, greater_than: 0 }
-  validates :backend_port, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 65_535 }, allow_nil: true
   validate :status_transition_is_allowed, if: :will_save_change_to_status?
 
   def fqdn
@@ -46,6 +48,24 @@ class MinecraftServer < ApplicationRecord
 
   def connection_target
     MinecraftPublicEndpoint.connection_target_for(hostname)
+  end
+
+  def backend_host
+    container_name
+  end
+
+  def backend_port
+    MANAGED_CONTAINER_PORT
+  end
+
+  def backend
+    return if container_name.blank?
+
+    "#{container_name}:#{MANAGED_CONTAINER_PORT}"
+  end
+
+  def lifecycle_ready?
+    container_id.present?
   end
 
   def can_transition_to?(next_status)
@@ -65,6 +85,13 @@ class MinecraftServer < ApplicationRecord
   private
     def normalize_hostname
       self.hostname = hostname.to_s.strip.downcase
+    end
+
+    def assign_managed_resource_names
+      return if hostname.blank?
+
+      self.container_name = "mc-server-#{hostname}"
+      self.volume_name = "mc-data-#{hostname}"
     end
 
     def status_transition_is_allowed

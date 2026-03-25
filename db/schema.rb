@@ -10,28 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_103001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_162943) do
   create_table "minecraft_servers", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "backend_host"
     t.integer "backend_port"
+    t.string "container_id"
+    t.string "container_name", null: false
+    t.string "container_state"
     t.datetime "created_at", null: false
     t.integer "disk_mb", null: false
     t.string "hostname", null: false
     t.string "last_error_message"
+    t.datetime "last_started_at"
     t.integer "memory_mb", null: false
     t.string "minecraft_version", null: false
     t.string "name", null: false
     t.bigint "owner_id", null: false
-    t.string "provider_name", null: false
+    t.string "provider_name"
     t.string "provider_server_id"
     t.string "provider_server_identifier"
     t.string "status", default: "provisioning", null: false
     t.string "template_kind", null: false
     t.datetime "updated_at", null: false
+    t.string "volume_name", null: false
+    t.index ["container_id"], name: "index_minecraft_servers_on_container_id"
+    t.index ["container_name"], name: "index_minecraft_servers_on_container_name", unique: true
+    t.index ["container_state"], name: "index_minecraft_servers_on_container_state"
     t.index ["hostname"], name: "index_minecraft_servers_on_hostname", unique: true
     t.index ["owner_id"], name: "index_minecraft_servers_on_owner_id"
     t.index ["provider_name", "provider_server_id"], name: "idx_on_provider_name_provider_server_id_01d0332424"
     t.index ["status"], name: "index_minecraft_servers_on_status"
+    t.index ["volume_name"], name: "index_minecraft_servers_on_volume_name", unique: true
   end
 
   create_table "router_routes", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|

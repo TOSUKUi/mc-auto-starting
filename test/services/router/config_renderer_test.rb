@@ -7,7 +7,7 @@ class Router::ConfigRendererTest < ActiveSupport::TestCase
     payload = JSON.parse(rendered)
 
     assert_nil payload.fetch("default-server")
-    assert_equal({ "main-survival.mc.tosukui.xyz" => "10.0.0.21:25565" }, payload.fetch("mappings"))
+    assert_equal({ "main-survival.mc.tosukui.xyz" => "mc-server-main-survival:25565" }, payload.fetch("mappings"))
   end
 
   test "sorts mappings by hostname for deterministic output" do
@@ -16,11 +16,8 @@ class Router::ConfigRendererTest < ActiveSupport::TestCase
       name: "Alpha",
       hostname: "alpha",
       status: :ready,
-      provider_name: "stub_provider",
-      provider_server_id: "srv-alpha",
-      provider_server_identifier: "alpha1234",
-      backend_host: "10.0.0.30",
-      backend_port: 25565,
+      container_id: "alpha-container-001",
+      container_state: "running",
       minecraft_version: "1.21.4",
       memory_mb: 4096,
       disk_mb: 20480,

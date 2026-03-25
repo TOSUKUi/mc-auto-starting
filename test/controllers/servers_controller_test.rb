@@ -52,10 +52,11 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "success", visible_server.fetch("route").fetch("last_apply_status")
     assert_equal "healthy", visible_server.fetch("route").fetch("last_healthcheck_status")
     assert_equal true, visible_server.fetch("route").fetch("enabled")
-    assert_equal "stub_provider", visible_server.fetch("execution").fetch("provider_name")
-    assert_equal "srv-001", visible_server.fetch("execution").fetch("provider_server_id")
-    assert_equal "10.0.0.21", visible_server.fetch("execution").fetch("backend_host")
-    assert_equal 25_565, visible_server.fetch("execution").fetch("backend_port")
+    assert_equal "mc-server-main-survival", visible_server.fetch("runtime").fetch("container_name")
+    assert_equal "container-001", visible_server.fetch("runtime").fetch("container_id")
+    assert_equal "running", visible_server.fetch("runtime").fetch("container_state")
+    assert_equal "mc-data-main-survival", visible_server.fetch("runtime").fetch("volume_name")
+    assert_equal "mc-server-main-survival:25565", visible_server.fetch("runtime").fetch("backend")
   end
 
   test "show allows visible server for member" do
@@ -69,7 +70,6 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal minecraft_servers(:one).id, server.fetch("id")
     assert_equal "operator", server.fetch("access_role")
-    assert_equal "abc12345", server.fetch("provider_server_identifier")
     assert_equal "provider unavailable", server.fetch("last_error_message")
     assert_equal true, server.fetch("can_start")
     assert_equal true, server.fetch("can_stop")
@@ -86,9 +86,9 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "show hides lifecycle controls when provider identifier is missing" do
+  test "show hides lifecycle controls when container id is missing" do
     server = minecraft_servers(:one)
-    server.update_columns(provider_server_identifier: nil)
+    server.update_columns(container_id: nil)
     sign_in_as(users(:one))
 
     get server_url(server, format: :json)
@@ -128,10 +128,10 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal users(:two).id, server.owner_id
     assert_equal "creative-build", server.hostname
     assert_equal "provisioning", server.status
-    assert_equal ExecutionProvider.config.provider_name, server.provider_name
-    assert_nil server.provider_server_id
-    assert_nil server.backend_host
-    assert_nil server.backend_port
+    assert_equal "mc-server-creative-build", server.container_name
+    assert_equal "mc-data-creative-build", server.volume_name
+    assert_nil server.container_id
+    assert_nil server.container_state
     assert_equal "paper", server.template_kind
     assert_equal false, server.router_route.enabled
     assert_equal "pending", server.router_route.last_apply_status

@@ -1,6 +1,6 @@
-import { Alert, Button, Code, Divider, Grid, Group, NumberInput, Paper, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
+import { Button, Code, Divider, Grid, Group, NumberInput, Paper, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { IconAlertCircle, IconCircleCheck, IconPlugConnected, IconServer2, IconSparkles } from '@tabler/icons-react'
+import { IconCircleCheck, IconPlugConnected, IconServer2, IconSparkles } from '@tabler/icons-react'
 
 function normalizeHostname(value) {
   return value.trim().toLowerCase()
@@ -16,7 +16,7 @@ function endpointPreview(hostname, publicEndpoint) {
   }
 }
 
-export default function ServersNew({ form_defaults, provider_name, public_endpoint, template_available, template_kind }) {
+export default function ServersNew({ form_defaults, public_endpoint, runtime_image, template_kind }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
@@ -29,7 +29,6 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
 
   const submit = (event) => {
     event?.preventDefault()
-    if (!template_available) return
     form.transform((data) => ({ minecraft_server: data }))
     form.post('/servers')
   }
@@ -80,13 +79,6 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
             <Paper p="lg" radius="lg" shadow="sm" withBorder>
               <form onSubmit={submit}>
                 <Stack gap="md">
-                  {!template_available ? (
-                    <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="作成設定が未接続です" variant="light">
-                      実行基盤側に、いまの標準サーバー作成設定がまだ入っていません。管理側で `paper` の provisioning
-                      template を設定するまで、この画面からは作成できません。
-                    </Alert>
-                  ) : null}
-
                   <Title order={3}>基本情報</Title>
 
                   <TextInput
@@ -181,7 +173,6 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
 
                   <Group justify="flex-end">
                     <Button
-                      disabled={!template_available}
                       fullWidth
                       loading={form.processing}
                       onClick={submit}
@@ -240,7 +231,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
               <Paper p="lg" radius="lg" shadow="sm" withBorder>
                 <Stack gap="sm">
                   <Text c="dimmed" size="sm">
-                    実行基盤: {provider_name}
+                    実行イメージ: {runtime_image}
                   </Text>
                   <Text c="dimmed" size="sm">
                     サーバー方式: {template_kind}

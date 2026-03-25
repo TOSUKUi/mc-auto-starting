@@ -74,6 +74,6 @@ class MinecraftServerPolicy < ApplicationPolicy
     end
 
     def lifecycle_access?
-      (owner? || operator?) && record.provider_server_identifier.present?
+      (owner? || operator?) && record.lifecycle_ready?
     end
 end
