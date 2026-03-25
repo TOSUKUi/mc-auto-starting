@@ -59,6 +59,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show allows visible server for member" do
+    minecraft_servers(:one).update!(last_error_message: "provider unavailable")
     sign_in_as(users(:three))
 
     get server_url(minecraft_servers(:one), format: :json)
@@ -69,6 +70,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal minecraft_servers(:one).id, server.fetch("id")
     assert_equal "operator", server.fetch("access_role")
     assert_equal "abc12345", server.fetch("provider_server_identifier")
+    assert_equal "provider unavailable", server.fetch("last_error_message")
     assert_equal true, server.fetch("can_start")
     assert_equal true, server.fetch("can_stop")
     assert_equal true, server.fetch("can_restart")

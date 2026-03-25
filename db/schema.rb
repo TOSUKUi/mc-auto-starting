@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_103000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_25_103001) do
   create_table "minecraft_servers", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "backend_host"
     t.integer "backend_port"
     t.datetime "created_at", null: false
     t.integer "disk_mb", null: false
     t.string "hostname", null: false
+    t.string "last_error_message"
     t.integer "memory_mb", null: false
     t.string "minecraft_version", null: false
     t.string "name", null: false

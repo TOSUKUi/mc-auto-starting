@@ -233,6 +233,7 @@ class ServersController < InertiaController
         provider_server_identifier: server.provider_server_identifier,
         minecraft_version: server.minecraft_version,
         template_kind: server.template_kind,
+        last_error_message: server.last_error_message,
         owner_id: server.owner_id,
         can_manage_members: policy(server).manage_members?,
         can_destroy: policy(server).destroy?,

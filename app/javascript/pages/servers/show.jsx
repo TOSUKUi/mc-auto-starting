@@ -1,7 +1,8 @@
-import { Badge, Button, Code, Divider, Grid, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core'
+import { Alert, Badge, Button, Code, Divider, Grid, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core'
 import { Head, Link, router } from '@inertiajs/react'
 import {
   IconActivityHeartbeat,
+  IconAlertCircle,
   IconArrowBackUp,
   IconPlayerPause,
   IconPlayerPlay,
@@ -206,6 +207,12 @@ export default function ServersShow({ server }) {
             </SimpleGrid>
           </Stack>
         </Paper>
+
+        {server.last_error_message ? (
+          <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="Last failure" variant="light">
+            {server.last_error_message}
+          </Alert>
+        ) : null}
 
         <Grid gutter="md">
           <Grid.Col span={{ base: 12, md: 6 }}>

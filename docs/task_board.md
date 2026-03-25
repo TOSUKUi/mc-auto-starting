@@ -46,7 +46,7 @@
 | T-404 | P4 | Implement route health checking | T-403 | todo | Route/application health can be persisted |
 | T-500 | P5 | Implement server create controller flow | T-102,T-106,T-201,T-301 | done | Create request stores provisional record and queues work |
 | T-501 | P5 | Implement create job end-to-end | T-500,T-302,T-403 | done | Provider create, backend save, route apply, ready transition all work |
-| T-502 | P5 | Implement rollback and failure-state handling | T-501 | done | Failed create does not leave inconsistent publication state, and failed provisional records remain inspectable |
+| T-502 | P5 | Implement rollback and failure-state handling | T-501 | done | Failed create does not leave inconsistent publication state, failed provisional records remain inspectable, and latest failure reason is visible on the detail flow |
 | T-503 | P5 | Implement delete flow | T-403,T-302,T-106 | done | Deletion removes route and updates DB state |
 | T-504 | P5 | Implement start/stop/restart/sync flows | T-302,T-106 | done | Lifecycle operations update status correctly |
 | T-505 | P5 | Drop audit event recording from product scope | T-105,T-500 | done | Project docs explicitly keep audit event recording out of scope |

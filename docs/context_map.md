@@ -61,7 +61,7 @@ This file tells any contributor or agent where to find authoritative information
 - The mc-router contract is fixed through `T-400` in `docs/router_api_contract.md`.
 - The route definition builder, config renderer, and config applier baselines are installed through `T-401`, `T-402`, and `T-403`.
 - The provider-backed create job flow is installed through `T-501`; provisioning now resolves template config, creates the provider server, persists backend identifiers, applies router config, and transitions to `ready` on success.
-- Create failure rollback handling is installed through `T-502`; provider create failures now keep the provisional record visible in `failed` with route publication disabled, and route apply failures keep the server in `unpublished` with route publication disabled.
+- Create failure rollback handling is installed through `T-502`; provider create failures now keep the provisional record visible in `failed` with route publication disabled, route apply failures keep the server in `unpublished` with route publication disabled, and the latest provisioning failure reason is persisted on `MinecraftServer.last_error_message` for the detail UI.
 - The delete flow is installed through `T-503`; owners can delete a server, the route is unpublished before provider deletion, and the DB records are removed on success.
 - Lifecycle actions and provider-status sync are installed through `T-504`; start/stop/restart/sync endpoints now use the persisted provider server identifier for Client API operations and update Rails status accordingly.
 - The server detail page UI is installed through `T-604`; operators can inspect connection, route, provider backend, and run lifecycle actions from a single screen.

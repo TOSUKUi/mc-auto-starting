@@ -57,6 +57,7 @@ module Servers
           provider_server_identifier: provider_server.identifier,
           backend_host: provider_server.backend_host,
           backend_port: provider_server.backend_port,
+          last_error_message: nil,
         )
       end
 
@@ -74,6 +75,7 @@ module Servers
       def rollback_provider_failure!(error)
         if server.persisted?
           server.router_route.update!(enabled: false)
+          server.update!(last_error_message: error.message)
           server.transition_to!(:failed) if server.can_transition_to?(:failed)
         end
 
@@ -85,6 +87,7 @@ module Servers
           enabled: false,
           last_apply_status: :failed,
         )
+        server.update!(last_error_message: error.message)
         server.transition_to!(:unpublished) if server.can_transition_to?(:unpublished)
         Rails.logger.error("CreateServerJob route apply failed for server=#{server.id}: #{error.class}: #{error.message}")
       end

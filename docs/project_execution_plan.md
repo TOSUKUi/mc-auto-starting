@@ -310,7 +310,7 @@
 - 完了条件:
   - 中途半端な公開状態を残さない
 - 進捗メモ:
-  - `T-502` 完了。provider create が失敗した provisional server は詳細画面から追えるよう `failed` のまま保持しつつ route を disabled にし、route apply 失敗時は route を disabled + `last_apply_status=failed` にして `unpublished` へ倒す挙動をテスト付きで固定した。
+  - `T-502` 完了。provider create が失敗した provisional server は詳細画面から追えるよう `failed` のまま保持しつつ route を disabled にし、route apply 失敗時は route を disabled + `last_apply_status=failed` にして `unpublished` へ倒す。あわせて最新の失敗理由を `MinecraftServer.last_error_message` に残し、詳細画面で表示できるようにした。
 
 #### P5-4 削除フロー
 

@@ -44,7 +44,7 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
 
   test "provisions the provider server, applies the route, and marks the server ready" do
     server = minecraft_servers(:two)
-    server.update!(template_kind: "paper")
+    server.update!(template_kind: "paper", last_error_message: "old failure")
 
     provider_server = ExecutionProvider::ProviderServer.new(
       provider_server_id: "321",
@@ -71,6 +71,7 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal "abcd1234", server.provider_server_identifier
     assert_equal "wings.internal", server.backend_host
     assert_equal 25565, server.backend_port
+    assert_nil server.last_error_message
     assert_equal true, server.router_route.enabled
     assert_equal "success", server.router_route.last_apply_status
     assert_not_nil server.router_route.last_applied_at
@@ -96,6 +97,7 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     server.reload
 
     assert_equal "failed", server.status
+    assert_equal "provider unavailable", server.last_error_message
     assert_equal false, server.router_route.enabled
     assert_equal "pending", server.router_route.last_apply_status
     assert MinecraftServer.exists?(server.id)
@@ -133,6 +135,7 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal "unpublished", server.status
     assert_equal "321", server.provider_server_id
     assert_equal "abcd1234", server.provider_server_identifier
+    assert_equal "reload failed", server.last_error_message
     assert_equal false, server.router_route.enabled
     assert_equal "failed", server.router_route.last_apply_status
   end
