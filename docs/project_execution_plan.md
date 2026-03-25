@@ -478,6 +478,8 @@
 - Playwright による実ブラウザ導線確認
 - 完了条件:
   - 要件定義の受け入れ条件を automated acceptance test と実ブラウザ確認の両方で検証できる
+- 進捗メモ:
+  - `T-803` 完了。`test/integration/servers_acceptance_test.rb` で create success / create failure visibility / delete / lifecycle-sync acceptance を検証し、Playwright 実ブラウザ確認では login / server index / create / detail / members / delete 導線を確認済み。
 
 ### Phase 9: 運用・保守
 

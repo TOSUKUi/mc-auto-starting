@@ -69,7 +69,7 @@ This file tells any contributor or agent where to find authoritative information
 - The delete flow is installed through `T-503`; owners can delete a server, the route is unpublished before provider deletion, and the DB records are removed on success.
 - Lifecycle actions and provider-status sync are installed through `T-504`; start/stop/restart/sync endpoints now use the persisted provider server identifier for Client API operations and update Rails status accordingly.
 - The server detail page UI is installed through `T-604`; operators can inspect connection, route, provider backend, and run lifecycle actions from a single screen.
-- `T-803` is now in progress; acceptance coverage includes Docker-run Rails acceptance tests plus Playwright-based real-browser checks for login, server index, create, detail, members, and delete flows.
+- `T-803` is complete; acceptance coverage includes Docker-run Rails acceptance tests plus Playwright-based real-browser checks for login, server index, create, detail, members, and delete flows.
 - Playwright MCP reachability note: in the current Docker host setup, the working browser target was `http://172.17.0.1:3000`; `localhost`, `127.0.0.1`, and the Docker service name were not reliable from the MCP side.
 - Before launching a new Dockerized `bin/dev` process for browser verification, first check whether an existing reachable app instance is already serving the target URL and reuse it when healthy.
 - The server detail page no longer emits the previous invalid HTML nesting warning during browser verification because non-text detail values now render through a `div` wrapper instead of a nested paragraph.
@@ -78,4 +78,4 @@ This file tells any contributor or agent where to find authoritative information
 - Application scope is centered on server lifecycle and publication consistency; mc-router liveness is handled outside the app via Docker health checks.
 - Monitoring dashboards, audit-log viewing pages, audit event recording, and unknown-hostname analytics are currently out of scope.
 - If audit logging returns in a future phase, the preferred implementation baseline is the `audited` gem.
-- The current critical path now moves through `T-803`.
+- The current remaining critical-path documentation task is `T-902`.
