@@ -50,7 +50,7 @@
 | T-503 | P5 | Implement delete flow | T-403,T-302,T-106 | done | Deletion removes route and updates DB state |
 | T-504 | P5 | Implement start/stop/restart/sync flows | T-302,T-106 | done | Lifecycle operations update status correctly |
 | T-505 | P5 | Drop audit event recording from product scope | T-105,T-500 | done | Project docs explicitly keep audit event recording out of scope |
-| T-600 | P6 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
+| T-600 | P6 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages, including collapsed mobile navigation |
 | T-601 | P6 | Build login page | T-100,T-004 | done | UI login works |
 | T-602 | P6 | Build server index page | T-107,T-600 | done | User sees only owned/member servers |
 | T-603 | P6 | Build server creation page | T-500,T-600,T-202 | done | User can submit create request and see status |

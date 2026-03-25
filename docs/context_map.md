@@ -49,7 +49,7 @@ This file tells any contributor or agent where to find authoritative information
 - `ServerMember` baseline is installed through `T-103`.
 - `RouterRoute` baseline is installed through `T-104`.
 - Server visibility scopes and request protections are installed through `T-107`.
-- The authenticated layout shell is installed through `T-600`.
+- The authenticated layout shell is installed through `T-600`; the navbar now collapses behind a Burger on mobile widths instead of staying open by default.
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
 - The members management page UI is installed through `T-605`.
