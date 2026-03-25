@@ -110,6 +110,8 @@ GEM
     dry-cli (1.4.1)
     erb (6.0.2)
     erubi (1.13.1)
+    excon (1.4.2)
+      logger
     ffi (1.17.3-aarch64-linux-gnu)
     ffi (1.17.3-aarch64-linux-musl)
     ffi (1.17.3-arm-linux-gnu)
@@ -356,6 +358,7 @@ DEPENDENCIES
   bundler-audit
   capybara
   debug
+  excon (~> 1.2)
   image_processing (~> 1.2)
   inertia_rails (~> 3.18)
   jbuilder

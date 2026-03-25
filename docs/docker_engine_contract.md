@@ -79,6 +79,8 @@ The wrapper does not expose:
   - Builds the required labels for app-managed resources.
 - `DockerEngine::ManagedName`
   - Builds container and volume names from normalized hostnames.
+- `DockerEngine::Configuration`
+  - Holds socket path, API version, and timeout settings for the wrapper.
 
 ## mc-router Backend Contract
 - `RouterRoute` publication resolves the backend to `<container_name>:25565`.

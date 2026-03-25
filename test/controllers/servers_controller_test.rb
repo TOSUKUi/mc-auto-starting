@@ -52,6 +52,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "success", visible_server.fetch("route").fetch("last_apply_status")
     assert_equal "healthy", visible_server.fetch("route").fetch("last_healthcheck_status")
     assert_equal true, visible_server.fetch("route").fetch("enabled")
+    assert_equal "published", visible_server.fetch("route").fetch("publication_state")
     assert_equal "mc-server-main-survival", visible_server.fetch("runtime").fetch("container_name")
     assert_equal "container-001", visible_server.fetch("runtime").fetch("container_id")
     assert_equal "running", visible_server.fetch("runtime").fetch("container_state")
@@ -134,6 +135,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_nil server.container_state
     assert_equal "paper", server.template_kind
     assert_equal false, server.router_route.enabled
+    assert_equal "unpublished", server.router_route.publication_state
     assert_equal "pending", server.router_route.last_apply_status
     assert_equal "unknown", server.router_route.last_healthcheck_status
   end

@@ -38,7 +38,7 @@
 | T-205 | P1 | Inventory legacy provider dependencies | T-110 | todo | Files, schema fields, fixtures, tests, and UI props that still depend on `ExecutionProvider` are explicitly listed before removal starts |
 | T-300 | P2 | Define docker.sock safety boundary and compose strategy | T-110 | done | Compose and permission strategy for Docker Engine access are fixed |
 | T-301 | P2 | Define Docker naming and label conventions | T-300,T-200 | done | Container names, volume names, and labels are fixed |
-| T-302 | P2 | Implement Docker Engine client wrapper | T-300 | todo | Rails can create/inspect/start/stop/restart/remove managed containers |
+| T-302 | P2 | Implement Docker Engine client wrapper | T-300 | done | Rails can create/inspect/start/stop/restart/remove managed containers |
 | T-303 | P2 | Implement `mc-router` publication update flow | T-200,T-204,T-300 | todo | Router config updates are applied safely when servers are created or removed |
 | T-304 | P2 | Define direct-Docker environment contract | T-300,T-301 | todo | Required env such as image baseline, public domain, shared public port, and router paths are documented |
 | T-400 | P3 | Implement direct-Docker create flow | T-200,T-201,T-202,T-203,T-302,T-303 | todo | Create request persists a server, creates Docker resources, updates router publication, and stores identifiers |
@@ -86,3 +86,4 @@ The current critical path is:
 - `T-202`: public connection targets are always rendered from normalized hostname via `MinecraftPublicEndpoint`.
 - `T-203`: direct-Docker status transitions and router-publication-eligible statuses are centralized in `MinecraftServerStatus`.
 - `T-204`: `RouterRoute` now derives its published server address and backend from the related `MinecraftServer`.
+- `T-302`: Docker Engine access is wrapped behind Excon-based Unix socket transport with managed labels, names, and the minimal lifecycle API surface.

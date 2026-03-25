@@ -247,6 +247,6 @@
 
 1. Pivot 方針の文書を固定する
 2. Docker socket の compose 方針を固める
-3. `T-201` から `T-204` で hostname slug / FQDN / 状態遷移 / route publication の正本ルールを固定する
-4. `T-302` で Docker client wrapper 実装へ入る
-5. `T-303` と `T-304` で router publication と env contract を固める
+3. `T-303` と `T-304` で router publication と env contract を固める
+4. `T-400` 以降で direct-Docker create / lifecycle / delete を実装する
+5. そのあとに provider coupling cleanup を進める

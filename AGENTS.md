@@ -27,7 +27,8 @@ Current baseline:
 - The planning pivot through `T-110` is complete.
 - `T-200` is complete: `minecraft_servers` now carries direct-Docker baseline fields such as `container_name`, `container_id`, `volume_name`, `container_state`, and `last_started_at`, while router ingress remains active.
 - `T-201` through `T-204` are complete: normalized hostname slugs, FQDN/connection-target formatting, status-transition rules, and retained `router_routes` publication responsibilities are now codified in shared helpers and models.
-- The next implementation critical-path task is `T-302`.
+- `T-302` is complete: a minimal `DockerEngine` wrapper now talks to Docker over `/var/run/docker.sock` via Excon-based Unix socket HTTP transport.
+- The next implementation critical-path task is `T-303`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -147,7 +148,7 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 ## Immediate Next Start Point
 If no other instruction is given, start from the current critical path:
 
-1. Start from `T-200` and redesign `minecraft_servers` for direct Docker management
-2. Implement the Docker client wrapper through `T-302`
-3. Implement retained `mc-router` publication flow and env contract through `T-303` and `T-304`
-4. Then implement the direct-Docker create/lifecycle/delete flows while keeping `mc-router`
+1. `T-200` through `T-302` are complete
+2. Implement retained `mc-router` publication flow and env contract through `T-303` and `T-304`
+3. Then implement the direct-Docker create/lifecycle/delete flows while keeping `mc-router`
+4. Remove provider coupling after the direct-Docker path is working end to end

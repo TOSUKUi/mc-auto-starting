@@ -1,0 +1,5 @@
+Rails.application.config.x.docker_engine.socket_path = ENV.fetch("DOCKER_ENGINE_SOCKET_PATH", "/var/run/docker.sock")
+Rails.application.config.x.docker_engine.api_version = ENV.fetch("DOCKER_ENGINE_API_VERSION", "v1.51")
+Rails.application.config.x.docker_engine.open_timeout = ENV.fetch("DOCKER_ENGINE_OPEN_TIMEOUT", 5)
+Rails.application.config.x.docker_engine.read_timeout = ENV.fetch("DOCKER_ENGINE_READ_TIMEOUT", 30)
+Rails.application.config.x.docker_engine.write_timeout = ENV.fetch("DOCKER_ENGINE_WRITE_TIMEOUT", 30)
