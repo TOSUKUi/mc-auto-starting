@@ -51,7 +51,8 @@ This file tells any contributor or agent where to find authoritative information
 - Authenticated layout and current login/index/create/detail/members UI baselines already exist, but they still contain legacy provider assumptions and need cleanup while preserving router-based ingress.
 - The planning pivot task `T-110` is complete.
 - `T-200` is complete: `minecraft_servers` now has direct-Docker baseline fields for managed container/volume identity and runtime state.
+- `T-201` through `T-204` are complete: hostname slug normalization, FQDN/public-port connection formatting, status transitions, and `router_routes` publication responsibilities are fixed in code.
 - The active architecture is now `Rails + docker.sock + mc-router` for single-host Minecraft container management.
 - `Pterodactyl/Wings` are no longer the current target architecture, but `mc-router` remains active.
 - `mc-router` and app-managed Minecraft containers are expected to share one bridge network, with router backends addressed by container name.
-- The next implementation critical path starts at `T-201`.
+- The next implementation critical path starts at `T-302`.

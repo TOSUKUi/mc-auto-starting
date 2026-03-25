@@ -6,12 +6,13 @@ module Router
 
     def call
       raise ArgumentError, "router_route minecraft_server is required" if minecraft_server.nil?
-      raise ArgumentError, "minecraft_server hostname is required" if minecraft_server.hostname.blank?
-      raise ArgumentError, "minecraft_server container_name is required" if minecraft_server.container_name.blank?
+      raise ArgumentError, "router_route is not publishable" unless router_route.publishable?
+      raise ArgumentError, "minecraft_server fqdn is required" if router_route.server_address.blank?
+      raise ArgumentError, "minecraft_server backend is required" if router_route.backend.blank?
 
       RouteDefinition.new(
-        server_address: minecraft_server.fqdn,
-        backend: minecraft_server.backend,
+        server_address: router_route.server_address,
+        backend: router_route.backend,
       )
     end
 

@@ -8,13 +8,13 @@ class Router::RouteDefinitionBuilderTest < ActiveSupport::TestCase
     assert_equal "mc-server-main-survival:25565", definition.backend
   end
 
-  test "rejects routes without a managed container name" do
-    minecraft_servers(:two).update_columns(container_name: "")
+  test "rejects routes that are not publishable" do
+    router_routes(:two).update_columns(enabled: true)
 
     error = assert_raises(ArgumentError) do
       Router::RouteDefinitionBuilder.new(router_route: router_routes(:two)).call
     end
 
-    assert_equal "minecraft_server container_name is required", error.message
+    assert_equal "router_route is not publishable", error.message
   end
 end

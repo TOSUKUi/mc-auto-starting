@@ -35,6 +35,7 @@ class RouterRouteTest < ActiveSupport::TestCase
 
     assert route.valid?
     assert_equal false, route.enabled
+    assert_equal "unpublished", route.publication_state
     assert_equal "pending", route.last_apply_status
     assert_equal "unknown", route.last_healthcheck_status
   end
@@ -44,5 +45,30 @@ class RouterRouteTest < ActiveSupport::TestCase
 
     assert_not route.valid?
     assert_includes route.errors[:minecraft_server_id], "has already been taken"
+  end
+
+  test "derives publication fields from the related server" do
+    route = router_routes(:one)
+
+    assert_equal "main-survival.mc.tosukui.xyz", route.server_address
+    assert_equal "mc-server-main-survival:25565", route.backend
+    assert_equal true, route.desired_enabled?
+    assert_equal true, route.publishable?
+    assert_equal "published", route.publication_state
+  end
+
+  test "returns failed publication state when the last apply failed" do
+    route = router_routes(:one)
+    route.last_apply_status = :failed
+
+    assert_equal "failed", route.publication_state
+  end
+
+  test "returns invalid publication state when the server should not be routed" do
+    route = router_routes(:one)
+    route.minecraft_server.update!(status: :failed)
+
+    assert_equal false, route.publishable?
+    assert_equal "invalid", route.publication_state
   end
 end

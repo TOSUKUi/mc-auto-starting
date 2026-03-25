@@ -1,36 +1,14 @@
 class MinecraftServer < ApplicationRecord
   MANAGED_CONTAINER_PORT = 25_565
 
-  STATUS_TRANSITIONS = {
-    provisioning: %i[ready failed unpublished deleting],
-    ready: %i[starting stopping restarting degraded unpublished deleting failed],
-    stopped: %i[starting deleting failed],
-    starting: %i[ready failed degraded stopping],
-    stopping: %i[stopped failed degraded],
-    restarting: %i[ready failed degraded],
-    degraded: %i[ready restarting stopping unpublished failed deleting],
-    unpublished: %i[provisioning ready deleting failed],
-    failed: %i[provisioning deleting],
-    deleting: [],
-  }.freeze
+  STATUS_TRANSITIONS = MinecraftServerStatus::TRANSITIONS
 
   belongs_to :owner, class_name: "User", inverse_of: :owned_minecraft_servers
   has_one :router_route, dependent: :destroy
   has_many :server_members, dependent: :destroy
   has_many :member_users, through: :server_members, source: :user
 
-  enum :status, {
-    provisioning: "provisioning",
-    ready: "ready",
-    stopped: "stopped",
-    starting: "starting",
-    stopping: "stopping",
-    restarting: "restarting",
-    degraded: "degraded",
-    unpublished: "unpublished",
-    failed: "failed",
-    deleting: "deleting",
-  }, prefix: true
+  enum :status, MinecraftServerStatus::ENUM, prefix: true
 
   before_validation :normalize_hostname
   before_validation :assign_managed_resource_names
@@ -42,8 +20,16 @@ class MinecraftServer < ApplicationRecord
   validates :memory_mb, :disk_mb, numericality: { only_integer: true, greater_than: 0 }
   validate :status_transition_is_allowed, if: :will_save_change_to_status?
 
+  def self.normalize_hostname(value)
+    MinecraftServerHostname.normalize(value).presence
+  end
+
   def fqdn
     MinecraftPublicEndpoint.fqdn_for(hostname)
+  end
+
+  def slug
+    hostname
   end
 
   def connection_target
@@ -68,11 +54,12 @@ class MinecraftServer < ApplicationRecord
     container_id.present?
   end
 
-  def can_transition_to?(next_status)
-    next_status = next_status.to_sym
-    return true if next_status == status.to_sym
+  def route_should_be_enabled?
+    MinecraftServerStatus.route_enabled?(status)
+  end
 
-    STATUS_TRANSITIONS.fetch(status.to_sym).include?(next_status)
+  def can_transition_to?(next_status)
+    MinecraftServerStatus.can_transition?(from: status, to: next_status)
   end
 
   def transition_to!(next_status)
@@ -84,14 +71,14 @@ class MinecraftServer < ApplicationRecord
 
   private
     def normalize_hostname
-      self.hostname = hostname.to_s.strip.downcase
+      self.hostname = self.class.normalize_hostname(hostname)
     end
 
     def assign_managed_resource_names
       return if hostname.blank?
 
-      self.container_name = "mc-server-#{hostname}"
-      self.volume_name = "mc-data-#{hostname}"
+      self.container_name = MinecraftServerHostname.container_name_for(hostname)
+      self.volume_name = MinecraftServerHostname.volume_name_for(hostname)
     end
 
     def status_transition_is_allowed
@@ -99,7 +86,7 @@ class MinecraftServer < ApplicationRecord
       next_status = status.to_sym
       return if previous_status.nil?
       return if previous_status == next_status
-      return if STATUS_TRANSITIONS.fetch(previous_status).include?(next_status)
+      return if MinecraftServerStatus.can_transition?(from: previous_status, to: next_status)
 
       errors.add(:status, "cannot transition from #{previous_status} to #{next_status}")
     end

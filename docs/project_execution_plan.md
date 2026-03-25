@@ -24,7 +24,7 @@
 
 1. Docker 直接制御の安全境界を定義する
 2. `minecraft_servers` を direct-Docker + router 前提に再設計する
-3. hostname / FQDN / single-port 接続ルールを定義する
+3. hostname / FQDN / single-port / route publication / 状態遷移ルールを定義する
 4. Docker client wrapper を実装する
 5. コンテナ create / delete / start / stop / restart / sync を実装する
 6. provider 依存を除去しつつ `mc-router` 連携を維持する
@@ -247,6 +247,6 @@
 
 1. Pivot 方針の文書を固定する
 2. Docker socket の compose 方針を固める
-3. `hostname` / FQDN / shared-public-port の正本ルールを `T-201` と `T-202` で固定する
-4. retained `router_routes` の責務と publication ルールを `T-204` で固定する
-5. そのあとに Docker client wrapper 実装へ入る
+3. `T-201` から `T-204` で hostname slug / FQDN / 状態遷移 / route publication の正本ルールを固定する
+4. `T-302` で Docker client wrapper 実装へ入る
+5. `T-303` と `T-304` で router publication と env contract を固める

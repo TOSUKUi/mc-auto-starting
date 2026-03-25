@@ -37,6 +37,17 @@ class MinecraftServerTest < ActiveSupport::TestCase
     assert_equal "mixed-case-host", server.hostname
   end
 
+  test "normalizes hostname through the shared class helper" do
+    assert_equal "build-node", MinecraftServer.normalize_hostname("  Build-Node  ")
+    assert_nil MinecraftServer.normalize_hostname("   ")
+  end
+
+  test "uses normalized hostname as the stable slug" do
+    server = minecraft_servers(:one)
+
+    assert_equal "main-survival", server.slug
+  end
+
   test "rejects invalid hostname format" do
     server = minecraft_servers(:one)
     server.hostname = "-bad-host-"
@@ -97,6 +108,11 @@ class MinecraftServerTest < ActiveSupport::TestCase
     assert_equal "mc-server-main-survival", server.backend_host
     assert_equal 25_565, server.backend_port
     assert_equal "mc-server-main-survival:25565", server.backend
+  end
+
+  test "keeps router publication enabled only for routable statuses" do
+    assert_equal true, minecraft_servers(:one).route_should_be_enabled?
+    assert_equal false, minecraft_servers(:two).route_should_be_enabled?
   end
 
   test "lifecycle becomes ready only after the container id is assigned" do

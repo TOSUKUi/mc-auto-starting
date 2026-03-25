@@ -187,7 +187,7 @@ class ServersController < InertiaController
     end
 
     def normalized_hostname(value)
-      value.to_s.strip.downcase.presence
+      MinecraftServer.normalize_hostname(value)
     end
 
     def fixed_template_kind
@@ -210,6 +210,7 @@ class ServersController < InertiaController
         updated_at: server.updated_at.iso8601,
         route: {
           enabled: route&.enabled || false,
+          publication_state: route&.publication_state || "unpublished",
           last_apply_status: route&.last_apply_status || "pending",
           last_healthcheck_status: route&.last_healthcheck_status || "unknown",
           last_applied_at: route&.last_applied_at&.iso8601,

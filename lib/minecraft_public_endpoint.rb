@@ -13,10 +13,16 @@ module MinecraftPublicEndpoint
   end
 
   def fqdn_for(hostname)
-    [ hostname, public_domain ].join(".")
+    normalized = MinecraftServerHostname.normalize(hostname)
+    return if normalized.blank?
+
+    [ normalized, public_domain ].join(".")
   end
 
   def connection_target_for(hostname)
-    "#{fqdn_for(hostname)}:#{public_port}"
+    fqdn = fqdn_for(hostname)
+    return if fqdn.blank?
+
+    "#{fqdn}:#{public_port}"
   end
 end
