@@ -1,8 +1,10 @@
 module Servers
   class ProvisionServer
-    def initialize(server:, provider_client: ExecutionProvider.build_client, router_applier: Router::ConfigApplier.new)
+    DATA_VOLUME_TARGET = "/data".freeze
+
+    def initialize(server:, docker_client: DockerEngine.build_client, router_applier: Router::ConfigApplier.new)
       @server = server
-      @provider_client = provider_client
+      @docker_client = docker_client
       @router_publication_sync = Router::PublicationSync.new(
         router_route: server&.router_route,
         enabled: true,
@@ -13,15 +15,15 @@ module Servers
     def call
       return if server.nil?
 
-      profile = ExecutionProvider::ProvisioningProfileResolver.new(server: server).call
-      provider_server = provider_client.create_server(build_create_request(profile))
-
-      persist_provider_server!(provider_server)
+      create_volume!
+      create_container!
+      start_container!
+      persist_runtime!
       server.transition_to!(:ready) unless server.status_ready?
       apply_route!
       server
-    rescue ExecutionProvider::Error => error
-      rollback_provider_failure!(error)
+    rescue DockerEngine::Error => error
+      rollback_docker_failure!(error)
       raise
     rescue Router::ApplyError => error
       mark_route_failure!(error)
@@ -29,37 +31,40 @@ module Servers
     end
 
     private
-      attr_reader :server, :provider_client, :router_publication_sync
+      attr_reader :server, :docker_client, :router_publication_sync
 
-      def build_create_request(profile)
-        ExecutionProvider::CreateServerRequest.new(
-          name: server.name,
-          external_id: "minecraft-server-#{server.id}",
-          owner_id: profile.owner_id,
-          node_id: profile.node_id,
-          egg_id: profile.egg_id,
-          allocation_id: profile.allocation_id,
-          memory_mb: server.memory_mb,
-          swap_mb: profile.swap_mb,
-          disk_mb: server.disk_mb,
-          io_weight: profile.io_weight,
-          cpu_limit: profile.cpu_limit,
-          cpu_pinning: profile.cpu_pinning,
-          oom_killer_enabled: profile.oom_killer_enabled,
-          allocation_limit: profile.allocation_limit,
-          backup_limit: profile.backup_limit,
-          database_limit: profile.database_limit,
-          environment: profile.environment,
-          skip_scripts: profile.skip_scripts,
+      def create_volume!
+        docker_client.create_volume(
+          name: server.volume_name,
+          labels: managed_labels,
         )
       end
 
-      def persist_provider_server!(provider_server)
+      def create_container!
+        response = docker_client.create_container(
+          name: server.container_name,
+          image: MinecraftRuntime.image,
+          env: container_env,
+          mounts: [ data_volume_mount ],
+          labels: managed_labels,
+          network_name: MinecraftRuntime.network_name,
+          memory_mb: server.memory_mb,
+        )
+
+        @container_id = response.fetch("Id")
+      end
+
+      def start_container!
+        docker_client.start_container(id: container_id)
+      end
+
+      def persist_runtime!
+        inspection = docker_client.inspect_container(id_or_name: container_id)
+
         server.update!(
-          provider_server_id: provider_server.provider_server_id,
-          provider_server_identifier: provider_server.identifier,
-          backend_host: provider_server.backend_host,
-          backend_port: provider_server.backend_port,
+          container_id: inspection.fetch("Id", container_id),
+          container_state: inspection.dig("State", "Status") || "running",
+          last_started_at: Time.current,
           last_error_message: nil,
         )
       end
@@ -68,14 +73,21 @@ module Servers
         router_publication_sync.call
       end
 
-      def rollback_provider_failure!(error)
+      def rollback_docker_failure!(error)
+        cleanup_runtime_resources!
+
         if server.persisted?
           server.router_route.update!(enabled: false)
-          server.update!(last_error_message: error.message)
+          server.update!(
+            container_id: nil,
+            container_state: nil,
+            last_started_at: nil,
+            last_error_message: error.message,
+          )
           server.transition_to!(:failed) if server.can_transition_to?(:failed)
         end
 
-        Rails.logger.error("CreateServerJob provider provisioning failed for server=#{server.id}: #{error.class}: #{error.message}")
+        Rails.logger.error("CreateServerJob docker provisioning failed for server=#{server.id}: #{error.class}: #{error.message}")
       end
 
       def mark_route_failure!(error)
@@ -86,6 +98,43 @@ module Servers
         server.update!(last_error_message: error.message)
         server.transition_to!(:unpublished) if server.can_transition_to?(:unpublished)
         Rails.logger.error("CreateServerJob route apply failed for server=#{server.id}: #{error.class}: #{error.message}")
+      end
+
+      def cleanup_runtime_resources!
+        if container_id.present?
+          docker_client.remove_container(id: container_id, force: true)
+        elsif server.container_name.present?
+          docker_client.remove_container(id: server.container_name, force: true)
+        end
+
+        docker_client.remove_volume(name: server.volume_name) if server.volume_name.present?
+      rescue DockerEngine::Error => cleanup_error
+        Rails.logger.error("CreateServerJob docker cleanup failed for server=#{server.id}: #{cleanup_error.class}: #{cleanup_error.message}")
+      end
+
+      def managed_labels
+        DockerEngine::ManagedLabels.for_server(minecraft_server: server)
+      end
+
+      def data_volume_mount
+        {
+          Type: "volume",
+          Source: server.volume_name,
+          Target: DATA_VOLUME_TARGET,
+        }
+      end
+
+      def container_env
+        {
+          "EULA" => "TRUE",
+          "TYPE" => server.template_kind.to_s.upcase,
+          "VERSION" => server.minecraft_version,
+          "MEMORY" => "#{server.memory_mb}M",
+        }
+      end
+
+      def container_id
+        @container_id
       end
   end
 end

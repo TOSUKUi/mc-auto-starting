@@ -158,6 +158,7 @@
 - route publication
 - 完了条件:
   - UI からの create で Minecraft コンテナが立ち上がる
+  - server record に `container_id`, `container_state`, `last_started_at` が反映される
 
 #### P3-4 lifecycle / delete / sync 実装
 
@@ -256,5 +257,5 @@
 1. Pivot 方針の文書を固定する
 2. Docker socket の compose 方針を固める
 3. `T-303` と `T-304` は完了
-4. `T-400` 以降で direct-Docker create / lifecycle / delete を実装する
+4. `T-400` は完了し、次は `T-402` / `T-401` で direct-Docker lifecycle / delete を実装する
 5. そのあとに provider coupling cleanup を進める

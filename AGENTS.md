@@ -31,7 +31,8 @@ Current baseline:
 - `T-302` is complete: a minimal `DockerEngine` wrapper now talks to Docker over `/var/run/docker.sock` via Excon-based Unix socket HTTP transport.
 - `T-303` is complete: route publication apply/rollback is now centralized so create/delete flows share one `mc-router` update path.
 - `T-304` is complete: direct-Docker env defaults for Docker transport, public endpoint, runtime image/network, and router config are now fixed in code and docs.
-- The next implementation critical-path task is `T-400`.
+- `T-400` is complete: create requests now provision managed Docker volume/container resources, start the container, persist runtime identifiers, and publish the router route.
+- The next implementation critical-path task is `T-402`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -152,6 +153,6 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 ## Immediate Next Start Point
 If no other instruction is given, start from the current critical path:
 
-1. `T-200` through `T-304` are complete
-2. Implement the direct-Docker create/lifecycle/delete flows while keeping `mc-router`
+1. `T-200` through `T-400` are complete
+2. Implement the direct-Docker lifecycle and delete flows while keeping `mc-router`
 3. Remove provider coupling after the direct-Docker path is working end to end

@@ -3,6 +3,69 @@ require "json"
 require "tmpdir"
 
 class ServersAcceptanceTest < ActionDispatch::IntegrationTest
+  class FakeDockerClient
+    class << self
+      attr_accessor :calls, :error_on
+
+      def reset!
+        self.calls = []
+        self.error_on = nil
+      end
+    end
+
+    def create_volume(**kwargs)
+      record(:create_volume, kwargs)
+      raise_error!(:create_volume)
+
+      { "Name" => kwargs.fetch(:name) }
+    end
+
+    def create_container(**kwargs)
+      record(:create_container, kwargs)
+      raise_error!(:create_container)
+
+      { "Id" => "container-acceptance-001" }
+    end
+
+    def start_container(**kwargs)
+      record(:start_container, kwargs)
+      raise_error!(:start_container)
+
+      true
+    end
+
+    def inspect_container(**kwargs)
+      record(:inspect_container, kwargs)
+      raise_error!(:inspect_container)
+
+      {
+        "Id" => "container-acceptance-001",
+        "State" => { "Status" => "running" },
+      }
+    end
+
+    def remove_container(**kwargs)
+      record(:remove_container, kwargs)
+      true
+    end
+
+    def remove_volume(**kwargs)
+      record(:remove_volume, kwargs)
+      true
+    end
+
+    private
+      def record(name, kwargs)
+        self.class.calls << [ name, kwargs ]
+      end
+
+      def raise_error!(name)
+        return unless self.class.error_on&.first == name
+
+        raise self.class.error_on.last
+      end
+  end
+
   class FakeExecutionProviderClient
     class << self
       attr_accessor :created_requests, :create_result, :create_error, :deleted_ids, :power_calls, :status_result
@@ -69,30 +132,30 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
   setup do
     @original_execution_provider_config = Rails.application.config.x.execution_provider
     @original_mc_router_config = Rails.application.config.x.mc_router
+    @original_docker_build_client = DockerEngine.method(:build_client)
     @tmpdir = Dir.mktmpdir("servers-acceptance")
 
+    FakeDockerClient.reset!
     FakeExecutionProviderClient.reset!
     Rails.application.config.x.execution_provider = acceptance_provider_config
     Rails.application.config.x.mc_router = Router::Configuration.new(
       routes_config_path: File.join(@tmpdir, "routes.json"),
       reload_strategy: "watch",
     )
+    DockerEngine.define_singleton_method(:build_client) do |**_overrides|
+      FakeDockerClient.new
+    end
   end
 
   teardown do
     Rails.application.config.x.execution_provider = @original_execution_provider_config
     Rails.application.config.x.mc_router = @original_mc_router_config
+    DockerEngine.define_singleton_method(:build_client, @original_docker_build_client)
     FileUtils.remove_entry(@tmpdir) if @tmpdir && File.exist?(@tmpdir)
   end
 
   test "accepted create request provisions the server and publishes the route" do
     sign_in_as(users(:two))
-    FakeExecutionProviderClient.create_result = provider_server(
-      provider_server_id: "srv-900",
-      identifier: "ident-900",
-      backend_host: "wings.internal",
-      backend_port: 25590,
-    )
 
     assert_difference("MinecraftServer.count", 1) do
       assert_difference("RouterRoute.count", 1) do
@@ -127,19 +190,40 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal true, server.fetch("route").fetch("enabled")
     assert_equal "success", server.fetch("route").fetch("last_apply_status")
     assert_nil server.fetch("last_error_message")
+    assert_equal "container-acceptance-001", server.fetch("runtime").fetch("container_id")
+    assert_equal "running", server.fetch("runtime").fetch("container_state")
 
-    create_request = FakeExecutionProviderClient.created_requests.last
-    assert_equal "minecraft-server-#{server_id}", create_request.external_id
-    assert_equal 8192, create_request.memory_mb
     assert_equal "paper", MinecraftServer.find(server_id).template_kind
+    assert_equal(
+      [
+        [ :create_volume, { name: "mc-data-creative-build", labels: :labels } ],
+        [ :create_container, {
+          name: "mc-server-creative-build",
+          image: "itzg/minecraft-server",
+          env: {
+            "EULA" => "TRUE",
+            "TYPE" => "PAPER",
+            "VERSION" => "1.21.4",
+            "MEMORY" => "8192M",
+          },
+          mounts: [ { Type: "volume", Source: "mc-data-creative-build", Target: "/data" } ],
+          labels: :labels,
+          network_name: "mc_router_net",
+          memory_mb: 8192,
+        } ],
+        [ :start_container, { id: "container-acceptance-001" } ],
+        [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
+      ],
+      normalize_docker_calls(FakeDockerClient.calls),
+    )
 
     mappings = JSON.parse(File.read(File.join(@tmpdir, "routes.json"))).fetch("mappings")
     assert_equal "mc-server-creative-build:25565", mappings.fetch("creative-build.mc.tosukui.xyz")
   end
 
-  test "provider provisioning failure leaves the requested server inspectable in failed state" do
+  test "docker provisioning failure leaves the requested server inspectable in failed state" do
     sign_in_as(users(:two))
-    FakeExecutionProviderClient.create_error = ExecutionProvider::RequestError.new("provider unavailable")
+    FakeDockerClient.error_on = [ :start_container, DockerEngine::RequestError.new("docker unavailable") ]
 
     post servers_url(format: :json), params: {
       minecraft_server: {
@@ -156,11 +240,11 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
 
     server_id = response.parsed_body.fetch("server").fetch("id")
 
-    error = assert_raises(ExecutionProvider::RequestError) do
+    error = assert_raises(DockerEngine::RequestError) do
       CreateServerJob.perform_now(server_id)
     end
 
-    assert_equal "provider unavailable", error.message
+    assert_equal "docker unavailable", error.message
 
     get server_url(server_id, format: :json)
 
@@ -168,10 +252,33 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
 
     server = response.parsed_body.fetch("server")
     assert_equal "failed", server.fetch("status")
-    assert_equal "provider unavailable", server.fetch("last_error_message")
+    assert_equal "docker unavailable", server.fetch("last_error_message")
     assert_equal false, server.fetch("route").fetch("enabled")
     assert_equal "pending", server.fetch("route").fetch("last_apply_status")
     assert_nil server.fetch("runtime").fetch("container_id")
+    assert_equal(
+      [
+        [ :create_volume, { name: "mc-data-broken-build", labels: :labels } ],
+        [ :create_container, {
+          name: "mc-server-broken-build",
+          image: "itzg/minecraft-server",
+          env: {
+            "EULA" => "TRUE",
+            "TYPE" => "PAPER",
+            "VERSION" => "1.21.4",
+            "MEMORY" => "4096M",
+          },
+          mounts: [ { Type: "volume", Source: "mc-data-broken-build", Target: "/data" } ],
+          labels: :labels,
+          network_name: "mc_router_net",
+          memory_mb: 4096,
+        } ],
+        [ :start_container, { id: "container-acceptance-001" } ],
+        [ :remove_container, { id: "container-acceptance-001", force: true } ],
+        [ :remove_volume, { name: "mc-data-broken-build" } ],
+      ],
+      normalize_docker_calls(FakeDockerClient.calls),
+    )
   end
 
   test "owner delete request removes publication and provider record" do
@@ -241,16 +348,14 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
       )
     end
 
-    def provider_server(provider_server_id:, identifier:, backend_host:, backend_port:)
-      ExecutionProvider::ProviderServer.new(
-        provider_server_id: provider_server_id,
-        identifier: identifier,
-        name: "acceptance-server",
-        backend_host: backend_host,
-        backend_port: backend_port,
-        node_id: 2,
-        allocation_id: 21,
-        raw: {},
-      )
+    def normalize_docker_calls(calls)
+      calls.map do |name, payload|
+        [
+          name,
+          payload.deep_dup.tap do |normalized|
+            normalized[:labels] = :labels if normalized.key?(:labels)
+          end,
+        ]
+      end
     end
 end

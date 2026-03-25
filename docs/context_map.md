@@ -60,4 +60,5 @@ This file tells any contributor or agent where to find authoritative information
 - `mc-router` and app-managed Minecraft containers are expected to share one bridge network, with router backends addressed by container name.
 - `T-303` is complete: route publication apply/rollback is centralized and reused by the existing create/delete-era services.
 - `T-304` is complete: Docker transport, public endpoint, runtime image/network, and router file/reload defaults are fixed in env-backed helpers and docs.
-- The next implementation critical path starts at `T-400`.
+- `T-400` is complete: the create job now provisions managed Docker resources, persists runtime state, and publishes the `mc-router` mapping.
+- The next implementation critical path starts at `T-402`.
