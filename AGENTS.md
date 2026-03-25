@@ -10,6 +10,7 @@ Current important files:
 
 - `Dockerfile`
 - `compose.yaml`
+- `docs/direct_docker_lifecycle_contract.md`
 - `docs/direct_docker_env_contract.md`
 - `docs/implementation_breakdown.md`
 - `docs/project_execution_plan.md`
@@ -33,6 +34,7 @@ Current baseline:
 - `T-303` is complete: route publication apply/rollback is now centralized so create/delete flows share one `mc-router` update path.
 - `T-304` is complete: direct-Docker env defaults for Docker transport, public endpoint, runtime image/network, and router config are now fixed in code and docs.
 - `T-400` is complete: create requests now provision managed Docker volume/container resources, start the container, persist runtime identifiers, and publish the router route.
+- The direct-Docker lifecycle/delete contract is fixed in `docs/direct_docker_lifecycle_contract.md` before `T-401` / `T-402` implementation.
 - The next implementation critical-path task is `T-402`.
 
 Development seed login is available as `dev@example.com` / `password`.
@@ -88,6 +90,7 @@ The active system has four parts.
 4. `docs/task_board.md`
 5. `docs/implementation_breakdown.md`
 6. `docs/direct_docker_env_contract.md`
+7. `docs/direct_docker_lifecycle_contract.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.

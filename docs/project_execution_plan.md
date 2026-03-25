@@ -167,6 +167,7 @@
 - restart
 - delete
 - sync
+- 実装前に direct-Docker lifecycle/delete 契約を文書で固定し、Docker state から Rails status への写像と delete 順序を揃える
 - 完了条件:
   - UI からコンテナ lifecycle が操作できる
 
@@ -257,5 +258,5 @@
 1. Pivot 方針の文書を固定する
 2. Docker socket の compose 方針を固める
 3. `T-303` と `T-304` は完了
-4. `T-400` は完了し、次は `T-402` / `T-401` で direct-Docker lifecycle / delete を実装する
+4. `T-400` は完了し、direct-Docker lifecycle/delete 契約も文書化済みで、次は `T-402` / `T-401` で service 実装へ入る
 5. そのあとに provider coupling cleanup を進める

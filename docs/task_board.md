@@ -43,7 +43,7 @@
 | T-304 | P2 | Define direct-Docker environment contract | T-300,T-301 | done | Required env such as image baseline, public domain, shared public port, shared network, and router paths are documented and wired into app defaults |
 | T-400 | P3 | Implement direct-Docker create flow | T-200,T-201,T-202,T-203,T-302,T-303 | done | Create request persists a server, creates Docker resources, updates router publication, and stores identifiers |
 | T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | todo | Delete removes managed container resources and unpublishes the router route |
-| T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | todo | Lifecycle operations update Docker state and Rails status correctly |
+| T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | in_progress | Lifecycle operations update Docker state and Rails status correctly |
 | T-403 | P3 | Persist container runtime details on sync | T-302,T-402 | todo | `container_state`, timestamps, and last error fields stay reconcilable |
 | T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | todo | Create UI exposes only the fields needed for single-host Docker provisioning while keeping hostname/FQDN guidance |
 | T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | todo | Detail UI shows connection target, container/runtime info, and router publication instead of provider info |
@@ -91,3 +91,4 @@ The current critical path is:
 - `T-302`: the wrapper defaults to unversioned Engine API paths and only prefixes `/v1.xx` when `DOCKER_ENGINE_API_VERSION` is explicitly set.
 - `T-304`: direct-Docker defaults are fixed through env-backed `MinecraftPublicEndpoint`, `MinecraftRuntime`, compose defaults, and the dedicated env contract doc.
 - `T-400`: `Servers::ProvisionServer` now creates a managed volume/container through `DockerEngine`, starts it, persists runtime state, and then publishes the route.
+- `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
