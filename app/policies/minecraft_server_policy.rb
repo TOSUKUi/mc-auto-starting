@@ -24,19 +24,19 @@ class MinecraftServerPolicy < ApplicationPolicy
   end
 
   def start?
-    owner? || operator?
+    lifecycle_access?
   end
 
   def stop?
-    owner? || operator?
+    lifecycle_access?
   end
 
   def restart?
-    owner? || operator?
+    lifecycle_access?
   end
 
   def sync?
-    owner? || operator?
+    lifecycle_access?
   end
 
   class Scope < Scope
@@ -71,5 +71,9 @@ class MinecraftServerPolicy < ApplicationPolicy
 
     def visible_to_user?
       owner? || operator? || viewer?
+    end
+
+    def lifecycle_access?
+      (owner? || operator?) && record.provider_server_identifier.present?
     end
 end

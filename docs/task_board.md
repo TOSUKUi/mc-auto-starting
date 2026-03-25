@@ -57,6 +57,7 @@
 | T-603 | P6 | Build server creation page | T-500,T-600,T-202 | done | User can submit create request and see status, including on smartphone-width layouts |
 | T-604 | P6 | Build server detail page | T-504,T-600 | done | User can inspect and operate server |
 | T-605 | P6 | Build members management page | T-103,T-106,T-600 | done | Owner can manage memberships |
+| T-608 | P6 | Localize operator-facing UI copy to Japanese baseline | T-600,T-601,T-602,T-603,T-604,T-605 | todo | Default operator-facing copy is Japanese across the current Inertia/Mantine screens, while shared locale handling remains compatible with optional English |
 | T-606 | P6 | Drop audit log page from product scope | T-105,T-505,T-600 | done | Project docs explicitly keep audit-log browsing UI out of scope |
 | T-607 | P6 | Drop monitoring and reconciliation dashboard from product scope | T-700,T-701,T-702,T-703,T-600 | done | Project docs explicitly keep monitoring/reconciliation dashboards out of scope |
 | T-700 | P7 | Defer mc-router liveness checks to Docker health checks | T-403 | done | Project docs explicitly treat router liveness as infrastructure responsibility, not app UI scope |
@@ -69,7 +70,7 @@
 | T-802 | P8 | Add service and job tests | T-301,T-302,T-403,T-501,T-701,T-702 | todo | Critical async and service paths are covered |
 | T-803 | P8 | Add acceptance checks for requirement criteria | T-304,T-403,T-501,T-503,T-504 | done | Main acceptance conditions are verifiable by automated acceptance tests and Playwright-based real-browser checks covering login, server index, create, detail, members, and delete flows, including create-form behavior that reflects configured execution-provider templates |
 | T-900 | P9 | Document setup and local development workflow | T-003,T-004,T-005 | todo | New contributor can boot project locally |
-| T-901 | P9 | Document provider and router integration operations | T-403,T-501 | todo | Operational integration steps are written |
+| T-901 | P9 | Document provider and router integration operations | T-403,T-501 | done | Operational integration steps are written |
 | T-902 | P9 | Document release, migration, and rollback procedure | T-803 | todo | Release workflow is written and reviewable |
 
 ## Critical Path Tasks

@@ -421,6 +421,15 @@
 - 完了条件:
   - これらの UI を作らない判断が docs と task board に反映されている
 
+#### P6-8 UI 日本語化
+
+- operator-facing copy を日本語へ寄せる
+- Rails I18n を正本にして文言定義を集約する
+- 既存 Inertia/Mantine 画面で英語ハードコードを減らす
+- 完了条件:
+  - 既定 locale `ja` で主要 UI が日本語表示される
+  - optional な `en` 切替余地を壊さない
+
 ### Phase 7: 整合性チェック
 
 #### P7-1 route 整合性チェック
@@ -491,6 +500,8 @@
 - トラブルシュート
 - 完了条件:
   - 新規参加者が環境構築できる
+- 進捗メモ:
+  - `T-901` 完了。`docs/provider_router_operations.md` に Rails Docker / Panel Docker / Wings host の運用トポロジ、必要 env、接続境界、provisioning checklist を追加済み。
 
 #### P9-2 セキュリティ運用整理
 

@@ -86,6 +86,22 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "show hides lifecycle controls when provider identifier is missing" do
+    server = minecraft_servers(:one)
+    server.update_columns(provider_server_identifier: nil)
+    sign_in_as(users(:one))
+
+    get server_url(server, format: :json)
+
+    assert_response :success
+    payload = response.parsed_body.fetch("server")
+
+    assert_equal false, payload.fetch("can_start")
+    assert_equal false, payload.fetch("can_stop")
+    assert_equal false, payload.fetch("can_restart")
+    assert_equal false, payload.fetch("can_sync")
+  end
+
   test "create stores a provisional server and enqueues provisioning job" do
     sign_in_as(users(:two))
 

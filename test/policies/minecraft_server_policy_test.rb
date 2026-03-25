@@ -53,4 +53,16 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
   test "scope is empty for anonymous users" do
     assert_empty MinecraftServerPolicy::Scope.new(nil, MinecraftServer).resolve
   end
+
+  test "lifecycle actions are blocked when the provider identifier is missing" do
+    server = minecraft_servers(:one)
+    server.update_columns(provider_server_identifier: nil)
+
+    policy = MinecraftServerPolicy.new(users(:one), server)
+
+    assert_not policy.start?
+    assert_not policy.stop?
+    assert_not policy.restart?
+    assert_not policy.sync?
+  end
 end
