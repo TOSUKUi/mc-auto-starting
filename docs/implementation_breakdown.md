@@ -1,76 +1,91 @@
-# Minecraft サーバー公開・管理基盤 実装設計ドラフト
+# Minecraft サーバー単一ホスト管理基盤 実装設計ドラフト
 
 ## 1. 前提
 
-- 本ドキュメントは、要件定義書（修正版）を Rails + Inertia.js + React + Mantine UI 実装へ落とし込むための初期設計である。
-- 現時点ではリポジトリに既存アプリケーションは存在しないため、新規 Rails アプリケーションとして構成する前提で整理する。
-- Minecraft サーバーの実行責務は外部の既存実行基盤に委譲し、本アプリケーションは control plane として振る舞う。
-- DNS の追加・削除は行わず、`*.mc.tosukui.xyz` と単一公開ポートを前提とする。
-- UI 文言は Rails I18n を正本とし、既定 locale は日本語、英語は切替対応とする。
+- 本ドキュメントは、Rails 8 + Inertia.js + React + Mantine を使って、単一ホスト上の Minecraft サーバーを直接 Docker 管理するための実装設計である。
+- 既存の `Pterodactyl Panel + Wings` / `mc-router` 前提のコードと文書は履歴として残るが、今後の正本設計ではない。
+- Rails アプリは `/var/run/docker.sock` をマウントされた単一ホスト control plane として振る舞う。
+- 初期版の実行イメージは `itzg/minecraft-server` 系を前提とする。
+- 公開方式は「サーバーごとにホストの公開 TCP ポートを 1 つ払い出す」単純方式とする。
+- 接続先表示は `public_host:public_port` を正本とする。
+- UI 文言は Rails I18n を正本とし、既定 locale は日本語、英語は将来対応に留める。
 
-## 2. 画面一覧
+## 2. システム構成
 
-### 2.1 認証
+### 2.1 役割分担
+
+- Rails:
+  - 認証、認可、UI、DB 永続化
+  - Docker Engine API 呼び出し
+  - ポート払い出し
+  - コンテナ / volume / label の正本管理
+- Docker Engine:
+  - Minecraft コンテナの create/start/stop/remove
+  - 永続 volume の保持
+- Minecraft コンテナ:
+  - 実サーバープロセス
+  - コンテナ単位で `itzg/minecraft-server` を実行
+
+### 2.2 非目標
+
+- 複数ホスト / 複数ノード管理
+- Pterodactyl 連携
+- mc-router 連携
+- DNS 自動化
+- SRV レコード運用
+- 監査ログ UI
+- 監視ダッシュボード
+- 一般公開 SaaS を前提にした厳格な分離構成
+
+## 3. 画面一覧
+
+### 3.1 認証
 
 #### ログイン画面
 
 - パス: `/login`
 - 目的: Web UI へのログイン
-- 主な要素:
-  - email
-  - password
-  - ログイン実行ボタン
-- 備考:
-  - 未認証時のデフォルト遷移先
-  - 将来 SSO を入れる場合もこの画面を起点にする
 
-### 2.2 ダッシュボード
+### 3.2 サーバー一覧
 
 #### サーバー一覧画面
 
 - パス: `/servers`
-- 目的: 自分が所有または参加しているサーバーのみ一覧表示
+- 目的: 所有または参加しているサーバーのみ一覧表示
 - 表示項目:
   - サーバー名
-  - hostname
-  - 接続先 `hostname:port`
+  - 接続先 `public_host:public_port`
   - 状態
   - Minecraft バージョン
-  - 所有者/自分の権限
+  - メモリ
+  - ディスク
+  - 所有者 / 自分の権限
   - 最終更新日時
-  - route 反映状態
-  - 実行基盤状態
 - 操作:
   - サーバー詳細へ遷移
   - サーバー作成画面へ遷移
-  - フィルタリング
 
-### 2.3 サーバー作成
+### 3.3 サーバー作成
 
 #### サーバー作成画面
 
 - パス: `/servers/new`
-- 目的: 新規サーバーの作成要求
+- 目的: 新規サーバーの作成
 - 入力項目:
   - サーバー名
-  - hostname prefix
+  - サーバー識別子 `slug`
   - Minecraft バージョン
-  - memory_mb
-  - disk_mb
-- 実行基盤テンプレートは `paper` 固定
+  - メモリ
+  - ディスク
 - 表示項目:
-  - 生成される `fqdn`
-  - 公開ポート
-  - 接続先 `hostname:port`
-  - 作成ジョブ状態
-  - route 反映状態
+  - 生成予定の接続先 `public_host:public_port`
+  - 使う標準イメージ
 - バリデーション:
-  - hostname prefix 形式
-  - hostname 一意性
-  - 予約語チェック
-  - リソース上限チェック
+  - `slug` 形式
+  - `slug` 一意性
+  - メモリ / ディスク上限
 
-### 2.4 サーバー詳細
+### 3.4 サーバー詳細
 
 #### サーバー詳細画面
 
@@ -78,64 +93,29 @@
 - 目的: サーバー状態確認と運用操作
 - 表示項目:
   - サーバー基本情報
-  - 接続先 `hostname:port`
-  - 実行基盤状態
-  - router route 状態
-  - backend 情報
-  - 最終ヘルスチェック結果
+  - 接続先 `public_host:public_port`
+  - Docker コンテナ状態
+  - コンテナ名 / volume 名
+  - Minecraft バージョン
+  - メモリ / ディスク
+  - 最終エラー
 - 操作:
   - 起動
   - 停止
   - 再起動
-  - 編集
+  - 状態同期
   - 削除
-  - route 再反映
-  - 状態再取得
 
-### 2.5 サーバー編集
-
-#### サーバー設定編集画面
-
-- パス: `/servers/:id/edit`
-- 目的: サーバーのメタ情報や公開状態を更新
-- 編集対象候補:
-  - サーバー名
-  - メモ
-  - 公開有効/無効
-  - メンバー権限
-- 非対応候補:
-  - hostname の安易な変更
-  - backend の手動直接変更
-- 備考:
-  - hostname 変更は route と実行基盤整合に影響が大きいため、初期版では禁止または管理者限定が妥当
-
-### 2.6 メンバー管理
+### 3.5 メンバー管理
 
 #### メンバー一覧・招待画面
 
 - パス: `/servers/:id/members`
 - 目的: 所有者がメンバーを管理
-- 表示項目:
-  - ユーザー名
-  - email
-  - role
-  - 追加日時
-- 操作:
-  - 招待
-  - 権限更新
-  - 削除
 
-### 2.7 監査・監視の扱い
+## 4. URL 設計
 
-- 監査ログ閲覧画面は初期版スコープに含めない
-- 監視 / 整合性ダッシュボードも初期版スコープに含めない
-- unknown hostname の reject は mc-router 契約で担保し、Rails 側では集計・可視化しない
-- mc-router の死活や listen ポートは Docker / runtime health check に委譲する
-- 将来もし監査ログを戻すなら、custom 実装ではなく `audited` gem を優先する
-
-## 3. URL 設計
-
-### 3.1 Web ルート
+### 4.1 Web ルート
 
 ```text
 GET    /login
@@ -146,15 +126,12 @@ GET    /servers
 GET    /servers/new
 POST   /servers
 GET    /servers/:id
-GET    /servers/:id/edit
-PATCH  /servers/:id
 DELETE /servers/:id
 
 POST   /servers/:id/start
 POST   /servers/:id/stop
 POST   /servers/:id/restart
 POST   /servers/:id/sync
-POST   /servers/:id/reapply-route
 
 GET    /servers/:id/members
 POST   /servers/:id/members
@@ -164,25 +141,112 @@ DELETE /servers/:id/members/:user_id
 GET    /health
 ```
 
-### 3.2 内部 API 方針
-
-- Inertia ベースのため、初期版では JSON API を乱立させず controller を中心に構成する。
-- ただし以下は JSON endpoint 化の価値が高い:
-  - 非同期状態ポーリング
-  - route 反映状態再取得
-  - 実行基盤状態取得
-
-#### JSON endpoint 候補
+### 4.2 JSON endpoint 候補
 
 ```text
 GET /api/servers/:id/status
-GET /api/servers/:id/route-status
-GET /api/servers/:id/execution-status
+GET /api/servers/:id/container
 ```
 
-## 4. Rails / Inertia ディレクトリ構成
+## 5. データモデル
 
-### 4.1 Rails 側
+### 5.1 users
+
+- 既存 auth baseline を利用
+
+### 5.2 minecraft_servers
+
+保持したい主な項目:
+
+- `owner_id`
+- `name`
+- `slug`
+- `status`
+- `minecraft_version`
+- `memory_mb`
+- `disk_mb`
+- `public_port`
+- `docker_image`
+- `container_name`
+- `container_id`
+- `volume_name`
+- `container_state`
+- `last_started_at`
+- `last_error_message`
+
+### 5.3 server_members
+
+- 既存の owner / operator / viewer モデルを継続
+
+### 5.4 旧 router_routes の扱い
+
+- `router_routes` は新設計の正本モデルではない
+- Pivot 後の cleanup task で削除する
+
+## 6. Docker 管理方針
+
+### 6.1 コンテナ命名
+
+- 形式: `mc-server-<slug>`
+
+### 6.2 volume 命名
+
+- 形式: `mc-data-<slug>`
+
+### 6.3 Docker labels
+
+Rails が作成したリソースだけを安全に扱うため、少なくとも以下を付与する。
+
+- `app=mc-auto-starting`
+- `managed_by=rails`
+- `minecraft_server_id=<db id>`
+- `minecraft_server_slug=<slug>`
+
+### 6.4 ポート払い出し
+
+- Rails が `public_port` を DB 上で一意に管理する
+- ポート範囲は設定値で定義する
+- create 前に未使用ポートを予約する
+- delete 時に解放する
+
+### 6.5 初期 create payload
+
+`itzg/minecraft-server` コンテナへ最低限渡すもの:
+
+- `EULA=TRUE`
+- `TYPE=PAPER` または標準方式に対応する値
+- `VERSION=<minecraft_version>`
+- `MEMORY=<memory_mb 相当>`
+
+将来追加候補:
+
+- `MOTD`
+- `DIFFICULTY`
+- `OPS`
+- `ENABLE_WHITELIST`
+
+## 7. 状態モデル
+
+初期状態遷移:
+
+- `requested`
+- `creating`
+- `ready`
+- `starting`
+- `stopping`
+- `stopped`
+- `restarting`
+- `failed`
+- `deleting`
+
+基本ルール:
+
+- DB 保存後、Docker create 成功で `requested -> ready` または `stopped`
+- Docker create 失敗で `requested/creating -> failed`
+- 削除受付後は `deleting`
+- Docker 実状態との不整合は `failed` または `stopped` へ寄せて明示
+
+## 8. Rails 側ディレクトリ構成
 
 ```text
 app/
@@ -198,7 +262,6 @@ app/
     user.rb
     minecraft_server.rb
     server_member.rb
-    router_route.rb
 
   policies/
     application_policy.rb
@@ -206,14 +269,11 @@ app/
     server_member_policy.rb
 
   services/
-    execution_provider/
-      base_client.rb
-      pterodactyl_client.rb
-    router/
-      route_definition_builder.rb
-      config_renderer.rb
-      config_applier.rb
-      health_checker.rb
+    docker_engine/
+      client.rb
+      port_allocator.rb
+      container_name.rb
+      volume_name.rb
     servers/
       create_server.rb
       destroy_server.rb
@@ -221,250 +281,14 @@ app/
       stop_server.rb
       restart_server.rb
       sync_server_state.rb
-    monitoring/
-      consistency_checker.rb
 
   jobs/
     create_server_job.rb
-    destroy_server_job.rb
     sync_server_state_job.rb
-    consistency_check_job.rb
-    route_healthcheck_job.rb
-
-  presenters/
-    minecraft_server_presenter.rb
-
-  validators/
-    hostname_format_validator.rb
-    reserved_hostname_validator.rb
-
-config/
-  routes.rb
-  initializers/
-    execution_provider.rb
-    mc_router.rb
 ```
 
-### 4.2 Inertia / React 側
+## 9. 既存実装との関係
 
-```text
-app/frontend/
-  app.tsx
-  layouts/
-    authenticated-layout.tsx
-    auth-layout.tsx
-
-  pages/
-    auth/
-      login.tsx
-    servers/
-      index.tsx
-      new.tsx
-      show.tsx
-      edit.tsx
-      members.tsx
-
-  components/
-    servers/
-      server-form.tsx
-      server-status-badge.tsx
-      connection-info.tsx
-      route-status-panel.tsx
-      execution-status-panel.tsx
-      members-table.tsx
-    common/
-      app-shell.tsx
-      copyable-text.tsx
-      confirm-button.tsx
-      empty-state.tsx
-
-  lib/
-    routes.ts
-    format.ts
-    status.ts
-```
-
-### 4.3 補足方針
-
-- 認可は Pundit 系を第一候補とする。
-- 非同期処理は Active Job を前提とし、Queue backend は Sidekiq か Solid Queue を後で選定する。
-- mc-router 設定反映は service object と job に分離し、controller から直接 shell 実行しない。
-- locale は `ja` を default とし、`en` 切替時も Rails view と Inertia page が同じ方針で翻訳されるようにする。
-
-## 5. ドメインモデル補足
-
-### 5.1 `minecraft_servers`
-
-- `status` は最低限以下を持つ:
-  - `provisioning`
-  - `ready`
-  - `stopped`
-  - `starting`
-  - `stopping`
-  - `restarting`
-  - `degraded`
-  - `unpublished`
-  - `failed`
-  - `deleting`
-
-### 5.2 `router_routes`
-
-- `enabled` は公開制御の実質フラグ
-- `last_apply_status` は `pending/success/failed`
-- `last_healthcheck_status` は `unknown/healthy/unreachable/rejected`
-
-### 5.3 `server_members`
-
-- role 候補:
-  - `viewer`
-  - `operator`
-- owner は `minecraft_servers.owner_id` を正本とし、`server_members` には重複保持しない
-
-## 6. 実装タスク分解
-
-### フェーズ 0: アプリケーション土台
-
-1. Rails + Inertia.js + React + Mantine UI の新規プロジェクト作成
-2. 認証基盤導入
-3. 共通レイアウトとナビゲーション整備
-4. Pundit 等の認可基盤導入
-5. バックグラウンドジョブ基盤導入
-
-### フェーズ 1: 認可と基本データモデル
-
-1. `users` 作成
-2. `minecraft_servers` 作成
-3. `server_members` 作成
-4. `router_routes` 作成
-5. 監査ログは initial scope から外す
-6. モデル関連付け定義
-7. 所有者 / メンバー可視性制御実装
-8. サーバー一覧のスコープ実装
-
-### フェーズ 2: hostname 制約
-
-1. hostname 正規化方針決定
-   - 初期版は DNS label 準拠で `a-z`、`0-9`、内部ハイフンのみ許可
-   - 保存前に trim + lowercase を適用
-   - 先頭末尾ハイフンは禁止
-   - 最大長は 63 文字とする
-2. 予約語バリデータ実装
-3. `fqdn = "#{hostname}.mc.tosukui.xyz"`、接続先表示 = `"#{fqdn}:42434"` を shared formatter に集約
-3. DB ユニーク制約追加
-4. モデルバリデーション追加
-5. 作成 UI に即時エラー表示追加
-
-### フェーズ 3: 実行基盤 API クライアント
-
-1. 実行基盤抽象インターフェース定義
-2. 具体実装クライアント追加
-3. create / delete / start / stop / restart / status API 実装
-4. エラーハンドリング方針統一
-5. API レスポンスから backend 接続情報抽出
-
-### フェーズ 4: サーバー作成 / 削除フロー
-
-1. `ServersController#create` 実装
-2. 仮レコード作成と `provisioning` 遷移実装
-3. `CreateServerJob` 実装
-4. 実行基盤作成成功時に backend 情報保存
-5. route 生成処理呼び出し
-6. route 反映成功時に `ready` 遷移
-7. 失敗時ロールバック実装
-8. 削除フローと route 削除実装
-9. 必要になった場合のみ内部イベント記録を再検討
-
-### フェーズ 4 補足: status 遷移
-
-- `provisioning -> ready/failed/unpublished/deleting`
-- `ready -> starting/stopping/restarting/degraded/unpublished/deleting/failed`
-- `stopped -> starting/deleting/failed`
-- `starting -> ready/failed/degraded/stopping`
-- `stopping -> stopped/failed/degraded`
-- `restarting -> ready/failed/degraded`
-- `degraded -> ready/restarting/stopping/unpublished/failed/deleting`
-- `unpublished -> provisioning/ready/deleting/failed`
-- `failed -> provisioning/deleting`
-- `deleting` からの通常遷移はなし
-
-### フェーズ 5: mc-router 連携
-
-1. route 定義モデル整理
-2. config renderer 実装
-3. 現行設定のバックアップ戦略定義
-4. config ファイル生成
-5. reload 実行処理
-6. reload 結果検証
-7. 未登録 hostname reject 方針固定
-8. route 反映状態保存
-
-### フェーズ 6: 整合性チェック
-
-1. hostname ごとの route 存在確認
-2. backend 疎通確認
-3. 実行基盤状態取得ジョブ
-4. DB / router / 実行基盤突合ジョブ
-5. 異常状態遷移定義
-
-### フェーズ 7: UI 実装
-
-1. ログイン画面
-2. サーバー一覧画面
-3. サーバー作成画面
-4. サーバー詳細画面
-5. メンバー管理画面
-6. エラー通知と copy UI 整備
-
-### フェーズ 8: 運用補強
-
-1. 監査イベントは現時点で product scope 外
-2. 管理者向け運用補助権限制御
-3. リトライ戦略
-4. タイムアウト / circuit breaker 検討
-5. ドキュメント整備
-6. 受け入れテスト整備
-
-## 7. 初期マイルストーン
-
-### Milestone 1
-
-- ログインできる
-- 自分のサーバー一覧だけ見える
-- サーバー作成フォームを送信できる
-- DB に仮レコードができる
-
-### Milestone 2
-
-- 実行基盤 API 経由でサーバー作成できる
-- backend 情報を保存できる
-- route 定義が生成される
-
-### Milestone 3
-
-- mc-router へ設定反映できる
-- `hostname:port` で公開できる
-- 未登録 hostname が reject される
-
-### Milestone 4
-
-- 起動 / 停止 / 再起動できる
-- 整合性チェックジョブが動く
-- UI に異常状態が出る
-
-## 8. 未確定事項を実装着手可能レベルにするための確認項目
-
-1. 実行基盤は Pterodactyl/Wings 互換か、それ以外か
-2. mc-router の設定ファイル形式と reload 手段
-3. 認証方式はメール+パスワードで開始してよいか
-4. 非同期ジョブ基盤は Sidekiq を使うか
-5. `public_port` は固定値 `42434` として system-wide 定数化してよいか
-6. hostname 変更を初期版で禁止してよいか
-
-## 9. 次の実装着手順
-
-1. Rails アプリを新規作成する
-2. 認証・認可・主要テーブル migration を作る
-3. サーバー一覧と作成画面の骨組みを先に出す
-4. 実行基盤 API クライアントの interface を固定する
-5. route 生成と apply を service 化する
-6. 非同期ジョブと整合性チェックジョブを追加する
+- auth / policy / layout / servers UI の土台は流用する
+- provider / router 前提の service, docs, schema は cleanup 対象
+- まずは新設計で計画と task board を切り直し、その後に migration 戦略を確定する

@@ -4,7 +4,9 @@
 This file is the primary restart guide for contributors and agents. If context is lost, start here, then read `docs/context_map.md`, then `docs/project_execution_plan.md`, then `docs/task_board.md`.
 
 ## Current Project State
-This repository now has a generated Rails 8 application skeleton plus planning and bootstrap documents. Bootstrap cleanup and environment alignment are still in progress. Current important files:
+This repository contains a generated Rails 8 application skeleton plus planning and bootstrap documents. The project has pivoted away from the earlier `Pterodactyl Panel + Wings` / `mc-router` direction and is now being planned as a single-host Minecraft server manager where Rails directly controls Docker through `/var/run/docker.sock`.
+
+Current important files:
 
 - `Dockerfile`
 - `compose.yaml`
@@ -12,21 +14,26 @@ This repository now has a generated Rails 8 application skeleton plus planning a
 - `docs/project_execution_plan.md`
 - `docs/task_board.md`
 - `docs/context_map.md`
-- `docs/provider_api_contract.md`
-- `docs/provider_template_env_setup.md`
-- `docs/provider_router_operations.md`
-- `docs/router_api_contract.md`
 
-A Rails app skeleton has already been generated in-place. Environment cleanup, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`. Authentication now uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`, and the login page UI is installed through `T-601`. Authorization now uses a Pundit baseline through `T-106`, server visibility/request protection is installed through `T-107`, the authenticated layout shell is installed through `T-600`, the server index page UI is installed through `T-602`, the server creation page UI is installed through `T-603`, the members management page UI is installed through `T-605`, and the server detail page UI is installed through `T-604`. `T-608` is in progress for Japanese-first copy cleanup across the current screens; the create page now uses plainer Japanese copy, hides Paper jargon from the main path, and pushes resource sizing into a "normally leave this alone" section. `T-609` is complete: the create flow is now simplified to a Paper-only baseline with no template selector in the UI, and server create requests force `template_kind = paper` on the Rails side. The execution-provider contract is now fixed through `T-300` on a `Pterodactyl Panel + Wings` baseline, with the detailed API split captured in `docs/provider_api_contract.md`. The provider base client contract, concrete Pterodactyl HTTP client, and environment-driven initialization are now installed through `T-301`, `T-302`, and `T-303`, including Zeitwerk-compatible service objects, request/result value objects, error mapping, power/status calls, and provider config bootstrap. `T-304` is complete in docs via `docs/provider_template_env_setup.md`. `T-901` is complete in docs via `docs/provider_router_operations.md`, and the operational topology is now fixed as Rails Docker + Panel Docker + Wings host. The provider-backed create job flow is now wired end-to-end through `T-501`, create failure rollback handling is hardened through `T-502`, the owner-authorized delete flow is installed through `T-503`, and lifecycle control plus provider-status sync are installed through `T-504`, using the persisted provider server identifier for Client API operations. Lifecycle controls are now hidden unless that provider identifier exists, so the UI no longer invites invalid start/stop/restart/sync calls. The create page is now fixed to the Paper runtime baseline and disables submission when the active execution provider does not expose the required `paper` provisioning template. Provider create failures now keep the provisional record visible in `failed` instead of deleting it immediately, so the post-create redirect target remains inspectable, and the latest provisioning failure is persisted on `MinecraftServer.last_error_message` for the detail page. The `MinecraftServer` model baseline is in place through `T-102`, hostname normalization, uniqueness, shared endpoint formatting, and status transition rules are fixed through `T-203`, the `ServerMember` model baseline is installed through `T-103`, and the `RouterRoute` baseline is installed through `T-104`. The mc-router contract is now fixed through `T-400` in `docs/router_api_contract.md`, and the route definition builder, config renderer, and config applier baselines are installed through `T-401`, `T-402`, and `T-403`. `T-803` is complete: acceptance coverage includes Docker-run Rails acceptance tests and Playwright-based real-browser checks for login, server index, create, detail, members, and delete flows. The server detail page no longer emits the previous invalid HTML nesting warning during real-browser verification because `DetailLine` now renders non-text content through a `div` wrapper instead of a nested paragraph. Inertia development ergonomics are now adjusted for the local Docker/LAN workflow: history encryption is disabled outside production, GET navigation uses Inertia `Link` through safer Mantine `renderRoot` integration, and the server-create form uses a non-chained `transform` + `post` workaround for the React adapter. The Docker fallback startup path in `bin/dev` now removes stale `tmp/pids/server.pid` before booting Rails, so container restarts no longer leave Puma blocked behind an old PID file. Out-of-scope audit-log and monitoring code has been removed from the app codebase; if audit logging returns later, prefer the `audited` gem. Application scope is explicitly centered on server lifecycle and publication consistency; mc-router liveness is treated as infrastructure responsibility via Docker health checks rather than an in-app monitoring surface, and monitoring dashboards, audit-log browsing pages, audit event recording, and unknown-hostname analytics are outside the product scope. The next remaining critical-path documentation task is `T-902`.
+Current baseline:
+
+- Docker bootstrap, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`.
+- Authentication uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`.
+- Authorization and visibility protection are installed through `T-106` and `T-107`.
+- The authenticated layout shell and basic login/index/create/detail/members pages already exist, but they still contain legacy provider/router assumptions and are now subject to simplification.
+- Existing provider/router code and docs remain in the repository as migration debt only. They are not the current target architecture.
+- The planning pivot through `T-110` is complete.
+- The next implementation critical-path task is `T-200`.
+
 Development seed login is available as `dev@example.com` / `password`.
-Playwright MCP reachability note for the current Docker host setup: the working browser target was `http://172.17.0.1:3000`; `http://localhost:3000`, `http://127.0.0.1:3000`, and the Docker service name `app` were not reachable from the MCP side.
 
 ## Locked Technical Decisions
 These are already decided and should be treated as defaults unless explicitly changed.
 
-- App role: Rails control plane for Minecraft server lifecycle and publication management
+- App role: Rails control plane for single-host Minecraft server lifecycle management
 - Runtime: Docker-first workflow
-- Dev container user mapping: the `app` container runs as the host UID/GID in local development
+- Docker control path: Rails may control Docker directly through mounted `/var/run/docker.sock`
+- Topology: single host only in the initial version
 - Ruby: `3.4.9`
 - Rails: `8.1.2`
 - Database: MariaDB `10.11.16` (via `mysql2` adapter)
@@ -35,36 +42,29 @@ These are already decided and should be treated as defaults unless explicitly ch
 - UI library: Mantine `8.3.1`
 - UI language policy: default `ja`, optional `en`, with Rails I18n as the source of truth
 - Frontend bundler: `vite_rails` + Vite
-- Public routing: `mc-router`
-- Public DNS model: wildcard `*.mc.tosukui.xyz`
-- Public connection format: `hostname:port`
-- DNS automation: not allowed
-- SRV record operations: not allowed
-- Direct backend publish: not allowed
-- Per-server public port allocation: not allowed
-- Rails direct Docker control of Minecraft servers: not allowed
-- Execution platform control path: external provider API only
-
-Mantine version was checked from npm latest tag and is fixed here as `8.3.1` for bootstrap planning. If package installation starts much later, verify again before pinning `package.json`.
-Source used for that decision: npm package page for `@mantine/core`.
+- Minecraft runtime image family: `itzg/minecraft-server`
+- Public connection format: `public_host:public_port`
+- Per-server public port allocation: allowed
+- DNS automation: out of scope
+- SRV record operations: out of scope
+- Pterodactyl / Wings integration: not part of the active plan
+- mc-router integration: not part of the active plan
 
 ## Architecture Summary
-The system has four planes.
+The active system has three parts.
 
-- Control plane: Rails, Inertia.js, React, Mantine UI, auth, authorization, route generation, provider API orchestration
-- Execution plane: existing Minecraft execution platform, responsible for actual server processes, logs, backups, templates, lifecycle
-- Routing plane: `mc-router`, responsible for hostname-based backend routing from Minecraft Java handshake
-- Network edge: home router with a single forwarded TCP port to the mc-router host
+- Control plane: Rails, Inertia.js, React, Mantine UI, auth, authorization, Docker orchestration
+- Execution plane: Docker Engine on the same host
+- Runtime plane: Minecraft server containers created and managed by Rails
 
 ## Repository Structure
-Use these paths once implementation begins.
 
 - `app/controllers/` : Rails controllers
 - `app/models/` : Active Record models
 - `app/policies/` : authorization policies
-- `app/services/` : provider, router, lifecycle, and reconciliation services
+- `app/services/` : Docker orchestration and server lifecycle services
 - `app/jobs/` : async jobs
-- `app/frontend/` : Inertia + React frontend
+- `app/javascript/` : Inertia + React frontend
 - `docs/` : persistent design, plans, decision docs, task tracking
 - `.local/` : non-versioned scratch notes and per-session restart context
 
@@ -75,24 +75,18 @@ Use these paths once implementation begins.
 4. `docs/task_board.md`
 5. `docs/implementation_breakdown.md`
 
-That order is intentional: orientation, where information lives, overall plan, concrete tasks, then detailed implementation design.
-
 ## Execution Rules
 Follow these rules unless the user overrides them.
 
 - Use Docker for Ruby and Rails commands.
 - Prefer Rails generators before manual scaffolding.
-- When a proposed fix is hinted in `AGENTS.md` or other repo docs, first verify that it still matches current Rails standard conventions before implementing it.
 - Prefer Rails-standard autoloading, reloading, initializer, and configuration patterns over manual `require`/load workarounds.
-- Treat Rails as control plane only.
-- Keep route state, DB state, and execution-provider state reconcilable.
-- Show end users the exact connection target as `hostname:port`.
+- Keep Docker control isolated behind small service classes.
+- Never let Rails operate on Docker resources that are not explicitly labeled as app-managed.
+- Show end users the exact connection target as `public_host:public_port`.
 - Restrict visibility so users only see servers they own or belong to.
-- Preserve the single-public-port model.
-- Route rejection for unknown hostnames is mandatory.
-- Do not add monitoring dashboards, audit-log browsing screens, audit event recording, or unknown-hostname analytics unless the user explicitly reintroduces them.
-- If audit logging is reintroduced later, prefer the `audited` gem instead of custom audit-trail implementation.
-- Do not add shortcut implementations that violate the architecture just to move faster.
+- Treat `/var/run/docker.sock` access as high risk and document it clearly.
+- Do not add monitoring dashboards or audit-log screens unless the user explicitly reintroduces them.
 - UI copy should default to Japanese, while remaining compatible with English via shared locale handling.
 
 ## Build and Bootstrap Commands
@@ -101,11 +95,8 @@ Use these as the default command set.
 - `export LOCAL_UID=$(id -u) LOCAL_GID=$(id -g)` if your host user is not `1000:1000`
 - `docker compose build app`
 - `docker compose up --build`
-- `docker compose run --rm --no-deps app rails new . --database=mariadb-mysql --javascript=esbuild --skip-git --skip-docker --skip-ci --skip-kamal --skip-devcontainer --skip-thruster --skip-solid`
-- `docker compose run --rm app bundle add vite_rails`
-- `docker compose run --rm app bin/rails vite:install`
-- `docker compose run --rm -p 3000:3000 -p 3036:3036 app bin/dev`
 - `docker compose run --rm app bin/rails db:prepare`
+- `docker compose run --rm -p 3000:3000 -p 3036:3036 app bin/dev`
 - `docker compose run --rm app bin/rails test`
 
 Do not install Ruby gems on the host unless there is an explicit exception.
@@ -116,9 +107,6 @@ Keep gems in `vendor/bundle` inside the workspace so the mapped app user can wri
 - For Playwright MCP quality checks, confirm reachability from the MCP runtime, not only from inside the `app` container.
 - Before starting a new Dockerized Rails/Vite dev process for browser checks, first confirm whether an existing reachable app instance is already serving the target URL and reuse it if healthy.
 - In the current Docker setup, the reliable browser target was `http://172.17.0.1:3000`.
-- If `localhost` or `127.0.0.1` fails in Playwright while Rails still answers in Docker, treat that first as an MCP/container network-path issue.
-- Vite dev websocket errors may still appear during browser checks even when page render and navigation succeed; separate websocket noise from base page-flow verification.
-- The current real-browser baseline reached login, server index, create, detail, members, and delete flows successfully against the existing reachable app instance on `http://172.17.0.1:3000`.
 
 ## Coding and Naming Conventions
 - Indentation: 2 spaces for Ruby, YAML, ERB, JS, and TS
@@ -143,45 +131,14 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 - Update `.local/session_context.md` for temporary restart notes that should not be committed
 - After each meaningful progress step, create a git commit unless the user explicitly says not to
 - Each progress-step commit must include both the implementation change and the matching restart-doc updates for that step
-- Commit messages should reference the task ID first, for example: `T-201 Add hostname uniqueness enforcement`
+- Commit messages should reference the task ID first
 - Do not batch unrelated task progress into one commit when separate commits are practical
 - Do not leave the repository in a state where the current task status and the restart docs disagree
 
-## Persistent vs Ephemeral Context
-Use committed docs for durable project knowledge.
-
-Persistent, committed:
-- architecture
-- task definitions
-- milestone plans
-- dependency decisions
-- environment decisions
-- constraints and prohibitions
-
-Ephemeral, not committed:
-- session notes
-- temporary command transcripts
-- partial investigations
-- handoff notes that may become stale quickly
-
-Put ephemeral notes in `.local/`, especially `.local/session_context.md`.
-
-## Agent Persona
-Default persona for interactive work in this repository: practical Kansai uncle engineer.
-
-Behavioral rules:
-- conversational tone may be relaxed in chat
-- implementation and documentation must remain precise
-- be direct, pragmatic, and slightly blunt when useful
-- do not become sloppy, vague, or overly cute
-- challenge bad assumptions clearly
-- do not trade correctness for speed without saying so
-
 ## Immediate Next Start Point
-If no other instruction is given, start from Phase 0 on the critical path.
+If no other instruction is given, start from the current critical path:
 
-1. Confirm Docker bootstrap files are intact.
-2. Build the app container.
-3. Confirm the Vite + Inertia + React + Mantine baseline still boots cleanly.
-4. With `T-604` fixed, continue on the critical path at `T-803` while filling remaining acceptance coverage gaps around create/delete/lifecycle flows and keeping Playwright-based real-browser checks in the quality gate.
-5. Keep MariaDB bootstrap SQL and Docker-first commands as the default local workflow.
+1. Start from `T-200` and redesign `minecraft_servers` for direct Docker management
+2. Define slug, connection target, and state rules through `T-201` to `T-203`
+3. Fix docker.sock safety boundary and Docker naming / label rules through `T-300` and `T-301`
+4. Then implement the Docker client wrapper and create flow

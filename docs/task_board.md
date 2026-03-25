@@ -25,60 +25,48 @@
 | T-005 | P0 | Configure DB, Redis, env handling, queue baseline | T-003 | done | `bin/rails db:prepare` succeeds, env approach is documented, and dev UID/GID mapping is defined |
 | T-100 | P1 | Choose and add authentication library | T-003 | done | Login/logout flow path is fixed and installed |
 | T-101 | P1 | Generate `User` model and migration | T-100 | done | User model persists required attributes |
-| T-102 | P1 | Generate `MinecraftServer` model and migration | T-101 | done | Server model stores owner, status, backend, provider identifiers |
+| T-102 | P1 | Baseline `MinecraftServer` model exists | T-101 | done | Existing model and table are available for pivot work |
 | T-103 | P1 | Generate `ServerMember` model and migration | T-102 | done | Membership and role model works |
-| T-104 | P1 | Generate `RouterRoute` model and migration | T-102 | done | Route state can be persisted |
-| T-105 | P1 | Remove out-of-scope audit log baseline | T-101 | done | AuditLog model, tests, and DB table are no longer part of the active app baseline |
 | T-106 | P1 | Add authorization framework and policies | T-101,T-102,T-103 | done | Owner/member visibility rules are enforced |
 | T-107 | P1 | Add server visibility scopes and request protections | T-106 | done | Users cannot fetch other users' servers |
-| T-200 | P2 | Define hostname normalization rules | T-102 | done | Allowed characters, lowercase rule, reserved words documented and coded |
-| T-201 | P2 | Add hostname unique index and validations | T-200 | done | Duplicate hostname cannot persist |
-| T-202 | P2 | Define fqdn and `hostname:port` generation rules | T-200 | done | Shared formatting logic exists |
-| T-203 | P2 | Define server status transition model | T-102 | done | State machine or equivalent rules are documented and coded |
-| T-300 | P3 | Confirm external execution-provider API contract | T-102,T-200 | done | Endpoints, auth, and backend discovery are known |
-| T-301 | P3 | Implement provider base client interface | T-300 | done | Unified create/delete/start/stop/restart/status contract exists |
-| T-302 | P3 | Implement concrete provider client | T-301 | done | Provider client can talk to target API or a stubbed equivalent |
-| T-303 | P3 | Add provider config and initialization | T-301 | done | Environment-driven provider selection works |
-| T-304 | P3 | Define and document provisioning template environment setup | T-303,T-501 | done | Active environments have a documented `EXECUTION_PROVIDER_PROVISIONING_TEMPLATES` baseline for every exposed create-form template |
-| T-400 | P4 | Confirm mc-router config and reload contract | T-200 | done | Input format and reload mechanism are known |
-| T-401 | P4 | Implement route definition builder | T-400,T-104 | done | Route definition can be built from DB state |
-| T-402 | P4 | Implement config renderer | T-401 | done | Whole router config can be rendered |
-| T-403 | P4 | Implement config applier and reload | T-402 | done | Config can be written and reload triggered safely |
-| T-404 | P4 | Implement route health checking | T-403 | todo | Route/application health can be persisted |
-| T-500 | P5 | Implement server create controller flow | T-102,T-106,T-201,T-301 | done | Create request stores provisional record and queues work |
-| T-501 | P5 | Implement create job end-to-end | T-500,T-302,T-403 | done | Provider create, backend save, route apply, ready transition all work |
-| T-502 | P5 | Implement rollback and failure-state handling | T-501 | done | Failed create does not leave inconsistent publication state, failed provisional records remain inspectable, and latest failure reason is visible on the detail flow |
-| T-503 | P5 | Implement delete flow | T-403,T-302,T-106 | done | Deletion removes route and updates DB state |
-| T-504 | P5 | Implement start/stop/restart/sync flows | T-302,T-106 | done | Lifecycle operations update status correctly |
-| T-505 | P5 | Drop audit event recording from product scope | T-105,T-500 | done | Project docs explicitly keep audit event recording out of scope |
-| T-600 | P6 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages, including collapsed mobile navigation |
-| T-601 | P6 | Build login page | T-100,T-004 | done | UI login works |
-| T-602 | P6 | Build server index page | T-107,T-600 | done | User sees only owned/member servers |
-| T-603 | P6 | Build server creation page | T-500,T-600,T-202 | done | User can submit create request and see status, including on smartphone-width layouts |
-| T-604 | P6 | Build server detail page | T-504,T-600 | done | User can inspect and operate server |
-| T-605 | P6 | Build members management page | T-103,T-106,T-600 | done | Owner can manage memberships |
-| T-608 | P6 | Localize operator-facing UI copy to Japanese baseline | T-600,T-601,T-602,T-603,T-604,T-605 | in_progress | Default operator-facing copy is Japanese across the current Inertia/Mantine screens, while shared locale handling remains compatible with optional English |
-| T-609 | P6 | Simplify create flow to Paper-only baseline | T-603,T-304 | done | The create UI no longer exposes template selection, `paper` is the fixed runtime baseline, and provider template docs/UI stay consistent with that restriction |
-| T-606 | P6 | Drop audit log page from product scope | T-105,T-505,T-600 | done | Project docs explicitly keep audit-log browsing UI out of scope |
-| T-607 | P6 | Drop monitoring and reconciliation dashboard from product scope | T-700,T-701,T-702,T-703,T-600 | done | Project docs explicitly keep monitoring/reconciliation dashboards out of scope |
-| T-700 | P7 | Defer mc-router liveness checks to Docker health checks | T-403 | done | Project docs explicitly treat router liveness as infrastructure responsibility, not app UI scope |
-| T-701 | P7 | Implement DB vs router consistency check | T-403,T-104 | todo | Missing/extraneous routes are detectable |
-| T-702 | P7 | Implement DB vs execution-provider consistency check | T-302,T-102 | todo | Missing/extraneous provider servers are detectable |
-| T-703 | P7 | Implement backend connectivity checks | T-302,T-102 | todo | Backend reachability is persisted |
-| T-704 | P7 | Keep unknown hostname rejection at router-contract level only | T-400 | done | The app relies on mc-router contract/config for unknown-host rejection and does not build analytics or an in-app detector |
-| T-800 | P8 | Add model tests | T-101,T-102,T-103,T-104,T-201,T-203 | todo | Core domain logic is covered |
-| T-801 | P8 | Add request and authorization tests | T-106,T-107,T-500,T-503,T-504 | todo | Access control regressions are caught |
-| T-802 | P8 | Add service and job tests | T-301,T-302,T-403,T-501,T-701,T-702 | todo | Critical async and service paths are covered |
-| T-803 | P8 | Add acceptance checks for requirement criteria | T-304,T-403,T-501,T-503,T-504 | done | Main acceptance conditions are verifiable by automated acceptance tests and Playwright-based real-browser checks covering login, server index, create, detail, members, and delete flows, including create-form behavior that reflects configured execution-provider templates |
-| T-900 | P9 | Document setup and local development workflow | T-003,T-004,T-005 | todo | New contributor can boot project locally |
-| T-901 | P9 | Document provider and router integration operations | T-403,T-501 | done | Operational integration steps are written |
-| T-902 | P9 | Document release, migration, and rollback procedure | T-803 | todo | Release workflow is written and reviewable |
+| T-110 | P0 | Pivot planning docs to direct Docker control | T-005 | done | Restart docs, design, plan, and task board reflect the `Rails + docker.sock` single-host approach |
+| T-200 | P1 | Redesign `minecraft_servers` for direct Docker management | T-110,T-102 | todo | Direct-Docker fields and migration strategy are fixed |
+| T-201 | P1 | Define slug normalization and uniqueness rules | T-200 | todo | `slug` format and DB uniqueness are enforceable |
+| T-202 | P1 | Define `public_host:public_port` connection rules | T-200 | todo | Shared formatting logic is fixed for direct public-port access |
+| T-203 | P1 | Define server status transition model | T-200 | todo | Direct-Docker state machine is documented and coded |
+| T-204 | P1 | Plan removal of legacy `router_routes` data model | T-110,T-200 | todo | Cleanup order for router/provider-era schema is fixed |
+| T-300 | P2 | Define docker.sock safety boundary and compose strategy | T-110 | todo | Compose and permission strategy for Docker Engine access are fixed |
+| T-301 | P2 | Define Docker naming and label conventions | T-300,T-200 | todo | Container names, volume names, and labels are fixed |
+| T-302 | P2 | Implement Docker Engine client wrapper | T-300 | todo | Rails can create/inspect/start/stop/restart/remove managed containers |
+| T-303 | P2 | Implement public port allocator | T-200,T-300 | todo | Ports are reserved uniquely and released correctly |
+| T-304 | P2 | Define direct-Docker environment contract | T-300,T-301 | todo | Required env such as image baseline, public host, and port range are documented |
+| T-400 | P3 | Implement direct-Docker create flow | T-200,T-201,T-202,T-203,T-302,T-303 | todo | Create request persists a server, reserves a port, creates Docker resources, and stores identifiers |
+| T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | todo | Delete removes managed container resources and frees the reserved port |
+| T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | todo | Lifecycle operations update Docker state and Rails status correctly |
+| T-403 | P3 | Persist container runtime details on sync | T-302,T-402 | todo | `container_state`, timestamps, and last error fields stay reconcilable |
+| T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | todo | Create UI exposes only the fields needed for single-host Docker provisioning |
+| T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | todo | Detail UI shows connection target and container/runtime info instead of provider/router info |
+| T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | todo | Index UI reflects public ports and container status cleanly |
+| T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | todo | Default operator-facing copy is Japanese across the active screens |
+| T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
+| T-601 | P5 | Build login page | T-100,T-004 | done | UI login works |
+| T-700 | P6 | Remove provider/router coupling from app services | T-400,T-401,T-402 | todo | Direct-Docker implementation no longer depends on provider/router services |
+| T-701 | P6 | Remove legacy router/provider docs from active workflow | T-110,T-700 | todo | Restart docs no longer point to old provider/router docs as current truth |
+| T-800 | P7 | Add model tests for direct-Docker rules | T-200,T-201,T-202,T-203 | todo | Core direct-Docker domain logic is covered |
+| T-801 | P7 | Add request and authorization tests | T-400,T-401,T-402,T-500,T-501 | todo | Access control and create/lifecycle/delete flows are covered |
+| T-802 | P7 | Add service tests for Docker client and allocators | T-302,T-303,T-400,T-401,T-402 | todo | Critical Docker orchestration paths are covered |
+| T-803 | P7 | Add acceptance checks for direct-Docker requirement criteria | T-400,T-401,T-402,T-500,T-501 | todo | Main create/detail/delete/lifecycle paths are verifiable by automated checks |
+| T-900 | P8 | Document single-host setup and local development workflow | T-300,T-304,T-400 | todo | New contributor can boot the project with docker.sock mounted |
+| T-901 | P8 | Document direct-Docker operations and safety notes | T-302,T-401,T-402 | todo | Operators can manage containers and understand docker.sock risks |
+| T-902 | P8 | Document release, migration, and rollback procedure | T-803,T-900,T-901 | todo | Release workflow is written and reviewable for the new architecture |
 
 ## Critical Path Tasks
-The next remaining critical-path documentation task is:
 
-`T-902`
+The current critical path is:
+
+`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-300 -> T-301 -> T-302 -> T-303 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-900 -> T-901 -> T-902`
 
 ## Known Blockers
-- No active blockers are recorded on the current critical path.
-- Operational note for browser verification: before launching another Dockerized browser-check target, first verify whether an existing reachable app process is already serving the MCP-visible URL.
+
+- No active blockers are recorded.
+- The repository still contains legacy provider/router code and docs; treat them as migration debt, not the current target architecture.
