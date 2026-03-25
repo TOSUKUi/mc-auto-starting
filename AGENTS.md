@@ -23,6 +23,7 @@ Current baseline:
 - The authenticated layout shell and basic login/index/create/detail/members pages already exist, but they still contain legacy provider/router assumptions and are now subject to simplification.
 - Existing provider code remains in the repository as migration debt and is expected to be removed progressively.
 - Existing `mc-router` code remains part of the active architecture and should not be removed unless the user explicitly changes that decision.
+- The selected Docker integration path is direct Engine API access via `/var/run/docker.sock` with a minimal Rails wrapper, not `docker` CLI orchestration.
 - The planning pivot through `T-110` is complete.
 - The next implementation critical-path task is `T-200`.
 
@@ -35,6 +36,7 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Runtime: Docker-first workflow
 - Docker control path: Rails may control Docker directly through mounted `/var/run/docker.sock`
 - Topology: single host only in the initial version
+- Router/container topology: `mc-router` and app-managed Minecraft containers share one bridge network
 - Ruby: `3.4.9`
 - Rails: `8.1.2`
 - Database: MariaDB `10.11.16` (via `mysql2` adapter)
@@ -46,6 +48,7 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Minecraft runtime image family: `itzg/minecraft-server`
 - Public connection format: `<server-fqdn>:<shared_public_port>`
 - Public ingress port: single shared public port
+- Router backend format: `<container_name>:25565` on the shared bridge network
 - DNS automation: out of scope
 - SRV record operations: out of scope
 - Pterodactyl / Wings integration: not part of the active plan

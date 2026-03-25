@@ -36,7 +36,7 @@ This document fixes the initial mc-router integration contract for Phase 4 tasks
 - `default-server` stays `null`.
   This preserves the project requirement that unknown hostnames must be rejected.
 - Each mapping key is the normalized public FQDN generated from `MinecraftServer#fqdn`.
-- Each mapping value is the execution-provider backend target in `backend_host:backend_port` form.
+- Each mapping value is the app-managed Minecraft container backend target in `container_name:25565` form.
 - Initial reload strategy is file-watch driven:
   - mc-router should run with `ROUTES_CONFIG_WATCH=true`
   - Rails writes the config atomically
@@ -60,4 +60,4 @@ This document fixes the initial mc-router integration contract for Phase 4 tasks
 - `T-402` renders the whole config as deterministic JSON with sorted mappings.
 - `T-403` writes the config atomically and triggers reload according to the configured strategy.
 - Disabled routes are omitted from the rendered config.
-- Enabled routes without backend coordinates are treated as invalid input and should fail fast.
+- Enabled routes without a resolved container-name backend are treated as invalid input and should fail fast.

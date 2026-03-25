@@ -36,8 +36,8 @@
 | T-203 | P1 | Define server status transition model | T-200 | todo | Direct-Docker state machine is documented and coded |
 | T-204 | P1 | Define retained `router_routes` responsibilities | T-110,T-200 | todo | Router model and route publication rules are fixed for the Docker-managed flow |
 | T-205 | P1 | Inventory legacy provider dependencies | T-110 | todo | Files, schema fields, fixtures, tests, and UI props that still depend on `ExecutionProvider` are explicitly listed before removal starts |
-| T-300 | P2 | Define docker.sock safety boundary and compose strategy | T-110 | todo | Compose and permission strategy for Docker Engine access are fixed |
-| T-301 | P2 | Define Docker naming and label conventions | T-300,T-200 | todo | Container names, volume names, and labels are fixed |
+| T-300 | P2 | Define docker.sock safety boundary and compose strategy | T-110 | done | Compose and permission strategy for Docker Engine access are fixed |
+| T-301 | P2 | Define Docker naming and label conventions | T-300,T-200 | done | Container names, volume names, and labels are fixed |
 | T-302 | P2 | Implement Docker Engine client wrapper | T-300 | todo | Rails can create/inspect/start/stop/restart/remove managed containers |
 | T-303 | P2 | Implement `mc-router` publication update flow | T-200,T-204,T-300 | todo | Router config updates are applied safely when servers are created or removed |
 | T-304 | P2 | Define direct-Docker environment contract | T-300,T-301 | todo | Required env such as image baseline, public domain, shared public port, and router paths are documented |
@@ -74,3 +74,10 @@ The current critical path is:
 - No active blockers are recorded.
 - The repository still contains legacy provider code and docs; treat them as migration debt.
 - `mc-router` remains part of the active architecture and should not be treated as cleanup debt.
+
+## Recent Decisions
+
+- `T-300`: initial Docker integration uses direct `/var/run/docker.sock` mounting for the Rails app without a socket proxy.
+- `T-300`: `mc-router` and app-managed Minecraft containers share one bridge network.
+- `T-301`: router backends use `<container_name>:25565`.
+- `T-301`: managed container names use `mc-server-<hostname>` and managed volume names use `mc-data-<hostname>`.

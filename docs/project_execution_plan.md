@@ -12,6 +12,8 @@
 - 初期版は単一ホスト運用のみを対象とする
 - Minecraft 実行イメージは `itzg/minecraft-server` 系を標準とする
 - 公開方式は `mc-router` による単一公開ポート + FQDN ベース振り分けとする
+- `mc-router` と app 管理の Minecraft コンテナは同一 bridge network に参加させる
+- router backend は `<container_name>:25565` を正本とする
 - 接続先表示は `<server-fqdn>:<shared_public_port>` を正本とする
 - Pterodactyl / Wings は現行計画の対象外とする
 - `mc-router` は現行計画の対象に含む
@@ -59,11 +61,12 @@
 
 #### P0-2 Docker socket 利用の開発構成整理
 
-- `app` コンテナへ `/var/run/docker.sock` を安全にマウントする方針を固める
+- `app` コンテナへ `/var/run/docker.sock` を直接マウントする方針を固める
+- 初期版は安全強化よりも単純さを優先し、socket proxy は導入しない
 - 開発時にどのユーザー権限で Docker API を叩くか整理する
 - 完了条件:
   - compose 構成の変更方針が決まる
-  - 安全上の注意点が明文化される
+  - docker.sock 利用上の注意点が明文化される
 
 ### Phase 1: ドメインモデルの再定義
 
@@ -102,6 +105,7 @@
 - コンテナ名
 - volume 名
 - labels
+- shared bridge network 名
 - Rails が触ってよい Docker object の条件
 - 完了条件:
   - Docker リソース識別規則が固定される
@@ -126,6 +130,7 @@
 #### P3-1 Docker client wrapper 実装
 
 - Docker Engine API を呼ぶ service を追加する
+- `docker` CLI は使わず、Unix socket 越しの最小 API surface に限定する
 - container create / inspect / start / stop / restart / remove を包む
 - 完了条件:
   - Rails から Docker 操作を一箇所で扱える

@@ -9,6 +9,8 @@ This file tells any contributor or agent where to find authoritative information
 ## Architecture and Implementation Design
 - `docs/implementation_breakdown.md`
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
+- `docs/docker_engine_contract.md`
+  Use for the direct Docker Engine wrapper scope, shared bridge network rules, and managed resource conventions.
 - `docs/project_execution_plan.md`
   Use for the active phase ordering, dependency flow, milestones, and critical path.
 - `docs/task_board.md`
@@ -50,4 +52,5 @@ This file tells any contributor or agent where to find authoritative information
 - The planning pivot task `T-110` is complete.
 - The active architecture is now `Rails + docker.sock + mc-router` for single-host Minecraft container management.
 - `Pterodactyl/Wings` are no longer the current target architecture, but `mc-router` remains active.
+- `mc-router` and app-managed Minecraft containers are expected to share one bridge network, with router backends addressed by container name.
 - The next implementation critical path starts at `T-200` after the planning pivot is fixed.
