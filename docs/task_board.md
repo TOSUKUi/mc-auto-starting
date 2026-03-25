@@ -57,7 +57,7 @@
 | T-603 | P6 | Build server creation page | T-500,T-600,T-202 | done | User can submit create request and see status, including on smartphone-width layouts |
 | T-604 | P6 | Build server detail page | T-504,T-600 | done | User can inspect and operate server |
 | T-605 | P6 | Build members management page | T-103,T-106,T-600 | done | Owner can manage memberships |
-| T-608 | P6 | Localize operator-facing UI copy to Japanese baseline | T-600,T-601,T-602,T-603,T-604,T-605 | todo | Default operator-facing copy is Japanese across the current Inertia/Mantine screens, while shared locale handling remains compatible with optional English |
+| T-608 | P6 | Localize operator-facing UI copy to Japanese baseline | T-600,T-601,T-602,T-603,T-604,T-605 | in_progress | Default operator-facing copy is Japanese across the current Inertia/Mantine screens, while shared locale handling remains compatible with optional English |
 | T-609 | P6 | Simplify create flow to Paper-only baseline | T-603,T-304 | done | The create UI no longer exposes template selection, `paper` is the fixed runtime baseline, and provider template docs/UI stay consistent with that restriction |
 | T-606 | P6 | Drop audit log page from product scope | T-105,T-505,T-600 | done | Project docs explicitly keep audit-log browsing UI out of scope |
 | T-607 | P6 | Drop monitoring and reconciliation dashboard from product scope | T-700,T-701,T-702,T-703,T-600 | done | Project docs explicitly keep monitoring/reconciliation dashboards out of scope |

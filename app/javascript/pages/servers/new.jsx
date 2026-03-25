@@ -38,9 +38,9 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const resourceHints = [
-    { label: 'Memory', value: `${form.data.memory_mb.toLocaleString()} MB` },
-    { label: 'Disk', value: `${form.data.disk_mb.toLocaleString()} MB` },
-    { label: 'Runtime', value: template_kind.toUpperCase() },
+    { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
+    { label: 'ディスク', value: `${form.data.disk_mb.toLocaleString()} MB` },
+    { label: 'サーバー方式', value: '標準' },
   ]
 
   const submit = (event) => {
@@ -52,7 +52,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
 
   return (
     <>
-      <Head title="New Server" />
+      <Head title="サーバー作成" />
 
       <Stack gap="xl">
         <Paper
@@ -73,13 +73,13 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     <IconServer2 size={18} />
                   </ThemeIcon>
                   <Text c="dimmed" fw={700} size="sm" tt="uppercase">
-                    Server creation
+                    Create Server
                   </Text>
                 </Group>
-                <Title order={1}>New server</Title>
+                <Title order={1}>新しいサーバーを作成</Title>
                 <Text c="dimmed" maw={760}>
-                  Submit the create request here, preview the public endpoint before commit, and hand provisioning off to the
-                  background worker.
+                  名前とアドレス、遊びたいバージョンを入れれば、そのまま作成できます。細かい設定は下で変えられますが、
+                  ふつうは初期値のままで大丈夫です。
                 </Text>
               </Stack>
 
@@ -89,7 +89,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                 variant="light"
                 w={{ base: '100%', sm: 'auto' }}
               >
-                Back to servers
+                サーバー一覧へ戻る
               </Button>
             </Group>
 
@@ -97,39 +97,39 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
               <Paper p="md" radius="lg" withBorder>
                 <Stack gap={4}>
                   <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                    Preview target
+                    接続先
                   </Text>
                   <Text fw={800} size="lg">
                     hostname:port
                   </Text>
                   <Text c="dimmed" size="sm">
-                    Users will connect through the shared public edge, not a direct backend port.
+                    プレイヤーにはこのアドレスだけを案内します。裏側の接続先は見せません。
                   </Text>
                 </Stack>
               </Paper>
               <Paper p="md" radius="lg" withBorder>
                 <Stack gap={4}>
                   <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                    Create status
+                    作成方法
                   </Text>
                   <Text fw={800} size="lg">
-                    Queue-backed intake
+                    受付後に自動作成
                   </Text>
                   <Text c="dimmed" size="sm">
-                    The provisional record is stored immediately, then provisioning continues asynchronously.
+                    先に受付だけ保存して、そのあと裏でプロビジョニングを進めます。
                   </Text>
                 </Stack>
               </Paper>
               <Paper p="md" radius="lg" withBorder>
                 <Stack gap={4}>
                   <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                    Current baseline
+                    実行基盤
                   </Text>
                   <Text fw={800} size="lg">
                     {provider_name}
                   </Text>
                   <Text c="dimmed" size="sm">
-                    The provider client is configured centrally, so this page stays aligned with the active backend.
+                    どの実行基盤に作るかは管理側で固定しています。この画面では迷わせません。
                   </Text>
                 </Stack>
               </Paper>
@@ -143,35 +143,36 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
               <form onSubmit={submit}>
                 <Stack gap="md">
                   {!template_available ? (
-                    <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="Paper template missing" variant="light">
-                      The active execution provider does not expose the required paper provisioning template yet. Add the
-                      paper entry before submitting a server create request.
+                    <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="作成設定が未接続です" variant="light">
+                      実行基盤側に、いまの標準サーバー作成設定がまだ入っていません。管理側で `paper` の provisioning
+                      template を設定するまで、この画面からは作成できません。
                     </Alert>
                   ) : null}
 
                   <Stack gap={4}>
-                    <Title order={3}>Request details</Title>
+                    <Title order={3}>基本情報</Title>
                     <Text c="dimmed" size="sm">
-                      Fill in the operator-facing metadata first. Valid requests are accepted now and move into provisioning.
+                      まずはこれだけ入れてください。受け付けたら、そのまま作成処理に進みます。
                     </Text>
                   </Stack>
 
                   <TextInput
                     error={form.errors.name}
-                    label="Server name"
+                    description="一覧や詳細画面に出る名前です。あとで見てわかる名前にしてください。"
+                    label="サーバー名"
                     onChange={(event) => form.setData('name', event.currentTarget.value)}
-                    placeholder="Main Survival"
+                    placeholder="みんなのサバイバル"
                     required
                     value={form.data.name}
                   />
                   <TextInput
                     description={
                       hasTouchedHostname
-                        ? `Normalized preview: ${normalizedHostname || 'empty'}`
-                        : 'Lowercase letters, numbers, and internal hyphens only.'
+                        ? `使用されるアドレス名: ${normalizedHostname || 'empty'}`
+                        : '半角英小文字・数字・ハイフンだけ使えます。'
                     }
                     error={form.errors.hostname}
-                    label="Hostname prefix"
+                    label="アドレス名"
                     onChange={(event) => form.setData('hostname', event.currentTarget.value)}
                     placeholder="main-survival"
                     required
@@ -180,9 +181,11 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                   <Grid gutter="md">
                     <Grid.Col span={{ base: 12 }}>
                       <TextInput
+                        description="迷ったら、遊ぶ予定のクライアントと同じバージョンを入れてください。"
                         error={form.errors.minecraft_version}
-                        label="Minecraft version"
+                        label="Minecraft バージョン"
                         onChange={(event) => form.setData('minecraft_version', event.currentTarget.value)}
+                        placeholder="1.21.4"
                         required
                         value={form.data.minecraft_version}
                       />
@@ -191,23 +194,25 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                   <Paper p="md" radius="lg" style={{ background: 'rgba(13, 110, 253, 0.06)' }} withBorder>
                     <Stack gap={4}>
                       <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                        Runtime baseline
+                        サーバー方式
                       </Text>
                       <Text fw={800} size="lg">
-                        Paper
+                        標準構成
                       </Text>
                       <Text c="dimmed" size="sm">
-                        This intake is fixed to the Paper baseline for now. Provider-side provisioning must expose the
-                        matching paper template.
+                        プラグイン互換を重視した標準構成で作成します。内部的には `{template_kind}` テンプレートを使いますが、
+                        利用者がここを選ぶ必要はありません。
                       </Text>
                     </Stack>
                   </Paper>
+                  <Divider label="詳細設定（通常はそのままでOK）" labelPosition="center" />
                   <Grid gutter="md">
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <NumberInput
                         allowDecimal={false}
+                        description="重くなってきたら後で増やす前提で、まずは初期値で十分です。"
                         error={form.errors.memory_mb}
-                        label="Memory (MB)"
+                        label="メモリ (MB)"
                         min={512}
                         onChange={(value) => form.setData('memory_mb', value || 0)}
                         required
@@ -218,8 +223,9 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <NumberInput
                         allowDecimal={false}
+                        description="ワールドやプラグインが増えてきたら後で見直します。"
                         error={form.errors.disk_mb}
-                        label="Disk (MB)"
+                        label="ディスク (MB)"
                         min={1024}
                         onChange={(value) => form.setData('disk_mb', value || 0)}
                         required
@@ -229,7 +235,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     </Grid.Col>
                   </Grid>
 
-                  <Divider label="Draft summary" labelPosition="center" />
+                  <Divider label="作成内容の確認" labelPosition="center" />
                   <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
                     {resourceHints.map((item) => (
                       <Paper key={item.label} p="md" radius="lg" withBorder>
@@ -255,7 +261,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                       variant="gradient"
                       gradient={{ from: 'blue', to: 'cyan' }}
                     >
-                      Submit create request
+                      この内容でサーバーを作成
                     </Button>
                   </Group>
                 </Stack>
@@ -271,15 +277,15 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     <ThemeIcon color="cyan" radius="xl" size={32} variant="light">
                       <IconPlugConnected size={16} />
                     </ThemeIcon>
-                    <Title order={3}>Endpoint preview</Title>
+                    <Title order={3}>接続先プレビュー</Title>
                   </Group>
                   <Text c="dimmed" size="sm">
-                    This is the only public target users should ever see. Backend coordinates stay hidden behind mc-router.
+                    プレイヤーに伝えるのはこの接続先だけです。サーバーの裏側の接続情報は隠したままにします。
                   </Text>
                   <Paper p="md" radius="lg" style={{ background: 'rgba(25, 135, 84, 0.08)' }} withBorder>
                     <Stack gap={3}>
                       <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                        Connection target
+                        接続先
                       </Text>
                       <Text fw={900} size="xl" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                         {preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434'}
@@ -294,10 +300,10 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                       </Code>
                     </Text>
                     <Text size="sm">
-                      Public port <Code>{public_endpoint.public_port}</Code>
+                      公開ポート <Code>{public_endpoint.public_port}</Code>
                     </Text>
                     <Text size="sm">
-                      Domain <Code>{public_endpoint.public_domain}</Code>
+                      ドメイン <Code>{public_endpoint.public_domain}</Code>
                     </Text>
                   </Stack>
                 </Stack>
@@ -309,17 +315,16 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     <ThemeIcon color="teal" radius="xl" size={32} variant="light">
                       <IconSparkles size={16} />
                     </ThemeIcon>
-                    <Title order={4}>Current scope</Title>
+                    <Title order={4}>この画面でやること</Title>
                   </Group>
                   <Text c="dimmed" size="sm">
-                    The create intake is live now. Provider orchestration and route apply still continue behind the background
-                    worker boundary.
+                    ここでは「作成受付」までを行います。実際のサーバー作成、ルーティング反映、状態更新は裏で続きます。
                   </Text>
                   <List spacing="xs" size="sm" icon={<IconCircleCheck size={14} />}>
-                    <List.Item>Accepted requests persist a provisional server record immediately.</List.Item>
-                    <List.Item>Preview always uses the shared public endpoint.</List.Item>
-                    <List.Item>The create baseline is fixed to Paper until multi-template support is reintroduced deliberately.</List.Item>
-                    <List.Item>The detail page becomes the source of truth for `provisioning` progress.</List.Item>
+                    <List.Item>受け付けた時点で、仮のサーバーレコードを先に保存します。</List.Item>
+                    <List.Item>接続先は常に共通の公開エンドポイントで案内します。</List.Item>
+                    <List.Item>サーバー方式は標準構成に固定して、選択で迷わせません。</List.Item>
+                    <List.Item>作成の進み具合は詳細画面で確認します。</List.Item>
                   </List>
                 </Stack>
               </Paper>

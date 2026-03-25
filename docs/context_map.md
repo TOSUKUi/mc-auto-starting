@@ -56,7 +56,7 @@ This file tells any contributor or agent where to find authoritative information
 - The authenticated layout shell is installed through `T-600`; the navbar now collapses behind a Burger on mobile widths instead of staying open by default.
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
-- `T-608` is the remaining Phase 6 UI task for Japanese-first copy cleanup across the current screens.
+- `T-608` is in progress for Japanese-first copy cleanup across the current screens; the create page now uses plainer Japanese copy, hides Paper jargon from the main path, and pushes resource sizing into a "normally leave this alone" section.
 - `T-609` is complete; the create page now uses a Paper-only baseline with no template selector in the UI, and Rails forces `template_kind = paper` for create requests.
 - The members management page UI is installed through `T-605`.
 - The server creation page UI is installed through `T-603`; the form now submits real create requests, shows validation errors, redirects into the server detail status view after intake, and wraps correctly on smartphone widths.
