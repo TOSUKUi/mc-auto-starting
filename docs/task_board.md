@@ -30,28 +30,31 @@
 | T-106 | P1 | Add authorization framework and policies | T-101,T-102,T-103 | done | Owner/member visibility rules are enforced |
 | T-107 | P1 | Add server visibility scopes and request protections | T-106 | done | Users cannot fetch other users' servers |
 | T-110 | P0 | Pivot planning docs to direct Docker control | T-005 | done | Restart docs, design, plan, and task board reflect the `Rails + docker.sock` single-host approach |
-| T-200 | P1 | Redesign `minecraft_servers` for direct Docker management | T-110,T-102 | todo | Direct-Docker fields and migration strategy are fixed |
+| T-200 | P1 | Redesign `minecraft_servers` for direct Docker management with `mc-router` | T-110,T-102 | todo | Direct-Docker fields and migration strategy are fixed without removing router-based ingress |
 | T-201 | P1 | Define slug normalization and uniqueness rules | T-200 | todo | `slug` format and DB uniqueness are enforceable |
-| T-202 | P1 | Define `public_host:public_port` connection rules | T-200 | todo | Shared formatting logic is fixed for direct public-port access |
+| T-202 | P1 | Define FQDN + single-public-port connection rules | T-200 | todo | Shared formatting logic is fixed for `hostname.public_domain:shared_public_port` access |
 | T-203 | P1 | Define server status transition model | T-200 | todo | Direct-Docker state machine is documented and coded |
-| T-204 | P1 | Plan removal of legacy `router_routes` data model | T-110,T-200 | todo | Cleanup order for router/provider-era schema is fixed |
+| T-204 | P1 | Define retained `router_routes` responsibilities | T-110,T-200 | todo | Router model and route publication rules are fixed for the Docker-managed flow |
+| T-205 | P1 | Inventory legacy provider dependencies | T-110 | todo | Files, schema fields, fixtures, tests, and UI props that still depend on `ExecutionProvider` are explicitly listed before removal starts |
 | T-300 | P2 | Define docker.sock safety boundary and compose strategy | T-110 | todo | Compose and permission strategy for Docker Engine access are fixed |
 | T-301 | P2 | Define Docker naming and label conventions | T-300,T-200 | todo | Container names, volume names, and labels are fixed |
 | T-302 | P2 | Implement Docker Engine client wrapper | T-300 | todo | Rails can create/inspect/start/stop/restart/remove managed containers |
-| T-303 | P2 | Implement public port allocator | T-200,T-300 | todo | Ports are reserved uniquely and released correctly |
-| T-304 | P2 | Define direct-Docker environment contract | T-300,T-301 | todo | Required env such as image baseline, public host, and port range are documented |
-| T-400 | P3 | Implement direct-Docker create flow | T-200,T-201,T-202,T-203,T-302,T-303 | todo | Create request persists a server, reserves a port, creates Docker resources, and stores identifiers |
-| T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | todo | Delete removes managed container resources and frees the reserved port |
+| T-303 | P2 | Implement `mc-router` publication update flow | T-200,T-204,T-300 | todo | Router config updates are applied safely when servers are created or removed |
+| T-304 | P2 | Define direct-Docker environment contract | T-300,T-301 | todo | Required env such as image baseline, public domain, shared public port, and router paths are documented |
+| T-400 | P3 | Implement direct-Docker create flow | T-200,T-201,T-202,T-203,T-302,T-303 | todo | Create request persists a server, creates Docker resources, updates router publication, and stores identifiers |
+| T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | todo | Delete removes managed container resources and unpublishes the router route |
 | T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | todo | Lifecycle operations update Docker state and Rails status correctly |
 | T-403 | P3 | Persist container runtime details on sync | T-302,T-402 | todo | `container_state`, timestamps, and last error fields stay reconcilable |
-| T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | todo | Create UI exposes only the fields needed for single-host Docker provisioning |
-| T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | todo | Detail UI shows connection target and container/runtime info instead of provider/router info |
-| T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | todo | Index UI reflects public ports and container status cleanly |
+| T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | todo | Create UI exposes only the fields needed for single-host Docker provisioning while keeping hostname/FQDN guidance |
+| T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | todo | Detail UI shows connection target, container/runtime info, and router publication instead of provider info |
+| T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | todo | Index UI reflects FQDN-based connection targets and container status cleanly |
 | T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | todo | Default operator-facing copy is Japanese across the active screens |
 | T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
 | T-601 | P5 | Build login page | T-100,T-004 | done | UI login works |
-| T-700 | P6 | Remove provider/router coupling from app services | T-400,T-401,T-402 | todo | Direct-Docker implementation no longer depends on provider/router services |
-| T-701 | P6 | Remove legacy router/provider docs from active workflow | T-110,T-700 | todo | Restart docs no longer point to old provider/router docs as current truth |
+| T-700 | P6 | Remove provider coupling from app services | T-400,T-401,T-402 | todo | Direct-Docker implementation no longer depends on execution-provider services |
+| T-702 | P6 | Remove provider-era initializers and tests | T-205,T-700 | todo | Provider initializers, provider service tests, and related fixtures are removed or replaced while router tests remain active |
+| T-703 | P6 | Remove provider fields and references from controllers and UI | T-205,T-500,T-501,T-502,T-700 | todo | Server controller responses and Inertia pages no longer expose provider concepts while preserving router data |
+| T-701 | P6 | Remove legacy provider docs from active workflow | T-110,T-700 | todo | Restart docs no longer point to old provider docs as current truth |
 | T-800 | P7 | Add model tests for direct-Docker rules | T-200,T-201,T-202,T-203 | todo | Core direct-Docker domain logic is covered |
 | T-801 | P7 | Add request and authorization tests | T-400,T-401,T-402,T-500,T-501 | todo | Access control and create/lifecycle/delete flows are covered |
 | T-802 | P7 | Add service tests for Docker client and allocators | T-302,T-303,T-400,T-401,T-402 | todo | Critical Docker orchestration paths are covered |
@@ -64,9 +67,10 @@
 
 The current critical path is:
 
-`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-300 -> T-301 -> T-302 -> T-303 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-900 -> T-901 -> T-902`
+`T-110 -> T-200 -> T-201 -> T-202 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-900 -> T-901 -> T-902`
 
 ## Known Blockers
 
 - No active blockers are recorded.
-- The repository still contains legacy provider/router code and docs; treat them as migration debt, not the current target architecture.
+- The repository still contains legacy provider code and docs; treat them as migration debt.
+- `mc-router` remains part of the active architecture and should not be treated as cleanup debt.

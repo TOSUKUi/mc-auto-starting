@@ -4,7 +4,7 @@
 This file is the primary restart guide for contributors and agents. If context is lost, start here, then read `docs/context_map.md`, then `docs/project_execution_plan.md`, then `docs/task_board.md`.
 
 ## Current Project State
-This repository contains a generated Rails 8 application skeleton plus planning and bootstrap documents. The project has pivoted away from the earlier `Pterodactyl Panel + Wings` / `mc-router` direction and is now being planned as a single-host Minecraft server manager where Rails directly controls Docker through `/var/run/docker.sock`.
+This repository contains a generated Rails 8 application skeleton plus planning and bootstrap documents. The project has pivoted away from the earlier `Pterodactyl Panel + Wings` direction and is now being planned as a single-host Minecraft server manager where Rails directly controls Docker through `/var/run/docker.sock` while continuing to use `mc-router` for single-port public routing.
 
 Current important files:
 
@@ -21,7 +21,8 @@ Current baseline:
 - Authentication uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`.
 - Authorization and visibility protection are installed through `T-106` and `T-107`.
 - The authenticated layout shell and basic login/index/create/detail/members pages already exist, but they still contain legacy provider/router assumptions and are now subject to simplification.
-- Existing provider/router code and docs remain in the repository as migration debt only. They are not the current target architecture.
+- Existing provider code remains in the repository as migration debt and is expected to be removed progressively.
+- Existing `mc-router` code remains part of the active architecture and should not be removed unless the user explicitly changes that decision.
 - The planning pivot through `T-110` is complete.
 - The next implementation critical-path task is `T-200`.
 
@@ -43,18 +44,19 @@ These are already decided and should be treated as defaults unless explicitly ch
 - UI language policy: default `ja`, optional `en`, with Rails I18n as the source of truth
 - Frontend bundler: `vite_rails` + Vite
 - Minecraft runtime image family: `itzg/minecraft-server`
-- Public connection format: `public_host:public_port`
-- Per-server public port allocation: allowed
+- Public connection format: `<server-fqdn>:<shared_public_port>`
+- Public ingress port: single shared public port
 - DNS automation: out of scope
 - SRV record operations: out of scope
 - Pterodactyl / Wings integration: not part of the active plan
-- mc-router integration: not part of the active plan
+- mc-router integration: part of the active plan
 
 ## Architecture Summary
-The active system has three parts.
+The active system has four parts.
 
 - Control plane: Rails, Inertia.js, React, Mantine UI, auth, authorization, Docker orchestration
 - Execution plane: Docker Engine on the same host
+- Routing plane: `mc-router` on the same host, exposing a single public port and dispatching by hostname
 - Runtime plane: Minecraft server containers created and managed by Rails
 
 ## Repository Structure
@@ -83,9 +85,11 @@ Follow these rules unless the user overrides them.
 - Prefer Rails-standard autoloading, reloading, initializer, and configuration patterns over manual `require`/load workarounds.
 - Keep Docker control isolated behind small service classes.
 - Never let Rails operate on Docker resources that are not explicitly labeled as app-managed.
-- Show end users the exact connection target as `public_host:public_port`.
+- Show end users the exact connection target as `<server-fqdn>:<shared_public_port>`.
 - Restrict visibility so users only see servers they own or belong to.
 - Treat `/var/run/docker.sock` access as high risk and document it clearly.
+- When touching a flow that still references provider-specific concepts, prefer removing those references as part of the same progress step instead of leaving dead compatibility layers behind.
+- Preserve `mc-router`-based single-port routing unless the user explicitly instructs otherwise.
 - Do not add monitoring dashboards or audit-log screens unless the user explicitly reintroduces them.
 - UI copy should default to Japanese, while remaining compatible with English via shared locale handling.
 
@@ -139,6 +143,6 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 If no other instruction is given, start from the current critical path:
 
 1. Start from `T-200` and redesign `minecraft_servers` for direct Docker management
-2. Define slug, connection target, and state rules through `T-201` to `T-203`
+2. Define hostname/FQDN, shared-public-port connection target, and state rules through `T-201` to `T-203`
 3. Fix docker.sock safety boundary and Docker naming / label rules through `T-300` and `T-301`
-4. Then implement the Docker client wrapper and create flow
+4. Then implement the Docker client wrapper, provider removal, and create flow while keeping `mc-router`

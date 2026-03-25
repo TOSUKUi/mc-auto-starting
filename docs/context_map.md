@@ -12,7 +12,7 @@ This file tells any contributor or agent where to find authoritative information
 - `docs/project_execution_plan.md`
   Use for the active phase ordering, dependency flow, milestones, and critical path.
 - `docs/task_board.md`
-  Use for the active direct-Docker task system.
+  Use for the active `direct-Docker + mc-router` task system.
 
 ## Historical / Superseded References
 - `docs/provider_api_contract.md`
@@ -22,7 +22,7 @@ This file tells any contributor or agent where to find authoritative information
 - `docs/provider_router_operations.md`
   Historical reference from the abandoned external-provider approach. Not current architecture.
 - `docs/router_api_contract.md`
-  Historical reference from the abandoned mc-router approach. Not current architecture.
+  Active reference for the retained `mc-router` ingress contract.
 
 ## Disposable Session Context
 - `.local/session_context.md`
@@ -46,8 +46,8 @@ This file tells any contributor or agent where to find authoritative information
 - Authentication baseline is installed through `T-100` and `T-101`.
 - `MinecraftServer` and `ServerMember` baselines exist through `T-102` and `T-103`.
 - Authorization and visibility protection are installed through `T-106` and `T-107`.
-- Authenticated layout and current login/index/create/detail/members UI baselines already exist, but they still contain legacy provider/router assumptions and are now subject to direct-Docker cleanup.
+- Authenticated layout and current login/index/create/detail/members UI baselines already exist, but they still contain legacy provider assumptions and need cleanup while preserving router-based ingress.
 - The planning pivot task `T-110` is complete.
-- The active architecture is now `Rails + docker.sock` for single-host Minecraft container management.
-- `Pterodactyl/Wings` and `mc-router` are no longer the current target architecture.
+- The active architecture is now `Rails + docker.sock + mc-router` for single-host Minecraft container management.
+- `Pterodactyl/Wings` are no longer the current target architecture, but `mc-router` remains active.
 - The next implementation critical path starts at `T-200` after the planning pivot is fixed.

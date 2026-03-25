@@ -1,20 +1,4 @@
-import {
-  Alert,
-  Button,
-  Code,
-  Divider,
-  Grid,
-  Group,
-  List,
-  NumberInput,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Text,
-  TextInput,
-  Title,
-  ThemeIcon,
-} from '@mantine/core'
+import { Alert, Button, Code, Divider, Grid, Group, NumberInput, Paper, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
 import { IconAlertCircle, IconCircleCheck, IconPlugConnected, IconServer2, IconSparkles } from '@tabler/icons-react'
 
@@ -38,9 +22,9 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const resourceHints = [
+    { label: 'バージョン', value: form.data.minecraft_version },
     { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: 'ディスク', value: `${form.data.disk_mb.toLocaleString()} MB` },
-    { label: 'サーバー方式', value: '標準' },
   ]
 
   const submit = (event) => {
@@ -77,10 +61,6 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                   </Text>
                 </Group>
                 <Title order={1}>新しいサーバーを作成</Title>
-                <Text c="dimmed" maw={760}>
-                  名前とアドレス、遊びたいバージョンを入れれば、そのまま作成できます。細かい設定は下で変えられますが、
-                  ふつうは初期値のままで大丈夫です。
-                </Text>
               </Stack>
 
               <Button
@@ -92,48 +72,6 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                 サーバー一覧へ戻る
               </Button>
             </Group>
-
-            <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
-              <Paper p="md" radius="lg" withBorder>
-                <Stack gap={4}>
-                  <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                    接続先
-                  </Text>
-                  <Text fw={800} size="lg">
-                    hostname:port
-                  </Text>
-                  <Text c="dimmed" size="sm">
-                    プレイヤーにはこのアドレスだけを案内します。裏側の接続先は見せません。
-                  </Text>
-                </Stack>
-              </Paper>
-              <Paper p="md" radius="lg" withBorder>
-                <Stack gap={4}>
-                  <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                    作成方法
-                  </Text>
-                  <Text fw={800} size="lg">
-                    受付後に自動作成
-                  </Text>
-                  <Text c="dimmed" size="sm">
-                    先に受付だけ保存して、そのあと裏でプロビジョニングを進めます。
-                  </Text>
-                </Stack>
-              </Paper>
-              <Paper p="md" radius="lg" withBorder>
-                <Stack gap={4}>
-                  <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                    実行基盤
-                  </Text>
-                  <Text fw={800} size="lg">
-                    {provider_name}
-                  </Text>
-                  <Text c="dimmed" size="sm">
-                    どの実行基盤に作るかは管理側で固定しています。この画面では迷わせません。
-                  </Text>
-                </Stack>
-              </Paper>
-            </SimpleGrid>
           </Stack>
         </Paper>
 
@@ -149,12 +87,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     </Alert>
                   ) : null}
 
-                  <Stack gap={4}>
-                    <Title order={3}>基本情報</Title>
-                    <Text c="dimmed" size="sm">
-                      まずはこれだけ入れてください。受け付けたら、そのまま作成処理に進みます。
-                    </Text>
-                  </Stack>
+                  <Title order={3}>基本情報</Title>
 
                   <TextInput
                     error={form.errors.name}
@@ -196,21 +129,17 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                       <Text c="dimmed" fw={700} size="xs" tt="uppercase">
                         サーバー方式
                       </Text>
-                      <Text fw={800} size="lg">
-                        標準構成
-                      </Text>
-                      <Text c="dimmed" size="sm">
-                        プラグイン互換を重視した標準構成で作成します。内部的には `{template_kind}` テンプレートを使いますが、
-                        利用者がここを選ぶ必要はありません。
-                      </Text>
+                      <Text fw={800} size="lg">標準</Text>
                     </Stack>
                   </Paper>
                   <Divider label="詳細設定（通常はそのままでOK）" labelPosition="center" />
+                  <Text c="dimmed" size="sm">
+                    メモリとディスクはあとから見直せます。まずは初期値のままで作って、足りなくなってから増やす運用で十分です。
+                  </Text>
                   <Grid gutter="md">
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <NumberInput
                         allowDecimal={false}
-                        description="重くなってきたら後で増やす前提で、まずは初期値で十分です。"
                         error={form.errors.memory_mb}
                         label="メモリ (MB)"
                         min={512}
@@ -223,7 +152,6 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     <Grid.Col span={{ base: 12, sm: 6 }}>
                       <NumberInput
                         allowDecimal={false}
-                        description="ワールドやプラグインが増えてきたら後で見直します。"
                         error={form.errors.disk_mb}
                         label="ディスク (MB)"
                         min={1024}
@@ -280,7 +208,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                     <Title order={3}>接続先プレビュー</Title>
                   </Group>
                   <Text c="dimmed" size="sm">
-                    プレイヤーに伝えるのはこの接続先だけです。サーバーの裏側の接続情報は隠したままにします。
+                    Minecraft のサーバーアドレスに入力する内容
                   </Text>
                   <Paper p="md" radius="lg" style={{ background: 'rgba(25, 135, 84, 0.08)' }} withBorder>
                     <Stack gap={3}>
@@ -311,21 +239,12 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
 
               <Paper p="lg" radius="lg" shadow="sm" withBorder>
                 <Stack gap="sm">
-                  <Group gap="xs">
-                    <ThemeIcon color="teal" radius="xl" size={32} variant="light">
-                      <IconSparkles size={16} />
-                    </ThemeIcon>
-                    <Title order={4}>この画面でやること</Title>
-                  </Group>
                   <Text c="dimmed" size="sm">
-                    ここでは「作成受付」までを行います。実際のサーバー作成、ルーティング反映、状態更新は裏で続きます。
+                    実行基盤: {provider_name}
                   </Text>
-                  <List spacing="xs" size="sm" icon={<IconCircleCheck size={14} />}>
-                    <List.Item>受け付けた時点で、仮のサーバーレコードを先に保存します。</List.Item>
-                    <List.Item>接続先は常に共通の公開エンドポイントで案内します。</List.Item>
-                    <List.Item>サーバー方式は標準構成に固定して、選択で迷わせません。</List.Item>
-                    <List.Item>作成の進み具合は詳細画面で確認します。</List.Item>
-                  </List>
+                  <Text c="dimmed" size="sm">
+                    サーバー方式: {template_kind}
+                  </Text>
                 </Stack>
               </Paper>
             </Stack>
