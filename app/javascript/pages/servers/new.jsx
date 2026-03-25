@@ -55,7 +55,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
 
       <Stack gap="xl">
         <Paper
-          p="xl"
+          p={{ base: 'lg', sm: 'xl' }}
           radius="xl"
           shadow="sm"
           style={{
@@ -65,7 +65,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
           withBorder
         >
           <Stack gap="lg">
-            <Group align="flex-start" justify="space-between">
+            <Group align="flex-start" justify="space-between" wrap="wrap">
               <Stack gap={6}>
                 <Group gap="xs">
                   <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
@@ -82,7 +82,12 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                 </Text>
               </Stack>
 
-              <Button href="/servers" renderRoot={(props) => <Link {...props} href="/servers" />} variant="light">
+              <Button
+                href="/servers"
+                renderRoot={(props) => <Link {...props} href="/servers" />}
+                variant="light"
+                w={{ base: '100%', sm: 'auto' }}
+              >
                 Back to servers
               </Button>
             </Group>
@@ -230,6 +235,7 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
 
                   <Group justify="flex-end">
                     <Button
+                      fullWidth
                       loading={form.processing}
                       onClick={submit}
                       type="submit"
@@ -262,14 +268,17 @@ export default function ServersNew({ form_defaults, provider_name, public_endpoi
                       <Text c="dimmed" fw={700} size="xs" tt="uppercase">
                         Connection target
                       </Text>
-                      <Text fw={900} size="xl">
+                      <Text fw={900} size="xl" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                         {preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434'}
                       </Text>
                     </Stack>
                   </Paper>
                   <Stack gap={6}>
                     <Text size="sm">
-                      FQDN <Code>{preview?.fqdn ?? 'hostname.mc.tosukui.xyz'}</Code>
+                      FQDN{' '}
+                      <Code style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'normal' }}>
+                        {preview?.fqdn ?? 'hostname.mc.tosukui.xyz'}
+                      </Code>
                     </Text>
                     <Text size="sm">
                       Public port <Code>{public_endpoint.public_port}</Code>

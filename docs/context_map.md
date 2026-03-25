@@ -53,7 +53,7 @@ This file tells any contributor or agent where to find authoritative information
 - The login page UI is installed through `T-601`.
 - The server index page UI is installed through `T-602`.
 - The members management page UI is installed through `T-605`.
-- The server creation page UI is installed through `T-603`; the form now submits real create requests, shows validation errors, and redirects into the server detail status view after intake.
+- The server creation page UI is installed through `T-603`; the form now submits real create requests, shows validation errors, redirects into the server detail status view after intake, and wraps correctly on smartphone widths.
 - Development seed login is available as `dev@example.com` / `password`.
 - The execution-provider contract is fixed through `T-300` using a Pterodactyl/Wings baseline.
 - The provider base client contract, concrete Pterodactyl client, and env-driven provider initialization are installed through `T-301`, `T-302`, and `T-303`.
