@@ -40,7 +40,7 @@ Current baseline:
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now operate on managed Docker containers and volumes instead of the legacy provider path.
 - `T-500` is complete: create UI and controller props are reduced to the direct-Docker baseline inputs plus hostname/FQDN preview metadata.
 - `T-501` and `T-502` are complete: detail/index UI now emphasize connection target and router publication instead of provider-era framing, while active screens no longer foreground Docker backend identifiers.
-- `T-503` is in progress: operator-facing UI copy and layout polish are being shifted toward a simpler Japanese-first presentation.
+- `T-503` is in progress: operator-facing UI copy and layout polish are being shifted toward a simpler Japanese-first presentation, the root route now lands on the server index, and the active app shell uses a flat Minecraft-inspired dark theme instead of gradient-heavy panels.
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider dependency inventory exists, provider services/initializer/tests are removed, and controller create flow now treats `template_kind` as internal schema debt instead of an exposed input.
 - `T-803` is complete: automated acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline with router publication checks.
 - `T-804` is complete: compose-managed `mc-router` now runs on the shared bridge network and a live status ping through the shared public port reached a managed Minecraft container.

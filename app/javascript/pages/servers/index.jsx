@@ -111,10 +111,7 @@ export default function ServersIndex({ servers, summary }) {
           p="xl"
           radius="xl"
           shadow="sm"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(14,116,144,0.08) 0%, rgba(255,255,255,0.65) 42%, rgba(226,244,233,0.95) 100%)',
-          }}
+          style={{ background: '#26231e', borderColor: '#4a4338' }}
           withBorder
         >
           <Stack gap="lg">
@@ -124,10 +121,10 @@ export default function ServersIndex({ servers, summary }) {
                   <ThemeIcon color="teal" radius="xl" size={36} variant="light">
                     <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Overview</Text>
+                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">Overview</Text>
                 </Group>
                 <Title order={1}>サーバー一覧</Title>
-                <Text c="dimmed" maw={720} size="md">
+                <Text c="stone.3" maw={720} size="md">
                   自分のサーバーと共有中のサーバーを、接続先と状態中心で確認できます。
                 </Text>
               </Stack>
@@ -135,8 +132,7 @@ export default function ServersIndex({ servers, summary }) {
               <Button
                 href="/servers/new"
                 renderRoot={(props) => <Link {...props} href="/servers/new" />}
-                variant="gradient"
-                gradient={{ from: 'blue', to: 'cyan' }}
+                color="grass"
               >
                 新しいサーバー
               </Button>

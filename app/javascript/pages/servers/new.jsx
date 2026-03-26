@@ -42,10 +42,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
           p={{ base: 'lg', sm: 'xl' }}
           radius="xl"
           shadow="sm"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(14,116,144,0.08) 0%, rgba(255,255,255,0.7) 44%, rgba(226,244,233,0.95) 100%)',
-          }}
+          style={{ background: '#26231e', borderColor: '#4a4338' }}
           withBorder
         >
           <Stack gap="lg">
@@ -55,10 +52,10 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                   <ThemeIcon color="teal" radius="xl" size={36} variant="light">
                     <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">New Server</Text>
+                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">New Server</Text>
                 </Group>
                 <Title order={1}>新しいサーバーを作成</Title>
-                <Text c="dimmed" maw={640}>
+                <Text c="stone.3" maw={640}>
                   プレイヤーに見せる名前と接続先を決めれば作成できます。技術的な設定はアプリ側で自動的に整えます。
                 </Text>
               </Stack>
@@ -157,8 +154,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                       loading={form.processing}
                       onClick={submit}
                       type="submit"
-                      variant="gradient"
-                      gradient={{ from: 'blue', to: 'cyan' }}
+                      color="grass"
                     >
                       この内容でサーバーを作成
                     </Button>

@@ -3,9 +3,8 @@
 class InertiaController < ApplicationController
   inertia_share app: -> {
     {
-      current_user: Current.user&.as_json(only: [ :id, :email_address ]),
+      current_user: Current.user&.as_json(only: [ :id, :email_address, :discord_username ]),
       navigation: [
-        { name: "Home", href: "/" },
         { name: "Servers", href: "/servers" },
         { name: "招待", href: "/discord-invitations" },
       ],

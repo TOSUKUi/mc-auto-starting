@@ -65,10 +65,7 @@ export default function DiscordInvitationsIndex({ expiration_options, form_defau
           p="xl"
           radius="xl"
           shadow="sm"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(14,116,144,0.08) 0%, rgba(255,255,255,0.65) 42%, rgba(226,244,233,0.95) 100%)',
-          }}
+          style={{ background: '#26231e', borderColor: '#4a4338' }}
           withBorder
         >
           <Stack gap="md">
@@ -76,12 +73,12 @@ export default function DiscordInvitationsIndex({ expiration_options, form_defau
               <ThemeIcon color="teal" radius="xl" size={36} variant="light">
                 <IconUserPlus size={18} />
               </ThemeIcon>
-              <Text c="dimmed" fw={700} size="sm" tt="uppercase">
+              <Text c="stone.5" fw={700} size="sm" tt="uppercase">
                 Invite
               </Text>
             </Group>
             <Title order={1}>Discord 招待リンク</Title>
-            <Text c="dimmed" maw={720}>
+            <Text c="stone.3" maw={720}>
               参加を許可する Discord ユーザーを指定して、手動で 1 回使い切りの招待リンクを発行します。
             </Text>
           </Stack>

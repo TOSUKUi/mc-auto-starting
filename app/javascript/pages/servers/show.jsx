@@ -77,10 +77,7 @@ export default function ServersShow({ server }) {
           p="xl"
           radius="xl"
           shadow="sm"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(16,84,111,0.08) 0%, rgba(87,143,240,0.07) 45%, rgba(245,249,255,0.96) 100%)',
-          }}
+          style={{ background: '#26231e', borderColor: '#4a4338' }}
           withBorder
         >
           <Stack gap="lg">
@@ -96,10 +93,10 @@ export default function ServersShow({ server }) {
                   <ThemeIcon color="teal" radius="xl" size={36} variant="light">
                     <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Server Detail</Text>
+                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">Server Detail</Text>
                 </Group>
                 <Title order={1}>{server.name}</Title>
-                <Text c="dimmed" size="md" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                <Text c="stone.3" size="md" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                   {server.connection_target}
                 </Text>
                 <Group gap="xs">

@@ -18,6 +18,20 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_path
   end
 
+  test "root redirects unauthenticated users to login" do
+    get root_url
+
+    assert_redirected_to login_path
+  end
+
+  test "root serves the server index for authenticated users" do
+    sign_in_as(users(:one))
+
+    get root_url
+
+    assert_response :success
+  end
+
   test "index returns only owned and member servers" do
     sign_in_as(users(:two))
 
