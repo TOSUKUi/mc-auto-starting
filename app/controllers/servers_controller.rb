@@ -155,15 +155,18 @@ class ServersController < InertiaController
   private
     def new_server_page_props(form_values: {})
       hostname = normalized_hostname(form_values[:hostname])
+      selected_runtime_family = form_values[:runtime_family] || form_values["runtime_family"] || MinecraftRuntime.default_runtime_family
+      minecraft_version_options_by_runtime_family = MinecraftRuntime.version_options_by_runtime_family
 
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
         runtime_family_options: MinecraftRuntime.runtime_family_options,
-        minecraft_version_options: MinecraftRuntime.version_options(
-          runtime_family: form_values[:runtime_family] || form_values["runtime_family"] || MinecraftRuntime.default_runtime_family,
+        minecraft_version_options: minecraft_version_options_by_runtime_family.fetch(
+          MinecraftRuntime.normalize_runtime_family(selected_runtime_family),
+          [],
         ),
-        minecraft_version_options_by_runtime_family: MinecraftRuntime.version_options_by_runtime_family,
-        minecraft_version_tag_list_urls: MinecraftRuntime.tag_list_urls,
+        minecraft_version_options_by_runtime_family: minecraft_version_options_by_runtime_family,
+        minecraft_version_source_urls: MinecraftRuntime.version_source_urls,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,

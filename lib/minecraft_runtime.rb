@@ -1,16 +1,13 @@
 module MinecraftRuntime
   DEFAULT_RUNTIME_FAMILY = "paper".freeze
-  DEFAULT_IMAGE = "marctv/minecraft-papermc-server".freeze
+  DEFAULT_IMAGE = "itzg/minecraft-server".freeze
   DEFAULT_VANILLA_IMAGE = "itzg/minecraft-server".freeze
   DEFAULT_NETWORK_NAME = "mc_router_net".freeze
   DEFAULT_VERSION_TAG = "latest".freeze
   JVM_HEADROOM_MB = 512
   MIN_JVM_MEMORY_MB = 512
   CATALOG_PATH = Rails.root.join("config/minecraft_runtime_catalog.yml")
-  TAG_LIST_URLS = {
-    "paper" => "https://hub.docker.com/r/marctv/minecraft-papermc-server/tags",
-    "vanilla" => "https://hub.docker.com/r/itzg/minecraft-server/tags",
-  }.freeze
+  STABLE_VERSION_PATTERN = /\A\d+(?:\.\d+)+\z/
 
   module_function
 
@@ -24,11 +21,7 @@ module MinecraftRuntime
   end
 
   def image_for(version_tag:, runtime_family: DEFAULT_RUNTIME_FAMILY)
-    repository = image(runtime_family: runtime_family)
-    resolved_tag = normalize_version_tag(version_tag)
-    return repository if repository.match?(/:[^\/]+\z/)
-
-    "#{repository}:#{resolved_tag}"
+    image(runtime_family: runtime_family)
   end
 
   def network_name
@@ -53,21 +46,40 @@ module MinecraftRuntime
   end
 
   def version_options(runtime_family: DEFAULT_RUNTIME_FAMILY)
-    family_catalog(runtime_family).fetch("version_options").map { |option| option.symbolize_keys }
+    VersionCatalog.new.version_options(runtime_family: runtime_family)
   end
 
   def version_options_by_runtime_family
+    VersionCatalog.new.version_options_by_runtime_family
+  end
+
+  def fallback_version_options(runtime_family: DEFAULT_RUNTIME_FAMILY)
+    family_catalog(runtime_family).fetch("version_options").map { |option| option.symbolize_keys }
+  end
+
+  def fallback_version_options_by_runtime_family
     catalog.to_h do |runtime_family, attributes|
       [ runtime_family, attributes.fetch("version_options").map { |option| option.symbolize_keys } ]
     end
   end
 
-  def tag_list_url(runtime_family: DEFAULT_RUNTIME_FAMILY)
-    TAG_LIST_URLS.fetch(normalize_runtime_family(runtime_family))
+  def version_source_url(runtime_family: DEFAULT_RUNTIME_FAMILY)
+    case normalize_runtime_family(runtime_family)
+    when "vanilla"
+      config.vanilla_version_manifest_url.to_s
+    else
+      config.paper_version_manifest_url.to_s
+    end
   end
 
-  def tag_list_urls
-    TAG_LIST_URLS.dup
+  def version_source_urls
+    catalog.keys.to_h do |runtime_family|
+      [ runtime_family, version_source_url(runtime_family: runtime_family) ]
+    end
+  end
+
+  def version_options_cache_ttl
+    config.version_options_cache_ttl
   end
 
   def container_env(server:)
@@ -81,8 +93,10 @@ module MinecraftRuntime
       }
     else
       {
-        "MEMORYSIZE" => "#{jvm_memory_mb(server.memory_mb)}M",
-        "PAPERMC_FLAGS" => "",
+        "EULA" => "TRUE",
+        "TYPE" => "PAPER",
+        "VERSION" => normalize_version_tag(server.minecraft_version),
+        "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
       }
     end
   end

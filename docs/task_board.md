@@ -85,9 +85,9 @@
 | T-1102 | P10 | Persist and display resolved Minecraft version metadata | T-1100,T-1101,T-501,T-502 | todo | When a runtime tag such as `latest` is selected, the app stores and shows the concrete Minecraft server version returned by the managed server instead of only the symbolic tag |
 | T-1103 | P10 | Implement dynamic or synchronized Minecraft version option catalog | T-1100,T-1101 | done | The create UI can build version choices from a maintained catalog or dynamic source, with a documented fallback when live tag discovery is unavailable or unsafe |
 | T-1104 | P10 | Define per-runtime version-source strategy and display contract | T-1102,T-1103 | todo | `vanilla` uses the Mojang version manifest, `paper` uses a Paper-specific version source, and the UI contract clearly separates user-facing labels from internal stored values |
-| T-1105 | P10 | Fetch `vanilla` options from the Mojang version manifest at request time | T-1104 | todo | The create form can build `vanilla` version choices from the live Mojang manifest while preserving a safe fallback when the manifest is unavailable |
-| T-1106 | P10 | Fetch `paper` options from the Paper version list at request time | T-1104 | todo | The create form can build `paper` version choices from the Paper-specific source while preserving a safe fallback when that source is unavailable |
-| T-1107 | P10 | Unify version-option presentation around label/value display rules | T-1104,T-1105,T-1106 | todo | Operators see only the human-facing Minecraft version label, while the stored/submitted value remains the stable version key chosen for each runtime family |
+| T-1105 | P10 | Fetch `vanilla` options from the Mojang version manifest at request time | T-1104 | done | The create form can build `vanilla` version choices from the live Mojang manifest while preserving a safe fallback when the manifest is unavailable |
+| T-1106 | P10 | Fetch `paper` options from the Paper version list at request time | T-1104 | done | The create form can build `paper` version choices from the Paper-specific source while preserving a safe fallback when that source is unavailable |
+| T-1107 | P10 | Unify version-option presentation around label/value display rules | T-1104,T-1105,T-1106 | done | Operators see only the human-facing Minecraft version label, while the stored/submitted value remains the stable version key chosen for each runtime family |
 
 ## Critical Path Tasks
 
@@ -115,12 +115,12 @@ The current critical path is:
 - `T-303`: route publication apply/rollback is centralized in `Router::PublicationSync` so create/delete flows share one `mc-router` update path.
 - `T-302`: Docker Engine access is wrapped behind Excon-based Unix socket transport with managed labels, names, and the minimal lifecycle API surface.
 - `T-302`: the wrapper defaults to unversioned Engine API paths and only prefixes `/v1.xx` when `DOCKER_ENGINE_API_VERSION` is explicitly set.
-- `T-304`: direct-Docker defaults are fixed through env-backed `MinecraftPublicEndpoint`, `MinecraftRuntime`, the `marctv` create payload, compose defaults, and the dedicated env contract doc.
-- `T-304`: the create-form `minecraft_version` value now maps to the selected `marctv` image tag rather than an env payload field.
+- `T-304`: direct-Docker defaults are fixed through env-backed `MinecraftPublicEndpoint`, `MinecraftRuntime`, the `itzg` runtime payload, compose defaults, and the dedicated env contract doc.
+- `T-304`: the create-form `minecraft_version` value is runtime-version input passed through the container `VERSION` env contract rather than a Docker image tag.
 - Local Compose now reads checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE`.
 - `T-400`: `Servers::ProvisionServer` now creates a managed volume/container through `DockerEngine`, starts it, persists runtime state, and then publishes the route.
 - `T-400`: create retries once with `DockerEngine#pull_image` when the selected runtime image is missing locally.
-- `T-400`: `MEMORYSIZE` now reserves JVM headroom below the Docker memory limit to avoid immediate OOM kill on boot.
+- `T-400`: container `MEMORY` now reserves JVM headroom below the Docker memory limit to avoid immediate OOM kill on boot.
 - `T-803`: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync flows against the direct-Docker baseline.
 - `T-804`: compose-managed `mc-router` ingress is verified end-to-end on the shared public port after loading the generated routes.
 - `T-805`: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, avoiding unreliable bind-mounted file-watch behavior.
@@ -131,14 +131,12 @@ The current critical path is:
 - `T-903`: `.env.example` now keeps the local Compose and bootstrap-owner baseline uncommented, while optional Discord OAuth, bot, router-command, and Docker API override examples stay commented until needed.
 - Future operator UI work should put current player count ahead of lower-priority metadata on server screens, and browser-side log viewing / bounded command execution should reuse the same Rails-owned trust boundary as bot-triggered commands.
 - Future runtime-catalog work should cover standard Java-server selection, concrete version resolution for symbolic tags such as `latest`, and a documented decision on whether version choices are built dynamically or from a synchronized catalog.
-- `T-1101`: create flow now exposes `runtime_family` as a user-facing choice, persists it through the legacy `template_kind` column for now, keeps `paper` as the default, and provisions `vanilla` servers with the standard Java runtime image path.
-- `T-1100` / `T-1103`: runtime version choices now come from a checked-in synchronized catalog file instead of live tag lookups or DB-backed storage; `latest` concrete-version resolution remains the separate follow-up task in `T-1102`.
-- `T-1103`: create UI now supports both catalog-backed tag selection and freeform tag entry, with runtime-family-specific Docker Hub tag-list links for operator reference.
-- `T-1103`: version option `value` is treated as the runtime tag actually sent to the container image, while `label` is the operator-facing version display; they do not need to match.
-- `itzg/minecraft-server` nuance: the official Minecraft-version docs use the `VERSION` environment variable as the Minecraft version selector, so future runtime/version work must not blindly assume image tag equals Minecraft version on that runtime family.
-- Future dynamic-option work should split sources by runtime family: `vanilla` from Mojang's version manifest, `paper` from a Paper-specific version list, and the visible UI should show only the human-facing version label while keeping a stable submitted value internally.
-- Dynamic version options should be resolved on the Rails side when the create screen is opened, cached for a short TTL, and only fall back to checked-in defaults when the upstream source is unavailable.
-- The first live-source attempt should use `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`.
+- `T-1101`: create flow now exposes `runtime_family` as a user-facing choice, persists it through the legacy `template_kind` column for now, keeps `paper` as the default, and provisions both runtime families through `itzg/minecraft-server`.
+- `T-1100` / `T-1103`: a checked-in synchronized catalog file remains as the fallback source instead of live registry access or DB-backed storage.
+- `T-1105` / `T-1106` / `T-1107`: create UI now resolves `vanilla` and `paper` version choices on the Rails side during page load, caches them briefly, falls back to the checked-in catalog, keeps freeform version entry available, and links each runtime family to its upstream version source.
+- `T-1107`: version option `label` is the Minecraft version text shown to operators, and submitted `value` is the stable version key sent through the runtime `VERSION` contract; Docker image tags are no longer shown as the primary user-facing value.
+- `itzg/minecraft-server` nuance: the official docs use `TYPE` + `VERSION` as the Minecraft version selector, so runtime/version work must not assume image tag equals Minecraft version.
+- The current live sources are `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.

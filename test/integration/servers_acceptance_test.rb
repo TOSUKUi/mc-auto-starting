@@ -89,14 +89,10 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     @original_mc_router_config = Rails.application.config.x.mc_router
     @original_docker_build_client = DockerEngine.method(:build_client)
     @original_runtime_image = Rails.application.config.x.minecraft_runtime.image
-    @original_runtime_image_for = MinecraftRuntime.method(:image_for)
     @tmpdir = Dir.mktmpdir("servers-acceptance")
 
     FakeDockerClient.reset!
-    Rails.application.config.x.minecraft_runtime.image = "marctv/minecraft-papermc-server"
-    MinecraftRuntime.define_singleton_method(:image_for) do |version_tag:|
-      "marctv/minecraft-papermc-server:#{normalize_version_tag(version_tag)}"
-    end
+    Rails.application.config.x.minecraft_runtime.image = "itzg/minecraft-server"
     Rails.application.config.x.mc_router = Router::Configuration.new(
       routes_config_path: File.join(@tmpdir, "routes.json"),
       reload_strategy: "watch",
@@ -110,7 +106,6 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     Rails.application.config.x.mc_router = @original_mc_router_config
     DockerEngine.define_singleton_method(:build_client, @original_docker_build_client)
     Rails.application.config.x.minecraft_runtime.image = @original_runtime_image
-    MinecraftRuntime.define_singleton_method(:image_for, @original_runtime_image_for)
     FileUtils.remove_entry(@tmpdir) if @tmpdir && File.exist?(@tmpdir)
   end
 
@@ -158,10 +153,12 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
         [ :create_volume, { name: "mc-data-creative-build", labels: :labels } ],
         [ :create_container, {
           name: "mc-server-creative-build",
-          image: "marctv/minecraft-papermc-server:1.21.4",
+          image: "itzg/minecraft-server",
           env: {
-            "MEMORYSIZE" => "3584M",
-            "PAPERMC_FLAGS" => "",
+            "EULA" => "TRUE",
+            "TYPE" => "PAPER",
+            "VERSION" => "1.21.4",
+            "MEMORY" => "3584M",
           },
           mounts: [ { Type: "volume", Source: "mc-data-creative-build", Target: "/data" } ],
           labels: :labels,
@@ -217,10 +214,12 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
         [ :create_volume, { name: "mc-data-broken-build", labels: :labels } ],
         [ :create_container, {
           name: "mc-server-broken-build",
-          image: "marctv/minecraft-papermc-server:1.21.4",
+          image: "itzg/minecraft-server",
           env: {
-            "MEMORYSIZE" => "3584M",
-            "PAPERMC_FLAGS" => "",
+            "EULA" => "TRUE",
+            "TYPE" => "PAPER",
+            "VERSION" => "1.21.4",
+            "MEMORY" => "3584M",
           },
           mounts: [ { Type: "volume", Source: "mc-data-broken-build", Target: "/data" } ],
           labels: :labels,

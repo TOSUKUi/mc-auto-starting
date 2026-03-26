@@ -68,9 +68,9 @@ This file tells any contributor or agent where to find authoritative information
 - `Pterodactyl/Wings` are no longer the current target architecture, but `mc-router` remains active.
 - `mc-router` and app-managed Minecraft containers are expected to share one bridge network, with router backends addressed by container name.
 - `T-303` is complete: route publication apply/rollback is centralized and reused by the existing create/delete-era services.
-- `T-304` is complete: Docker transport, public endpoint, runtime image/network, `marctv` create payload, and router file/reload defaults are fixed in env-backed helpers and docs.
-- The create-form `minecraft_version` field now represents the selected `marctv` image tag, and the UI exposes it as a fixed select list.
-- `MinecraftRuntime` now derives `MEMORYSIZE` below the Docker limit so the container keeps JVM headroom.
+- `T-304` is complete: Docker transport, public endpoint, runtime image/network, the `itzg` runtime payload, and router file/reload defaults are fixed in env-backed helpers and docs.
+- The create-form `minecraft_version` field is runtime-version input passed through the container `VERSION` contract rather than a Docker image tag.
+- `MinecraftRuntime` now derives container `MEMORY` below the Docker limit so the server keeps JVM headroom.
 - Local Compose bootstrap now includes checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE`.
 - `T-400` is complete: the create job now provisions managed Docker resources, persists runtime state, and publishes the `mc-router` mapping.
 - `T-400` now pulls the selected runtime image on demand when Docker create fails with `No such image`.
@@ -86,14 +86,12 @@ This file tells any contributor or agent where to find authoritative information
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - The next implementation critical path starts at `T-900`, then `T-903` / `T-904` / `T-905` to align `.env`, `.env.example`, and the Kamal deploy baseline before the remaining P8 ops docs; after the Discord bot/RCON track, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
-- `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and can also provision a standard Java `vanilla` server path through the existing direct-Docker flow.
-- `T-1100` and `T-1103` are complete: version choices are now sourced from the checked-in `config/minecraft_runtime_catalog.yml` catalog rather than live registry access or DB-backed storage.
-- The create UI now keeps catalog-backed version choices, allows freeform tag input, and links to the runtime-family-specific Docker Hub tag list as an operator reference.
-- Catalog option `value` now represents the actual runtime tag, while `label` is reserved for the version text shown to operators.
-- For `itzg/minecraft-server`, the official docs treat Minecraft version selection as the `VERSION` environment variable contract, not as a guarantee that image tag equals Minecraft version; keep that distinction in mind when touching `T-1102` and later runtime-catalog work.
-- The next runtime-source refinement is to split live option sources by family: Mojang manifest for `vanilla`, a Paper-specific source for `paper`, and a UI contract where users only see the version label while the submitted value remains the stable version key.
-- The active strategy direction is to resolve those live options on the Rails side when the create page is opened, using a short TTL cache and a fallback path instead of browser-direct upstream calls.
-- The first live-source attempt is planned against Mojang's `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`.
+- `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and both runtime families provision through `itzg/minecraft-server`.
+- `T-1100` and `T-1103` are complete: a checked-in `config/minecraft_runtime_catalog.yml` file remains as the fallback version source rather than live registry access or DB-backed storage.
+- `T-1105` through `T-1107` are complete: the create UI resolves runtime-family-specific version choices on the Rails side when the page opens, caches them briefly, falls back to the checked-in catalog, keeps freeform version entry available, and links each runtime family to its upstream version source.
+- The UI now shows stable Minecraft version labels instead of Docker image tags; submitted values are stable version keys, with `latest` remaining a special symbolic option.
+- For `itzg/minecraft-server`, the official docs treat Minecraft version selection as the `TYPE` + `VERSION` container contract, not as a guarantee that image tag equals Minecraft version; keep that distinction in mind when touching `T-1102` and later runtime work.
+- The current live sources are Mojang's `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`.
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.

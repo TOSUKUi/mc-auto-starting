@@ -52,15 +52,13 @@ Current baseline:
 - `T-1002` is complete: authenticated users can issue Discord-user-bound invite records, see invite status in the app, copy the raw invite URL at creation time, and revoke issued invites without email delivery.
 - `T-1004` is complete: `/invites/:token` now stores pending invite context, Discord OAuth callbacks can create the first linked local user from a matching invite, and consumed invites are marked used.
 - After the Discord bot/RCON track, the next planned operator UI work is `T-1010` through `T-1012` for player-count visibility and browser-side log / command operations.
-- `T-1101` is complete: create flow now exposes runtime family selection with `paper` as the default and a standard Java `vanilla` option wired through the existing direct-Docker provisioning path.
-- `T-1100` and `T-1103` are complete: runtime version choices now come from a checked-in synchronized catalog file rather than live registry access or DB-backed storage.
-- The create UI now supports both catalog-backed version selection and freeform tag entry, with runtime-family-specific Docker Hub tag-list links for operator reference.
-- Runtime catalog option `value` now represents the actual image/runtime tag, while `label` is the user-facing version display and does not need to match the tag verbatim.
+- `T-1101` is complete: create flow now exposes runtime family selection with `paper` as the default, and both `paper` and `vanilla` provision through the `itzg/minecraft-server` runtime family.
+- `T-1100` and `T-1103` are complete: a checked-in synchronized catalog file remains as the safe fallback instead of live registry access or DB-backed storage.
+- `T-1105` through `T-1107` are complete: the create UI now resolves version options server-side on page load, caches them briefly, falls back to the checked-in catalog, and keeps freeform version entry plus upstream source links available.
+- Runtime catalog option `label` is the user-facing Minecraft version display, while submitted `value` is the stable version key sent through the runtime `VERSION` contract.
 - The remaining runtime-catalog follow-up is `T-1102` for concrete version resolution for symbolic tags such as `latest`.
-- Important runtime nuance: `itzg/minecraft-server` should be treated as a VERSION-driven image family, not as a runtime where image tag always equals the Minecraft version; use the official docs page `https://docker-minecraft-server.readthedocs.io/en/latest/versions/minecraft/` as the source of truth for that distinction.
-- The next refinement after the file-backed catalog is to split live version sources by runtime family, using Mojang's version manifest for `vanilla` and a Paper-specific list for `paper`, while showing only the human-facing version label to operators and keeping a stable internal value for form submission.
-- The active strategy for that refinement is server-side resolution at create-page load time, with Rails calling the upstream sources, caching for a short TTL, and falling back safely if upstream data is unavailable.
-- The first upstream URLs to try are Mojang's `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`.
+- Important runtime nuance: `itzg/minecraft-server` should be treated as a `TYPE` + `VERSION` driven image family, not as a runtime where image tag always equals the Minecraft version; use the official docs page `https://docker-minecraft-server.readthedocs.io/en/latest/versions/minecraft/` as the source of truth for that distinction.
+- The active live sources are Mojang's `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`, resolved by Rails on create-page load with a short TTL cache and a checked-in fallback catalog.
 
 Development seed login is available as `dev@example.com` / `password`.
 The initial Discord owner can be bootstrapped with `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed`; use this before the Discord-only login flow replaces the local password baseline.
@@ -89,9 +87,10 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Account onboarding direction: manually issued invite URLs
 - Bot integration direction: Discord Bot calls Rails-owned APIs
 - Minecraft command operation direction: Rails executes lifecycle/RCON actions; bots must not talk directly to Docker or server containers
-- Minecraft runtime image family: `marctv/minecraft-papermc-server`
-- The create-form `minecraft_version` field is treated as runtime-version input; for `marctv` it maps cleanly to the image tag, but for `itzg` the Minecraft version is driven by the container `VERSION` environment contract rather than assuming image tag equals version
-- `MEMORYSIZE` should leave JVM headroom below the Docker memory limit
+- Minecraft runtime image family: `itzg/minecraft-server`
+- `paper` and `vanilla` both run on `itzg/minecraft-server`, selected through `TYPE=PAPER` or `TYPE=VANILLA`
+- The create-form `minecraft_version` field is treated as runtime-version input and is passed through the container `VERSION` environment contract rather than mapped to a Docker image tag
+- `MEMORY` should leave JVM headroom below the Docker memory limit
 - Public connection format: `<server-fqdn>:<shared_public_port>`
 - Public ingress port: single shared public port
 - Router backend format: `<container_name>:25565` on the shared bridge network

@@ -38,13 +38,13 @@ function selectedRuntimeLabel(value, options) {
   return options.find((option) => option.value === value)?.label || value
 }
 
-export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, minecraft_version_tag_list_urls, public_endpoint }) {
+export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, minecraft_version_source_urls, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const minecraftVersionOptions = minecraft_version_options_by_runtime_family[form.data.runtime_family] || []
-  const selectedTagListUrl = minecraft_version_tag_list_urls[form.data.runtime_family]
+  const selectedVersionSourceUrl = minecraft_version_source_urls[form.data.runtime_family]
   const resourceHints = [
     { label: '種類', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
     { label: 'バージョン', value: form.data.custom_minecraft_version.trim() || form.data.minecraft_version },
@@ -157,18 +157,18 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
                   <TextInput
                     description={
                       <>
-                        一覧にないタグを使うときはこちらを優先します。{' '}
-                        {selectedTagListUrl ? (
-                          <Anchor href={selectedTagListUrl} target="_blank" rel="noreferrer">
-                            タグ一覧を見る
+                        一覧にないバージョンを使うときはこちらを優先します。{' '}
+                        {selectedVersionSourceUrl ? (
+                          <Anchor href={selectedVersionSourceUrl} target="_blank" rel="noreferrer">
+                            候補ソースを見る
                           </Anchor>
                         ) : null}
                       </>
                     }
                     error={form.errors.custom_minecraft_version}
-                    label="バージョンタグを自由入力"
+                    label="バージョンを自由入力"
                     onChange={(event) => form.setData('custom_minecraft_version', event.currentTarget.value.trim())}
-                    placeholder="例: 1.21.11-127 / latest"
+                    placeholder="例: 1.21.11 / latest"
                     value={form.data.custom_minecraft_version}
                   />
                   <Divider label="起動設定" labelPosition="center" />

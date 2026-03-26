@@ -22,12 +22,13 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").first.fetch("value")
-    assert_equal "1.21.11", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").second.fetch("value")
+    assert_equal "26.1", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").second.fetch("value")
+    assert_equal "26.1", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").second.fetch("label")
     assert_equal "1.21.11", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").second.fetch("label")
-    assert_equal "1.21.11", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").third.fetch("label")
-    assert_equal "1.21.11-127", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").third.fetch("value")
-    assert_match(/marctv\/minecraft-papermc-server\/tags/, response.parsed_body.fetch("minecraft_version_tag_list_urls").fetch("paper"))
-    assert_match(/itzg\/minecraft-server\/tags/, response.parsed_body.fetch("minecraft_version_tag_list_urls").fetch("vanilla"))
+    assert_equal "1.21.10", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").third.fetch("label")
+    assert_equal "1.21.10", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").third.fetch("value")
+    assert_match(/qing762\.is-a\.dev\/api\/papermc/, response.parsed_body.fetch("minecraft_version_source_urls").fetch("paper"))
+    assert_match(/piston-meta\.mojang\.com\/mc\/game\/version_manifest_v2\.json/, response.parsed_body.fetch("minecraft_version_source_urls").fetch("vanilla"))
     assert_not response.parsed_body.fetch("form_defaults").key?("template_kind")
     assert_not response.parsed_body.key?("template_kind")
     assert_not response.parsed_body.key?("runtime_image")
@@ -120,13 +121,13 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
         hostname: "custom-tag-world",
         runtime_family: "paper",
         minecraft_version: "latest",
-        custom_minecraft_version: "1.21.11-127",
+        custom_minecraft_version: "1.21.11",
         memory_mb: 2048,
         disk_mb: 20480,
       },
     }
 
     assert_response :created
-    assert_equal "1.21.11-127", MinecraftServer.order(:id).last.minecraft_version
+    assert_equal "1.21.11", MinecraftServer.order(:id).last.minecraft_version
   end
 end

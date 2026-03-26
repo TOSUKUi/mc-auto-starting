@@ -2,16 +2,22 @@ paper:
   label: Paper
   version_options:
     - value: latest
-      label: 最新 (latest)
-    - value: 1.21.11
-      label: 1.21.11
-    - value: 1.21.11-127
-      label: 1.21.11
+      label: 1.21.11 (latest)
+    - value: "1.21.11"
+      label: "1.21.11"
+    - value: "1.21.10"
+      label: "1.21.10"
+    - value: "1.21.9"
+      label: "1.21.9"
 
 vanilla:
   label: Java
   version_options:
     - value: latest
-      label: 最新 (latest)
-    - value: 1.21.11
-      label: 1.21.11
+      label: 26.1 (latest)
+    - value: "26.1"
+      label: "26.1"
+    - value: "1.21.11"
+      label: "1.21.11"
+    - value: "1.20.6"
+      label: "1.20.6"
