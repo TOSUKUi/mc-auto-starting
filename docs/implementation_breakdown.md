@@ -60,8 +60,8 @@
   - 接続先 `<server-fqdn>:<shared_public_port>`
   - 状態
   - Minecraft バージョン
-  - メモリ
-  - ディスク
+  - container 状態
+  - route publication 状態
   - 所有者 / 自分の権限
   - 最終更新日時
 - 操作:
@@ -79,7 +79,6 @@
   - サーバー識別子 / サブドメイン `hostname`
   - Minecraft バージョン
   - メモリ
-  - ディスク
 - 表示項目:
   - 生成予定の接続先 `<hostname>.<public_domain>:<shared_public_port>`
   - 単一ホスト標準構成で作成されることの説明
@@ -97,10 +96,11 @@
 - 表示項目:
   - サーバー基本情報
   - 接続先 `<server-fqdn>:<shared_public_port>`
+  - router backend `<container_name>:25565`
   - Docker コンテナ状態
   - コンテナ名 / volume 名
   - Minecraft バージョン
-  - メモリ / ディスク
+  - route publication 状態
   - 最終エラー
 - 操作:
   - 起動

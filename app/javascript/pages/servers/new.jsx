@@ -1,6 +1,6 @@
 import { Alert, Button, Code, Divider, Grid, Group, NumberInput, Paper, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { IconAlertCircle, IconPlugConnected, IconServer2 } from '@tabler/icons-react'
+import { IconInfoCircle, IconPlugConnected, IconServer2 } from '@tabler/icons-react'
 
 function normalizeHostname(value) {
   return value.trim().toLowerCase()
@@ -24,7 +24,7 @@ export default function ServersNew({ form_defaults, public_endpoint }) {
   const resourceHints = [
     { label: 'バージョン', value: form.data.minecraft_version },
     { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
-    { label: 'ディスク', value: `${form.data.disk_mb.toLocaleString()} MB` },
+    { label: '接続先', value: preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434' },
   ]
 
   const submit = (event) => {
@@ -55,12 +55,12 @@ export default function ServersNew({ form_defaults, public_endpoint }) {
                   <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
                     <IconServer2 size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">New Server</Text>
+                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Direct Docker</Text>
                 </Group>
                 <Title order={1}>新しいサーバーを作成</Title>
                 <Text c="dimmed" maw={640}>
-                  入力するのは名前、アドレス名、バージョン、初期リソースだけです。作成後は Docker 上で managed container を起動し、
-                  同じ bridge network 上の `mc-router` へ公開設定を反映します。
+                  この画面では、単一ホスト上の Paper サーバーを 1 台作成します。作成後は Docker 上で起動し、同じ bridge network 上の
+                  `mc-router` がホスト名で振り分けます。
                 </Text>
               </Stack>
 
@@ -95,7 +95,7 @@ export default function ServersNew({ form_defaults, public_endpoint }) {
                   <TextInput
                     description={
                       hasTouchedHostname
-                        ? `使用されるアドレス名: ${normalizedHostname || 'empty'}`
+                        ? `使用されるホスト名: ${normalizedHostname || 'empty'}`
                         : '半角英小文字・数字・ハイフンだけ使えます。'
                     }
                     error={form.errors.hostname}
@@ -105,25 +105,21 @@ export default function ServersNew({ form_defaults, public_endpoint }) {
                     required
                     value={form.data.hostname}
                   />
-                  <Grid gutter="md">
-                    <Grid.Col span={{ base: 12 }}>
-                      <TextInput
-                        description="迷ったら、遊ぶ予定のクライアントと同じバージョンを入れてください。"
-                        error={form.errors.minecraft_version}
-                        label="Minecraft バージョン"
-                        onChange={(event) => form.setData('minecraft_version', event.currentTarget.value)}
-                        placeholder="1.21.4"
-                        required
-                        value={form.data.minecraft_version}
-                      />
-                    </Grid.Col>
-                  </Grid>
-                  <Divider label="初期リソース" labelPosition="center" />
+                  <TextInput
+                    description="迷ったら、遊ぶ予定のクライアントと同じバージョンを入れてください。"
+                    error={form.errors.minecraft_version}
+                    label="Minecraft バージョン"
+                    onChange={(event) => form.setData('minecraft_version', event.currentTarget.value)}
+                    placeholder="1.21.4"
+                    required
+                    value={form.data.minecraft_version}
+                  />
+                  <Divider label="起動設定" labelPosition="center" />
                   <Text c="dimmed" size="sm">
-                    メモリとディスクはあとから見直せます。まずは初期値のままで作って、足りなくなってから増やす運用で十分です。
+                    初期作成で調整できるのはメモリだけです。ディスクやコンテナの詳細は app 側の管理値で固定します。
                   </Text>
                   <Grid gutter="md">
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                    <Grid.Col span={{ base: 12 }}>
                       <NumberInput
                         allowDecimal={false}
                         error={form.errors.memory_mb}
@@ -135,19 +131,10 @@ export default function ServersNew({ form_defaults, public_endpoint }) {
                         value={form.data.memory_mb}
                       />
                     </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <NumberInput
-                        allowDecimal={false}
-                        error={form.errors.disk_mb}
-                        label="ディスク (MB)"
-                        min={1024}
-                        onChange={(value) => form.setData('disk_mb', value || 0)}
-                        required
-                        thousandSeparator=","
-                        value={form.data.disk_mb}
-                      />
-                    </Grid.Col>
                   </Grid>
+                  <Alert color="blue" icon={<IconInfoCircle size={16} />} radius="md" variant="light">
+                    作成時には Paper イメージを使い、managed volume と managed container を自動作成します。
+                  </Alert>
 
                   <Divider label="作成内容の確認" labelPosition="center" />
                   <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
@@ -224,8 +211,8 @@ export default function ServersNew({ form_defaults, public_endpoint }) {
 
               <Paper p="lg" radius="lg" shadow="sm" withBorder>
                 <Stack gap="sm">
-                  <Alert color="blue" icon={<IconAlertCircle size={16} />} radius="md" variant="light">
-                    この画面では単一ホストの標準構成だけを扱います。作成時に Paper ベースの managed container と volume が自動で作られます。
+                  <Alert color="blue" icon={<IconInfoCircle size={16} />} radius="md" variant="light">
+                    コンテナ名や volume 名は app が自動採番します。ここではプレイヤーに見せる名前と接続先だけを決めれば十分です。
                   </Alert>
                 </Stack>
               </Paper>

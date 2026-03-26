@@ -48,7 +48,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "sky-lab.mc.tosukui.xyz", server.fetch("fqdn")
     assert_equal "sky-lab.mc.tosukui.xyz:42434", server.fetch("connection_target")
     assert_equal "provisioning", server.fetch("status")
-    assert_equal "paper", server.fetch("template_kind")
+    assert_not server.key?("template_kind")
     assert_equal "mc-server-sky-lab", server.fetch("runtime").fetch("container_name")
     assert_equal "mc-data-sky-lab", server.fetch("runtime").fetch("volume_name")
   end

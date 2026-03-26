@@ -48,9 +48,9 @@ function labelize(value) {
 }
 
 function formatTimestamp(value) {
-  if (!value) return 'Not yet'
+  if (!value) return '未実行'
 
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('ja-JP', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value))
@@ -89,16 +89,14 @@ export default function ServersShow({ server }) {
                 <Text href="/servers" renderRoot={(props) => <Link {...props} href="/servers" />} size="sm">
                   <Group gap={6}>
                     <IconArrowBackUp size={14} />
-                    <span>Back to servers</span>
+                    <span>一覧へ戻る</span>
                   </Group>
                 </Text>
                 <Group gap="xs">
                   <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
                     <IconServer2 size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">
-                    Server Detail
-                  </Text>
+                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Direct Docker</Text>
                 </Group>
                 <Title order={1}>{server.name}</Title>
                 <Text c="dimmed" size="md">
@@ -128,32 +126,32 @@ export default function ServersShow({ server }) {
                     renderRoot={(props) => <Link {...props} href={`/servers/${server.id}/members`} />}
                     variant="light"
                   >
-                    Members
+                    メンバー
                   </Button>
                 ) : null}
                 {server.can_start ? (
                   <Button leftSection={<IconPlayerPlay size={16} />} onClick={() => router.post(`/servers/${server.id}/start`)} type="button" variant="light">
-                    Start
+                    起動
                   </Button>
                 ) : null}
                 {server.can_stop ? (
                   <Button leftSection={<IconPlayerPause size={16} />} onClick={() => router.post(`/servers/${server.id}/stop`)} type="button" variant="light">
-                    Stop
+                    停止
                   </Button>
                 ) : null}
                 {server.can_restart ? (
                   <Button leftSection={<IconRefresh size={16} />} onClick={() => router.post(`/servers/${server.id}/restart`)} type="button" variant="light">
-                    Restart
+                    再起動
                   </Button>
                 ) : null}
                 {server.can_sync ? (
                   <Button onClick={() => router.post(`/servers/${server.id}/sync`)} type="button" variant="default">
-                    Sync
+                    同期
                   </Button>
                 ) : null}
                 {server.can_destroy ? (
                   <Button color="red" leftSection={<IconTrash size={16} />} onClick={() => router.delete(`/servers/${server.id}`)} type="button" variant="light">
-                    Delete
+                    削除
                   </Button>
                 ) : null}
               </Group>
@@ -166,11 +164,8 @@ export default function ServersShow({ server }) {
                     <ThemeIcon color="blue" radius="xl" size={28} variant="light">
                       <IconWorldWww size={15} />
                     </ThemeIcon>
-                    <Text fw={700}>Connection</Text>
+                  <Text fw={700}>接続先</Text>
                   </Group>
-                  <Text c="dimmed" size="sm">
-                    This public target is the only address players should use.
-                  </Text>
                   <Code block>{server.connection_target}</Code>
                 </Stack>
               </Paper>
@@ -181,12 +176,9 @@ export default function ServersShow({ server }) {
                     <ThemeIcon color="orange" radius="xl" size={28} variant="light">
                       <IconRoute2 size={15} />
                     </ThemeIcon>
-                    <Text fw={700}>Route Publication</Text>
+                    <Text fw={700}>公開状態</Text>
                   </Group>
-                  <Text c="dimmed" size="sm">
-                    Publication state on mc-router for this hostname.
-                  </Text>
-                  <Text fw={600}>{server.route.enabled ? 'Enabled' : 'Disabled'}</Text>
+                  <Text fw={600}>{server.route.enabled ? '有効' : '無効'}</Text>
                 </Stack>
               </Paper>
 
@@ -196,12 +188,9 @@ export default function ServersShow({ server }) {
                     <ThemeIcon color="teal" radius="xl" size={28} variant="light">
                       <IconActivityHeartbeat size={15} />
                     </ThemeIcon>
-                    <Text fw={700}>Container Backend</Text>
+                    <Text fw={700}>コンテナ</Text>
                   </Group>
-                  <Text c="dimmed" size="sm">
-                    mc-router が参照するコンテナ backend です。
-                  </Text>
-                  <Code block>{server.runtime.backend ?? 'Provisioning pending'}</Code>
+                  <Code block>{server.runtime.backend ?? 'provisioning pending'}</Code>
                 </Stack>
               </Paper>
             </SimpleGrid>
@@ -209,7 +198,7 @@ export default function ServersShow({ server }) {
         </Paper>
 
         {server.last_error_message ? (
-          <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="Last failure" variant="light">
+          <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="直近の失敗" variant="light">
             {server.last_error_message}
           </Alert>
         ) : null}
@@ -218,15 +207,15 @@ export default function ServersShow({ server }) {
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
               <Stack gap="md">
-                <Text fw={700}>Server Overview</Text>
+                <Text fw={700}>サーバー概要</Text>
                 <Divider />
-                <DetailLine label="Hostname" value={<Code>{server.fqdn}</Code>} />
-                <DetailLine label="Minecraft Version" value={<Code>{server.minecraft_version}</Code>} />
-                <DetailLine label="Template" value={<Code>{server.template_kind}</Code>} />
+                <DetailLine label="FQDN" value={<Code>{server.fqdn}</Code>} />
+                <DetailLine label="Minecraft バージョン" value={<Code>{server.minecraft_version}</Code>} />
                 <DetailLine label="Container Name" value={<Code>{server.runtime.container_name}</Code>} />
-                <DetailLine label="Container ID" value={<Code>{server.runtime.container_id ?? 'Not assigned'}</Code>} />
+                <DetailLine label="Container ID" value={<Code>{server.runtime.container_id ?? '未割り当て'}</Code>} />
                 <DetailLine label="Volume Name" value={<Code>{server.runtime.volume_name}</Code>} />
-                <DetailLine label="Container State" value={<Code>{server.runtime.container_state ?? 'Unknown'}</Code>} />
+                <DetailLine label="Container State" value={<Code>{server.runtime.container_state ?? 'unknown'}</Code>} />
+                <DetailLine label="最終起動" value={formatTimestamp(server.last_started_at)} />
               </Stack>
             </Paper>
           </Grid.Col>
@@ -234,29 +223,13 @@ export default function ServersShow({ server }) {
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
               <Stack gap="md">
-                <Text fw={700}>Route State</Text>
+                <Text fw={700}>公開情報</Text>
                 <Divider />
                 <DetailLine label="Apply Status" value={<Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">{labelize(server.route.last_apply_status)}</Badge>} />
                 <DetailLine label="Health Status" value={<Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">{labelize(server.route.last_healthcheck_status)}</Badge>} />
-                <DetailLine label="Publication" value={server.route.enabled ? 'Enabled' : 'Disabled'} />
-                <DetailLine label="Last Applied" value={formatTimestamp(server.route.last_applied_at)} />
-                <DetailLine label="Last Health Check" value={formatTimestamp(server.route.last_healthchecked_at)} />
-              </Stack>
-            </Paper>
-          </Grid.Col>
-
-          <Grid.Col span={12}>
-            <Paper p="lg" radius="lg" shadow="sm" withBorder>
-              <Stack gap="md">
-                <Text fw={700}>Operator Notes</Text>
-                <Divider />
-                <Text c="dimmed" size="sm">
-                  `start` / `stop` / `restart` は Docker 上の managed container を対象にします。`sync` は runtime state を再取得し、
-                  この record と route publication を突き合わせます。
-                </Text>
-                <Text c="dimmed" size="sm">
-                  container 実体や route publication と DB 状態がずれた場合は、古い値を正しいものとして扱わず `degraded` などへ落とします。
-                </Text>
+                <DetailLine label="公開" value={server.route.enabled ? '有効' : '無効'} />
+                <DetailLine label="最終反映" value={formatTimestamp(server.route.last_applied_at)} />
+                <DetailLine label="最終ヘルスチェック" value={formatTimestamp(server.route.last_healthchecked_at)} />
               </Stack>
             </Paper>
           </Grid.Col>

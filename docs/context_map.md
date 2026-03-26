@@ -52,7 +52,7 @@ This file tells any contributor or agent where to find authoritative information
 - Authentication baseline is installed through `T-100` and `T-101`.
 - `MinecraftServer` and `ServerMember` baselines exist through `T-102` and `T-103`.
 - Authorization and visibility protection are installed through `T-106` and `T-107`.
-- Authenticated layout and current login/index/create/detail/members UI baselines already exist, but they still contain legacy provider assumptions and need cleanup while preserving router-based ingress.
+- Authenticated layout and current login/index/create/detail/members UI baselines already exist; the active server create/detail/index screens are now direct-Docker-first, while provider cleanup debt still remains in the repository.
 - The planning pivot task `T-110` is complete.
 - `T-200` is complete: `minecraft_servers` now has direct-Docker baseline fields for managed container/volume identity and runtime state.
 - `T-201` through `T-204` are complete: hostname slug normalization, FQDN/public-port connection formatting, status transitions, and `router_routes` publication responsibilities are fixed in code.
@@ -67,4 +67,5 @@ This file tells any contributor or agent where to find authoritative information
 - The direct-Docker lifecycle/delete contract is now fixed in `docs/direct_docker_lifecycle_contract.md` ahead of service replacement work.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
 - `T-500` is complete: create UI now exposes only the direct-Docker baseline inputs and the public connection preview contract.
-- The next implementation critical path starts at `T-501`.
+- `T-501` and `T-502` are complete: detail/index UI now center connection targets, runtime/container state, and router publication data.
+- The next implementation critical path starts at `T-700`.

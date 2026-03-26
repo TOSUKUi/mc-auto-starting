@@ -207,7 +207,6 @@ class ServersController < InertiaController
         updated_at: server.updated_at.iso8601,
         route: {
           enabled: route&.enabled || false,
-          publication_state: route&.publication_state || "unpublished",
           last_apply_status: route&.last_apply_status || "pending",
           last_healthcheck_status: route&.last_healthcheck_status || "unknown",
           last_applied_at: route&.last_applied_at&.iso8601,
@@ -218,19 +217,22 @@ class ServersController < InertiaController
           container_id: server.container_id,
           container_state: server.container_state,
           volume_name: server.volume_name,
-          backend: server.backend,
         },
       }
     end
 
     def server_detail(server)
-      server_summary(server).merge(
+      summary = server_summary(server)
+
+      summary.merge(
         fqdn: server.fqdn,
         minecraft_version: server.minecraft_version,
-        template_kind: server.template_kind,
         last_error_message: server.last_error_message,
         last_started_at: server.last_started_at&.iso8601,
         owner_id: server.owner_id,
+        runtime: summary.fetch(:runtime).merge(
+          backend: server.backend,
+        ),
         can_manage_members: policy(server).manage_members?,
         can_destroy: policy(server).destroy?,
         can_start: policy(server).start?,

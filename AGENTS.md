@@ -22,7 +22,7 @@ Current baseline:
 - Docker bootstrap, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`.
 - Authentication uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`.
 - Authorization and visibility protection are installed through `T-106` and `T-107`.
-- The authenticated layout shell and basic login/index/create/detail/members pages already exist, but they still contain legacy provider/router assumptions and are now subject to simplification.
+- The authenticated layout shell and basic login/index/create/detail/members pages already exist, and the active server create/detail/index screens now follow the direct-Docker baseline while provider cleanup debt remains behind them.
 - Existing provider code remains in the repository as migration debt and is expected to be removed progressively.
 - Existing `mc-router` code remains part of the active architecture and should not be removed unless the user explicitly changes that decision.
 - The selected Docker integration path is direct Engine API access via `/var/run/docker.sock` with a minimal Rails wrapper, not `docker` CLI orchestration.
@@ -37,7 +37,8 @@ Current baseline:
 - The direct-Docker lifecycle/delete contract is fixed in `docs/direct_docker_lifecycle_contract.md` before `T-401` / `T-402` implementation.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now operate on managed Docker containers and volumes instead of the legacy provider path.
 - `T-500` is complete: create UI and controller props are reduced to the direct-Docker baseline inputs plus hostname/FQDN preview metadata.
-- The next implementation critical-path task is `T-501`.
+- `T-501` and `T-502` are complete: detail/index UI now emphasize connection target, container runtime state, and router publication instead of provider-era framing.
+- The next implementation critical-path task is `T-700`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -161,5 +162,5 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 If no other instruction is given, start from the current critical path:
 
 1. `T-200` through `T-400` are complete
-2. `T-500` is complete, so the next critical path is the direct-Docker detail/index UI simplification while keeping `mc-router`
-3. Remove provider coupling after the direct-Docker path is working end to end
+2. `T-500` through `T-502` are complete, so the next critical path is provider coupling cleanup while keeping `mc-router`
+3. After cleanup, add the remaining direct-Docker verification and operations docs

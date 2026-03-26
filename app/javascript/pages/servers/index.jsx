@@ -52,9 +52,9 @@ function labelize(value) {
 }
 
 function formatTimestamp(value) {
-  if (!value) return 'Not yet'
+  if (!value) return '未更新'
 
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('ja-JP', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value))
@@ -65,15 +65,15 @@ function routeLabel(route) {
 }
 
 function runtimeLabel(runtime) {
-  if (runtime.backend) {
-    return runtime.backend
+  if (runtime.container_state) {
+    return labelize(runtime.container_state)
   }
 
-  if (runtime.container_name) {
-    return runtime.container_name
+  if (runtime.container_id || runtime.container_name) {
+    return 'Provisioned'
   }
 
-  return 'Provisioning pending'
+  return 'Provisioning Pending'
 }
 
 function needsAttention(server) {
@@ -136,19 +136,10 @@ export default function ServersIndex({ servers, summary }) {
                   <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
                     <IconWorldWww size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">
-                    Server Directory
-                  </Text>
+                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Direct Docker</Text>
                 </Group>
-                <Title order={1}>Servers</Title>
-                <Text c="dimmed" maw={720} size="md">
-                  Owned and shared Minecraft servers visible to the current user. Connection targets are always shown in the
-                  public `hostname:port` format.
-                </Text>
-                <Text c="dimmed" size="sm">
-                  Search stays local. Create requests persist immediately, then provisioning, publication, and lifecycle updates
-                  continue through the control-plane flow.
-                </Text>
+                <Title order={1}>サーバー一覧</Title>
+                <Text c="dimmed" maw={720} size="md">自分が所有しているサーバーと共有されているサーバーを確認できます。</Text>
               </Stack>
 
               <Button
@@ -157,16 +148,16 @@ export default function ServersIndex({ servers, summary }) {
                 variant="gradient"
                 gradient={{ from: 'blue', to: 'cyan' }}
               >
-                New server
+                新しいサーバー
               </Button>
             </Group>
 
             <SimpleGrid cols={{ base: 2, md: 5 }} spacing="md">
-              <StatCard label="Visible" tone="blue" value={summary.total} />
-              <StatCard label="Owned" tone="teal" value={summary.owned} />
-              <StatCard label="Shared" tone="cyan" value={summary.member} />
-              <StatCard label="Ready" tone="green" value={summary.ready} />
-              <StatCard label="Needs Attention" tone="orange" value={summary.attention_needed} />
+              <StatCard label="表示中" tone="blue" value={summary.total} />
+              <StatCard label="所有" tone="teal" value={summary.owned} />
+              <StatCard label="共有" tone="cyan" value={summary.member} />
+              <StatCard label="稼働中" tone="green" value={summary.ready} />
+              <StatCard label="要確認" tone="orange" value={summary.attention_needed} />
             </SimpleGrid>
           </Stack>
         </Paper>
@@ -176,16 +167,16 @@ export default function ServersIndex({ servers, summary }) {
             <TextInput
               leftSection={<IconSearch size={16} />}
               onChange={(event) => setQuery(event.currentTarget.value)}
-              placeholder="Filter by name, hostname, version, owner, or role"
+              placeholder="名前、ホスト名、バージョン、所有者で絞り込み"
               value={query}
               w={{ base: '100%', sm: 360 }}
             />
             <Stack align="flex-end" gap={2}>
               <Text c="dimmed" size="sm">
-                Showing {filteredServers.length} of {servers.length}
+                {filteredServers.length} / {servers.length} 件を表示
               </Text>
               <Text c="dimmed" size="xs">
-                Connection target is always `hostname:port`.
+                接続先は常に `hostname:port` です。
               </Text>
             </Stack>
           </Group>
@@ -197,11 +188,11 @@ export default function ServersIndex({ servers, summary }) {
               <ThemeIcon color="gray" radius="xl" size={48} variant="light">
                 <IconServer2 size={24} />
               </ThemeIcon>
-              <Title order={3}>{servers.length === 0 ? 'No visible servers yet' : 'No servers matched this filter'}</Title>
+              <Title order={3}>{servers.length === 0 ? '表示できるサーバーがありません' : '条件に一致するサーバーがありません'}</Title>
               <Text c="dimmed" ta="center">
                 {servers.length === 0
-                  ? 'Server records will appear here once you own a server or are added as a member.'
-                  : 'Adjust the search term to see the matching server records again.'}
+                  ? '自分が所有するか、メンバーとして追加されたサーバーがここに表示されます。'
+                  : '検索条件を変更すると一致するサーバーを再表示できます。'}
               </Text>
             </Stack>
           </Paper>
@@ -238,7 +229,7 @@ export default function ServersIndex({ servers, summary }) {
 
                     {needsAttention(server) ? (
                       <Badge color="orange" leftSection={<IconAlertTriangle size={12} />} variant="light">
-                        Attention
+                        要確認
                       </Badge>
                     ) : null}
                   </Group>
@@ -252,7 +243,7 @@ export default function ServersIndex({ servers, summary }) {
                         <Table.Td>{server.owner_email_address}</Table.Td>
                       </Table.Tr>
                       <Table.Tr>
-                        <Table.Th>Route</Table.Th>
+                        <Table.Th>公開状態</Table.Th>
                         <Table.Td>
                           <Group gap="xs">
                             <Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">
@@ -263,14 +254,19 @@ export default function ServersIndex({ servers, summary }) {
                             </Badge>
                           </Group>
                         </Table.Td>
-                        <Table.Th>Runtime</Table.Th>
+                        <Table.Th>Container</Table.Th>
                         <Table.Td>
-                          <Code>{runtimeLabel(server.runtime)}</Code>
+                          <Group gap="xs">
+                            <Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">
+                              {runtimeLabel(server.runtime)}
+                            </Badge>
+                            <Code>{server.runtime.container_name}</Code>
+                          </Group>
                         </Table.Td>
                       </Table.Tr>
                       <Table.Tr>
-                        <Table.Th>Route enabled</Table.Th>
-                        <Table.Td>{server.route.enabled ? 'Enabled' : 'Disabled'}</Table.Td>
+                        <Table.Th>公開</Table.Th>
+                        <Table.Td>{server.route.enabled ? '有効' : '無効'}</Table.Td>
                         <Table.Th>Updated</Table.Th>
                         <Table.Td>{formatTimestamp(server.updated_at)}</Table.Td>
                       </Table.Tr>
@@ -278,11 +274,8 @@ export default function ServersIndex({ servers, summary }) {
                   </Table>
 
                   <Group c="dimmed" gap="lg" justify="space-between">
-                    <Text size="sm">Apply / health: {routeLabel(server.route)}</Text>
-                    <Text size="sm">
-                      Last route sync: {formatTimestamp(server.route.last_applied_at)} / check:{' '}
-                      {formatTimestamp(server.route.last_healthchecked_at)}
-                    </Text>
+                    <Text size="sm">公開状態: {routeLabel(server.route)}</Text>
+                    <Text size="sm">最終反映: {formatTimestamp(server.route.last_applied_at)}</Text>
                   </Group>
                 </Stack>
               </Paper>

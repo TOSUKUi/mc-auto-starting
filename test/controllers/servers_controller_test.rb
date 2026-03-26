@@ -52,12 +52,11 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "success", visible_server.fetch("route").fetch("last_apply_status")
     assert_equal "healthy", visible_server.fetch("route").fetch("last_healthcheck_status")
     assert_equal true, visible_server.fetch("route").fetch("enabled")
-    assert_equal "published", visible_server.fetch("route").fetch("publication_state")
     assert_equal "mc-server-main-survival", visible_server.fetch("runtime").fetch("container_name")
     assert_equal "container-001", visible_server.fetch("runtime").fetch("container_id")
     assert_equal "running", visible_server.fetch("runtime").fetch("container_state")
     assert_equal "mc-data-main-survival", visible_server.fetch("runtime").fetch("volume_name")
-    assert_equal "mc-server-main-survival:25565", visible_server.fetch("runtime").fetch("backend")
+    assert_not visible_server.fetch("runtime").key?("backend")
   end
 
   test "show allows visible server for member" do
