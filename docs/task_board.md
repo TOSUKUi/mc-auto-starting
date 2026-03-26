@@ -80,8 +80,8 @@
 | T-1010 | P9 | Define player count, server logs, and browser command-console contract | T-402,T-1006 | todo | The source of truth, refresh strategy, authorization rules, and payload shape for player counts, recent logs, and browser-issued commands are fixed before UI work starts |
 | T-1011 | P9 | Surface player counts in server index and detail views | T-1010,T-502 | todo | Server index and detail show current player count prominently ahead of secondary operator metadata |
 | T-1012 | P9 | Add browser log viewer and command console UI | T-1010,T-1007,T-501 | todo | Authorized operators can view recent server logs and issue bounded commands from the web UI with clear success/failure feedback |
-| T-1100 | P10 | Research Java runtime family options, latest-version resolution, and dynamic tag sourcing | T-304,T-400 | todo | The supported Java server runtime families, a source of truth for resolving `latest` to a concrete Minecraft version, and the feasibility/fallback plan for dynamically building tag choices are documented before implementation |
-| T-1101 | P10 | Add Java server runtime family selection to create flow | T-1100,T-500 | todo | Operators can choose between the current runtime family and a standard Java-server path without breaking provisioning defaults |
+| T-1101 | P10 | Add Java server runtime family selection to create flow | T-304,T-400,T-500 | todo | Operators can choose between the current runtime family and a standard Java-server path without breaking provisioning defaults |
+| T-1100 | P10 | Research latest-version resolution and dynamic tag sourcing for the expanded Java runtimes | T-1101 | todo | After Java runtime family selection exists, the source of truth for resolving `latest` to a concrete Minecraft version and the feasibility/fallback plan for dynamically building tag choices are documented |
 | T-1102 | P10 | Persist and display resolved Minecraft version metadata | T-1100,T-1101,T-501,T-502 | todo | When a runtime tag such as `latest` is selected, the app stores and shows the concrete Minecraft server version returned by the managed server instead of only the symbolic tag |
 | T-1103 | P10 | Implement dynamic or synchronized Minecraft version option catalog | T-1100,T-1101 | todo | The create UI can build version choices from a maintained catalog or dynamic source, with a documented fallback when live tag discovery is unavailable or unsafe |
 
@@ -89,7 +89,7 @@
 
 The current critical path is:
 
-`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-304 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-804 -> T-805 -> T-900 -> T-903 -> T-904 -> T-901 -> T-905 -> T-902 -> T-1000 -> T-1001 -> T-1002 -> T-1003 -> T-1004 -> T-1005 -> T-1006 -> T-1007 -> T-1008 -> T-1009 -> T-1010 -> T-1011 -> T-1012 -> T-1100 -> T-1101 -> T-1102 -> T-1103`
+`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-304 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-804 -> T-805 -> T-900 -> T-903 -> T-904 -> T-901 -> T-905 -> T-902 -> T-1000 -> T-1001 -> T-1002 -> T-1003 -> T-1004 -> T-1005 -> T-1006 -> T-1007 -> T-1008 -> T-1009 -> T-1010 -> T-1011 -> T-1012 -> T-1101 -> T-1100 -> T-1102 -> T-1103`
 
 ## Known Blockers
 
