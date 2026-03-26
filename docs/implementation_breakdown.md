@@ -80,10 +80,12 @@
 - 入力項目:
   - サーバー名
   - サーバー識別子 / サブドメイン `hostname`
+  - runtime family 選択
   - Minecraft バージョン tag 選択
   - メモリ
 - 表示項目:
   - 生成予定の接続先 `<hostname>.<public_domain>:<shared_public_port>`
+  - `latest` など symbolic tag を選んだ場合の concrete version 表示方針
   - 単一ホスト標準構成で作成されることの説明
 - バリデーション:
   - `hostname` 形式

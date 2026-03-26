@@ -36,6 +36,7 @@
 11. 単一ホスト運用手順を文書化する
 12. Discord OAuth 招待制ログインと Bot 経由の RCON 操作を追加する
 13. プレイヤー人数表示とブラウザ運用コンソールを追加する
+14. Java サーバー runtime の選択肢とバージョン解決を改善する
 
 この順序を崩すと、DB 項目、UI、Docker label、ポート管理の手戻りが大きい。
 
@@ -52,6 +53,7 @@
 - provider schema debt の棚卸しは `docs/provider_cleanup_inventory.md` を正本にする
 - Discord auth / invite / bot command 実装は P8 の運用 docs で基本運用を固めたあとに着手する
 - プレイヤー人数表示とブラウザ console UI は RCON/command trust boundary を先に固めてから進める
+- Java runtime family と version catalog の改善は、現行 create flow を壊さない fallback を先に決めてから着手する
 
 ## 5. 詳細タスクリスト
 
@@ -313,6 +315,38 @@
 - 完了条件:
   - operator は人数確認、ログ確認、command 実行を Discord を経由せずに Web UI から行える
 
+### Phase 8: Java runtime と version catalog
+
+#### P8-1 runtime family / version source 調査
+
+- 最新の Minecraft Java 版で遊べる runtime family 候補を整理する
+- 現行 runtime と標準 Java-server path の差分を整理する
+- `latest` のような symbolic tag から concrete version をどう得るか整理する
+- tag 候補を live に取得するか、同期済み catalog を持つかを比較する
+- 完了条件:
+  - runtime family 選択、version 解決、tag catalog の設計判断が揃う
+
+#### P8-2 create flow の runtime family 対応
+
+- create UI に runtime family の選択肢を追加する
+- 現行の provisioning default を壊さずに Java-server path を追加する
+- 完了条件:
+  - operator が対応 runtime family を選んで作成できる
+
+#### P8-3 concrete version metadata 表示
+
+- symbolic tag と concrete version を分けて扱う
+- サーバー側から取得した concrete version を一覧 / 詳細へ反映する
+- 完了条件:
+  - `latest` を選んだ場合でも実際の Minecraft version が UI で分かる
+
+#### P8-4 version option catalog
+
+- dynamic fetch または synchronized catalog のどちらかで version 選択肢を構築する
+- live tag discovery が不安定な場合の fallback を用意する
+- 完了条件:
+  - create UI の version 選択肢生成が運用可能な形で固定される
+
 ## 6. マイルストーン案
 
 ### Milestone A: 方針転換完了
@@ -349,6 +383,12 @@
 - 一覧と詳細でプレイヤー人数を優先表示できる
 - Web UI から recent logs と command console を扱える
 
+### Milestone H: Java runtime と version catalog 完了
+
+- 通常の Java サーバー系 runtime を選べる
+- `latest` でも concrete Minecraft version が分かる
+- version 選択肢の供給方法が固定される
+
 ## 7. 直近着手順
 
 1. Pivot 方針の文書を固定する
@@ -358,3 +398,4 @@
 5. `mc-router` の live route reload は `SIGHUP` ベースで安定化済み
 6. 次は request / acceptance / operations docs を厚くする
 7. その後は Discord bot/RCON 基盤を足場に、プレイヤー人数表示とブラウザ console UI を追加する
+8. Java runtime family と version catalog の改善は、その後の独立トラックとして進める
