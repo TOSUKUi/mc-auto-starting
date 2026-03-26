@@ -276,6 +276,54 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     )
   end
 
+  test "owner can restart and stop a visible server" do
+    sign_in_as(users(:one))
+    server = minecraft_servers(:one)
+
+    FakeDockerClient.inspect_result = {
+      "Id" => "container-001",
+      "State" => { "Status" => "running" },
+    }
+
+    post restart_server_url(server, format: :json)
+
+    assert_response :success
+    assert_equal "restarting", response.parsed_body.fetch("server").fetch("status")
+    assert_equal "running", response.parsed_body.fetch("server").fetch("runtime").fetch("container_state")
+
+    post sync_server_url(server, format: :json)
+
+    assert_response :success
+    assert_equal "ready", response.parsed_body.fetch("server").fetch("status")
+
+    FakeDockerClient.inspect_result = {
+      "Id" => "container-001",
+      "State" => { "Status" => "exited" },
+    }
+
+    post stop_server_url(server, format: :json)
+
+    assert_response :success
+    assert_equal "stopping", response.parsed_body.fetch("server").fetch("status")
+    assert_equal "exited", response.parsed_body.fetch("server").fetch("runtime").fetch("container_state")
+
+    post sync_server_url(server, format: :json)
+
+    assert_response :success
+    assert_equal "stopped", response.parsed_body.fetch("server").fetch("status")
+    assert_equal(
+      [
+        [ :restart_container, { id: "container-001", timeout_seconds: 30 } ],
+        [ :inspect_container, { id_or_name: "container-001" } ],
+        [ :inspect_container, { id_or_name: "container-001" } ],
+        [ :stop_container, { id: "container-001", timeout_seconds: 30 } ],
+        [ :inspect_container, { id_or_name: "container-001" } ],
+        [ :inspect_container, { id_or_name: "container-001" } ],
+      ],
+      FakeDockerClient.calls.last(6),
+    )
+  end
+
   private
     def normalize_docker_calls(calls)
       calls.map do |name, payload|

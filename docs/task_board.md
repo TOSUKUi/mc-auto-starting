@@ -58,7 +58,7 @@
 | T-800 | P7 | Add model tests for direct-Docker rules | T-200,T-201,T-202,T-203 | todo | Core direct-Docker domain logic is covered |
 | T-801 | P7 | Add request and authorization tests | T-400,T-401,T-402,T-500,T-501 | todo | Access control and create/lifecycle/delete flows are covered |
 | T-802 | P7 | Add service tests for Docker client and allocators | T-302,T-303,T-400,T-401,T-402 | todo | Critical Docker orchestration paths are covered |
-| T-803 | P7 | Add acceptance checks for direct-Docker requirement criteria | T-400,T-401,T-402,T-500,T-501 | todo | Main create/detail/delete/lifecycle paths are verifiable by automated checks |
+| T-803 | P7 | Add acceptance checks for direct-Docker requirement criteria | T-400,T-401,T-402,T-500,T-501 | done | Main create/detail/delete/lifecycle paths are verifiable by automated checks |
 | T-804 | P7 | Verify compose-managed `mc-router` ingress against managed containers | T-303,T-400,T-803 | todo | A compose-managed `mc-router` service can load generated routes, reach `mc-server-<hostname>:25565` on `mc_router_net`, and accept an end-to-end connection on the shared public port |
 | T-900 | P8 | Document single-host setup and local development workflow | T-300,T-304,T-400 | todo | New contributor can boot the project with docker.sock mounted |
 | T-901 | P8 | Document direct-Docker operations and safety notes | T-302,T-401,T-402 | todo | Operators can manage containers and understand docker.sock risks |
@@ -96,6 +96,7 @@ The current critical path is:
 - `T-400`: `Servers::ProvisionServer` now creates a managed volume/container through `DockerEngine`, starts it, persists runtime state, and then publishes the route.
 - `T-400`: create retries once with `DockerEngine#pull_image` when the selected runtime image is missing locally.
 - `T-400`: `MEMORYSIZE` now reserves JVM headroom below the Docker memory limit to avoid immediate OOM kill on boot.
+- `T-803`: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync flows against the direct-Docker baseline.
 - `T-804`: live ingress verification still needs a compose-managed `mc-router` service; current checks only prove route file generation plus direct container reachability.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.

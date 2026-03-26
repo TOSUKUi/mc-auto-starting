@@ -264,6 +264,6 @@
 2. Docker socket の compose 方針を固める
 3. `T-303` と `T-304` は完了
 4. `T-400` と `T-401` / `T-402` は完了し、`T-500` / `T-501` / `T-502` で create/detail/index UI を direct-Docker 前提へ簡素化した
-5. 次は acceptance と live ingress 検証を進める
+5. 次は live ingress 検証を進める
 6. そのあとに `mc-router` 実 service を含む ingress 疎通確認を追加する
 7. 最後に request / acceptance / operations docs を厚くする
