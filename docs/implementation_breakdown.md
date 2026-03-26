@@ -23,6 +23,7 @@
 - mc-router:
   - 単一公開ポートの受け口
   - FQDN から backend への振り分け
+  - compose 管理の sibling service として起動
 - Docker Engine:
   - Minecraft コンテナの create/start/stop/remove
   - 永続 volume の保持

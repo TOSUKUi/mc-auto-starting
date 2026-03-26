@@ -52,6 +52,7 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Docker control path: Rails may control Docker directly through mounted `/var/run/docker.sock`
 - Topology: single host only in the initial version
 - Router/container topology: `mc-router` and app-managed Minecraft containers share one bridge network
+- `mc-router` itself is managed by `compose.yaml`, not created or lifecycle-managed by Rails
 - Ruby: `3.4.9`
 - Rails: `8.1.2`
 - Database: MariaDB `10.11.16` (via `mysql2` adapter)

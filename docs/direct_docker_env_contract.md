@@ -36,6 +36,7 @@ This document fixes the initial environment and configuration contract for the d
 ## Compose Baseline
 - Local development should keep `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_GID` in the repository `.env` file so `docker compose up` uses the same user/group mapping consistently.
 - The Rails `app` service mounts `/var/run/docker.sock`.
+- `mc-router` is expected to be a compose-managed sibling service, not a container created by Rails.
 - The Rails `app` service should join the host Docker group via `group_add`, using the host Docker group GID from `DOCKER_GID`.
 - On Linux development hosts, derive `DOCKER_GID` from the `docker` group, for example with `grep '^docker:' /etc/group | cut -d: -f3`.
 - The Rails `app` service should export the direct-Docker defaults above unless deployment overrides them.

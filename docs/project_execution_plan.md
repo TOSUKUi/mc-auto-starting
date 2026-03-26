@@ -13,6 +13,7 @@
 - Minecraft 実行イメージは `marctv/minecraft-papermc-server` 系を標準とする
 - 公開方式は `mc-router` による単一公開ポート + FQDN ベース振り分けとする
 - `mc-router` と app 管理の Minecraft コンテナは同一 bridge network に参加させる
+- `mc-router` 自体は Rails ではなく `compose.yaml` 側で管理する
 - router backend は `<container_name>:25565` を正本とする
 - 接続先表示は `<server-fqdn>:<shared_public_port>` を正本とする
 - Pterodactyl / Wings は現行計画の対象外とする

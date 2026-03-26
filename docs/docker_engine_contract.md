@@ -11,6 +11,7 @@ This document fixes the initial Docker Engine integration contract for Phase 2 t
 
 ## Network Topology
 - `mc-router` and app-managed Minecraft containers join the same dedicated bridge network.
+- `mc-router` is provided as compose-managed infrastructure, not as a Rails-managed runtime resource.
 - Minecraft containers do not publish per-server host ports.
 - `mc-router` is the only component that publishes the shared public Minecraft port.
 - Router backends use `container_name:25565` on the shared bridge network.
@@ -66,6 +67,7 @@ The wrapper does not expose:
 
 ## Compose Strategy
 - The `app` service mounts `/var/run/docker.sock`.
+- The `mc-router` service is defined and lifecycle-managed in `compose.yaml`.
 - The `mc-router` service joins the shared bridge network.
 - App-created Minecraft containers join the same shared bridge network at create time.
 - No Docker socket proxy is introduced in the initial implementation.
