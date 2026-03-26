@@ -38,9 +38,48 @@ This document fixes the initial environment and configuration contract for the d
   Required when `MC_ROUTER_RELOAD_STRATEGY=docker_signal`. Comma-separated Docker label filters that uniquely identify the compose-managed `mc-router` container.
 - `MC_ROUTER_API_URL`
   Optional operational endpoint for future router inspection or tooling.
+- `DISCORD_CLIENT_ID`
+  Discord OAuth application client id used by OmniAuth. Default: unset.
+- `DISCORD_CLIENT_SECRET`
+  Discord OAuth application client secret used by OmniAuth. Default: unset.
+- `BOOTSTRAP_DISCORD_USER_ID`
+  Optional Discord user id used by `bin/rails db:seed` to create the initial owner. Default: unset.
+- `BOOTSTRAP_DISCORD_USERNAME`
+  Optional Discord username used during bootstrap seeding. Default: unset.
+- `BOOTSTRAP_EMAIL_ADDRESS`
+  Optional fallback local email used during bootstrap seeding. Default: unset.
+- `BOOTSTRAP_PASSWORD`
+  Optional local password used only while the legacy password baseline still exists. Default: unset, which generates a random password during seed.
+- `DISCORD_BOT_TOKEN`
+  Reserved for the future Discord bot process and local integration testing. Default: unset.
+- `DISCORD_BOT_PUBLIC_KEY`
+  Reserved for the future Discord interactions verification path. Default: unset.
+- `DISCORD_BOT_APPLICATION_ID`
+  Reserved for future Discord bot setup and command registration. Default: unset.
+- `DISCORD_BOT_SHARED_SECRET`
+  Reserved for future bot-to-Rails machine authentication. Default: unset.
+- `DB_HOST`
+  Database host. Default: `db`.
+- `DB_PORT`
+  Database port. Default: `3306`.
+- `DB_USERNAME`
+  Database username. Default: `app`.
+- `DB_PASSWORD`
+  Database password. Default: `password`.
+- `DB_ROOT_PASSWORD`
+  MariaDB root password used by local Compose. Default: `rootpassword`.
+- `DB_NAME_DEVELOPMENT`
+  Development database name. Default: `mc_auto_starting_development`.
+- `DB_NAME_TEST`
+  Test database name. Default: `mc_auto_starting_test`.
+- `DB_NAME_PRODUCTION`
+  Production database name. Default: `mc_auto_starting_production`.
+- `RAILS_LOG_LEVEL`
+  Rails log level. Default: `info`.
 
 ## Compose Baseline
-- Local development should keep `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_GID` in the repository `.env` file so `docker compose up` uses the same user/group mapping consistently.
+- Local development should keep the full runtime configuration in a local `.env` file copied from `.env.example` so `docker compose up` and one-off `docker compose run` commands share the same values consistently.
+- `compose.yaml` now uses `.env` as the single local source for Rails, MariaDB, Docker transport, Discord OAuth, bootstrap owner seeding, and future bot-related secrets.
 - The Rails `app` service mounts `/var/run/docker.sock`.
 - `mc-router` is expected to be a compose-managed sibling service, not a container created by Rails.
 - The `mc-router` compose service should carry a stable label such as `app.kubos.dev/component=mc-router` so Rails can target reloads without relying on generated container names.

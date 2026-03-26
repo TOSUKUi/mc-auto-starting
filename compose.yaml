@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     group_add:
       - "${DOCKER_GID:-65534}"
@@ -13,19 +15,39 @@ services:
     environment:
       HOME: /tmp
       BUNDLE_PATH: /app/vendor/bundle
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_USERNAME: app
-      DB_PASSWORD: password
-      DOCKER_ENGINE_SOCKET_PATH: /var/run/docker.sock
-      MINECRAFT_PUBLIC_DOMAIN: mc.tosukui.xyz
-      MINECRAFT_PUBLIC_PORT: 42434
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USERNAME: ${DB_USERNAME:-app}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      DB_NAME_DEVELOPMENT: ${DB_NAME_DEVELOPMENT:-mc_auto_starting_development}
+      DB_NAME_TEST: ${DB_NAME_TEST:-mc_auto_starting_test}
+      DB_NAME_PRODUCTION: ${DB_NAME_PRODUCTION:-mc_auto_starting_production}
+      DOCKER_ENGINE_SOCKET_PATH: ${DOCKER_ENGINE_SOCKET_PATH:-/var/run/docker.sock}
+      DOCKER_ENGINE_API_VERSION: ${DOCKER_ENGINE_API_VERSION:-}
+      DOCKER_ENGINE_OPEN_TIMEOUT: ${DOCKER_ENGINE_OPEN_TIMEOUT:-5}
+      DOCKER_ENGINE_READ_TIMEOUT: ${DOCKER_ENGINE_READ_TIMEOUT:-30}
+      DOCKER_ENGINE_WRITE_TIMEOUT: ${DOCKER_ENGINE_WRITE_TIMEOUT:-30}
+      MINECRAFT_PUBLIC_DOMAIN: ${MINECRAFT_PUBLIC_DOMAIN:-mc.tosukui.xyz}
+      MINECRAFT_PUBLIC_PORT: ${MINECRAFT_PUBLIC_PORT:-42434}
       MINECRAFT_RUNTIME_IMAGE: ${MINECRAFT_RUNTIME_IMAGE:-marctv/minecraft-papermc-server}
-      MINECRAFT_RUNTIME_NETWORK_NAME: mc_router_net
-      MC_ROUTER_ROUTES_CONFIG_PATH: /app/tmp/mc-router/routes.json
-      MC_ROUTER_RELOAD_STRATEGY: docker_signal
-      MC_ROUTER_RELOAD_SIGNAL: HUP
-      MC_ROUTER_RELOAD_CONTAINER_LABELS: app.kubos.dev/component=mc-router
+      MINECRAFT_RUNTIME_NETWORK_NAME: ${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}
+      MC_ROUTER_ROUTES_CONFIG_PATH: ${MC_ROUTER_ROUTES_CONFIG_PATH:-/app/tmp/mc-router/routes.json}
+      MC_ROUTER_RELOAD_STRATEGY: ${MC_ROUTER_RELOAD_STRATEGY:-docker_signal}
+      MC_ROUTER_RELOAD_COMMAND: ${MC_ROUTER_RELOAD_COMMAND:-}
+      MC_ROUTER_RELOAD_SIGNAL: ${MC_ROUTER_RELOAD_SIGNAL:-HUP}
+      MC_ROUTER_RELOAD_CONTAINER_LABELS: ${MC_ROUTER_RELOAD_CONTAINER_LABELS:-app.kubos.dev/component=mc-router}
+      MC_ROUTER_API_URL: ${MC_ROUTER_API_URL:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      BOOTSTRAP_DISCORD_USER_ID: ${BOOTSTRAP_DISCORD_USER_ID:-}
+      BOOTSTRAP_DISCORD_USERNAME: ${BOOTSTRAP_DISCORD_USERNAME:-}
+      BOOTSTRAP_EMAIL_ADDRESS: ${BOOTSTRAP_EMAIL_ADDRESS:-}
+      BOOTSTRAP_PASSWORD: ${BOOTSTRAP_PASSWORD:-}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      DISCORD_BOT_PUBLIC_KEY: ${DISCORD_BOT_PUBLIC_KEY:-}
+      DISCORD_BOT_APPLICATION_ID: ${DISCORD_BOT_APPLICATION_ID:-}
+      DISCORD_BOT_SHARED_SECRET: ${DISCORD_BOT_SHARED_SECRET:-}
+      RAILS_LOG_LEVEL: ${RAILS_LOG_LEVEL:-info}
     ports:
       - "3000:3000"
       - "3036:3036"
@@ -56,13 +78,15 @@ services:
 
   db:
     image: mariadb:10.11.16
+    env_file:
+      - .env
     environment:
-      MARIADB_ROOT_PASSWORD: rootpassword
-      MARIADB_DATABASE: mc_auto_starting_development
-      MARIADB_USER: app
-      MARIADB_PASSWORD: password
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MARIADB_DATABASE: ${DB_NAME_DEVELOPMENT:-mc_auto_starting_development}
+      MARIADB_USER: ${DB_USERNAME:-app}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-password}
     healthcheck:
-      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -uroot -prootpassword --silent"]
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -uroot -p${DB_ROOT_PASSWORD:-rootpassword} --silent"]
       interval: 5s
       timeout: 5s
       retries: 20

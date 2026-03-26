@@ -92,3 +92,4 @@ This file tells any contributor or agent where to find authoritative information
 - `T-1002` is complete: `discord_invitations` now stores digest-backed manual invite records, authenticated users can issue/revoke invites from `/discord-invitations`, and raw invite URLs are shown only at issuance time.
 - `T-1004` is complete: invite redemption now starts at `/invites/:token`, pending invite tokens are held in the Rails session, and Discord OAuth callbacks can create/link the invited user on first login.
 - Initial operator bootstrap should use `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed` to create the first Discord-linked user before invite-based onboarding takes over.
+- Local configuration should now be driven from `.env`, using `.env.example` as the complete template for Compose, Discord OAuth, bootstrap owner, and future Discord bot secrets.
