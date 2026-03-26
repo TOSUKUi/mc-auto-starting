@@ -73,4 +73,5 @@ This file tells any contributor or agent where to find authoritative information
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
 - `T-500` is complete: create UI now exposes only the direct-Docker baseline inputs and the public connection preview contract.
 - `T-501` and `T-502` are complete: detail/index UI now center connection targets, runtime/container state, and router publication data.
+- Live `mc-router` ingress is not yet verified end-to-end; current checks stop at generated routes plus managed-container runtime checks.
 - The next implementation critical path starts at `T-700`.

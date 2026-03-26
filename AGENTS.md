@@ -39,6 +39,7 @@ Current baseline:
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now operate on managed Docker containers and volumes instead of the legacy provider path.
 - `T-500` is complete: create UI and controller props are reduced to the direct-Docker baseline inputs plus hostname/FQDN preview metadata.
 - `T-501` and `T-502` are complete: detail/index UI now emphasize connection target, container runtime state, and router publication instead of provider-era framing.
+- Live `mc-router` ingress verification is not implemented yet; the current baseline proves route file generation and managed-container startup, but not end-to-end routing through a running `mc-router` service.
 - The next implementation critical-path task is `T-700`.
 
 Development seed login is available as `dev@example.com` / `password`.

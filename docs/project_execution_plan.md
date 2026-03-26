@@ -216,8 +216,10 @@
 - request tests
 - service tests
 - acceptance tests
+- 実 `mc-router` service を同一 network に載せた end-to-end ingress 疎通確認
 - 完了条件:
   - create/delete/lifecycle/sync が自動検証される
+  - route file 生成だけでなく shared public port での ingress 疎通も確認される
 
 #### P6-2 単一ホスト運用 docs
 
@@ -260,4 +262,5 @@
 3. `T-303` と `T-304` は完了
 4. `T-400` と `T-401` / `T-402` は完了し、`T-500` / `T-501` / `T-502` で create/detail/index UI を direct-Docker 前提へ簡素化した
 5. 次は provider coupling cleanup を進める
-6. そのあとに request / acceptance / operations docs を厚くする
+6. そのあとに `mc-router` 実 service を含む ingress 疎通確認を追加する
+7. 最後に request / acceptance / operations docs を厚くする
