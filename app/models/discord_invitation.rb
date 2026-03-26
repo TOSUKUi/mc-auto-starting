@@ -12,6 +12,7 @@ class DiscordInvitation < ApplicationRecord
   validate :expires_at_is_in_future, on: :create
 
   scope :recent_first, -> { order(created_at: :desc, id: :desc) }
+  scope :active, -> { where(used_at: nil, revoked_at: nil).where("expires_at > ?", Time.current) }
 
   def self.issue!(invited_by:, discord_user_id:, expires_at:, note: nil)
     raw_token = SecureRandom.urlsafe_base64(TOKEN_BYTES)
@@ -28,6 +29,10 @@ class DiscordInvitation < ApplicationRecord
 
   def self.digest_token(raw_token)
     OpenSSL::Digest::SHA256.hexdigest(raw_token.to_s)
+  end
+
+  def self.find_by_raw_token(raw_token)
+    find_by(token_digest: digest_token(raw_token))
   end
 
   def status
@@ -58,6 +63,12 @@ class DiscordInvitation < ApplicationRecord
     return if revoked?
 
     update!(revoked_at: Time.current)
+  end
+
+  def consume!
+    return if used?
+
+    update!(used_at: Time.current)
   end
 
   private

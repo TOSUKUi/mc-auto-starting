@@ -89,4 +89,5 @@ This file tells any contributor or agent where to find authoritative information
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.
 - `T-1001` is complete: `users` now store Discord identity fields, OmniAuth Discord is wired into the app, and linked users can complete the Discord OAuth callback into a normal Rails session.
 - `T-1002` is complete: `discord_invitations` now stores digest-backed manual invite records, authenticated users can issue/revoke invites from `/discord-invitations`, and raw invite URLs are shown only at issuance time.
+- `T-1004` is complete: invite redemption now starts at `/invites/:token`, pending invite tokens are held in the Rails session, and Discord OAuth callbacks can create/link the invited user on first login.
 - Initial operator bootstrap should use `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed` to create the first Discord-linked user before invite-based onboarding takes over.

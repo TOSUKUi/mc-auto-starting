@@ -68,7 +68,7 @@
 | T-1001 | P9 | Add Discord identity fields and OAuth provider integration | T-1000,T-101 | done | Users can be resolved by Discord identity and Rails can complete the Discord OAuth callback |
 | T-1002 | P9 | Add manual invite-token model and issuance flow | T-1000,T-1001,T-106 | done | An authenticated operator can mint, view, revoke, and expire one-time invite URLs without sending email automatically |
 | T-1003 | P9 | Replace password login with Discord-only login entry | T-1001,T-1002,T-503,T-601 | todo | Login UI and session entry path no longer depend on local passwords or password reset screens |
-| T-1004 | P9 | Implement invite redemption and first-login account linking | T-1001,T-1002,T-107 | todo | Only invited Discord users can finish first login, and repeated logins resolve to the same local user safely |
+| T-1004 | P9 | Implement invite redemption and first-login account linking | T-1001,T-1002,T-107 | done | Only invited Discord users can finish first login, and repeated logins resolve to the same local user safely |
 | T-1005 | P9 | Define Discord bot trust boundary and command API contract | T-1000,T-106,T-402 | todo | Bot authentication, allowed commands, per-server authorization checks, and audit expectations are fixed before endpoint implementation |
 | T-1006 | P9 | Add Rails-side RCON client and server connection model | T-1000,T-200,T-400 | todo | Rails can connect to a managed server over RCON using app-managed configuration and timeout/error handling rules |
 | T-1007 | P9 | Implement bot-facing lifecycle and RCON command endpoints | T-1005,T-1006,T-402 | todo | Discord bot can invoke start/stop/restart/status plus bounded RCON actions through Rails APIs without bypassing policy checks |
@@ -128,3 +128,4 @@ The current critical path is:
 - `T-1001`: `users` now carry Discord identity fields, and Rails can complete a Discord OAuth callback to resolve already-linked users.
 - `T-1002`: manual invite issuance now uses digest-only stored tokens; the raw invite URL is shown only once when an authenticated user creates the invite from `/discord-invitations`.
 - Initial owner bootstrap is expected to use `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed` until the Discord-only login and invite redemption path is complete.
+- `T-1004`: invite redemption now begins at `/invites/:token`; a matching pending invite can create the first local user during the Discord OAuth callback, and mismatched or inactive invites are rejected.
