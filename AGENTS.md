@@ -122,7 +122,7 @@ Use these as the default command set.
 - `docker compose run --rm -p 3000:3000 -p 3036:3036 app bin/dev`
 - `docker compose run --rm app bin/rails test`
 
-- `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_SOCKET_GID` values used by Compose.
+- `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_GID` values used by Compose.
 - If the host user or Docker socket group differs, update `.env` before running Compose.
 Do not install Ruby gems on the host unless there is an explicit exception.
 Keep gems in `vendor/bundle` inside the workspace so the mapped app user can write them.

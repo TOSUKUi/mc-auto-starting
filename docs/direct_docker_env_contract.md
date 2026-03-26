@@ -34,9 +34,9 @@ This document fixes the initial environment and configuration contract for the d
   Optional operational endpoint for future router inspection or tooling.
 
 ## Compose Baseline
-- Local development should keep `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_SOCKET_GID` in the repository `.env` file so `docker compose up` uses the same user/group mapping consistently.
+- Local development should keep `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_GID` in the repository `.env` file so `docker compose up` uses the same user/group mapping consistently.
 - The Rails `app` service mounts `/var/run/docker.sock`.
-- The Rails `app` service should join the host Docker socket group via `group_add`, typically by passing `DOCKER_SOCKET_GID=$(stat -c '%g' /var/run/docker.sock)` to Compose.
+- The Rails `app` service should join the host Docker socket group via `group_add`, using the host Docker group GID from `DOCKER_GID`.
 - The Rails `app` service should export the direct-Docker defaults above unless deployment overrides them.
 - The Rails `app` service should leave `DOCKER_ENGINE_API_VERSION` unset unless the target daemon requires an explicit override.
 - The same `MINECRAFT_RUNTIME_NETWORK_NAME` value must be used by both Rails and the eventual `mc-router` service definition.
