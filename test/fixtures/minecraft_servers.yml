@@ -32,6 +32,6 @@ two:
   backend_host:
   backend_port:
   minecraft_version: 1.21.4
-  memory_mb: 6144
+  memory_mb: 4096
   disk_mb: 30720
   template_kind: velocity

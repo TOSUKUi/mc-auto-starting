@@ -127,7 +127,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
               name: "Creative Build",
               hostname: "Creative-Build",
               minecraft_version: "1.21.4",
-              memory_mb: 8192,
+              memory_mb: 4096,
               disk_mb: 40960,
             },
           }

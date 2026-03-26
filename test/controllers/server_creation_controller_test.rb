@@ -34,7 +34,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
           name: "Sky Lab",
           hostname: "  SKY-lab ",
           minecraft_version: "1.21.11",
-          memory_mb: 6144,
+          memory_mb: 4096,
           disk_mb: 40960,
         },
       }
@@ -52,5 +52,25 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "mc-server-sky-lab", server.fetch("runtime").fetch("container_name")
     assert_equal "mc-data-sky-lab", server.fetch("runtime").fetch("volume_name")
     assert_equal "paper", MinecraftServer.find(server.fetch("id")).template_kind
+  end
+
+  test "create rejects memory above 4gb and invalid hostname characters" do
+    sign_in_as(users(:one))
+
+    assert_no_difference("MinecraftServer.count") do
+      post servers_url(format: :json), params: {
+        minecraft_server: {
+          name: "Too Big",
+          hostname: "bad host",
+          minecraft_version: "1.21.11",
+          memory_mb: 4608,
+          disk_mb: 40960,
+        },
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes response.parsed_body.fetch("errors").fetch("hostname"), "Hostname must use lowercase letters, numbers, and internal hyphens only"
+    assert_includes response.parsed_body.fetch("errors").fetch("memory_mb"), "Memory mb must be less than or equal to 4096"
   end
 end

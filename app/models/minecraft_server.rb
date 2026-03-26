@@ -1,6 +1,8 @@
 class MinecraftServer < ApplicationRecord
   LEGACY_TEMPLATE_KIND = "paper"
   MANAGED_CONTAINER_PORT = 25_565
+  MIN_MEMORY_MB = 512
+  MAX_MEMORY_MB = 4096
 
   STATUS_TRANSITIONS = MinecraftServerStatus::TRANSITIONS
 
@@ -19,7 +21,12 @@ class MinecraftServer < ApplicationRecord
   validates :hostname, hostname_format: true, reserved_hostname: true
   validates :hostname, uniqueness: true
   validates :container_name, :volume_name, uniqueness: true
-  validates :memory_mb, :disk_mb, numericality: { only_integer: true, greater_than: 0 }
+  validates :memory_mb, numericality: {
+    only_integer: true,
+    greater_than_or_equal_to: MIN_MEMORY_MB,
+    less_than_or_equal_to: MAX_MEMORY_MB,
+  }
+  validates :disk_mb, numericality: { only_integer: true, greater_than: 0 }
   validate :status_transition_is_allowed, if: :will_save_change_to_status?
 
   def self.normalize_hostname(value)

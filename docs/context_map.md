@@ -77,7 +77,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
 - `T-500` is complete: create UI now exposes only the direct-Docker baseline inputs and the public connection preview contract.
 - `T-501` and `T-502` are complete: detail/index UI now center connection targets and publication data, while current active screens de-emphasize Docker backend identifiers.
-- `T-503` is in progress: operator-facing copy and layout polish are being moved further toward a Japanese-first, simpler presentation; the unused home page has been removed in favor of routing `/` to the server index, and the active app shell now uses a flat Minecraft-inspired dark theme.
+- `T-503` is in progress: operator-facing copy and layout polish are being moved further toward a Japanese-first, simpler presentation; the unused home page has been removed in favor of routing `/` to the server index, the active app shell now uses a flat Minecraft-inspired dark theme, and the server create form now caps memory at 4GB while blocking invalid hostname characters earlier.
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider inventory is documented, provider services/initializer/tests are removed, and create requests no longer expose provider-era template input.
 - `T-803` is complete: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline.
 - `compose.yaml` now defines a compose-managed `mc-router` service on the shared `mc_router_net` bridge network.

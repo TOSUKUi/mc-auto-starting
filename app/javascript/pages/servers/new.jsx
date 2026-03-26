@@ -1,9 +1,26 @@
-import { Alert, Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
+import { Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { IconInfoCircle, IconPlugConnected, IconSparkles } from '@tabler/icons-react'
+import { IconPlugConnected, IconSparkles } from '@tabler/icons-react'
+
+const MIN_MEMORY_MB = 512
+const MAX_MEMORY_MB = 4096
 
 function normalizeHostname(value) {
   return value.trim().toLowerCase()
+}
+
+function sanitizeHostnameInput(value) {
+  return value
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[^a-z0-9-]/g, '')
+    .slice(0, 63)
+}
+
+function clampMemory(value) {
+  if (!Number.isFinite(value)) return 0
+
+  return Math.min(MAX_MEMORY_MB, Math.max(MIN_MEMORY_MB, value))
 }
 
 function endpointPreview(hostname, publicEndpoint) {
@@ -56,7 +73,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                 </Group>
                 <Title order={1}>新しいサーバーを作成</Title>
                 <Text c="stone.3" maw={640}>
-                  プレイヤーに見せる名前と接続先を決めれば作成できます。技術的な設定はアプリ側で自動的に整えます。
+                  サーバー名、ホスト名、バージョンを決めて作成します。
                 </Text>
               </Stack>
 
@@ -81,7 +98,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
 
                   <TextInput
                     error={form.errors.name}
-                    description="一覧や詳細画面に出る名前です。あとで見てわかる名前にしてください。"
+                    description="一覧と詳細で表示する名前です。"
                     label="サーバー名"
                     onChange={(event) => form.setData('name', event.currentTarget.value)}
                     placeholder="みんなのサバイバル"
@@ -91,19 +108,22 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                   <TextInput
                     description={
                       hasTouchedHostname
-                        ? `使用されるホスト名: ${normalizedHostname || 'empty'}`
-                        : '半角英小文字・数字・ハイフンだけ使えます。'
+                        ? `使用するホスト名: ${normalizedHostname || '-'}`
+                        : '半角英小文字・数字・ハイフンのみ使えます。'
                     }
                     error={form.errors.hostname}
-                    label="アドレス名"
-                    onChange={(event) => form.setData('hostname', event.currentTarget.value)}
+                    inputMode="url"
+                    label="ホスト名"
+                    maxLength={63}
+                    onChange={(event) => form.setData('hostname', sanitizeHostnameInput(event.currentTarget.value))}
+                    pattern="[a-z0-9-]+"
                     placeholder="main-survival"
                     required
                     value={form.data.hostname}
                   />
                   <Select
                     data={minecraft_version_options}
-                    description="使う Paper イメージのタグを選びます。"
+                    description="起動する Minecraft バージョンです。"
                     error={form.errors.minecraft_version}
                     label="Minecraft バージョン"
                     onChange={(value) => form.setData('minecraft_version', value || '')}
@@ -111,26 +131,23 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                     value={form.data.minecraft_version}
                   />
                   <Divider label="起動設定" labelPosition="center" />
-                  <Text c="dimmed" size="sm">
-                    初期作成で調整できるのはメモリだけです。細かい内部設定は自動で管理されます。
-                  </Text>
                   <Grid gutter="md">
                     <Grid.Col span={{ base: 12 }}>
                       <NumberInput
                         allowDecimal={false}
                         error={form.errors.memory_mb}
+                        hideControls
                         label="メモリ (MB)"
-                        min={512}
-                        onChange={(value) => form.setData('memory_mb', value || 0)}
+                        max={MAX_MEMORY_MB}
+                        min={MIN_MEMORY_MB}
+                        onChange={(value) => form.setData('memory_mb', clampMemory(Number(value)))}
                         required
+                        step={512}
                         thousandSeparator=","
                         value={form.data.memory_mb}
                       />
                     </Grid.Col>
                   </Grid>
-                  <Alert color="blue" icon={<IconInfoCircle size={16} />} radius="md" variant="light">
-                    作成後すぐに共有できるよう、公開アドレスまでまとめて準備します。
-                  </Alert>
 
                   <Divider label="作成内容の確認" labelPosition="center" />
                   <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
@@ -140,7 +157,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                           <Text c="dimmed" fw={700} size="xs" tt="uppercase">
                             {item.label}
                           </Text>
-                          <Text fw={800} size="lg">
+                          <Text fw={800} size="lg" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                             {item.value}
                           </Text>
                         </Stack>
@@ -175,7 +192,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                     <Title order={3}>接続先プレビュー</Title>
                   </Group>
                   <Text c="dimmed" size="sm">
-                    Minecraft のサーバーアドレスに入力する内容
+                    Minecraft で入力する接続先
                   </Text>
                   <Paper p="md" radius="lg" style={{ background: 'rgba(25, 135, 84, 0.08)' }} withBorder>
                     <Stack gap={3}>
@@ -201,14 +218,6 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                       ドメイン <Code>{public_endpoint.public_domain}</Code>
                     </Text>
                   </Stack>
-                </Stack>
-              </Paper>
-
-              <Paper p="lg" radius="lg" shadow="sm" withBorder>
-                <Stack gap="sm">
-                  <Alert color="blue" icon={<IconInfoCircle size={16} />} radius="md" variant="light">
-                    内部の実行環境は自動で管理されます。ここではプレイヤー向けの名前と接続先だけ気にすれば十分です。
-                  </Alert>
                 </Stack>
               </Paper>
             </Stack>

@@ -195,6 +195,7 @@ export default function ServersIndex({ servers, summary }) {
                           fw={700}
                           renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />}
                           size="lg"
+                          style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
                         >
                           {server.name}
                         </Text>
@@ -208,7 +209,7 @@ export default function ServersIndex({ servers, summary }) {
                       <Text c="dimmed" size="sm">
                         共有アドレス
                       </Text>
-                      <Text fw={700} size="lg" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                      <Text fw={700} size="lg" style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                         {server.connection_target}
                       </Text>
                     </Stack>
@@ -234,7 +235,7 @@ export default function ServersIndex({ servers, summary }) {
                         <Text c="dimmed" fw={700} size="xs" tt="uppercase">
                           オーナー
                         </Text>
-                        <Text fw={700}>{server.owner_email_address}</Text>
+                        <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.owner_email_address}</Text>
                       </Stack>
                     </Paper>
                     <Paper p="md" radius="lg" withBorder>

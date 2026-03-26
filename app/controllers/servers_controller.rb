@@ -173,7 +173,7 @@ class ServersController < InertiaController
         name: "",
         hostname: "",
         minecraft_version: MinecraftRuntime.default_version_tag,
-        memory_mb: 4096,
+        memory_mb: MinecraftServer::MAX_MEMORY_MB,
         disk_mb: 20480,
       }
     end

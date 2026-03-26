@@ -95,8 +95,8 @@ export default function ServersShow({ server }) {
                   </ThemeIcon>
                   <Text c="stone.5" fw={700} size="sm" tt="uppercase">Server Detail</Text>
                 </Group>
-                <Title order={1}>{server.name}</Title>
-                <Text c="stone.3" size="md" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                <Title order={1} style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.name}</Title>
+                <Text c="stone.3" size="md" style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                   {server.connection_target}
                 </Text>
                 <Group gap="xs">
@@ -163,7 +163,7 @@ export default function ServersShow({ server }) {
                     </ThemeIcon>
                     <Text fw={700}>接続先</Text>
                   </Group>
-                  <Code block>{server.connection_target}</Code>
+                  <Code block style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{server.connection_target}</Code>
                 </Stack>
               </Paper>
 

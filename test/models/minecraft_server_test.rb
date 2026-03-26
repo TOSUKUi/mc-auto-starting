@@ -157,7 +157,15 @@ class MinecraftServerTest < ActiveSupport::TestCase
     server.disk_mb = -1
 
     assert_not server.valid?
-    assert_includes server.errors[:memory_mb], "must be greater than 0"
+    assert_includes server.errors[:memory_mb], "must be greater than or equal to 512"
     assert_includes server.errors[:disk_mb], "must be greater than 0"
+  end
+
+  test "rejects memory above the supported limit" do
+    server = minecraft_servers(:one)
+    server.memory_mb = 4608
+
+    assert_not server.valid?
+    assert_includes server.errors[:memory_mb], "must be less than or equal to 4096"
   end
 end
