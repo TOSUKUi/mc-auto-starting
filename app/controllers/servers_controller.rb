@@ -166,7 +166,6 @@ class ServersController < InertiaController
           [],
         ),
         minecraft_version_options_by_runtime_family: minecraft_version_options_by_runtime_family,
-        minecraft_version_source_urls: MinecraftRuntime.version_source_urls,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,

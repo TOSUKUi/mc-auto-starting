@@ -1,4 +1,4 @@
-import { Anchor, Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
+import { Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
 import { useEffect } from 'react'
 import { IconPlugConnected, IconSparkles } from '@tabler/icons-react'
@@ -44,13 +44,12 @@ function runtimeFamilyDescription(value) {
   return 'paper は、最新のバージョンに対応していない場合があるが、高速なサーバー。'
 }
 
-export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, minecraft_version_source_urls, public_endpoint }) {
+export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const minecraftVersionOptions = minecraft_version_options_by_runtime_family[form.data.runtime_family] || []
-  const selectedVersionSourceUrl = minecraft_version_source_urls[form.data.runtime_family]
   const resourceHints = [
     { label: '種類', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
     { label: 'バージョン', value: form.data.minecraft_version },
@@ -153,16 +152,7 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
                   />
                   <Select
                     data={minecraftVersionOptions}
-                    description={
-                      <>
-                        起動する Minecraft バージョンです。{' '}
-                        {selectedVersionSourceUrl ? (
-                          <Anchor href={selectedVersionSourceUrl} target="_blank" rel="noreferrer">
-                            候補ソースを見る
-                          </Anchor>
-                        ) : null}
-                      </>
-                    }
+                    description="起動する Minecraft バージョンです。"
                     error={form.errors.minecraft_version}
                     label="Minecraft バージョン"
                     onChange={(value) => form.setData('minecraft_version', value || '')}
