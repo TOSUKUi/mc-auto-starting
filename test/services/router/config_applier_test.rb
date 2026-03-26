@@ -17,6 +17,24 @@ class Router::ConfigApplierTest < ActiveSupport::TestCase
     end
   end
 
+  test "signals the compose-managed router when docker-signal reload is configured" do
+    Dir.mktmpdir do |dir|
+      config_path = File.join(dir, "routes.json")
+      configuration = Router::Configuration.new(
+        routes_config_path: config_path,
+        reload_strategy: "docker_signal",
+        reload_container_labels: [ "app.kubos.dev/component=mc-router" ],
+      )
+      reloader = Object.new
+      reloader.define_singleton_method(:call) { true }
+
+      result = Router::ConfigApplier.new(configuration: configuration, mc_router_reloader: reloader).call(routes: [ router_routes(:one) ])
+
+      assert_equal "docker_signal", result.reload_strategy
+      assert_equal true, result.reloaded
+    end
+  end
+
   test "watch mode rewrites the existing config file in place" do
     Dir.mktmpdir do |dir|
       config_path = File.join(dir, "routes.json")

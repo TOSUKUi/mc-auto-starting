@@ -264,5 +264,5 @@
 2. Docker socket の compose 方針を固める
 3. `T-303` と `T-304` は完了
 4. `T-400` と `T-401` / `T-402` は完了し、`T-500` / `T-501` / `T-502` で create/detail/index UI を direct-Docker 前提へ簡素化した
-5. 次は `mc-router` の live route reload を安定化する
-6. そのあとに request / acceptance / operations docs を厚くする
+5. `mc-router` の live route reload は `SIGHUP` ベースで安定化済み
+6. 次は request / acceptance / operations docs を厚くする

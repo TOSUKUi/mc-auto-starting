@@ -7,8 +7,9 @@ module Router
   class ConfigApplier
     ApplyResult = Data.define(:path, :reload_strategy, :reloaded)
 
-    def initialize(configuration: Router.config)
+    def initialize(configuration: Router.config, mc_router_reloader: nil)
       @configuration = configuration
+      @mc_router_reloader = mc_router_reloader || Router::McRouterReloader.new(configuration: configuration)
     end
 
     def call(routes:)
@@ -25,7 +26,7 @@ module Router
     end
 
     private
-      attr_reader :configuration
+      attr_reader :configuration, :mc_router_reloader
 
       def write_config(rendered_config)
         path = Pathname.new(configuration.routes_config_path)
@@ -54,6 +55,7 @@ module Router
 
       def trigger_reload
         return true if configuration.watch?
+        return mc_router_reloader.call if configuration.docker_signal?
         return false if configuration.manual?
 
         stdout, stderr, status = Open3.capture3(*Shellwords.split(configuration.reload_command))

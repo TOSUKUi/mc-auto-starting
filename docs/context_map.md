@@ -79,5 +79,5 @@ This file tells any contributor or agent where to find authoritative information
 - `T-803` is complete: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline.
 - `compose.yaml` now defines a compose-managed `mc-router` service on the shared `mc_router_net` bridge network.
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
-- The current remaining router gap is live route reload on bind-mounted config changes; `mc-router` restart reloads correctly, but file-watch pickup still needs follow-up.
-- The next implementation critical path starts at `T-805`.
+- `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
+- The next implementation critical path starts at `T-900`.

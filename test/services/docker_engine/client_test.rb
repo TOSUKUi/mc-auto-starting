@@ -30,6 +30,25 @@ class DockerEngine::ClientTest < ActiveSupport::TestCase
     assert_equal [ "app=mc-auto-starting", "managed_by=rails", "minecraft_server_id=1" ], filters.fetch("label")
   end
 
+  test "lists containers with raw filters" do
+    connection = FakeConnection.new(
+      responses: [ DockerEngine::Response.new(status: 200, headers: {}, body: [ { "Id" => "router-123" } ]) ],
+      requests: [],
+    )
+
+    result = DockerEngine::Client.new(configuration: @configuration, connection: connection).list_containers(
+      filters: { label: [ "app.kubos.dev/component=mc-router" ] },
+      all: false,
+    )
+
+    request = connection.requests.fetch(0)
+
+    assert_equal [ { "Id" => "router-123" } ], result
+    assert_equal "/containers/json", request.fetch(:path)
+    assert_equal 0, request.fetch(:query).fetch(:all)
+    assert_equal [ "app.kubos.dev/component=mc-router" ], JSON.parse(request.fetch(:query).fetch(:filters)).fetch("label")
+  end
+
   test "creates managed volumes with merged labels" do
     connection = FakeConnection.new(
       responses: [ DockerEngine::Response.new(status: 201, headers: {}, body: { "Name" => "mc-data-main-survival" }) ],
@@ -108,5 +127,23 @@ class DockerEngine::ClientTest < ActiveSupport::TestCase
     assert_equal({ t: 15 }, connection.requests.fetch(0).fetch(:query))
     assert_equal({ t: 30 }, connection.requests.fetch(1).fetch(:query))
     assert_equal({ force: 1 }, connection.requests.fetch(2).fetch(:query))
+  end
+
+  test "sends signals to containers through the engine" do
+    connection = FakeConnection.new(
+      responses: [ DockerEngine::Response.new(status: 204, headers: {}, body: nil) ],
+      requests: [],
+    )
+
+    result = DockerEngine::Client.new(configuration: @configuration, connection: connection).signal_container(
+      id: "router-123",
+      signal: "HUP",
+    )
+
+    request = connection.requests.fetch(0)
+
+    assert_equal true, result
+    assert_equal "/containers/router-123/kill", request.fetch(:path)
+    assert_equal({ signal: "HUP" }, request.fetch(:query))
   end
 end

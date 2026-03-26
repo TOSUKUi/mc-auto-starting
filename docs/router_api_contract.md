@@ -37,27 +37,30 @@ This document fixes the initial mc-router integration contract for Phase 4 tasks
   This preserves the project requirement that unknown hostnames must be rejected.
 - Each mapping key is the normalized public FQDN generated from `MinecraftServer#fqdn`.
 - Each mapping value is the app-managed Minecraft container backend target in `container_name:25565` form.
-- Initial reload strategy is file-watch driven:
-  - mc-router should run with `ROUTES_CONFIG_WATCH=true`
-  - Rails writes the config atomically
-  - the file change itself is the reload trigger
-- Optional fallback strategies may be configured later:
-  - explicit reload command after write
-  - operational use of the REST API for inspection or emergency intervention
+- The active reload strategy is explicit `SIGHUP` after each Rails write:
+  - Rails writes the full JSON config file
+  - Rails resolves the compose-managed `mc-router` container by Docker labels
+  - Rails sends `SIGHUP` so `mc-router` re-loads the file immediately
+- `ROUTES_CONFIG_WATCH=true` remains an upstream capability, but it is not the active local strategy because bind-mounted file-watch pickup was unreliable in this environment.
+- The compose-managed `mc-router` container should carry a stable label such as `app.kubos.dev/component=mc-router` so Rails can resolve it without depending on a generated container name.
 
 ## Rails Configuration Contract
 - `MC_ROUTER_ROUTES_CONFIG_PATH`
   Absolute or app-visible path to the rendered routes JSON file.
 - `MC_ROUTER_RELOAD_STRATEGY`
-  One of `watch`, `command`, `manual`.
+  One of `watch`, `command`, `docker_signal`, `manual`.
 - `MC_ROUTER_RELOAD_COMMAND`
   Required only when `MC_ROUTER_RELOAD_STRATEGY=command`.
+- `MC_ROUTER_RELOAD_SIGNAL`
+  Signal name sent when `MC_ROUTER_RELOAD_STRATEGY=docker_signal`. Default: `HUP`.
+- `MC_ROUTER_RELOAD_CONTAINER_LABELS`
+  Comma-separated Docker label filters that uniquely resolve the compose-managed `mc-router` container when `MC_ROUTER_RELOAD_STRATEGY=docker_signal`.
 - `MC_ROUTER_API_URL`
   Optional future-facing base URL for router inspection or operational tooling.
 
 ## Implementation Notes
 - `T-401` builds one route definition from `RouterRoute` + `MinecraftServer`.
 - `T-402` renders the whole config as deterministic JSON with sorted mappings.
-- `T-403` writes the config atomically and triggers reload according to the configured strategy.
+- `T-403` writes the config file and triggers reload according to the configured strategy.
 - Disabled routes are omitted from the rendered config.
 - Enabled routes without a resolved container-name backend are treated as invalid input and should fail fast.

@@ -23,7 +23,9 @@ services:
       MINECRAFT_RUNTIME_IMAGE: ${MINECRAFT_RUNTIME_IMAGE:-marctv/minecraft-papermc-server}
       MINECRAFT_RUNTIME_NETWORK_NAME: mc_router_net
       MC_ROUTER_ROUTES_CONFIG_PATH: /app/tmp/mc-router/routes.json
-      MC_ROUTER_RELOAD_STRATEGY: watch
+      MC_ROUTER_RELOAD_STRATEGY: docker_signal
+      MC_ROUTER_RELOAD_SIGNAL: HUP
+      MC_ROUTER_RELOAD_CONTAINER_LABELS: app.kubos.dev/component=mc-router
     ports:
       - "3000:3000"
       - "3036:3036"
@@ -39,10 +41,11 @@ services:
 
   mc-router:
     image: ${MC_ROUTER_IMAGE:-itzg/mc-router}
+    labels:
+      app.kubos.dev/component: mc-router
     environment:
       PORT: 25565
       ROUTES_CONFIG: /config/routes.json
-      ROUTES_CONFIG_WATCH: "true"
     volumes:
       - ./tmp/mc-router:/config
     ports:

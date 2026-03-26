@@ -27,11 +27,15 @@ This document fixes the initial environment and configuration contract for the d
 - `MC_ROUTER_ROUTES_CONFIG_PATH`
   App-visible path where Rails writes the full desired `mc-router` routes JSON. Default: `tmp/mc-router/routes.json` under the app root.
 - `MC_ROUTER_RELOAD_STRATEGY`
-  Router reload mode after config write. Allowed values: `watch`, `command`, `manual`. Default: `watch`.
+  Router reload mode after config write. Allowed values: `watch`, `command`, `docker_signal`, `manual`. Default: `docker_signal`.
 
 ## Conditionally Required Configuration
 - `MC_ROUTER_RELOAD_COMMAND`
   Required when `MC_ROUTER_RELOAD_STRATEGY=command`.
+- `MC_ROUTER_RELOAD_SIGNAL`
+  Required when `MC_ROUTER_RELOAD_STRATEGY=docker_signal`. Default: `HUP`.
+- `MC_ROUTER_RELOAD_CONTAINER_LABELS`
+  Required when `MC_ROUTER_RELOAD_STRATEGY=docker_signal`. Comma-separated Docker label filters that uniquely identify the compose-managed `mc-router` container.
 - `MC_ROUTER_API_URL`
   Optional operational endpoint for future router inspection or tooling.
 
@@ -39,6 +43,7 @@ This document fixes the initial environment and configuration contract for the d
 - Local development should keep `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_GID` in the repository `.env` file so `docker compose up` uses the same user/group mapping consistently.
 - The Rails `app` service mounts `/var/run/docker.sock`.
 - `mc-router` is expected to be a compose-managed sibling service, not a container created by Rails.
+- The `mc-router` compose service should carry a stable label such as `app.kubos.dev/component=mc-router` so Rails can target reloads without relying on generated container names.
 - The `mc-router` compose service should publish `${MINECRAFT_PUBLIC_PORT}:25565` and read the shared routes file via a bind mount such as `./tmp/mc-router:/config`.
 - The shared `MINECRAFT_RUNTIME_NETWORK_NAME` network is treated as an external named bridge network so compose-managed `mc-router` can join the same network as Rails-created Minecraft containers.
 - The Rails `app` service should join the host Docker group via `group_add`, using the host Docker group GID from `DOCKER_GID`.
@@ -46,7 +51,7 @@ This document fixes the initial environment and configuration contract for the d
 - The Rails `app` service should export the direct-Docker defaults above unless deployment overrides them.
 - The Rails `app` service should leave `DOCKER_ENGINE_API_VERSION` unset unless the target daemon requires an explicit override.
 - The same `MINECRAFT_RUNTIME_NETWORK_NAME` value must be used by both Rails and the eventual `mc-router` service definition.
-- On the current local bind-mount setup, `mc-router` reliably reloads the generated routes on process start, but live file-watch pickup of Rails rewrites still needs follow-up work.
+- On the current local bind-mount setup, live file-watch pickup was unreliable, so the active baseline is explicit `SIGHUP` reload against the compose-managed `mc-router` container after each config write.
 
 ## App Usage Contract
 - `MinecraftPublicEndpoint` is the single source of truth for public FQDN and connection-target formatting.

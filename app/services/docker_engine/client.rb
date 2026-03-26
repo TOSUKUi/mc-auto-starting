@@ -24,6 +24,17 @@ module DockerEngine
       connection.request(method: :get, path: "/volumes/#{escape_path(name)}").body
     end
 
+    def list_containers(filters: {}, all: true)
+      connection.request(
+        method: :get,
+        path: "/containers/json",
+        query: {
+          all: all ? 1 : 0,
+          filters: JSON.generate(normalize_filters(filters)),
+        },
+      ).body
+    end
+
     def list_managed_containers(filters: {})
       merged_filters = normalize_filters(filters)
       managed_labels = Array(merged_filters["label"]) + ManagedLabels.filter.fetch("label")
@@ -77,6 +88,14 @@ module DockerEngine
           memory_mb: memory_mb,
         ),
       ).body
+    end
+
+    def signal_container(id:, signal:)
+      connection.request(
+        method: :post,
+        path: "/containers/#{escape_path(id)}/kill",
+        query: { signal: signal.to_s },
+      ).status == 204
     end
 
     def start_container(id:)
