@@ -1,6 +1,6 @@
 import { Alert, Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { IconInfoCircle, IconPlugConnected, IconServer2 } from '@tabler/icons-react'
+import { IconInfoCircle, IconPlugConnected, IconSparkles } from '@tabler/icons-react'
 
 function normalizeHostname(value) {
   return value.trim().toLowerCase()
@@ -44,7 +44,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
           shadow="sm"
           style={{
             background:
-              'linear-gradient(135deg, rgba(13,110,253,0.10) 0%, rgba(25,135,84,0.08) 42%, rgba(248,249,250,0.95) 100%)',
+              'linear-gradient(135deg, rgba(14,116,144,0.08) 0%, rgba(255,255,255,0.7) 44%, rgba(226,244,233,0.95) 100%)',
           }}
           withBorder
         >
@@ -52,15 +52,14 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
             <Group align="flex-start" justify="space-between" wrap="wrap">
               <Stack gap={6}>
                 <Group gap="xs">
-                  <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
-                    <IconServer2 size={18} />
+                  <ThemeIcon color="teal" radius="xl" size={36} variant="light">
+                    <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Direct Docker</Text>
+                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">New Server</Text>
                 </Group>
                 <Title order={1}>新しいサーバーを作成</Title>
                 <Text c="dimmed" maw={640}>
-                  この画面では、単一ホスト上の Paper サーバーを 1 台作成します。作成後は Docker 上で起動し、同じ bridge network 上の
-                  `mc-router` がホスト名で振り分けます。
+                  プレイヤーに見せる名前と接続先を決めれば作成できます。技術的な設定はアプリ側で自動的に整えます。
                 </Text>
               </Stack>
 
@@ -116,7 +115,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                   />
                   <Divider label="起動設定" labelPosition="center" />
                   <Text c="dimmed" size="sm">
-                    初期作成で調整できるのはメモリだけです。ディスクやコンテナの詳細は app 側の管理値で固定します。
+                    初期作成で調整できるのはメモリだけです。細かい内部設定は自動で管理されます。
                   </Text>
                   <Grid gutter="md">
                     <Grid.Col span={{ base: 12 }}>
@@ -133,7 +132,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                     </Grid.Col>
                   </Grid>
                   <Alert color="blue" icon={<IconInfoCircle size={16} />} radius="md" variant="light">
-                    作成時には Paper イメージを使い、managed volume と managed container を自動作成します。
+                    作成後すぐに共有できるよう、公開アドレスまでまとめて準備します。
                   </Alert>
 
                   <Divider label="作成内容の確認" labelPosition="center" />
@@ -194,7 +193,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                   </Paper>
                   <Stack gap={6}>
                     <Text size="sm">
-                      FQDN{' '}
+                      アドレス{' '}
                       <Code style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'normal' }}>
                         {preview?.fqdn ?? 'hostname.mc.tosukui.xyz'}
                       </Code>
@@ -212,7 +211,7 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
               <Paper p="lg" radius="lg" shadow="sm" withBorder>
                 <Stack gap="sm">
                   <Alert color="blue" icon={<IconInfoCircle size={16} />} radius="md" variant="light">
-                    コンテナ名や volume 名は app が自動採番します。ここではプレイヤーに見せる名前と接続先だけを決めれば十分です。
+                    内部の実行環境は自動で管理されます。ここではプレイヤー向けの名前と接続先だけ気にすれば十分です。
                   </Alert>
                 </Stack>
               </Paper>

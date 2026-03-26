@@ -8,7 +8,7 @@ import {
   IconPlayerPlay,
   IconRefresh,
   IconRoute2,
-  IconServer2,
+  IconSparkles,
   IconTrash,
   IconUsers,
   IconWorldWww,
@@ -93,14 +93,14 @@ export default function ServersShow({ server }) {
                   </Group>
                 </Text>
                 <Group gap="xs">
-                  <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
-                    <IconServer2 size={18} />
+                  <ThemeIcon color="teal" radius="xl" size={36} variant="light">
+                    <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Direct Docker</Text>
+                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Server Detail</Text>
                 </Group>
                 <Title order={1}>{server.name}</Title>
-                <Text c="dimmed" size="md">
-                  {server.fqdn}
+                <Text c="dimmed" size="md" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                  {server.connection_target}
                 </Text>
                 <Group gap="xs">
                   <Badge color="blue" variant="light">
@@ -110,10 +110,10 @@ export default function ServersShow({ server }) {
                     {labelize(server.status)}
                   </Badge>
                   <Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">
-                    Route {labelize(server.route.last_apply_status)}
+                    {server.route.enabled ? '公開中' : '非公開'}
                   </Badge>
                   <Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">
-                    Health {labelize(server.route.last_healthcheck_status)}
+                    応答 {labelize(server.route.last_healthcheck_status)}
                   </Badge>
                 </Group>
               </Stack>
@@ -164,7 +164,7 @@ export default function ServersShow({ server }) {
                     <ThemeIcon color="blue" radius="xl" size={28} variant="light">
                       <IconWorldWww size={15} />
                     </ThemeIcon>
-                  <Text fw={700}>接続先</Text>
+                    <Text fw={700}>接続先</Text>
                   </Group>
                   <Code block>{server.connection_target}</Code>
                 </Stack>
@@ -178,7 +178,7 @@ export default function ServersShow({ server }) {
                     </ThemeIcon>
                     <Text fw={700}>公開状態</Text>
                   </Group>
-                  <Text fw={600}>{server.route.enabled ? '有効' : '無効'}</Text>
+                  <Text fw={600}>{server.route.enabled ? 'プレイヤーから接続できます' : '現在は公開されていません'}</Text>
                 </Stack>
               </Paper>
 
@@ -188,9 +188,9 @@ export default function ServersShow({ server }) {
                     <ThemeIcon color="teal" radius="xl" size={28} variant="light">
                       <IconActivityHeartbeat size={15} />
                     </ThemeIcon>
-                    <Text fw={700}>コンテナ</Text>
+                    <Text fw={700}>最終起動</Text>
                   </Group>
-                  <Code block>{server.runtime.backend ?? 'provisioning pending'}</Code>
+                  <Text fw={600}>{formatTimestamp(server.last_started_at)}</Text>
                 </Stack>
               </Paper>
             </SimpleGrid>
@@ -207,14 +207,13 @@ export default function ServersShow({ server }) {
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
               <Stack gap="md">
-                <Text fw={700}>サーバー概要</Text>
+                <Text fw={700}>サーバー情報</Text>
                 <Divider />
-                <DetailLine label="FQDN" value={<Code>{server.fqdn}</Code>} />
+                <DetailLine label="接続先" value={<Code>{server.connection_target}</Code>} />
+                <DetailLine label="アドレス" value={<Code>{server.fqdn}</Code>} />
                 <DetailLine label="Minecraft バージョン" value={<Code>{server.minecraft_version}</Code>} />
-                <DetailLine label="Container Name" value={<Code>{server.runtime.container_name}</Code>} />
-                <DetailLine label="Container ID" value={<Code>{server.runtime.container_id ?? '未割り当て'}</Code>} />
-                <DetailLine label="Volume Name" value={<Code>{server.runtime.volume_name}</Code>} />
-                <DetailLine label="Container State" value={<Code>{server.runtime.container_state ?? 'unknown'}</Code>} />
+                <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{server.access_role}</Badge>} />
+                <DetailLine label="現在の状態" value={<Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">{labelize(server.status)}</Badge>} />
                 <DetailLine label="最終起動" value={formatTimestamp(server.last_started_at)} />
               </Stack>
             </Paper>
@@ -225,8 +224,8 @@ export default function ServersShow({ server }) {
               <Stack gap="md">
                 <Text fw={700}>公開情報</Text>
                 <Divider />
-                <DetailLine label="Apply Status" value={<Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">{labelize(server.route.last_apply_status)}</Badge>} />
-                <DetailLine label="Health Status" value={<Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">{labelize(server.route.last_healthcheck_status)}</Badge>} />
+                <DetailLine label="公開状態" value={<Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">{server.route.enabled ? '公開中' : '非公開'}</Badge>} />
+                <DetailLine label="応答状態" value={<Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">{labelize(server.route.last_healthcheck_status)}</Badge>} />
                 <DetailLine label="公開" value={server.route.enabled ? '有効' : '無効'} />
                 <DetailLine label="最終反映" value={formatTimestamp(server.route.last_applied_at)} />
                 <DetailLine label="最終ヘルスチェック" value={formatTimestamp(server.route.last_healthchecked_at)} />

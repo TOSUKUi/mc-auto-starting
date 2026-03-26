@@ -48,7 +48,7 @@
 | T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | done | Create UI exposes only the fields needed for single-host Docker provisioning while keeping hostname/FQDN guidance |
 | T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | done | Detail UI shows connection target, container/runtime info, and router publication instead of provider info |
 | T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | done | Index UI reflects FQDN-based connection targets and container status cleanly |
-| T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | todo | Default operator-facing copy is Japanese across the active screens |
+| T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | in_progress | Default operator-facing copy is Japanese across the active screens |
 | T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
 | T-601 | P5 | Build login page | T-100,T-004 | done | UI login works |
 | T-700 | P6 | Remove provider coupling from app services | T-400,T-401,T-402 | done | Direct-Docker implementation no longer depends on execution-provider services |
@@ -108,6 +108,7 @@ The current critical path is:
 - `T-500`: create page props are reduced to the direct-Docker baseline form fields and connection preview metadata, dropping fixed runtime/template display props from the controller contract.
 - `T-501`: detail page now centers public connection target, router publication state, Docker runtime identifiers, and lifecycle actions without fixed template/provider framing.
 - `T-502`: index page now summarizes public connection targets plus container/router state, and no longer depends on backend-oriented runtime labels from the listing payload.
+- `T-503`: layout/create/index/detail copy is being shifted further toward Japanese, and active server screens now hide Docker backend identifiers behind simpler player-facing status and connection language.
 - `T-205`: legacy provider dependency inventory now lives in `docs/provider_cleanup_inventory.md`.
 - `T-700` / `T-702`: provider service classes, initializer, and dedicated provider tests are removed from the active code path.
 - `T-703`: controller create flow no longer accepts or injects provider-era template input; `template_kind` is retained only as internal schema debt for now.

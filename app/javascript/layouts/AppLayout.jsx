@@ -1,4 +1,4 @@
-import { Alert, AppShell, Badge, Box, Burger, Button, Container, Group, NavLink, Paper, Stack, Text, Title } from '@mantine/core'
+import { Alert, AppShell, Box, Burger, Button, Container, Group, NavLink, Paper, Stack, Text, Title } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { Head, Link, router, usePage } from '@inertiajs/react'
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-react'
@@ -18,6 +18,21 @@ export default function AppLayout({ children }) {
         padding={{ base: 'md', sm: 'lg' }}
         header={{ height: { base: 72, sm: 88 } }}
         navbar={{ width: 260, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+        styles={{
+          main: {
+            background: 'linear-gradient(180deg, #f8fafc 0%, #eef4f7 100%)',
+            minHeight: '100vh',
+          },
+          header: {
+            background: 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(10px)',
+            borderBottom: '1px solid #d9e3ea',
+          },
+          navbar: {
+            background: '#f5f8fb',
+            borderRight: '1px solid #d9e3ea',
+          },
+        }}
       >
         <AppShell.Header>
           <Container h="100%" size="lg">
@@ -26,18 +41,15 @@ export default function AppLayout({ children }) {
                 <Burger aria-label="Toggle navigation" hiddenFrom="sm" opened={opened} onClick={toggle} size="sm" />
                 <Stack gap={0}>
                   <Title order={3} size="h4">
-                    Minecraft Server Control Plane
+                    Minecraft Servers
                   </Title>
                   <Text c="dimmed" size="sm" visibleFrom="sm">
-                    Single-port publishing with mc-router
+                    サーバーの作成と公開先をまとめて管理
                   </Text>
                 </Stack>
               </Group>
 
               <Group gap="sm" wrap="nowrap">
-                <Badge color="teal" radius="sm" variant="light" visibleFrom="sm">
-                  Authenticated
-                </Badge>
                 <Paper px={{ base: 'sm', sm: 'md' }} py={8} radius="xl" withBorder>
                   <Group gap="sm" wrap="nowrap">
                     <Box visibleFrom="sm">
@@ -67,7 +79,10 @@ export default function AppLayout({ children }) {
         </AppShell.Header>
 
         <AppShell.Navbar p="md">
-          <Stack gap="xs">
+          <Stack gap="md">
+            <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+              Navigation
+            </Text>
             {navigation.map((item) => (
               <NavLink
                 key={item.href}
@@ -76,6 +91,14 @@ export default function AppLayout({ children }) {
                 label={item.name}
                 onClick={close}
                 renderRoot={(props) => <Link {...props} href={item.href} />}
+                styles={{
+                  root: {
+                    borderRadius: '14px',
+                  },
+                  label: {
+                    fontWeight: 600,
+                  },
+                }}
               />
             ))}
           </Stack>

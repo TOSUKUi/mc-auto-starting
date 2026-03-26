@@ -2,20 +2,17 @@ import {
   Badge,
   Button,
   Card,
-  Code,
-  Divider,
   Group,
   Paper,
   SimpleGrid,
   Stack,
-  Table,
   Text,
   TextInput,
   ThemeIcon,
   Title,
 } from '@mantine/core'
 import { Head, Link } from '@inertiajs/react'
-import { IconAlertTriangle, IconSearch, IconServer2, IconWorldWww } from '@tabler/icons-react'
+import { IconAlertTriangle, IconSearch, IconServer2, IconSparkles } from '@tabler/icons-react'
 import { useState } from 'react'
 
 const STATUS_COLORS = {
@@ -61,19 +58,8 @@ function formatTimestamp(value) {
 }
 
 function routeLabel(route) {
-  return `${labelize(route.last_apply_status)} / ${labelize(route.last_healthcheck_status)}`
-}
-
-function runtimeLabel(runtime) {
-  if (runtime.container_state) {
-    return labelize(runtime.container_state)
-  }
-
-  if (runtime.container_id || runtime.container_name) {
-    return 'Provisioned'
-  }
-
-  return 'Provisioning Pending'
+  const applyLabel = route.enabled ? '公開中' : '非公開'
+  return `${applyLabel} / ${labelize(route.last_healthcheck_status)}`
 }
 
 function needsAttention(server) {
@@ -82,15 +68,17 @@ function needsAttention(server) {
 
 function StatCard({ label, value, tone = 'gray' }) {
   return (
-    <Card padding="lg" radius="lg" withBorder>
-      <Stack gap={6}>
+    <Card padding="lg" radius="xl" withBorder>
+      <Stack gap={4}>
         <Text c="dimmed" fw={600} size="xs" tt="uppercase">
           {label}
         </Text>
         <Text fw={800} size="2rem">
           {value}
         </Text>
-        <Divider color={`${tone}.2`} />
+        <Text c={`${tone}.6`} size="sm">
+          現在の表示
+        </Text>
       </Stack>
     </Card>
   )
@@ -125,7 +113,7 @@ export default function ServersIndex({ servers, summary }) {
           shadow="sm"
           style={{
             background:
-              'linear-gradient(135deg, rgba(11,106,136,0.08) 0%, rgba(84,160,255,0.05) 48%, rgba(245,249,255,0.9) 100%)',
+              'linear-gradient(135deg, rgba(14,116,144,0.08) 0%, rgba(255,255,255,0.65) 42%, rgba(226,244,233,0.95) 100%)',
           }}
           withBorder
         >
@@ -133,13 +121,15 @@ export default function ServersIndex({ servers, summary }) {
             <Group align="flex-start" justify="space-between">
               <Stack gap={6}>
                 <Group gap="xs">
-                  <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
-                    <IconWorldWww size={18} />
+                  <ThemeIcon color="teal" radius="xl" size={36} variant="light">
+                    <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Direct Docker</Text>
+                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">Overview</Text>
                 </Group>
                 <Title order={1}>サーバー一覧</Title>
-                <Text c="dimmed" maw={720} size="md">自分が所有しているサーバーと共有されているサーバーを確認できます。</Text>
+                <Text c="dimmed" maw={720} size="md">
+                  自分のサーバーと共有中のサーバーを、接続先と状態中心で確認できます。
+                </Text>
               </Stack>
 
               <Button
@@ -176,7 +166,7 @@ export default function ServersIndex({ servers, summary }) {
                 {filteredServers.length} / {servers.length} 件を表示
               </Text>
               <Text c="dimmed" size="xs">
-                接続先は常に `hostname:port` です。
+                プレイヤーには接続先だけ共有すれば十分です。
               </Text>
             </Stack>
           </Group>
@@ -220,10 +210,10 @@ export default function ServersIndex({ servers, summary }) {
                         </Badge>
                       </Group>
                       <Text c="dimmed" size="sm">
-                        Hostname <Code>{server.fqdn}</Code>
+                        共有アドレス
                       </Text>
-                      <Text size="sm">
-                        Connection target <Code>{server.connection_target}</Code>
+                      <Text fw={700} size="lg" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                        {server.connection_target}
                       </Text>
                     </Stack>
 
@@ -234,48 +224,43 @@ export default function ServersIndex({ servers, summary }) {
                     ) : null}
                   </Group>
 
-                  <Table highlightOnHover horizontalSpacing="md" verticalSpacing="sm">
-                    <Table.Tbody>
-                      <Table.Tr>
-                        <Table.Th>Version</Table.Th>
-                        <Table.Td>{server.minecraft_version}</Table.Td>
-                        <Table.Th>Owner</Table.Th>
-                        <Table.Td>{server.owner_email_address}</Table.Td>
-                      </Table.Tr>
-                      <Table.Tr>
-                        <Table.Th>公開状態</Table.Th>
-                        <Table.Td>
-                          <Group gap="xs">
-                            <Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">
-                              {labelize(server.route.last_apply_status)}
-                            </Badge>
-                            <Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">
-                              {labelize(server.route.last_healthcheck_status)}
-                            </Badge>
-                          </Group>
-                        </Table.Td>
-                        <Table.Th>Container</Table.Th>
-                        <Table.Td>
-                          <Group gap="xs">
-                            <Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">
-                              {runtimeLabel(server.runtime)}
-                            </Badge>
-                            <Code>{server.runtime.container_name}</Code>
-                          </Group>
-                        </Table.Td>
-                      </Table.Tr>
-                      <Table.Tr>
-                        <Table.Th>公開</Table.Th>
-                        <Table.Td>{server.route.enabled ? '有効' : '無効'}</Table.Td>
-                        <Table.Th>Updated</Table.Th>
-                        <Table.Td>{formatTimestamp(server.updated_at)}</Table.Td>
-                      </Table.Tr>
-                    </Table.Tbody>
-                  </Table>
+                  <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+                    <Paper p="md" radius="lg" withBorder>
+                      <Stack gap={2}>
+                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                          バージョン
+                        </Text>
+                        <Text fw={700}>{server.minecraft_version}</Text>
+                      </Stack>
+                    </Paper>
+                    <Paper p="md" radius="lg" withBorder>
+                      <Stack gap={2}>
+                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                          オーナー
+                        </Text>
+                        <Text fw={700}>{server.owner_email_address}</Text>
+                      </Stack>
+                    </Paper>
+                    <Paper p="md" radius="lg" withBorder>
+                      <Stack gap={2}>
+                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                          更新
+                        </Text>
+                        <Text fw={700}>{formatTimestamp(server.updated_at)}</Text>
+                      </Stack>
+                    </Paper>
+                  </SimpleGrid>
 
-                  <Group c="dimmed" gap="lg" justify="space-between">
-                    <Text size="sm">公開状態: {routeLabel(server.route)}</Text>
-                    <Text size="sm">最終反映: {formatTimestamp(server.route.last_applied_at)}</Text>
+                  <Group c="dimmed" gap="sm" justify="space-between">
+                    <Group gap="xs">
+                      <Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">
+                        {server.route.enabled ? '公開中' : '非公開'}
+                      </Badge>
+                      <Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">
+                        応答 {labelize(server.route.last_healthcheck_status)}
+                      </Badge>
+                    </Group>
+                    <Text size="sm">{routeLabel(server.route)}</Text>
                   </Group>
                 </Stack>
               </Paper>
