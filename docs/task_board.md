@@ -130,6 +130,7 @@ The current critical path is:
 - `T-1101`: create flow now exposes `runtime_family` as a user-facing choice, persists it through the legacy `template_kind` column for now, keeps `paper` as the default, and provisions `vanilla` servers with the standard Java runtime image path.
 - `T-1100` / `T-1103`: runtime version choices now come from a checked-in synchronized catalog file instead of live tag lookups or DB-backed storage; `latest` concrete-version resolution remains the separate follow-up task in `T-1102`.
 - `T-1103`: create UI now supports both catalog-backed tag selection and freeform tag entry, with runtime-family-specific Docker Hub tag-list links for operator reference.
+- `T-1103`: version option `value` is treated as the runtime tag actually sent to the container image, while `label` is the operator-facing version display; they do not need to match.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.

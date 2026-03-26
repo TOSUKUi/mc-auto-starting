@@ -82,7 +82,7 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
       [
         { value: "latest", label: "最新 (latest)" },
         { value: "1.21.11", label: "1.21.11" },
-        { value: "1.21.11-127", label: "1.21.11-127" },
+        { value: "1.21.11-127", label: "1.21.11" },
       ],
       MinecraftRuntime.version_options,
     )
@@ -103,7 +103,6 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
       [
         { value: "latest", label: "最新 (latest)" },
         { value: "1.21.11", label: "1.21.11" },
-        { value: "1.21", label: "1.21 系の最新" },
       ],
       MinecraftRuntime.version_options(runtime_family: "vanilla"),
     )
@@ -113,12 +112,11 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
         "paper" => [
           { value: "latest", label: "最新 (latest)" },
           { value: "1.21.11", label: "1.21.11" },
-          { value: "1.21.11-127", label: "1.21.11-127" },
+          { value: "1.21.11-127", label: "1.21.11" },
         ],
         "vanilla" => [
           { value: "latest", label: "最新 (latest)" },
           { value: "1.21.11", label: "1.21.11" },
-          { value: "1.21", label: "1.21 系の最新" },
         ],
       },
       MinecraftRuntime.version_options_by_runtime_family,

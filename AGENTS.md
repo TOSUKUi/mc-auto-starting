@@ -55,6 +55,7 @@ Current baseline:
 - `T-1101` is complete: create flow now exposes runtime family selection with `paper` as the default and a standard Java `vanilla` option wired through the existing direct-Docker provisioning path.
 - `T-1100` and `T-1103` are complete: runtime version choices now come from a checked-in synchronized catalog file rather than live registry access or DB-backed storage.
 - The create UI now supports both catalog-backed version selection and freeform tag entry, with runtime-family-specific Docker Hub tag-list links for operator reference.
+- Runtime catalog option `value` now represents the actual image/runtime tag, while `label` is the user-facing version display and does not need to match the tag verbatim.
 - The remaining runtime-catalog follow-up is `T-1102` for concrete version resolution for symbolic tags such as `latest`.
 
 Development seed login is available as `dev@example.com` / `password`.
