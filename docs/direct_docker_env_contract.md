@@ -19,7 +19,7 @@ This document fixes the initial environment and configuration contract for the d
 - `MINECRAFT_PUBLIC_PORT`
   Shared public Minecraft ingress port shown to users. Default: `42434`.
 - `MINECRAFT_RUNTIME_IMAGE`
-  Baseline Minecraft container image family used by create flow and UI previews. Default: `itzg/minecraft-server`.
+  Baseline Minecraft container image family used by create flow and UI previews. Default: `marctv/minecraft-papermc-server`.
 - `MINECRAFT_RUNTIME_NETWORK_NAME`
   Shared bridge network name joined by `mc-router` and app-managed Minecraft containers. Default: `mc_router_net`.
 - `MC_ROUTER_ROUTES_CONFIG_PATH`
@@ -44,7 +44,8 @@ This document fixes the initial environment and configuration contract for the d
 
 ## App Usage Contract
 - `MinecraftPublicEndpoint` is the single source of truth for public FQDN and connection-target formatting.
-- `MinecraftRuntime` is the single source of truth for the baseline runtime image and shared bridge network name.
+- `MinecraftRuntime` is the single source of truth for the baseline runtime image, shared bridge network name, and `marctv/minecraft-papermc-server` create env payload.
+- The create form `minecraft_version` value is treated as a `marctv` image tag such as `latest` or `1.21.11`.
 - `DockerEngine` reads only Docker transport settings.
 - `Router` reads only route file and reload settings.
 

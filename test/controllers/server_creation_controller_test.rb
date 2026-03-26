@@ -13,9 +13,10 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     get new_server_url(format: :json)
 
     assert_response :success
-    assert_equal "1.21.4", response.parsed_body.fetch("form_defaults").fetch("minecraft_version")
+    assert_equal "latest", response.parsed_body.fetch("form_defaults").fetch("minecraft_version")
     assert_equal 4096, response.parsed_body.fetch("form_defaults").fetch("memory_mb")
     assert_equal 20480, response.parsed_body.fetch("form_defaults").fetch("disk_mb")
+    assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
     assert_not response.parsed_body.fetch("form_defaults").key?("template_kind")
     assert_not response.parsed_body.key?("template_kind")
     assert_not response.parsed_body.key?("runtime_image")
@@ -32,7 +33,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
         minecraft_server: {
           name: "Sky Lab",
           hostname: "  SKY-lab ",
-          minecraft_version: "1.21.5",
+          minecraft_version: "1.21.11",
           memory_mb: 6144,
           disk_mb: 40960,
           template_kind: "fabric",

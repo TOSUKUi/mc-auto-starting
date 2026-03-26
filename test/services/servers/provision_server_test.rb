@@ -62,6 +62,20 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     end
   end
 
+  setup do
+    @original_runtime_image = Rails.application.config.x.minecraft_runtime.image
+    @original_runtime_image_for = MinecraftRuntime.method(:image_for)
+    Rails.application.config.x.minecraft_runtime.image = "marctv/minecraft-papermc-server"
+    MinecraftRuntime.define_singleton_method(:image_for) do |version_tag:|
+      "marctv/minecraft-papermc-server:#{normalize_version_tag(version_tag)}"
+    end
+  end
+
+  teardown do
+    Rails.application.config.x.minecraft_runtime.image = @original_runtime_image
+    MinecraftRuntime.define_singleton_method(:image_for, @original_runtime_image_for)
+  end
+
   test "creates Docker resources publishes the route and marks the server ready" do
     server = minecraft_servers(:two)
     server.update!(template_kind: "paper", last_error_message: "old failure")
@@ -96,13 +110,11 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     create_call = docker_client.calls.fetch(1)
     assert_equal :create_container, create_call.fetch(0)
     assert_equal "mc-server-event-server", create_call.fetch(1).fetch(:name)
-    assert_equal MinecraftRuntime.image, create_call.fetch(1).fetch(:image)
+    assert_equal "marctv/minecraft-papermc-server:1.21.4", create_call.fetch(1).fetch(:image)
     assert_equal(
       {
-        "EULA" => "TRUE",
-        "TYPE" => "PAPER",
-        "VERSION" => "1.21.4",
-        "MEMORY" => "6144M",
+        "MEMORYSIZE" => "6144M",
+        "PAPERMC_FLAGS" => "",
       },
       create_call.fetch(1).fetch(:env),
     )

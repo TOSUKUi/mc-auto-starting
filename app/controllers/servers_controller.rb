@@ -158,6 +158,7 @@ class ServersController < InertiaController
 
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys.except(:template_kind)),
+        minecraft_version_options: MinecraftRuntime.version_options,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,
@@ -171,7 +172,7 @@ class ServersController < InertiaController
       {
         name: "",
         hostname: "",
-        minecraft_version: "1.21.4",
+        minecraft_version: MinecraftRuntime.default_version_tag,
         memory_mb: 4096,
         disk_mb: 20480,
       }

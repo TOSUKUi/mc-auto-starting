@@ -43,7 +43,7 @@ module Servers
       def create_container!
         response = docker_client.create_container(
           name: server.container_name,
-          image: MinecraftRuntime.image,
+          image: MinecraftRuntime.image_for(version_tag: server.minecraft_version),
           env: container_env,
           mounts: [ data_volume_mount ],
           labels: managed_labels,
@@ -125,12 +125,7 @@ module Servers
       end
 
       def container_env
-        {
-          "EULA" => "TRUE",
-          "TYPE" => server.template_kind.to_s.upcase,
-          "VERSION" => server.minecraft_version,
-          "MEMORY" => "#{server.memory_mb}M",
-        }
+        MinecraftRuntime.container_env(server: server)
       end
 
       def container_id

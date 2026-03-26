@@ -10,7 +10,7 @@
 - Rails は既存 skeleton を継続利用する
 - Rails アプリは `/var/run/docker.sock` を通じて Docker Engine を直接制御する
 - 初期版は単一ホスト運用のみを対象とする
-- Minecraft 実行イメージは `itzg/minecraft-server` 系を標準とする
+- Minecraft 実行イメージは `marctv/minecraft-papermc-server` 系を標準とする
 - 公開方式は `mc-router` による単一公開ポート + FQDN ベース振り分けとする
 - `mc-router` と app 管理の Minecraft コンテナは同一 bridge network に参加させる
 - router backend は `<container_name>:25565` を正本とする

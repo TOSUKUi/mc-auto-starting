@@ -1,4 +1,4 @@
-import { Alert, Button, Code, Divider, Grid, Group, NumberInput, Paper, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
+import { Alert, Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
 import { IconInfoCircle, IconPlugConnected, IconServer2 } from '@tabler/icons-react'
 
@@ -16,7 +16,7 @@ function endpointPreview(hostname, publicEndpoint) {
   }
 }
 
-export default function ServersNew({ form_defaults, public_endpoint }) {
+export default function ServersNew({ form_defaults, minecraft_version_options, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
@@ -105,12 +105,12 @@ export default function ServersNew({ form_defaults, public_endpoint }) {
                     required
                     value={form.data.hostname}
                   />
-                  <TextInput
-                    description="迷ったら、遊ぶ予定のクライアントと同じバージョンを入れてください。"
+                  <Select
+                    data={minecraft_version_options}
+                    description="使う Paper イメージのタグを選びます。"
                     error={form.errors.minecraft_version}
                     label="Minecraft バージョン"
-                    onChange={(event) => form.setData('minecraft_version', event.currentTarget.value)}
-                    placeholder="1.21.4"
+                    onChange={(value) => form.setData('minecraft_version', value || '')}
                     required
                     value={form.data.minecraft_version}
                   />

@@ -63,8 +63,9 @@ This file tells any contributor or agent where to find authoritative information
 - `Pterodactyl/Wings` are no longer the current target architecture, but `mc-router` remains active.
 - `mc-router` and app-managed Minecraft containers are expected to share one bridge network, with router backends addressed by container name.
 - `T-303` is complete: route publication apply/rollback is centralized and reused by the existing create/delete-era services.
-- `T-304` is complete: Docker transport, public endpoint, runtime image/network, and router file/reload defaults are fixed in env-backed helpers and docs.
-- Local Compose bootstrap now includes checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_GID`.
+- `T-304` is complete: Docker transport, public endpoint, runtime image/network, `marctv` create payload, and router file/reload defaults are fixed in env-backed helpers and docs.
+- The create-form `minecraft_version` field now represents the selected `marctv` image tag, and the UI exposes it as a fixed select list.
+- Local Compose bootstrap now includes checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE`.
 - `T-400` is complete: the create job now provisions managed Docker resources, persists runtime state, and publishes the `mc-router` mapping.
 - The direct-Docker lifecycle/delete contract is now fixed in `docs/direct_docker_lifecycle_contract.md` ahead of service replacement work.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
