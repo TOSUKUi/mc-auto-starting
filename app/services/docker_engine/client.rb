@@ -50,6 +50,15 @@ module DockerEngine
       ).body
     end
 
+    def pull_image(image:)
+      connection.request(
+        method: :post,
+        path: "/images/create",
+        query: { fromImage: image },
+        body: nil,
+      ).status == 200
+    end
+
     def remove_volume(name:)
       connection.request(method: :delete, path: "/volumes/#{escape_path(name)}").status == 204
     end

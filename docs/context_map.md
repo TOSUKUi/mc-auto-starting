@@ -67,6 +67,7 @@ This file tells any contributor or agent where to find authoritative information
 - The create-form `minecraft_version` field now represents the selected `marctv` image tag, and the UI exposes it as a fixed select list.
 - Local Compose bootstrap now includes checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE`.
 - `T-400` is complete: the create job now provisions managed Docker resources, persists runtime state, and publishes the `mc-router` mapping.
+- `T-400` now pulls the selected runtime image on demand when Docker create fails with `No such image`.
 - The direct-Docker lifecycle/delete contract is now fixed in `docs/direct_docker_lifecycle_contract.md` ahead of service replacement work.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
 - `T-500` is complete: create UI now exposes only the direct-Docker baseline inputs and the public connection preview contract.

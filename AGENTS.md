@@ -34,6 +34,7 @@ Current baseline:
 - `T-303` is complete: route publication apply/rollback is now centralized so create/delete flows share one `mc-router` update path.
 - `T-304` is complete: direct-Docker env defaults for Docker transport, public endpoint, runtime image/network, and router config are now fixed in code and docs.
 - `T-400` is complete: create requests now provision managed Docker volume/container resources, start the container, persist runtime identifiers, and publish the router route.
+- `T-400` now retries container create once by pulling the selected runtime image when Docker returns `No such image`.
 - The direct-Docker lifecycle/delete contract is fixed in `docs/direct_docker_lifecycle_contract.md` before `T-401` / `T-402` implementation.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now operate on managed Docker containers and volumes instead of the legacy provider path.
 - `T-500` is complete: create UI and controller props are reduced to the direct-Docker baseline inputs plus hostname/FQDN preview metadata.

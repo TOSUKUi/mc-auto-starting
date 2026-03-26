@@ -41,9 +41,27 @@ module Servers
       end
 
       def create_container!
+        image = MinecraftRuntime.image_for(version_tag: server.minecraft_version)
+
         response = docker_client.create_container(
           name: server.container_name,
-          image: MinecraftRuntime.image_for(version_tag: server.minecraft_version),
+          image: image,
+          env: container_env,
+          mounts: [ data_volume_mount ],
+          labels: managed_labels,
+          network_name: MinecraftRuntime.network_name,
+          memory_mb: server.memory_mb,
+        )
+
+        @container_id = response.fetch("Id")
+      rescue DockerEngine::NotFoundError => error
+        raise unless missing_image_error?(error)
+
+        docker_client.pull_image(image: image)
+
+        response = docker_client.create_container(
+          name: server.container_name,
+          image: image,
           env: container_env,
           mounts: [ data_volume_mount ],
           labels: managed_labels,
@@ -130,6 +148,10 @@ module Servers
 
       def container_id
         @container_id
+      end
+
+      def missing_image_error?(error)
+        error.message.to_s.start_with?("No such image:")
       end
   end
 end

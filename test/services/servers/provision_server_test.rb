@@ -43,6 +43,13 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
       true
     end
 
+    def pull_image(**kwargs)
+      record(:pull_image, kwargs)
+      raise_error!(:pull_image)
+
+      true
+    end
+
     private
       def record(name, kwargs)
         calls << [ name, kwargs ]
@@ -51,7 +58,9 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
       def raise_error!(name)
         return unless error_on&.first == name
 
-        raise error_on.last
+        error = error_on.last
+        self.error_on = nil if error_on.is_a?(Array)
+        raise error
       end
   end
 
@@ -184,5 +193,24 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal "reload failed", server.last_error_message
     assert_equal false, server.router_route.enabled
     assert_equal "failed", server.router_route.last_apply_status
+  end
+
+  test "pulls the image and retries container create when the image is missing" do
+    server = minecraft_servers(:two)
+    docker_client = FakeDockerClient.new(
+      calls: [],
+      container_id: "container-901",
+      inspect_state: "running",
+      error_on: [ :create_container, DockerEngine::NotFoundError.new("No such image: marctv/minecraft-papermc-server:1.21.4") ],
+    )
+
+    Servers::ProvisionServer.new(
+      server: server,
+      docker_client: docker_client,
+      router_applier: FakeRouterApplier.new([]),
+    ).call
+
+    assert_equal [ :pull_image, { image: "marctv/minecraft-papermc-server:1.21.4" } ], docker_client.calls.fetch(2)
+    assert_equal :create_container, docker_client.calls.fetch(3).fetch(0)
   end
 end

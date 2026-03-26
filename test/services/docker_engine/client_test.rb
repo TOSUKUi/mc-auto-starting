@@ -75,6 +75,21 @@ class DockerEngine::ClientTest < ActiveSupport::TestCase
     assert_equal "1", payload.fetch(:Labels).fetch("minecraft_server_id")
   end
 
+  test "pulls images through the engine API" do
+    connection = FakeConnection.new(
+      responses: [ DockerEngine::Response.new(status: 200, headers: { "content-type" => "application/json" }, body: "{\"status\":\"Pulling from marctv/minecraft-papermc-server\"}\n{\"status\":\"Downloaded newer image\"}") ],
+      requests: [],
+    )
+
+    assert_equal true, DockerEngine::Client.new(configuration: @configuration, connection: connection).pull_image(
+      image: "marctv/minecraft-papermc-server:latest",
+    )
+
+    request = connection.requests.fetch(0)
+    assert_equal "/images/create", request.fetch(:path)
+    assert_equal({ fromImage: "marctv/minecraft-papermc-server:latest" }, request.fetch(:query))
+  end
+
   test "passes lifecycle timeouts and force flags through to the engine" do
     connection = FakeConnection.new(
       responses: [

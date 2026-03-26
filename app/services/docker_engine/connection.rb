@@ -75,7 +75,13 @@ module DockerEngine
 
       def decode_body(body, headers)
         return nil if body.blank?
-        return JSON.parse(body) if headers["content-type"].to_s.include?("application/json")
+        if headers["content-type"].to_s.include?("application/json")
+          begin
+            return JSON.parse(body)
+          rescue JSON::ParserError
+            return body
+          end
+        end
 
         body
       end
