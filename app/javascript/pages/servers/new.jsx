@@ -38,6 +38,12 @@ function selectedRuntimeLabel(value, options) {
   return options.find((option) => option.value === value)?.label || value
 }
 
+function runtimeFamilyDescription(value) {
+  if (value === 'vanilla') return 'vanilla は、公式が提供しており、最新のバージョンに対応。'
+
+  return 'paper は、最新のバージョンに対応していない場合があるが、高速なサーバー。'
+}
+
 export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, minecraft_version_source_urls, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
@@ -47,7 +53,7 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
   const selectedVersionSourceUrl = minecraft_version_source_urls[form.data.runtime_family]
   const resourceHints = [
     { label: '種類', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
-    { label: 'バージョン', value: form.data.custom_minecraft_version.trim() || form.data.minecraft_version },
+    { label: 'バージョン', value: form.data.minecraft_version },
     { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: '接続先', value: preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434' },
   ]
@@ -138,7 +144,7 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
                   />
                   <Select
                     data={runtime_family_options}
-                    description="Paper と通常の Java サーバーから選べます。"
+                    description={runtimeFamilyDescription(form.data.runtime_family)}
                     error={form.errors.runtime_family}
                     label="サーバー種類"
                     onChange={(value) => form.setData('runtime_family', value || '')}
@@ -147,17 +153,9 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
                   />
                   <Select
                     data={minecraftVersionOptions}
-                    description="起動する Minecraft バージョンです。"
-                    error={form.errors.minecraft_version}
-                    label="Minecraft バージョン"
-                    onChange={(value) => form.setData('minecraft_version', value || '')}
-                    required
-                    value={form.data.minecraft_version}
-                  />
-                  <TextInput
                     description={
                       <>
-                        一覧にないバージョンを使うときはこちらを優先します。{' '}
+                        起動する Minecraft バージョンです。{' '}
                         {selectedVersionSourceUrl ? (
                           <Anchor href={selectedVersionSourceUrl} target="_blank" rel="noreferrer">
                             候補ソースを見る
@@ -165,11 +163,11 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
                         ) : null}
                       </>
                     }
-                    error={form.errors.custom_minecraft_version}
-                    label="バージョンを自由入力"
-                    onChange={(event) => form.setData('custom_minecraft_version', event.currentTarget.value.trim())}
-                    placeholder="例: 1.21.11 / latest"
-                    value={form.data.custom_minecraft_version}
+                    error={form.errors.minecraft_version}
+                    label="Minecraft バージョン"
+                    onChange={(value) => form.setData('minecraft_version', value || '')}
+                    required
+                    value={form.data.minecraft_version}
                   />
                   <Divider label="起動設定" labelPosition="center" />
                   <Grid gutter="md">
