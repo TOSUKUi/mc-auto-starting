@@ -9,6 +9,8 @@ This file tells any contributor or agent where to find authoritative information
 ## Architecture and Implementation Design
 - `docs/implementation_breakdown.md`
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
+- `docs/provider_cleanup_inventory.md`
+  Use for the legacy provider dependency inventory and the remaining schema/doc cleanup debt after `T-700` / `T-702` / `T-703`.
 - `docs/docker_engine_contract.md`
   Use for the direct Docker Engine wrapper scope, shared bridge network rules, and managed resource conventions.
 - `docs/direct_docker_env_contract.md`
@@ -53,7 +55,7 @@ This file tells any contributor or agent where to find authoritative information
 - Authentication baseline is installed through `T-100` and `T-101`.
 - `MinecraftServer` and `ServerMember` baselines exist through `T-102` and `T-103`.
 - Authorization and visibility protection are installed through `T-106` and `T-107`.
-- Authenticated layout and current login/index/create/detail/members UI baselines already exist; the active server create/detail/index screens are now direct-Docker-first, while provider cleanup debt still remains in the repository.
+- Authenticated layout and current login/index/create/detail/members UI baselines already exist; the active server create/detail/index screens are direct-Docker-first.
 - The planning pivot task `T-110` is complete.
 - `T-200` is complete: `minecraft_servers` now has direct-Docker baseline fields for managed container/volume identity and runtime state.
 - `T-201` through `T-204` are complete: hostname slug normalization, FQDN/public-port connection formatting, status transitions, and `router_routes` publication responsibilities are fixed in code.
@@ -73,5 +75,6 @@ This file tells any contributor or agent where to find authoritative information
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
 - `T-500` is complete: create UI now exposes only the direct-Docker baseline inputs and the public connection preview contract.
 - `T-501` and `T-502` are complete: detail/index UI now center connection targets, runtime/container state, and router publication data.
+- `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider inventory is documented, provider services/initializer/tests are removed, and create requests no longer expose provider-era template input.
 - Live `mc-router` ingress is not yet verified end-to-end; current checks stop at generated routes plus managed-container runtime checks.
-- The next implementation critical path starts at `T-700`.
+- The next implementation critical path starts at `T-803`.

@@ -13,6 +13,7 @@ Current important files:
 - `docs/direct_docker_lifecycle_contract.md`
 - `docs/direct_docker_env_contract.md`
 - `docs/implementation_breakdown.md`
+- `docs/provider_cleanup_inventory.md`
 - `docs/project_execution_plan.md`
 - `docs/task_board.md`
 - `docs/context_map.md`
@@ -22,8 +23,7 @@ Current baseline:
 - Docker bootstrap, DB readiness, and the Vite + Inertia + React + Mantine frontend baseline are complete through `T-005` and `T-004`.
 - Authentication uses the Rails 8 built-in authentication generator baseline through `T-100` and `T-101`.
 - Authorization and visibility protection are installed through `T-106` and `T-107`.
-- The authenticated layout shell and basic login/index/create/detail/members pages already exist, and the active server create/detail/index screens now follow the direct-Docker baseline while provider cleanup debt remains behind them.
-- Existing provider code remains in the repository as migration debt and is expected to be removed progressively.
+- The authenticated layout shell and basic login/index/create/detail/members pages already exist, and the active server create/detail/index screens now follow the direct-Docker baseline.
 - Existing `mc-router` code remains part of the active architecture and should not be removed unless the user explicitly changes that decision.
 - The selected Docker integration path is direct Engine API access via `/var/run/docker.sock` with a minimal Rails wrapper, not `docker` CLI orchestration.
 - The planning pivot through `T-110` is complete.
@@ -39,8 +39,9 @@ Current baseline:
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now operate on managed Docker containers and volumes instead of the legacy provider path.
 - `T-500` is complete: create UI and controller props are reduced to the direct-Docker baseline inputs plus hostname/FQDN preview metadata.
 - `T-501` and `T-502` are complete: detail/index UI now emphasize connection target, container runtime state, and router publication instead of provider-era framing.
+- `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider dependency inventory exists, provider services/initializer/tests are removed, and controller create flow now treats `template_kind` as internal schema debt instead of an exposed input.
 - Live `mc-router` ingress verification is not implemented yet; the current baseline proves route file generation and managed-container startup, but not end-to-end routing through a running `mc-router` service.
-- The next implementation critical-path task is `T-700`.
+- The next implementation critical-path task is `T-803`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -97,8 +98,9 @@ The active system has four parts.
 3. `docs/project_execution_plan.md`
 4. `docs/task_board.md`
 5. `docs/implementation_breakdown.md`
-6. `docs/direct_docker_env_contract.md`
-7. `docs/direct_docker_lifecycle_contract.md`
+6. `docs/provider_cleanup_inventory.md`
+7. `docs/direct_docker_env_contract.md`
+8. `docs/direct_docker_lifecycle_contract.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.
@@ -169,5 +171,5 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 If no other instruction is given, start from the current critical path:
 
 1. `T-200` through `T-400` are complete
-2. `T-500` through `T-502` are complete, so the next critical path is provider coupling cleanup while keeping `mc-router`
-3. After cleanup, add the remaining direct-Docker verification and operations docs
+2. `T-205`, `T-700`, `T-702`, and `T-703` are complete while keeping `mc-router`
+3. Next, add the remaining direct-Docker verification and operations docs

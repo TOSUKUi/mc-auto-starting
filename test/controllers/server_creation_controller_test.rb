@@ -25,7 +25,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_nil response.parsed_body.fetch("public_endpoint").fetch("fqdn")
   end
 
-  test "create accepts the request and forces the paper template baseline" do
+  test "create accepts the request without exposing legacy template fields" do
     sign_in_as(users(:one))
 
     assert_difference("MinecraftServer.count", 1) do
@@ -36,7 +36,6 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
           minecraft_version: "1.21.11",
           memory_mb: 6144,
           disk_mb: 40960,
-          template_kind: "fabric",
         },
       }
     end
@@ -52,5 +51,6 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_not server.key?("template_kind")
     assert_equal "mc-server-sky-lab", server.fetch("runtime").fetch("container_name")
     assert_equal "mc-data-sky-lab", server.fetch("runtime").fetch("volume_name")
+    assert_equal "paper", MinecraftServer.find(server.fetch("id")).template_kind
   end
 end

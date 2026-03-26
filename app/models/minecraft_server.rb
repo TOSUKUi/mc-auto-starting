@@ -1,4 +1,5 @@
 class MinecraftServer < ApplicationRecord
+  LEGACY_TEMPLATE_KIND = "paper"
   MANAGED_CONTAINER_PORT = 25_565
 
   STATUS_TRANSITIONS = MinecraftServerStatus::TRANSITIONS
@@ -11,6 +12,7 @@ class MinecraftServer < ApplicationRecord
   enum :status, MinecraftServerStatus::ENUM, prefix: true
 
   before_validation :normalize_hostname
+  before_validation :assign_legacy_template_kind
   before_validation :assign_managed_resource_names
 
   validates :name, :hostname, :status, :minecraft_version, :template_kind, :container_name, :volume_name, presence: true
@@ -72,6 +74,10 @@ class MinecraftServer < ApplicationRecord
   private
     def normalize_hostname
       self.hostname = self.class.normalize_hostname(hostname)
+    end
+
+    def assign_legacy_template_kind
+      self.template_kind = LEGACY_TEMPLATE_KIND if template_kind.blank?
     end
 
     def assign_managed_resource_names

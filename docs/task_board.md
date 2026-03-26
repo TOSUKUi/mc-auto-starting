@@ -35,7 +35,7 @@
 | T-202 | P1 | Define FQDN + single-public-port connection rules | T-200 | done | Shared formatting logic is fixed for `hostname.public_domain:shared_public_port` access |
 | T-203 | P1 | Define server status transition model | T-200 | done | Direct-Docker state machine is documented and coded |
 | T-204 | P1 | Define retained `router_routes` responsibilities | T-110,T-200 | done | Router model and route publication rules are fixed for the Docker-managed flow |
-| T-205 | P1 | Inventory legacy provider dependencies | T-110 | todo | Files, schema fields, fixtures, tests, and UI props that still depend on `ExecutionProvider` are explicitly listed before removal starts |
+| T-205 | P1 | Inventory legacy provider dependencies | T-110 | done | Files, schema fields, fixtures, tests, and UI props that still depend on `ExecutionProvider` are explicitly listed before removal starts |
 | T-300 | P2 | Define docker.sock safety boundary and compose strategy | T-110 | done | Compose and permission strategy for Docker Engine access are fixed |
 | T-301 | P2 | Define Docker naming and label conventions | T-300,T-200 | done | Container names, volume names, and labels are fixed |
 | T-302 | P2 | Implement Docker Engine client wrapper | T-300 | done | Rails can create/inspect/start/stop/restart/remove managed containers |
@@ -51,9 +51,9 @@
 | T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | todo | Default operator-facing copy is Japanese across the active screens |
 | T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
 | T-601 | P5 | Build login page | T-100,T-004 | done | UI login works |
-| T-700 | P6 | Remove provider coupling from app services | T-400,T-401,T-402 | todo | Direct-Docker implementation no longer depends on execution-provider services |
-| T-702 | P6 | Remove provider-era initializers and tests | T-205,T-700 | todo | Provider initializers, provider service tests, and related fixtures are removed or replaced while router tests remain active |
-| T-703 | P6 | Remove provider fields and references from controllers and UI | T-205,T-500,T-501,T-502,T-700 | todo | Server controller responses and Inertia pages no longer expose provider concepts while preserving router data |
+| T-700 | P6 | Remove provider coupling from app services | T-400,T-401,T-402 | done | Direct-Docker implementation no longer depends on execution-provider services |
+| T-702 | P6 | Remove provider-era initializers and tests | T-205,T-700 | done | Provider initializers, provider service tests, and related fixtures are removed or replaced while router tests remain active |
+| T-703 | P6 | Remove provider fields and references from controllers and UI | T-205,T-500,T-501,T-502,T-700 | done | Server controller responses and Inertia pages no longer expose provider concepts while preserving router data |
 | T-701 | P6 | Remove legacy provider docs from active workflow | T-110,T-700 | todo | Restart docs no longer point to old provider docs as current truth |
 | T-800 | P7 | Add model tests for direct-Docker rules | T-200,T-201,T-202,T-203 | todo | Core direct-Docker domain logic is covered |
 | T-801 | P7 | Add request and authorization tests | T-400,T-401,T-402,T-500,T-501 | todo | Access control and create/lifecycle/delete flows are covered |
@@ -73,7 +73,7 @@ The current critical path is:
 ## Known Blockers
 
 - No active blockers are recorded.
-- The repository still contains legacy provider code and docs; treat them as migration debt.
+- Legacy provider docs and schema columns still exist as migration debt; active services and tests no longer depend on them.
 - `mc-router` remains part of the active architecture and should not be treated as cleanup debt.
 
 ## Recent Decisions
@@ -103,3 +103,6 @@ The current critical path is:
 - `T-500`: create page props are reduced to the direct-Docker baseline form fields and connection preview metadata, dropping fixed runtime/template display props from the controller contract.
 - `T-501`: detail page now centers public connection target, router publication state, Docker runtime identifiers, and lifecycle actions without fixed template/provider framing.
 - `T-502`: index page now summarizes public connection targets plus container/router state, and no longer depends on backend-oriented runtime labels from the listing payload.
+- `T-205`: legacy provider dependency inventory now lives in `docs/provider_cleanup_inventory.md`.
+- `T-700` / `T-702`: provider service classes, initializer, and dedicated provider tests are removed from the active code path.
+- `T-703`: controller create flow no longer accepts or injects provider-era template input; `template_kind` is retained only as internal schema debt for now.

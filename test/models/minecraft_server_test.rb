@@ -26,7 +26,7 @@ class MinecraftServerTest < ActiveSupport::TestCase
     assert_includes server.errors[:name], "can't be blank"
     assert_includes server.errors[:hostname], "can't be blank"
     assert_includes server.errors[:minecraft_version], "can't be blank"
-    assert_includes server.errors[:template_kind], "can't be blank"
+    assert_equal "paper", server.template_kind
   end
 
   test "normalizes hostname before validation" do

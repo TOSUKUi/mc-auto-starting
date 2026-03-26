@@ -126,7 +126,6 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
             minecraft_version: "1.21.4",
             memory_mb: 8192,
             disk_mb: 40960,
-            template_kind: "velocity",
           },
         }
       end
@@ -190,7 +189,6 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
         minecraft_version: "1.21.4",
         memory_mb: 4096,
         disk_mb: 20480,
-        template_kind: "velocity",
       },
     }
 

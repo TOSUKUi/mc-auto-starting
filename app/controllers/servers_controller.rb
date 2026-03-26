@@ -157,7 +157,7 @@ class ServersController < InertiaController
       hostname = normalized_hostname(form_values[:hostname])
 
       {
-        form_defaults: default_new_server_form.merge(form_values.symbolize_keys.except(:template_kind)),
+        form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
         minecraft_version_options: MinecraftRuntime.version_options,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
@@ -179,17 +179,11 @@ class ServersController < InertiaController
     end
 
     def create_server_params
-      params.expect(minecraft_server: [ :name, :hostname, :minecraft_version, :memory_mb, :disk_mb ]).to_h.merge(
-        template_kind: fixed_template_kind,
-      )
+      params.expect(minecraft_server: [ :name, :hostname, :minecraft_version, :memory_mb, :disk_mb ]).to_h
     end
 
     def normalized_hostname(value)
       MinecraftServer.normalize_hostname(value)
-    end
-
-    def fixed_template_kind
-      "paper"
     end
 
     def server_summary(server)
