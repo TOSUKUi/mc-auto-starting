@@ -55,6 +55,7 @@ Current baseline:
 - `T-1101` is complete: create flow now exposes runtime family selection with `paper` as the default, and both `paper` and `vanilla` provision through the `itzg/minecraft-server` runtime family.
 - `T-1100` and `T-1103` are complete: a checked-in synchronized catalog file remains as the safe fallback instead of live registry access or DB-backed storage.
 - `T-1105` through `T-1107` are complete: the create UI now resolves version options server-side on page load, caches them briefly, falls back to the checked-in catalog, and exposes only the runtime-family-specific select choices without a freeform version field.
+- Index/detail screens now surface both Minecraft version and runtime `Type` so the current `paper` / `vanilla` selection is visible outside the create flow.
 - Runtime catalog option `label` is the user-facing Minecraft version display, while submitted `value` is the stable version key sent through the runtime `VERSION` contract.
 - The remaining runtime-catalog follow-up is `T-1102` for concrete version resolution for symbolic tags such as `latest`.
 - Important runtime nuance: `itzg/minecraft-server` should be treated as a `TYPE` + `VERSION` driven image family, not as a runtime where image tag always equals the Minecraft version; use the official docs page `https://docker-minecraft-server.readthedocs.io/en/latest/versions/minecraft/` as the source of truth for that distinction.

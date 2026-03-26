@@ -47,6 +47,13 @@ function labelize(value) {
     .join(' ')
 }
 
+function runtimeFamilyLabel(value) {
+  if (value === 'vanilla') return 'Vanilla'
+  if (value === 'paper') return 'Paper'
+
+  return value
+}
+
 function formatTimestamp(value) {
   if (!value) return '未実行'
 
@@ -102,6 +109,9 @@ export default function ServersShow({ server }) {
                 <Group gap="xs">
                   <Badge color="blue" variant="light">
                     {server.access_role}
+                  </Badge>
+                  <Badge color="grape" variant="light">
+                    Type {runtimeFamilyLabel(server.runtime_family)}
                   </Badge>
                   <Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">
                     {labelize(server.status)}
@@ -208,6 +218,7 @@ export default function ServersShow({ server }) {
                 <Divider />
                 <DetailLine label="接続先" value={<Code>{server.connection_target}</Code>} />
                 <DetailLine label="アドレス" value={<Code>{server.fqdn}</Code>} />
+                <DetailLine label="Type" value={<Badge color="grape" variant="light">{runtimeFamilyLabel(server.runtime_family)}</Badge>} />
                 <DetailLine label="Minecraft バージョン" value={<Code>{server.minecraft_version}</Code>} />
                 <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{server.access_role}</Badge>} />
                 <DetailLine label="現在の状態" value={<Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">{labelize(server.status)}</Badge>} />

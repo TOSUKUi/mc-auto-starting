@@ -48,6 +48,13 @@ function labelize(value) {
     .join(' ')
 }
 
+function runtimeFamilyLabel(value) {
+  if (value === 'vanilla') return 'Vanilla'
+  if (value === 'paper') return 'Paper'
+
+  return value
+}
+
 function formatTimestamp(value) {
   if (!value) return '未更新'
 
@@ -202,6 +209,9 @@ export default function ServersIndex({ servers, summary }) {
                         <Badge color="blue" variant="light">
                           {server.access_role}
                         </Badge>
+                        <Badge color="grape" variant="light">
+                          Type {runtimeFamilyLabel(server.runtime_family)}
+                        </Badge>
                         <Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">
                           {labelize(server.status)}
                         </Badge>
@@ -221,11 +231,19 @@ export default function ServersIndex({ servers, summary }) {
                     ) : null}
                   </Group>
 
-                  <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+                  <SimpleGrid cols={{ base: 1, sm: 4 }} spacing="sm">
                     <Paper p="md" radius="lg" withBorder>
                       <Stack gap={2}>
                         <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                          バージョン
+                          Type
+                        </Text>
+                        <Text fw={700}>{runtimeFamilyLabel(server.runtime_family)}</Text>
+                      </Stack>
+                    </Paper>
+                    <Paper p="md" radius="lg" withBorder>
+                      <Stack gap={2}>
+                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                          Minecraft バージョン
                         </Text>
                         <Text fw={700}>{server.minecraft_version}</Text>
                       </Stack>
