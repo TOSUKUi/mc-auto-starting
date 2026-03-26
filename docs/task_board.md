@@ -119,6 +119,7 @@ The current critical path is:
 - `T-501`: detail page now centers public connection target, router publication state, Docker runtime identifiers, and lifecycle actions without fixed template/provider framing.
 - `T-502`: index page now summarizes public connection targets plus container/router state, and no longer depends on backend-oriented runtime labels from the listing payload.
 - `T-503`: layout/create/index/detail copy is being shifted further toward Japanese, active server screens now hide Docker backend identifiers behind simpler player-facing status and connection language, the app shell has moved to a flat Minecraft-inspired dark theme with `/` routed directly to the server index, and create-form validation now enforces a 4GB memory ceiling plus stricter hostname input rules.
+- Local env handling now treats `.env.example` as the checked-in template while `.env` stays untracked for machine-specific values.
 - `T-205`: legacy provider dependency inventory now lives in `docs/provider_cleanup_inventory.md`.
 - `T-700` / `T-702`: provider service classes, initializer, and dedicated provider tests are removed from the active code path.
 - `T-703`: controller create flow no longer accepts or injects provider-era template input; `template_kind` is retained only as internal schema debt for now.

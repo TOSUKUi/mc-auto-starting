@@ -42,6 +42,7 @@ This file tells any contributor or agent where to find authoritative information
 - `Dockerfile`
 - `compose.yaml`
 - `.env`
+- `.env.example`
 - `.gitignore`
 
 ## Current Start State
