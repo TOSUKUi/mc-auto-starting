@@ -39,9 +39,9 @@ function selectedRuntimeLabel(value, options) {
 }
 
 function runtimeFamilyDescription(value) {
-  if (value === 'vanilla') return 'vanilla は、公式が提供しており、最新のバージョンに対応。'
+  if (value === 'vanilla') return '公式提供で、最新のバージョンに対応。'
 
-  return 'paper は、最新のバージョンに対応していない場合があるが、高速なサーバー。'
+  return '最新のバージョンに対応していない場合があるが、高速。'
 }
 
 export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint }) {
