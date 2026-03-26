@@ -97,4 +97,27 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
       MinecraftRuntime.runtime_family_options,
     )
   end
+
+  test "returns version options by runtime family from the catalog" do
+    assert_equal(
+      [
+        { value: "latest", label: "最新 (latest)" },
+      ],
+      MinecraftRuntime.version_options(runtime_family: "vanilla"),
+    )
+
+    assert_equal(
+      {
+        "paper" => [
+          { value: "latest", label: "最新 (latest)" },
+          { value: "1.21.11", label: "1.21.11" },
+          { value: "1.21.11-127", label: "1.21.11-127" },
+        ],
+        "vanilla" => [
+          { value: "latest", label: "最新 (latest)" },
+        ],
+      },
+      MinecraftRuntime.version_options_by_runtime_family,
+    )
+  end
 end

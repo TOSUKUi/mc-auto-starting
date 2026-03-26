@@ -19,6 +19,8 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal 20480, response.parsed_body.fetch("form_defaults").fetch("disk_mb")
     assert_equal "paper", response.parsed_body.fetch("runtime_family_options").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
+    assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").first.fetch("value")
+    assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").first.fetch("value")
     assert_not response.parsed_body.fetch("form_defaults").key?("template_kind")
     assert_not response.parsed_body.key?("template_kind")
     assert_not response.parsed_body.key?("runtime_image")

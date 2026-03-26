@@ -53,7 +53,8 @@ Current baseline:
 - `T-1004` is complete: `/invites/:token` now stores pending invite context, Discord OAuth callbacks can create the first linked local user from a matching invite, and consumed invites are marked used.
 - After the Discord bot/RCON track, the next planned operator UI work is `T-1010` through `T-1012` for player-count visibility and browser-side log / command operations.
 - `T-1101` is complete: create flow now exposes runtime family selection with `paper` as the default and a standard Java `vanilla` option wired through the existing direct-Docker provisioning path.
-- The remaining runtime-catalog track is now `T-1100` through `T-1103` for concrete version resolution for symbolic tags such as `latest` and version-choice sourcing on top of that runtime-family support.
+- `T-1100` and `T-1103` are complete: runtime version choices now come from a checked-in synchronized catalog file rather than live registry access or DB-backed storage.
+- The remaining runtime-catalog follow-up is `T-1102` for concrete version resolution for symbolic tags such as `latest`.
 
 Development seed login is available as `dev@example.com` / `password`.
 The initial Discord owner can be bootstrapped with `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed`; use this before the Discord-only login flow replaces the local password baseline.

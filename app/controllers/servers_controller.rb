@@ -159,7 +159,10 @@ class ServersController < InertiaController
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
         runtime_family_options: MinecraftRuntime.runtime_family_options,
-        minecraft_version_options: MinecraftRuntime.version_options,
+        minecraft_version_options: MinecraftRuntime.version_options(
+          runtime_family: form_values[:runtime_family] || form_values["runtime_family"] || MinecraftRuntime.default_runtime_family,
+        ),
+        minecraft_version_options_by_runtime_family: MinecraftRuntime.version_options_by_runtime_family,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,

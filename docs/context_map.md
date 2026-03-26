@@ -87,6 +87,7 @@ This file tells any contributor or agent where to find authoritative information
 - The next implementation critical path starts at `T-900`, then `T-903` / `T-904` / `T-905` to align `.env`, `.env.example`, and the Kamal deploy baseline before the remaining P8 ops docs; after the Discord bot/RCON track, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
 - `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and can also provision a standard Java `vanilla` server path through the existing direct-Docker flow.
+- `T-1100` and `T-1103` are complete: version choices are now sourced from the checked-in `config/minecraft_runtime_catalog.yml` catalog rather than live registry access or DB-backed storage.
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.

@@ -6,15 +6,7 @@ module MinecraftRuntime
   DEFAULT_VERSION_TAG = "latest".freeze
   JVM_HEADROOM_MB = 512
   MIN_JVM_MEMORY_MB = 512
-  RUNTIME_FAMILY_OPTIONS = [
-    { value: "paper", label: "Paper" },
-    { value: "vanilla", label: "Java" },
-  ].freeze
-  VERSION_OPTIONS = [
-    { value: "latest", label: "最新 (latest)" },
-    { value: "1.21.11", label: "1.21.11" },
-    { value: "1.21.11-127", label: "1.21.11-127" },
-  ].freeze
+  CATALOG_PATH = Rails.root.join("config/minecraft_runtime_catalog.yml")
 
   module_function
 
@@ -48,11 +40,22 @@ module MinecraftRuntime
   end
 
   def runtime_family_options
-    RUNTIME_FAMILY_OPTIONS.map(&:dup)
+    catalog.map do |runtime_family, attributes|
+      {
+        value: runtime_family,
+        label: attributes.fetch("label"),
+      }
+    end
   end
 
   def version_options(runtime_family: DEFAULT_RUNTIME_FAMILY)
-    VERSION_OPTIONS.map(&:dup)
+    family_catalog(runtime_family).fetch("version_options").map { |option| option.symbolize_keys }
+  end
+
+  def version_options_by_runtime_family
+    catalog.to_h do |runtime_family, attributes|
+      [ runtime_family, attributes.fetch("version_options").map { |option| option.symbolize_keys } ]
+    end
   end
 
   def container_env(server:)
@@ -81,11 +84,23 @@ module MinecraftRuntime
   end
 
   def normalize_runtime_family(value)
-    value.to_s.presence || DEFAULT_RUNTIME_FAMILY
+    runtime_family = value.to_s.presence || DEFAULT_RUNTIME_FAMILY
+    catalog.key?(runtime_family) ? runtime_family : DEFAULT_RUNTIME_FAMILY
   end
 
   def jvm_memory_mb(container_memory_mb)
     memory_mb = Integer(container_memory_mb)
     [ memory_mb - JVM_HEADROOM_MB, MIN_JVM_MEMORY_MB ].max
+  end
+
+  def catalog
+    @catalog ||= begin
+      raw_catalog = YAML.safe_load_file(CATALOG_PATH, aliases: false) || {}
+      raw_catalog.deep_stringify_keys
+    end
+  end
+
+  def family_catalog(runtime_family)
+    catalog.fetch(normalize_runtime_family(runtime_family))
   end
 end

@@ -1,5 +1,6 @@
 import { Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
+import { useEffect } from 'react'
 import { IconPlugConnected, IconSparkles } from '@tabler/icons-react'
 
 const MIN_MEMORY_MB = 512
@@ -37,11 +38,12 @@ function selectedRuntimeLabel(value, options) {
   return options.find((option) => option.value === value)?.label || value
 }
 
-export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options, public_endpoint }) {
+export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
+  const minecraftVersionOptions = minecraft_version_options_by_runtime_family[form.data.runtime_family] || []
   const resourceHints = [
     { label: '種類', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
     { label: 'バージョン', value: form.data.minecraft_version },
@@ -54,6 +56,13 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
     form.transform((data) => ({ minecraft_server: data }))
     form.post('/servers')
   }
+
+  useEffect(() => {
+    if (minecraftVersionOptions.length === 0) return
+    if (minecraftVersionOptions.some((option) => option.value === form.data.minecraft_version)) return
+
+    form.setData('minecraft_version', minecraftVersionOptions[0].value)
+  }, [form, minecraftVersionOptions, form.data.minecraft_version])
 
   return (
     <>
@@ -136,7 +145,7 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
                     value={form.data.runtime_family}
                   />
                   <Select
-                    data={minecraft_version_options}
+                    data={minecraftVersionOptions}
                     description="起動する Minecraft バージョンです。"
                     error={form.errors.minecraft_version}
                     label="Minecraft バージョン"
