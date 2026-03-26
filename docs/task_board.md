@@ -64,7 +64,7 @@
 | T-900 | P8 | Document single-host setup and local development workflow | T-300,T-304,T-400 | todo | New contributor can boot the project with docker.sock mounted |
 | T-901 | P8 | Document direct-Docker operations and safety notes | T-302,T-401,T-402 | todo | Operators can manage containers and understand docker.sock risks |
 | T-902 | P8 | Document release, migration, and rollback procedure | T-803,T-900,T-901 | todo | Release workflow is written and reviewable for the new architecture |
-| T-1000 | P9 | Define Discord auth, invite URL, and bot/RCON architecture contract | T-900,T-901 | todo | Discord OAuth-only sign-in, manual invite URL issuance, Rails-side bot API, and RCON execution boundaries are fixed in docs before implementation |
+| T-1000 | P9 | Define Discord auth, invite URL, and bot/RCON architecture contract | T-900,T-901 | done | Discord OAuth-only sign-in, manual invite URL issuance, Rails-side bot API, and RCON execution boundaries are fixed in docs before implementation |
 | T-1001 | P9 | Add Discord identity fields and OAuth provider integration | T-1000,T-101 | todo | Users can be resolved by Discord identity and Rails can complete the Discord OAuth callback |
 | T-1002 | P9 | Add manual invite-token model and issuance flow | T-1000,T-1001,T-106 | todo | An authenticated operator can mint, view, revoke, and expire one-time invite URLs without sending email automatically |
 | T-1003 | P9 | Replace password login with Discord-only login entry | T-1001,T-1002,T-503,T-601 | todo | Login UI and session entry path no longer depend on local passwords or password reset screens |
@@ -124,3 +124,4 @@ The current critical path is:
 - `T-703`: controller create flow no longer accepts or injects provider-era template input; `template_kind` is retained only as internal schema debt for now.
 - Discord login direction is now fixed as Discord OAuth-only sign-in with manual invite URLs instead of local password distribution.
 - Discord bot integration will call Rails-owned APIs for lifecycle and RCON operations; the bot must not talk to Docker or Minecraft containers directly.
+- `T-1000`: the strategy contract for Discord auth, invite URLs, and bot mediated RCON now lives in `docs/discord_auth_and_bot_strategy.md`.

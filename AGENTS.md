@@ -12,6 +12,7 @@ Current important files:
 - `compose.yaml`
 - `docs/direct_docker_lifecycle_contract.md`
 - `docs/direct_docker_env_contract.md`
+- `docs/discord_auth_and_bot_strategy.md`
 - `docs/implementation_breakdown.md`
 - `docs/provider_cleanup_inventory.md`
 - `docs/project_execution_plan.md`
@@ -46,6 +47,7 @@ Current baseline:
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after rewriting the routes file, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - The next implementation critical-path task is `T-900`.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
+- `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -112,6 +114,7 @@ The active system has four parts.
 6. `docs/provider_cleanup_inventory.md`
 7. `docs/direct_docker_env_contract.md`
 8. `docs/direct_docker_lifecycle_contract.md`
+9. `docs/discord_auth_and_bot_strategy.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.

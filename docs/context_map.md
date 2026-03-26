@@ -17,6 +17,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for the required env vars and config defaults for Docker transport, public endpoint rendering, runtime image, and router publication.
 - `docs/direct_docker_lifecycle_contract.md`
   Use for the direct-Docker lifecycle, sync, and delete contract before implementing `T-401` through `T-403`.
+- `docs/discord_auth_and_bot_strategy.md`
+  Use for the authoritative Discord OAuth, manual invite URL, and Discord Bot to Rails to RCON strategy fixed by `T-1000`.
 - `docs/project_execution_plan.md`
   Use for the active phase ordering, dependency flow, milestones, and critical path.
 - `docs/task_board.md`
@@ -84,3 +86,4 @@ This file tells any contributor or agent where to find authoritative information
 - The next implementation critical path starts at `T-900`; after the P8 docs track, the next planned feature track is `T-1000` through `T-1009` for Discord OAuth invites and bot/RCON integration.
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
+- `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.

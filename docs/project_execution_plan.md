@@ -242,6 +242,7 @@
 - ログイン方式を Discord OAuth2 のみに固定する
 - 手動発行の招待 URL と invite token の寿命・失効ルールを決める
 - 初回ログイン時に招待 token と Discord identity をどう結びつけるか決める
+- 正本ドキュメントは `docs/discord_auth_and_bot_strategy.md` とする
 - 完了条件:
   - ローカル password 配布を前提にしない onboarding 方式が固定される
 
