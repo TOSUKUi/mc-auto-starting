@@ -45,6 +45,7 @@ Current baseline:
 - `T-804` is complete: compose-managed `mc-router` now runs on the shared bridge network and a live status ping through the shared public port reached a managed Minecraft container.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after rewriting the routes file, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - The next implementation critical-path task is `T-900`.
+- After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -68,6 +69,10 @@ These are already decided and should be treated as defaults unless explicitly ch
 - UI library: Mantine `8.3.1`
 - UI language policy: default `ja`, optional `en`, with Rails I18n as the source of truth
 - Frontend bundler: `vite_rails` + Vite
+- Authentication target direction: Discord OAuth2 only
+- Account onboarding direction: manually issued invite URLs
+- Bot integration direction: Discord Bot calls Rails-owned APIs
+- Minecraft command operation direction: Rails executes lifecycle/RCON actions; bots must not talk directly to Docker or server containers
 - Minecraft runtime image family: `marctv/minecraft-papermc-server`
 - The create-form `minecraft_version` field is treated as the selected `marctv` image tag
 - `MEMORYSIZE` should leave JVM headroom below the Docker memory limit
@@ -180,3 +185,4 @@ If no other instruction is given, start from the current critical path:
 1. `T-200` through `T-400` are complete
 2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, `T-804`, and `T-805` are complete while keeping `mc-router`
 3. Next, add the remaining single-host setup and direct-Docker operations docs
+4. After `T-900` through `T-902`, start the Discord auth/invite/bot track at `T-1000`

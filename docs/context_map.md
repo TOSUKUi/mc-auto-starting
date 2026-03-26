@@ -81,4 +81,6 @@ This file tells any contributor or agent where to find authoritative information
 - `compose.yaml` now defines a compose-managed `mc-router` service on the shared `mc_router_net` bridge network.
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
-- The next implementation critical path starts at `T-900`.
+- The next implementation critical path starts at `T-900`; after the P8 docs track, the next planned feature track is `T-1000` through `T-1009` for Discord OAuth invites and bot/RCON integration.
+- The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
+- The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.

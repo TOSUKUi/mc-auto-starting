@@ -32,6 +32,7 @@
 7. 作成 / 詳細 UI を新前提へ簡素化する
 8. 受け入れ条件ベースの統合検証を追加する
 9. 単一ホスト運用手順を文書化する
+10. Discord OAuth 招待制ログインと Bot 経由の RCON 操作を追加する
 
 この順序を崩すと、DB 項目、UI、Docker label、ポート管理の手戻りが大きい。
 
@@ -44,6 +45,7 @@
 - provider 実装の cleanup は direct-Docker の最小経路が通ってから進める
 - `mc-router` 連携の維持に必要な FQDN / route 設定の整合確認は並行可能
 - provider schema debt の棚卸しは `docs/provider_cleanup_inventory.md` を正本にする
+- Discord auth / invite / bot command 実装は P8 の運用 docs で基本運用を固めたあとに着手する
 
 ## 5. 詳細タスクリスト
 
@@ -233,6 +235,48 @@
 - 完了条件:
   - 新規参加者が単一ホストで再現できる
 
+### Phase 7: Discord 認証と Bot 運用
+
+#### P7-1 Discord auth / invite 契約固定
+
+- ログイン方式を Discord OAuth2 のみに固定する
+- 手動発行の招待 URL と invite token の寿命・失効ルールを決める
+- 初回ログイン時に招待 token と Discord identity をどう結びつけるか決める
+- 完了条件:
+  - ローカル password 配布を前提にしない onboarding 方式が固定される
+
+#### P7-2 Discord identity と招待実装
+
+- `User` に Discord identity を保持する
+- invite token モデルと管理 UI を追加する
+- Discord callback から招待済みユーザーだけを通す
+- 完了条件:
+  - 手動発行した invite URL でのみ新規ユーザーが参加できる
+
+#### P7-3 Discord-only login への切り替え
+
+- login 画面を Discord サインイン中心に置き換える
+- password reset / local password login を active path から外す
+- 完了条件:
+  - Web UI の認証入口が Discord OAuth のみで完結する
+
+#### P7-4 Bot command / RCON 実装
+
+- Discord Bot が叩く Rails API の trust boundary を定義する
+- Rails 側に RCON client service を追加する
+- lifecycle 操作と制限付き RCON 実行を Bot 経由で扱えるようにする
+- 完了条件:
+  - Bot は Rails API 経由でサーバー操作でき、Docker やコンテナへ直接触れない
+
+#### P7-5 Discord auth / bot フロー検証と docs
+
+- OAuth callback
+- invite redemption
+- bot command authorization
+- RCON 実行失敗時の扱い
+- 完了条件:
+  - Discord auth / invite / bot 運用のテストと手順が揃う
+
 ## 6. マイルストーン案
 
 ### Milestone A: 方針転換完了
@@ -257,6 +301,12 @@
 ### Milestone E: 検証と運用 docs 完了
 
 - acceptance と運用手順が揃う
+
+### Milestone F: Discord SSO と Bot 操作完了
+
+- 手動 invite URL で参加できる
+- Discord ログインだけで Web UI に入れる
+- Discord Bot から Rails 経由で lifecycle / RCON 操作できる
 
 ## 7. 直近着手順
 
