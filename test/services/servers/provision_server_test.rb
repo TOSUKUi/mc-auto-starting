@@ -122,7 +122,7 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal "marctv/minecraft-papermc-server:1.21.4", create_call.fetch(1).fetch(:image)
     assert_equal(
       {
-        "MEMORYSIZE" => "6144M",
+        "MEMORYSIZE" => "5632M",
         "PAPERMC_FLAGS" => "",
       },
       create_call.fetch(1).fetch(:env),

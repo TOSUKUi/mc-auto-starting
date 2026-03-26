@@ -161,7 +161,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
           name: "mc-server-creative-build",
           image: "marctv/minecraft-papermc-server:1.21.4",
           env: {
-            "MEMORYSIZE" => "8192M",
+            "MEMORYSIZE" => "7680M",
             "PAPERMC_FLAGS" => "",
           },
           mounts: [ { Type: "volume", Source: "mc-data-creative-build", Target: "/data" } ],
@@ -221,7 +221,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
           name: "mc-server-broken-build",
           image: "marctv/minecraft-papermc-server:1.21.4",
           env: {
-            "MEMORYSIZE" => "4096M",
+            "MEMORYSIZE" => "3584M",
             "PAPERMC_FLAGS" => "",
           },
           mounts: [ { Type: "volume", Source: "mc-data-broken-build", Target: "/data" } ],

@@ -65,6 +65,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-303` is complete: route publication apply/rollback is centralized and reused by the existing create/delete-era services.
 - `T-304` is complete: Docker transport, public endpoint, runtime image/network, `marctv` create payload, and router file/reload defaults are fixed in env-backed helpers and docs.
 - The create-form `minecraft_version` field now represents the selected `marctv` image tag, and the UI exposes it as a fixed select list.
+- `MinecraftRuntime` now derives `MEMORYSIZE` below the Docker limit so the container keeps JVM headroom.
 - Local Compose bootstrap now includes checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE`.
 - `T-400` is complete: the create job now provisions managed Docker resources, persists runtime state, and publishes the `mc-router` mapping.
 - `T-400` now pulls the selected runtime image on demand when Docker create fails with `No such image`.

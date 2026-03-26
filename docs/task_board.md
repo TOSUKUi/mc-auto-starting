@@ -94,6 +94,7 @@ The current critical path is:
 - Local Compose now reads checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE`.
 - `T-400`: `Servers::ProvisionServer` now creates a managed volume/container through `DockerEngine`, starts it, persists runtime state, and then publishes the route.
 - `T-400`: create retries once with `DockerEngine#pull_image` when the selected runtime image is missing locally.
+- `T-400`: `MEMORYSIZE` now reserves JVM headroom below the Docker memory limit to avoid immediate OOM kill on boot.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.

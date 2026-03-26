@@ -2,6 +2,8 @@ module MinecraftRuntime
   DEFAULT_IMAGE = "marctv/minecraft-papermc-server".freeze
   DEFAULT_NETWORK_NAME = "mc_router_net".freeze
   DEFAULT_VERSION_TAG = "latest".freeze
+  JVM_HEADROOM_MB = 512
+  MIN_JVM_MEMORY_MB = 512
   VERSION_OPTIONS = [
     { value: "latest", label: "最新 (latest)" },
     { value: "1.21.11", label: "1.21.11" },
@@ -36,7 +38,7 @@ module MinecraftRuntime
 
   def container_env(server:)
     {
-      "MEMORYSIZE" => "#{server.memory_mb}M",
+      "MEMORYSIZE" => "#{jvm_memory_mb(server.memory_mb)}M",
       "PAPERMC_FLAGS" => "",
     }
   end
@@ -47,5 +49,10 @@ module MinecraftRuntime
 
   def normalize_version_tag(value)
     value.to_s.presence || DEFAULT_VERSION_TAG
+  end
+
+  def jvm_memory_mb(container_memory_mb)
+    memory_mb = Integer(container_memory_mb)
+    [ memory_mb - JVM_HEADROOM_MB, MIN_JVM_MEMORY_MB ].max
   end
 end

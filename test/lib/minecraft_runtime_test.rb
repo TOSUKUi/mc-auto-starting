@@ -32,11 +32,17 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
 
     assert_equal(
       {
-        "MEMORYSIZE" => "6144M",
+        "MEMORYSIZE" => "5632M",
         "PAPERMC_FLAGS" => "",
       },
       MinecraftRuntime.container_env(server: server),
     )
+  end
+
+  test "keeps JVM heap below the container memory limit" do
+    assert_equal 3584, MinecraftRuntime.jvm_memory_mb(4096)
+    assert_equal 1536, MinecraftRuntime.jvm_memory_mb(2048)
+    assert_equal 512, MinecraftRuntime.jvm_memory_mb(512)
   end
 
   test "builds a tagged image reference from the selected version" do

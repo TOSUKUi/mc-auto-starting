@@ -61,6 +61,7 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Frontend bundler: `vite_rails` + Vite
 - Minecraft runtime image family: `marctv/minecraft-papermc-server`
 - The create-form `minecraft_version` field is treated as the selected `marctv` image tag
+- `MEMORYSIZE` should leave JVM headroom below the Docker memory limit
 - Public connection format: `<server-fqdn>:<shared_public_port>`
 - Public ingress port: single shared public port
 - Router backend format: `<container_name>:25565` on the shared bridge network

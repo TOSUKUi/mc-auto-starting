@@ -46,6 +46,7 @@ This document fixes the initial environment and configuration contract for the d
 - `MinecraftPublicEndpoint` is the single source of truth for public FQDN and connection-target formatting.
 - `MinecraftRuntime` is the single source of truth for the baseline runtime image, shared bridge network name, and `marctv/minecraft-papermc-server` create env payload.
 - The create form `minecraft_version` value is treated as a `marctv` image tag such as `latest` or `1.21.11`.
+- `MEMORYSIZE` is derived from the selected container memory with reserved JVM headroom; it is not equal to the Docker memory limit.
 - `DockerEngine` reads only Docker transport settings.
 - `Router` reads only route file and reload settings.
 
