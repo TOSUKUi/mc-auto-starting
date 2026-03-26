@@ -62,8 +62,11 @@
 | T-804 | P7 | Verify compose-managed `mc-router` ingress against managed containers | T-303,T-400,T-803 | done | A compose-managed `mc-router` service can load generated routes, reach `mc-server-<hostname>:25565` on `mc_router_net`, and accept an end-to-end connection on the shared public port |
 | T-805 | P7 | Fix `mc-router` live route reload on bind-mounted config changes | T-303,T-804 | done | Route changes written by Rails are picked up by the running compose-managed `mc-router` service without requiring a manual restart |
 | T-900 | P8 | Document single-host setup and local development workflow | T-300,T-304,T-400 | todo | New contributor can boot the project with docker.sock mounted |
+| T-903 | P8 | Audit `.env` ownership, required keys, and `.env.example` coverage | T-304,T-900 | todo | `.env` remains untracked, every actively consumed env key is classified as required or optional, required local/bootstrap keys stay uncommented, and optional keys are safe to leave commented in `.env.example` |
+| T-904 | P8 | Define Kamal deployment topology and env/secret mapping | T-903 | todo | Kamal target host roles, accessory strategy, secret injection path, and the mapping from local `.env` keys to deploy-time env are fixed before implementation |
 | T-901 | P8 | Document direct-Docker operations and safety notes | T-302,T-401,T-402 | todo | Operators can manage containers and understand docker.sock risks |
-| T-902 | P8 | Document release, migration, and rollback procedure | T-803,T-900,T-901 | todo | Release workflow is written and reviewable for the new architecture |
+| T-905 | P8 | Implement Kamal deployment baseline | T-904 | todo | Repository includes the initial Kamal config, deploy hooks, and secret/env wiring needed to boot the Rails app on the target single host without reworking existing env names |
+| T-902 | P8 | Document release, migration, and rollback procedure | T-803,T-900,T-901,T-905 | todo | Release workflow is written and reviewable for the new architecture, including Kamal-based deploy, migration, and rollback steps |
 | T-1000 | P9 | Define Discord auth, invite URL, and bot/RCON architecture contract | T-900,T-901 | done | Discord OAuth-only sign-in, manual invite URL issuance, Rails-side bot API, and RCON execution boundaries are fixed in docs before implementation |
 | T-1001 | P9 | Add Discord identity fields and OAuth provider integration | T-1000,T-101 | done | Users can be resolved by Discord identity and Rails can complete the Discord OAuth callback |
 | T-1002 | P9 | Add manual invite-token model and issuance flow | T-1000,T-1001,T-106 | done | An authenticated operator can mint, view, revoke, and expire one-time invite URLs without sending email automatically |
@@ -79,7 +82,7 @@
 
 The current critical path is:
 
-`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-304 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-804 -> T-805 -> T-900 -> T-901 -> T-902 -> T-1000 -> T-1001 -> T-1002 -> T-1003 -> T-1004 -> T-1005 -> T-1006 -> T-1007 -> T-1008 -> T-1009`
+`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-304 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-804 -> T-805 -> T-900 -> T-903 -> T-904 -> T-901 -> T-905 -> T-902 -> T-1000 -> T-1001 -> T-1002 -> T-1003 -> T-1004 -> T-1005 -> T-1006 -> T-1007 -> T-1008 -> T-1009`
 
 ## Known Blockers
 
@@ -112,6 +115,8 @@ The current critical path is:
 - `T-805`: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, avoiding unreliable bind-mounted file-watch behavior.
 - `T-805`: the compose-managed `mc-router` service now carries a stable Docker label so Rails can resolve the reload target without depending on generated container names.
 - `T-804`: `compose.yaml` now defines a compose-managed `mc-router` service on the shared bridge network, and shared-port ingress has been verified against it.
+- `T-903` planning direction: `.env` stays untracked as the live local file, `.env.example` is the checked-in template, uncommented entries should be limited to required local/bootstrap values, and optional deploy-era keys should stay commented until needed.
+- `T-904` / `T-905` planning direction: the eventual deployment baseline should use Kamal while preserving the current env key names so local Compose and deploy automation do not drift.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.

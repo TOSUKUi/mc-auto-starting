@@ -45,7 +45,7 @@ Current baseline:
 - `T-803` is complete: automated acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline with router publication checks.
 - `T-804` is complete: compose-managed `mc-router` now runs on the shared bridge network and a live status ping through the shared public port reached a managed Minecraft container.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after rewriting the routes file, so live ingress updates no longer depend on bind-mounted file-watch behavior.
-- The next implementation critical-path task is `T-900`.
+- The next implementation critical-path tasks are `T-900`, `T-903`, `T-904`, `T-901`, `T-905`, and `T-902`.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.
@@ -149,7 +149,7 @@ Use these as the default command set.
 - `docker compose run --rm app bin/rails test`
 
 - `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE` values used by Compose.
-- `.env.example` is the checked-in template for those values; keep the real `.env` local and out of Git, and treat it as the single local source for Compose, Discord OAuth, bootstrap-owner, and future bot secrets.
+- `.env.example` is the checked-in template for those values; keep the real `.env` local and out of Git, treat it as the single local source for Compose, Discord OAuth, bootstrap-owner, and future bot secrets, and prefer leaving non-required variables commented in `.env.example` while keeping required bootstrap variables visible.
 - If the host user or Docker socket group differs, update `.env` before running Compose.
 Do not install Ruby gems on the host unless there is an explicit exception.
 Keep gems in `vendor/bundle` inside the workspace so the mapped app user can write them.

@@ -31,8 +31,10 @@
 6. provider 依存を除去しつつ `mc-router` 連携を維持する
 7. 作成 / 詳細 UI を新前提へ簡素化する
 8. 受け入れ条件ベースの統合検証を追加する
-9. 単一ホスト運用手順を文書化する
-10. Discord OAuth 招待制ログインと Bot 経由の RCON 操作を追加する
+9. `.env` / `.env.example` / deploy secrets の境界を整理する
+10. Kamal 前提の単一ホスト deploy 基盤を整える
+11. 単一ホスト運用手順を文書化する
+12. Discord OAuth 招待制ログインと Bot 経由の RCON 操作を追加する
 
 この順序を崩すと、DB 項目、UI、Docker label、ポート管理の手戻りが大きい。
 
@@ -42,6 +44,8 @@
 - データモデル見直しと Docker label / naming 規則の設計は並行可能
 - Docker client wrapper 実装と UI copy 調整は並行可能
 - 運用 docs は安全境界と Docker 構成が固まってから確定する
+- `.env` の required/optional 整理は運用 docs と並行可能だが、Kamal 実装前に終えて env 名を固定する
+- Kamal 導入は `.env.example` の required/optional 区分と secret 注入方針が固まってから着手する
 - provider 実装の cleanup は direct-Docker の最小経路が通ってから進める
 - `mc-router` 連携の維持に必要な FQDN / route 設定の整合確認は並行可能
 - provider schema debt の棚卸しは `docs/provider_cleanup_inventory.md` を正本にする
@@ -226,12 +230,32 @@
   - create/delete/lifecycle/sync が自動検証される
   - route file 生成だけでなく shared public port での ingress 疎通も確認される
 
-#### P6-2 単一ホスト運用 docs
+#### P6-2 `.env` / `.env.example` 契約の整理
+
+- 実データを持つ `.env` をローカル専用・Git 非追跡として維持する
+- `.env.example` を checked-in template の正本として扱う
+- 参照されている env を required と optional に分類する
+- 必須ではない env はコメントアウトしたまま例示できる形に寄せる
+- Discord 初期 owner bootstrap に必要な env は required 側に残す
+- 完了条件:
+  - `.env` と `.env.example` の責務が docs と task board で一致する
+  - required/optional の区分が deploy 前提でも破綻しない
+
+#### P6-3 Kamal deploy 基盤
+
+- 単一ホスト前提の Kamal deploy topology を決める
+- Rails app / accessories / secret 注入方法を固定する
+- 現在の local Compose 用 env 名を可能な限りそのまま deploy 側へ持ち込む
+- 完了条件:
+  - Kamal で deploy 可能な最小構成が決まる
+  - local `.env` と deploy secrets の写像が追跡できる
+
+#### P6-4 単一ホスト運用 docs
 
 - docker.sock マウント注意点
 - compose 起動
 - ポート範囲設定
-- リリース / rollback
+- Kamal deploy / rollback
 - 完了条件:
   - 新規参加者が単一ホストで再現できる
 

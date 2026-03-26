@@ -84,7 +84,7 @@ This file tells any contributor or agent where to find authoritative information
 - `compose.yaml` now defines a compose-managed `mc-router` service on the shared `mc_router_net` bridge network.
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
-- The next implementation critical path starts at `T-900`; after the P8 docs track, the next planned feature track is `T-1000` through `T-1009` for Discord OAuth invites and bot/RCON integration.
+- The next implementation critical path starts at `T-900`, then `T-903` / `T-904` / `T-905` to align `.env`, `.env.example`, and the Kamal deploy baseline before the remaining P8 ops docs.
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.
@@ -92,4 +92,4 @@ This file tells any contributor or agent where to find authoritative information
 - `T-1002` is complete: `discord_invitations` now stores digest-backed manual invite records, authenticated users can issue/revoke invites from `/discord-invitations`, and raw invite URLs are shown only at issuance time.
 - `T-1004` is complete: invite redemption now starts at `/invites/:token`, pending invite tokens are held in the Rails session, and Discord OAuth callbacks can create/link the invited user on first login.
 - Initial operator bootstrap should use `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed` to create the first Discord-linked user before invite-based onboarding takes over.
-- Local configuration should now be driven from `.env`, using `.env.example` as the complete template for Compose, Discord OAuth, bootstrap owner, and future Discord bot secrets.
+- Local configuration should now be driven from `.env`, using `.env.example` as the checked-in template; required local/bootstrap keys should stay active there, while non-required deploy-era examples should be allowed to remain commented until needed.
