@@ -90,6 +90,7 @@ The current critical path is:
 - `T-302`: Docker Engine access is wrapped behind Excon-based Unix socket transport with managed labels, names, and the minimal lifecycle API surface.
 - `T-302`: the wrapper defaults to unversioned Engine API paths and only prefixes `/v1.xx` when `DOCKER_ENGINE_API_VERSION` is explicitly set.
 - `T-304`: direct-Docker defaults are fixed through env-backed `MinecraftPublicEndpoint`, `MinecraftRuntime`, compose defaults, and the dedicated env contract doc.
+- Local Compose now reads checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_SOCKET_GID`.
 - `T-400`: `Servers::ProvisionServer` now creates a managed volume/container through `DockerEngine`, starts it, persists runtime state, and then publishes the route.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
