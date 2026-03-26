@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_26_214724) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_26_214725) do
+  create_table "discord_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "discord_user_id", null: false
+    t.datetime "expires_at", null: false
+    t.bigint "invited_by_id", null: false
+    t.string "note"
+    t.datetime "revoked_at"
+    t.string "token_digest", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "used_at"
+    t.index ["discord_user_id"], name: "index_discord_invitations_on_discord_user_id"
+    t.index ["invited_by_id"], name: "index_discord_invitations_on_invited_by_id"
+    t.index ["token_digest"], name: "index_discord_invitations_on_token_digest", unique: true
+  end
+
   create_table "minecraft_servers", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "backend_host"
     t.integer "backend_port"
@@ -93,6 +108,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_26_214724) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "discord_invitations", "users", column: "invited_by_id"
   add_foreign_key "minecraft_servers", "users", column: "owner_id"
   add_foreign_key "router_routes", "minecraft_servers"
   add_foreign_key "server_members", "minecraft_servers"

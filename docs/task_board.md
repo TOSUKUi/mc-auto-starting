@@ -66,7 +66,7 @@
 | T-902 | P8 | Document release, migration, and rollback procedure | T-803,T-900,T-901 | todo | Release workflow is written and reviewable for the new architecture |
 | T-1000 | P9 | Define Discord auth, invite URL, and bot/RCON architecture contract | T-900,T-901 | done | Discord OAuth-only sign-in, manual invite URL issuance, Rails-side bot API, and RCON execution boundaries are fixed in docs before implementation |
 | T-1001 | P9 | Add Discord identity fields and OAuth provider integration | T-1000,T-101 | done | Users can be resolved by Discord identity and Rails can complete the Discord OAuth callback |
-| T-1002 | P9 | Add manual invite-token model and issuance flow | T-1000,T-1001,T-106 | todo | An authenticated operator can mint, view, revoke, and expire one-time invite URLs without sending email automatically |
+| T-1002 | P9 | Add manual invite-token model and issuance flow | T-1000,T-1001,T-106 | done | An authenticated operator can mint, view, revoke, and expire one-time invite URLs without sending email automatically |
 | T-1003 | P9 | Replace password login with Discord-only login entry | T-1001,T-1002,T-503,T-601 | todo | Login UI and session entry path no longer depend on local passwords or password reset screens |
 | T-1004 | P9 | Implement invite redemption and first-login account linking | T-1001,T-1002,T-107 | todo | Only invited Discord users can finish first login, and repeated logins resolve to the same local user safely |
 | T-1005 | P9 | Define Discord bot trust boundary and command API contract | T-1000,T-106,T-402 | todo | Bot authentication, allowed commands, per-server authorization checks, and audit expectations are fixed before endpoint implementation |
@@ -126,3 +126,4 @@ The current critical path is:
 - Discord bot integration will call Rails-owned APIs for lifecycle and RCON operations; the bot must not talk to Docker or Minecraft containers directly.
 - `T-1000`: the strategy contract for Discord auth, invite URLs, and bot mediated RCON now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001`: `users` now carry Discord identity fields, and Rails can complete a Discord OAuth callback to resolve already-linked users.
+- `T-1002`: manual invite issuance now uses digest-only stored tokens; the raw invite URL is shown only once when an authenticated user creates the invite from `/discord-invitations`.

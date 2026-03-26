@@ -1,0 +1,26 @@
+one:
+  token_digest: digest-one
+  discord_user_id: "444444444444444444"
+  expires_at: <%= 7.days.from_now %>
+  used_at:
+  revoked_at:
+  invited_by: one
+  note: invited by one
+
+two:
+  token_digest: digest-two
+  discord_user_id: "555555555555555555"
+  expires_at: <%= 2.days.ago %>
+  used_at:
+  revoked_at:
+  invited_by: one
+  note: expired invite
+
+three:
+  token_digest: digest-three
+  discord_user_id: "666666666666666666"
+  expires_at: <%= 7.days.from_now %>
+  used_at:
+  revoked_at: <%= 1.day.ago %>
+  invited_by: two
+  note: revoked elsewhere

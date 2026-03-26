@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_many :owned_minecraft_servers, class_name: "MinecraftServer", foreign_key: :owner_id, inverse_of: :owner, dependent: :restrict_with_exception
   has_many :server_members, dependent: :destroy
   has_many :member_minecraft_servers, through: :server_members, source: :minecraft_server
+  has_many :issued_discord_invitations, class_name: "DiscordInvitation", foreign_key: :invited_by_id, inverse_of: :invited_by, dependent: :restrict_with_exception
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   normalizes :discord_user_id, with: ->(value) { value.present? ? value.to_s.strip : nil }

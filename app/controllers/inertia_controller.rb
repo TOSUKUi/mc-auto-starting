@@ -7,10 +7,12 @@ class InertiaController < ApplicationController
       navigation: [
         { name: "Home", href: "/" },
         { name: "Servers", href: "/servers" },
+        { name: "招待", href: "/discord-invitations" },
       ],
       flash: {
         notice: flash[:notice],
         alert: flash[:alert],
+        invite_url: flash[:invite_url],
       },
     }
   }

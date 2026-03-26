@@ -88,3 +88,4 @@ This file tells any contributor or agent where to find authoritative information
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.
 - `T-1001` is complete: `users` now store Discord identity fields, OmniAuth Discord is wired into the app, and linked users can complete the Discord OAuth callback into a normal Rails session.
+- `T-1002` is complete: `discord_invitations` now stores digest-backed manual invite records, authenticated users can issue/revoke invites from `/discord-invitations`, and raw invite URLs are shown only at issuance time.
