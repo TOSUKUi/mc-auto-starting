@@ -38,6 +38,9 @@ This document fixes the strategy for Discord-based authentication, manual invite
 - The Rails app remains the OAuth client and completes the callback on the server side.
 - Rails-managed sessions remain the local authenticated session mechanism after OAuth succeeds.
 - Discord OAuth should be implemented through an OmniAuth-based strategy rather than a custom OAuth client implementation.
+- `/login` remains as the browser login entry, but it should expose only Discord sign-in for existing users.
+- Public signup must stay disabled; creating a new local user is allowed only from a valid invite redemption flow.
+- The bootstrap owner should still be seeded from `BOOTSTRAP_DISCORD_USER_ID`, and startup logs may point that operator at `/login` for the first Discord sign-in.
 
 ### Invitations
 

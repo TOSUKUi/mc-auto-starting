@@ -3,14 +3,12 @@ Rails.application.routes.draw do
   get "auth/failure", to: "discord_oauth#failure"
   get "invites/:token", to: "invites#show", as: :invite
   get "login", to: "sessions#new", as: :login
-  post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy", as: :logout
   resources :discord_invitations, path: "discord-invitations", only: %i[index create] do
     member do
       patch :revoke
     end
   end
-  resources :passwords, param: :token
   resources :servers, only: %i[index new create show destroy] do
     member do
       post :start

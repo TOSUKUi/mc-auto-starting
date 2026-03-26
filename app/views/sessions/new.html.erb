@@ -1,28 +1,26 @@
-<% content_for :title, "Login" %>
+<% content_for :title, "Discord Login" %>
 
 <div class="auth-shell">
   <section class="auth-panel auth-panel--brand">
-    <p class="auth-eyebrow">Minecraft Control Plane</p>
-    <h1>Single-port publishing for servers your team actually uses.</h1>
+    <p class="auth-eyebrow">Minecraft Servers</p>
+    <h1>Discord でログイン</h1>
     <p class="auth-copy">
-      Sign in to manage owned servers, shared environments, route visibility, and the exact
-      <code>hostname:port</code>
-      players should connect to.
+      このアプリは招待制です。既存ユーザーは Discord でログインし、新規参加者は受け取った招待リンクから開始してください。
     </p>
 
     <ul class="auth-feature-list">
-      <li>Owner and member visibility is isolated per server.</li>
-      <li>Published endpoints stay aligned with the shared mc-router contract.</li>
-      <li>Operational status and routing stay aligned in one control plane.</li>
+      <li>一般公開のサインアップはありません。</li>
+      <li>招待済みの Discord アカウントだけが参加できます。</li>
+      <li>ログイン後にサーバー一覧と招待管理へ進めます。</li>
     </ul>
   </section>
 
   <section class="auth-panel auth-panel--form">
     <div class="auth-card">
       <div class="auth-card__header">
-        <p class="auth-kicker">Login</p>
-        <h2>Sign in</h2>
-        <p>Use your account email and password to enter the control plane.</p>
+        <p class="auth-kicker">Discord Login</p>
+        <h2>招待制ログイン</h2>
+        <p>既存ユーザーは Discord でログインしてください。招待リンクを受け取った場合は、リンクからそのまま開始できます。</p>
       </div>
 
       <% if flash[:alert] %>
@@ -33,22 +31,9 @@
         <div class="auth-flash auth-flash--notice"><%= flash[:notice] %></div>
       <% end %>
 
-      <%= form_with url: login_path, class: "auth-form" do |form| %>
-        <div class="auth-field">
-          <%= form.label :email_address, "Email address" %>
-          <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "you@example.com", value: params[:email_address] %>
-        </div>
-
-        <div class="auth-field">
-          <div class="auth-field__label_row">
-            <%= form.label :password, "Password" %>
-            <%= link_to "Forgot password?", new_password_path, class: "auth-inline-link" %>
-          </div>
-          <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "Enter your password", maxlength: 72 %>
-        </div>
-
-        <%= form.submit "Sign in", class: "auth-submit" %>
-      <% end %>
+      <div class="auth-form">
+        <%= link_to "Discord でログイン", "/auth/discord", class: "auth-submit" %>
+      </div>
     </div>
   </section>
 </div>

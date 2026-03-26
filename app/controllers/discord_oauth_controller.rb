@@ -8,7 +8,7 @@ class DiscordOauthController < ApplicationController
       user.apply_discord_auth!(discord_auth)
       start_new_session_for(user)
       clear_pending_invite_token
-      redirect_to after_authentication_url, notice: "Signed in with Discord."
+      redirect_to after_authentication_url, notice: "Discord でログインしました。"
     else
       invitation = pending_invitation
 
@@ -17,17 +17,17 @@ class DiscordOauthController < ApplicationController
         invitation.consume!
         clear_pending_invite_token
         start_new_session_for(user)
-        redirect_to after_authentication_url, notice: "Discord invitation accepted."
+        redirect_to after_authentication_url, notice: "招待を確認して Discord でログインしました。"
       else
         clear_pending_invite_token
-        redirect_to login_path, alert: "Discord account is not invited yet."
+        redirect_to login_path, alert: "この Discord アカウントはまだ招待されていません。招待リンクからやり直してください。"
       end
     end
   end
 
   def failure
     clear_pending_invite_token
-    redirect_to login_path, alert: "Discord sign-in failed."
+    redirect_to login_path, alert: "Discord ログインに失敗しました。時間をおいてもう一度試してください。"
   end
 
   private

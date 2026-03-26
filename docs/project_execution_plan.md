@@ -284,10 +284,12 @@
 
 #### P7-3 Discord-only login への切り替え
 
-- login 画面を Discord サインイン中心に置き換える
+- `/login` を既存ユーザー向け Discord-only login 入口に置き換える
+- 初回オーナー向けに startup log から最初の `/login` 導線を案内する
 - password reset / local password login を active path から外す
 - 完了条件:
   - Web UI の認証入口が Discord OAuth のみで完結する
+  - 招待リンク以外から public signup はできない
 
 #### P7-4 Bot command / RCON 実装
 

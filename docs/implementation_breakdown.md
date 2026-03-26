@@ -49,7 +49,14 @@
 #### ログイン画面
 
 - パス: `/login`
-- 目的: Web UI へのログイン
+- 目的: 既存ユーザー向け Discord-only ログイン入口
+- 表示項目:
+  - Discord ログイン CTA
+  - 招待制であることの説明
+  - 招待リンクを受け取った人はリンクから開始する案内
+- 非表示:
+  - email/password form
+  - password reset 導線
 
 ### 3.2 サーバー一覧
 
@@ -137,7 +144,6 @@
 
 ```text
 GET    /login
-POST   /login
 DELETE /logout
 
 GET    /servers

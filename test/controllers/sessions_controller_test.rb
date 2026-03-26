@@ -1,25 +1,20 @@
 require "test_helper"
+require "stringio"
 
 class SessionsControllerTest < ActionDispatch::IntegrationTest
-  setup { @user = User.take }
-
-  test "new" do
+  test "new shows discord-only login entry" do
     get login_path
+
     assert_response :success
+    assert_select "a.auth-submit[href='/auth/discord']", text: "Discord でログイン"
+    assert_select "input[type=email]", count: 0
+    assert_select "input[type=password]", count: 0
   end
 
-  test "create with valid credentials" do
-    post login_path, params: { email_address: @user.email_address, password: "password" }
+  test "create route is not available" do
+    post login_path
 
-    assert_redirected_to root_path
-    assert cookies[:session_id]
-  end
-
-  test "create with invalid credentials" do
-    post login_path, params: { email_address: @user.email_address, password: "wrong" }
-
-    assert_redirected_to login_path
-    assert_nil cookies[:session_id]
+    assert_response :not_found
   end
 
   test "destroy" do

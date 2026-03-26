@@ -8,7 +8,7 @@ This document fixes the initial environment and configuration contract for the d
 - `.env.example` is the checked-in template and should be the authoritative inventory of supported keys.
 - Keys required for the current local bootstrap path should stay uncommented in `.env.example`.
 - Keys that are not required for the current local bootstrap path should be kept as commented examples in `.env.example` until the feature or deploy path is active.
-- The bootstrap-owner Discord seed variables remain part of the required local bootstrap set even before Discord-only login fully replaces the legacy password path.
+- The bootstrap-owner Discord seed variables remain part of the required local bootstrap set so the initial operator can sign in before invite-based onboarding takes over.
 
 ## Required Runtime Configuration
 - `DOCKER_ENGINE_SOCKET_PATH`
@@ -58,14 +58,14 @@ This document fixes the initial environment and configuration contract for the d
   Discord OAuth application client id used by OmniAuth. Default: unset.
 - `DISCORD_CLIENT_SECRET`
   Discord OAuth application client secret used by OmniAuth. Default: unset.
+- `APP_BASE_URL`
+  Optional public app base URL used for startup login hints such as `http://localhost:3000/login`. Default: unset in production, `http://localhost:3000` fallback in development.
 - `BOOTSTRAP_DISCORD_USER_ID`
   Optional Discord user id used by `bin/rails db:seed` to create the initial owner. Default: unset.
 - `BOOTSTRAP_DISCORD_USERNAME`
   Optional Discord username used during bootstrap seeding. Default: unset.
 - `BOOTSTRAP_EMAIL_ADDRESS`
   Optional fallback local email used during bootstrap seeding. Default: unset.
-- `BOOTSTRAP_PASSWORD`
-  Optional local password used only while the legacy password baseline still exists. Default: unset, which generates a random password during seed.
 - `DISCORD_BOT_TOKEN`
   Reserved for the future Discord bot process and local integration testing. Default: unset.
 - `DISCORD_BOT_PUBLIC_KEY`
