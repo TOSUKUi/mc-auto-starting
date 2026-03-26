@@ -345,6 +345,22 @@
 - 完了条件:
   - create UI の version 選択肢生成が運用可能な形で固定される
 
+#### P8-5 runtime-family ごとの live version source
+
+- `vanilla` は Mojang version manifest を参照して候補を作る
+- `paper` は Paper-specific version source を参照して候補を作る
+- source ごとに到達不能時の fallback を持つ
+- 完了条件:
+  - runtime family に応じて候補生成の source が分かれ、誤った source の混用がなくなる
+
+#### P8-6 version option の表示契約
+
+- ユーザーに見せるのは Minecraft version 名だけに寄せる
+- 内部で送る `value` は runtime family ごとの安定した version key として扱う
+- `label` と `value` を分ける前提を UI / controller / doc で固定する
+- 完了条件:
+  - operator-facing 表示と内部の submitted/stored value の責務が混ざらない
+
 ## 6. マイルストーン案
 
 ### Milestone A: 方針転換完了

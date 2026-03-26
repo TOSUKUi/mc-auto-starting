@@ -91,6 +91,7 @@ This file tells any contributor or agent where to find authoritative information
 - The create UI now keeps catalog-backed version choices, allows freeform tag input, and links to the runtime-family-specific Docker Hub tag list as an operator reference.
 - Catalog option `value` now represents the actual runtime tag, while `label` is reserved for the version text shown to operators.
 - For `itzg/minecraft-server`, the official docs treat Minecraft version selection as the `VERSION` environment variable contract, not as a guarantee that image tag equals Minecraft version; keep that distinction in mind when touching `T-1102` and later runtime-catalog work.
+- The next runtime-source refinement is to split live option sources by family: Mojang manifest for `vanilla`, a Paper-specific source for `paper`, and a UI contract where users only see the version label while the submitted value remains the stable version key.
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.

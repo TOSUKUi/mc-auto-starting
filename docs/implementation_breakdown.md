@@ -88,6 +88,10 @@
   - `latest` など symbolic tag を選んだ場合の concrete version 表示方針
   - checked-in catalog から供給される runtime family ごとの version 候補
   - 単一ホスト標準構成で作成されることの説明
+- version 選択肢の表示方針:
+  - operator には Minecraft version 名だけを見せる
+  - form submit の `value` は runtime family ごとの安定した version key として扱う
+  - `vanilla` と `paper` は別 source から候補を取得できる前提で設計する
 - バリデーション:
   - `hostname` 形式
   - `hostname` 一意性
