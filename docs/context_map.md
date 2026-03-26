@@ -84,7 +84,7 @@ This file tells any contributor or agent where to find authoritative information
 - `compose.yaml` now defines a compose-managed `mc-router` service on the shared `mc_router_net` bridge network.
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
-- The next implementation critical path starts at `T-900`, then `T-903` / `T-904` / `T-905` to align `.env`, `.env.example`, and the Kamal deploy baseline before the remaining P8 ops docs.
+- The next implementation critical path starts at `T-900`, then `T-903` / `T-904` / `T-905` to align `.env`, `.env.example`, and the Kamal deploy baseline before the remaining P8 ops docs; after the Discord bot/RCON track, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.

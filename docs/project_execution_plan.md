@@ -35,6 +35,7 @@
 10. Kamal 前提の単一ホスト deploy 基盤を整える
 11. 単一ホスト運用手順を文書化する
 12. Discord OAuth 招待制ログインと Bot 経由の RCON 操作を追加する
+13. プレイヤー人数表示とブラウザ運用コンソールを追加する
 
 この順序を崩すと、DB 項目、UI、Docker label、ポート管理の手戻りが大きい。
 
@@ -50,6 +51,7 @@
 - `mc-router` 連携の維持に必要な FQDN / route 設定の整合確認は並行可能
 - provider schema debt の棚卸しは `docs/provider_cleanup_inventory.md` を正本にする
 - Discord auth / invite / bot command 実装は P8 の運用 docs で基本運用を固めたあとに着手する
+- プレイヤー人数表示とブラウザ console UI は RCON/command trust boundary を先に固めてから進める
 
 ## 5. 詳細タスクリスト
 
@@ -302,6 +304,15 @@
 - 完了条件:
   - Discord auth / invite / bot 運用のテストと手順が揃う
 
+#### P7-6 プレイヤー人数表示とブラウザ console UI
+
+- server 一覧と詳細で現在の参加人数を優先表示する
+- recent logs を Web UI から確認できるようにする
+- 制限付き command 実行を Web UI から扱えるようにする
+- browser 側の command 実行も Bot と同じ Rails-owned authorization / RCON boundary に乗せる
+- 完了条件:
+  - operator は人数確認、ログ確認、command 実行を Discord を経由せずに Web UI から行える
+
 ## 6. マイルストーン案
 
 ### Milestone A: 方針転換完了
@@ -333,6 +344,11 @@
 - Discord ログインだけで Web UI に入れる
 - Discord Bot から Rails 経由で lifecycle / RCON 操作できる
 
+### Milestone G: 運用 UI 完了
+
+- 一覧と詳細でプレイヤー人数を優先表示できる
+- Web UI から recent logs と command console を扱える
+
 ## 7. 直近着手順
 
 1. Pivot 方針の文書を固定する
@@ -341,3 +357,4 @@
 4. `T-400` と `T-401` / `T-402` は完了し、`T-500` / `T-501` / `T-502` で create/detail/index UI を direct-Docker 前提へ簡素化した
 5. `mc-router` の live route reload は `SIGHUP` ベースで安定化済み
 6. 次は request / acceptance / operations docs を厚くする
+7. その後は Discord bot/RCON 基盤を足場に、プレイヤー人数表示とブラウザ console UI を追加する

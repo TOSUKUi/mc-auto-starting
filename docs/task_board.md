@@ -77,12 +77,15 @@
 | T-1007 | P9 | Implement bot-facing lifecycle and RCON command endpoints | T-1005,T-1006,T-402 | todo | Discord bot can invoke start/stop/restart/status plus bounded RCON actions through Rails APIs without bypassing policy checks |
 | T-1008 | P9 | Add tests for Discord auth, invite redemption, and bot commands | T-1003,T-1004,T-1007 | todo | OAuth login, invite consumption, rejected access, and bot command flows are covered by automated tests |
 | T-1009 | P9 | Document Discord auth, invite issuance, and bot operations | T-1008,T-900,T-901 | todo | Operators can issue invites manually, configure Discord OAuth/Bot credentials, and understand the RCON security model |
+| T-1010 | P9 | Define player count, server logs, and browser command-console contract | T-402,T-1006 | todo | The source of truth, refresh strategy, authorization rules, and payload shape for player counts, recent logs, and browser-issued commands are fixed before UI work starts |
+| T-1011 | P9 | Surface player counts in server index and detail views | T-1010,T-502 | todo | Server index and detail show current player count prominently ahead of secondary operator metadata |
+| T-1012 | P9 | Add browser log viewer and command console UI | T-1010,T-1007,T-501 | todo | Authorized operators can view recent server logs and issue bounded commands from the web UI with clear success/failure feedback |
 
 ## Critical Path Tasks
 
 The current critical path is:
 
-`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-304 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-804 -> T-805 -> T-900 -> T-903 -> T-904 -> T-901 -> T-905 -> T-902 -> T-1000 -> T-1001 -> T-1002 -> T-1003 -> T-1004 -> T-1005 -> T-1006 -> T-1007 -> T-1008 -> T-1009`
+`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-304 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-804 -> T-805 -> T-900 -> T-903 -> T-904 -> T-901 -> T-905 -> T-902 -> T-1000 -> T-1001 -> T-1002 -> T-1003 -> T-1004 -> T-1005 -> T-1006 -> T-1007 -> T-1008 -> T-1009 -> T-1010 -> T-1011 -> T-1012`
 
 ## Known Blockers
 
@@ -118,6 +121,7 @@ The current critical path is:
 - `T-903` planning direction: `.env` stays untracked as the live local file, `.env.example` is the checked-in template, uncommented entries should be limited to required local/bootstrap values, and optional deploy-era keys should stay commented until needed.
 - `T-904` / `T-905` planning direction: the eventual deployment baseline should use Kamal while preserving the current env key names so local Compose and deploy automation do not drift.
 - `T-903`: `.env.example` now keeps the local Compose and bootstrap-owner baseline uncommented, while optional Discord OAuth, bot, router-command, and Docker API override examples stay commented until needed.
+- Future operator UI work should put current player count ahead of lower-priority metadata on server screens, and browser-side log viewing / bounded command execution should reuse the same Rails-owned trust boundary as bot-triggered commands.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.

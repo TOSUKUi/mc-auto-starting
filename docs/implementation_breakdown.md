@@ -59,6 +59,7 @@
 - 目的: 所有または参加しているサーバーのみ一覧表示
 - 表示項目:
   - サーバー名
+  - 現在の参加人数
   - 接続先 `<server-fqdn>:<shared_public_port>`
   - 状態
   - Minecraft バージョン
@@ -96,6 +97,7 @@
 - パス: `/servers/:id`
 - 目的: サーバー状態確認と運用操作
 - 表示項目:
+  - 現在の参加人数
   - サーバー基本情報
   - 接続先 `<server-fqdn>:<shared_public_port>`
   - router backend `<container_name>:25565`
@@ -109,6 +111,8 @@
   - 停止
   - 再起動
   - 状態同期
+  - recent logs の確認
+  - 制限付き command 実行
   - 削除
 
 ### 3.5 メンバー管理
