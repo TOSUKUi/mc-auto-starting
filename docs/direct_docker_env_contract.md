@@ -3,11 +3,16 @@
 ## Purpose
 This document fixes the initial environment and configuration contract for the direct-Docker baseline in task `T-304`.
 
+## Template Policy
+- The live `.env` file is local-only runtime data and must remain untracked.
+- `.env.example` is the checked-in template and should be the authoritative inventory of supported keys.
+- Keys required for the current local bootstrap path should stay uncommented in `.env.example`.
+- Keys that are not required for the current local bootstrap path should be kept as commented examples in `.env.example` until the feature or deploy path is active.
+- The bootstrap-owner Discord seed variables remain part of the required local bootstrap set even before Discord-only login fully replaces the legacy password path.
+
 ## Required Runtime Configuration
 - `DOCKER_ENGINE_SOCKET_PATH`
   Path to the Docker Engine Unix socket visible from the Rails app. Default: `/var/run/docker.sock`.
-- `DOCKER_ENGINE_API_VERSION`
-  Optional Docker Engine API version prefix used by the wrapper. Default: unset, which keeps requests unversioned. Set it only when a deployment needs an explicit `/v1.xx` override.
 - `DOCKER_ENGINE_OPEN_TIMEOUT`
   Socket open timeout in seconds. Default: `5`.
 - `DOCKER_ENGINE_READ_TIMEOUT`
@@ -30,6 +35,8 @@ This document fixes the initial environment and configuration contract for the d
   Router reload mode after config write. Allowed values: `watch`, `command`, `docker_signal`, `manual`. Default: `docker_signal`.
 
 ## Conditionally Required Configuration
+- `DOCKER_ENGINE_API_VERSION`
+  Optional Docker Engine API version prefix used by the wrapper. Default: unset, which keeps requests unversioned. Set it only when a deployment needs an explicit `/v1.xx` override.
 - `MC_ROUTER_RELOAD_COMMAND`
   Required when `MC_ROUTER_RELOAD_STRATEGY=command`.
 - `MC_ROUTER_RELOAD_SIGNAL`
@@ -80,6 +87,7 @@ This document fixes the initial environment and configuration contract for the d
 ## Compose Baseline
 - Local development should keep the full runtime configuration in a local `.env` file copied from `.env.example` so `docker compose up` and one-off `docker compose run` commands share the same values consistently.
 - `compose.yaml` now uses `.env` as the single local source for Rails, MariaDB, Docker transport, Discord OAuth, bootstrap owner seeding, and future bot-related secrets.
+- `.env.example` should leave only the current local/bootstrap baseline uncommented; optional Discord OAuth, bot, and deployment-only overrides should stay commented until they are needed.
 - The Rails `app` service mounts `/var/run/docker.sock`.
 - `mc-router` is expected to be a compose-managed sibling service, not a container created by Rails.
 - The `mc-router` compose service should carry a stable label such as `app.kubos.dev/component=mc-router` so Rails can target reloads without relying on generated container names.

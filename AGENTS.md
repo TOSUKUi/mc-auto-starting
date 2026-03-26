@@ -149,7 +149,7 @@ Use these as the default command set.
 - `docker compose run --rm app bin/rails test`
 
 - `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE` values used by Compose.
-- `.env.example` is the checked-in template for those values; keep the real `.env` local and out of Git, treat it as the single local source for Compose, Discord OAuth, bootstrap-owner, and future bot secrets, and prefer leaving non-required variables commented in `.env.example` while keeping required bootstrap variables visible.
+- `.env.example` is the checked-in template for those values; keep the real `.env` local and out of Git, treat it as the single local source for Compose, Discord OAuth, bootstrap-owner, and future bot secrets, and leave only the current local/bootstrap baseline uncommented while keeping non-required variables as commented examples.
 - If the host user or Docker socket group differs, update `.env` before running Compose.
 Do not install Ruby gems on the host unless there is an explicit exception.
 Keep gems in `vendor/bundle` inside the workspace so the mapped app user can write them.
