@@ -62,6 +62,8 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "main-survival.mc.tosukui.xyz:42434", visible_server.fetch("connection_target")
     assert_equal "paper", visible_server.fetch("runtime_family")
     assert_equal "1.21.4", visible_server.fetch("minecraft_version")
+    assert_equal "1.21.4", visible_server.fetch("resolved_minecraft_version")
+    assert_equal "1.21.4", visible_server.fetch("minecraft_version_display")
     assert_equal users(:one).email_address, visible_server.fetch("owner_email_address")
     assert_equal "viewer", visible_server.fetch("access_role")
     assert_equal "success", visible_server.fetch("route").fetch("last_apply_status")
@@ -85,6 +87,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal minecraft_servers(:one).id, server.fetch("id")
     assert_equal "operator", server.fetch("access_role")
+    assert_equal "1.21.4", server.fetch("minecraft_version_display")
     assert_equal "runtime unavailable", server.fetch("last_error_message")
     assert_equal true, server.fetch("can_start")
     assert_equal true, server.fetch("can_stop")

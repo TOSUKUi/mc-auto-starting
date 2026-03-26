@@ -55,6 +55,13 @@ function runtimeFamilyLabel(value) {
   return value
 }
 
+function selectedVersionNote(server) {
+  if (!server.resolved_minecraft_version) return null
+  if (server.resolved_minecraft_version === server.minecraft_version) return null
+
+  return `指定: ${server.minecraft_version}`
+}
+
 function formatTimestamp(value) {
   if (!value) return '未更新'
 
@@ -245,7 +252,10 @@ export default function ServersIndex({ servers, summary }) {
                         <Text c="dimmed" fw={700} size="xs" tt="uppercase">
                           Minecraft バージョン
                         </Text>
-                        <Text fw={700}>{server.minecraft_version}</Text>
+                        <Text fw={700}>{server.minecraft_version_display}</Text>
+                        {selectedVersionNote(server) ? (
+                          <Text c="dimmed" size="sm">{selectedVersionNote(server)}</Text>
+                        ) : null}
                       </Stack>
                     </Paper>
                     <Paper p="md" radius="lg" withBorder>

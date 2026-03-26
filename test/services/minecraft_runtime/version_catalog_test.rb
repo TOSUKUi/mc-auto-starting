@@ -71,4 +71,25 @@ class MinecraftRuntime::VersionCatalogTest < ActiveSupport::TestCase
 
     assert_equal MinecraftRuntime.fallback_version_options(runtime_family: "paper"), options
   end
+
+  test "resolves latest to the concrete runtime version" do
+    cache = ActiveSupport::Cache::MemoryStore.new
+    http_client = FakeHttpClient.new(
+      responses: {
+        MinecraftRuntime.version_source_url(runtime_family: "vanilla") => {
+          "latest" => { "release" => "26.1" },
+          "versions" => [
+            { "id" => "26.1", "type" => "release" },
+          ],
+        },
+      },
+    )
+
+    resolved = MinecraftRuntime::VersionCatalog.new(cache: cache, http_client: http_client).resolve_version(
+      runtime_family: "vanilla",
+      version: "latest",
+    )
+
+    assert_equal "26.1", resolved
+  end
 end

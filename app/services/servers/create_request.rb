@@ -23,8 +23,13 @@ module Servers
       def server_attributes
         normalized_attributes = attributes.symbolize_keys
         runtime_family = normalized_attributes.delete(:runtime_family)
+        selected_version = normalized_attributes[:minecraft_version]
 
         normalized_attributes.merge(
+          resolved_minecraft_version: MinecraftRuntime.resolve_version(
+            runtime_family: runtime_family,
+            version: selected_version,
+          ),
           template_kind: runtime_family,
           status: :provisioning,
         )

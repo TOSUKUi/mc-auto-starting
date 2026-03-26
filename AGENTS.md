@@ -57,7 +57,7 @@ Current baseline:
 - `T-1105` through `T-1107` are complete: the create UI now resolves version options server-side on page load, caches them briefly, falls back to the checked-in catalog, and exposes only the runtime-family-specific select choices without a freeform version field.
 - Index/detail screens now surface both Minecraft version and runtime `Type` so the current `paper` / `vanilla` selection is visible outside the create flow.
 - Runtime catalog option `label` is the user-facing Minecraft version display, while submitted `value` is the stable version key sent through the runtime `VERSION` contract.
-- The remaining runtime-catalog follow-up is `T-1102` for concrete version resolution for symbolic tags such as `latest`.
+- `T-1102` is complete: create flow now persists resolved Minecraft version metadata so symbolic selections such as `latest` can be shown as concrete numeric versions on index/detail screens.
 - Important runtime nuance: `itzg/minecraft-server` should be treated as a `TYPE` + `VERSION` driven image family, not as a runtime where image tag always equals the Minecraft version; use the official docs page `https://docker-minecraft-server.readthedocs.io/en/latest/versions/minecraft/` as the source of truth for that distinction.
 - The active live sources are Mojang's `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`, resolved by Rails on create-page load with a short TTL cache and a checked-in fallback catalog.
 

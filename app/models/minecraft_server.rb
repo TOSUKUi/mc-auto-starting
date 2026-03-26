@@ -43,6 +43,10 @@ class MinecraftServer < ApplicationRecord
     template_kind.presence || LEGACY_TEMPLATE_KIND
   end
 
+  def display_minecraft_version
+    resolved_minecraft_version.presence || minecraft_version
+  end
+
   def slug
     hostname
   end

@@ -59,6 +59,8 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "sky-lab.mc.tosukui.xyz:42434", server.fetch("connection_target")
     assert_equal "provisioning", server.fetch("status")
     assert_equal "paper", server.fetch("runtime_family")
+    assert_equal "1.21.11", server.fetch("resolved_minecraft_version")
+    assert_equal "1.21.11", server.fetch("minecraft_version_display")
     assert_not server.key?("template_kind")
     assert_equal "mc-server-sky-lab", server.fetch("runtime").fetch("container_name")
     assert_equal "mc-data-sky-lab", server.fetch("runtime").fetch("volume_name")
@@ -106,6 +108,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
 
     server = MinecraftServer.order(:id).last
     assert_equal "vanilla", server.template_kind
+    assert_equal "26.1", server.resolved_minecraft_version
     assert_equal "vanilla", response.parsed_body.fetch("server").fetch("runtime_family")
   end
 

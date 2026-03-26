@@ -14,6 +14,7 @@ one:
   backend_host: 10.0.0.21
   backend_port: 25565
   minecraft_version: 1.21.4
+  resolved_minecraft_version: 1.21.4
   memory_mb: 4096
   disk_mb: 20480
   template_kind: paper
@@ -32,6 +33,7 @@ two:
   backend_host:
   backend_port:
   minecraft_version: 1.21.4
+  resolved_minecraft_version: 1.21.4
   memory_mb: 4096
   disk_mb: 30720
   template_kind: paper

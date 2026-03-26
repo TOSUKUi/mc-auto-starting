@@ -53,6 +53,10 @@ module MinecraftRuntime
     VersionCatalog.new.version_options_by_runtime_family
   end
 
+  def resolve_version(runtime_family: DEFAULT_RUNTIME_FAMILY, version:)
+    VersionCatalog.new.resolve_version(runtime_family: runtime_family, version: version)
+  end
+
   def fallback_version_options(runtime_family: DEFAULT_RUNTIME_FAMILY)
     family_catalog(runtime_family).fetch("version_options").map { |option| option.symbolize_keys }
   end

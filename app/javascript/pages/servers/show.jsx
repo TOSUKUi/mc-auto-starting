@@ -54,6 +54,13 @@ function runtimeFamilyLabel(value) {
   return value
 }
 
+function selectedVersionNote(server) {
+  if (!server.resolved_minecraft_version) return null
+  if (server.resolved_minecraft_version === server.minecraft_version) return null
+
+  return `指定: ${server.minecraft_version}`
+}
+
 function formatTimestamp(value) {
   if (!value) return '未実行'
 
@@ -219,7 +226,15 @@ export default function ServersShow({ server }) {
                 <DetailLine label="接続先" value={<Code>{server.connection_target}</Code>} />
                 <DetailLine label="アドレス" value={<Code>{server.fqdn}</Code>} />
                 <DetailLine label="Type" value={<Badge color="grape" variant="light">{runtimeFamilyLabel(server.runtime_family)}</Badge>} />
-                <DetailLine label="Minecraft バージョン" value={<Code>{server.minecraft_version}</Code>} />
+                <DetailLine
+                  label="Minecraft バージョン"
+                  value={
+                    <Stack gap={4}>
+                      <Code>{server.minecraft_version_display}</Code>
+                      {selectedVersionNote(server) ? <Text c="dimmed" size="sm">{selectedVersionNote(server)}</Text> : null}
+                    </Stack>
+                  }
+                />
                 <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{server.access_role}</Badge>} />
                 <DetailLine label="現在の状態" value={<Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">{labelize(server.status)}</Badge>} />
                 <DetailLine label="最終起動" value={formatTimestamp(server.last_started_at)} />

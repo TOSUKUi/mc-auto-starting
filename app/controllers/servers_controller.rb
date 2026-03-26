@@ -206,6 +206,8 @@ class ServersController < InertiaController
         runtime_family: server.runtime_family,
         connection_target: server.connection_target,
         minecraft_version: server.minecraft_version,
+        resolved_minecraft_version: server.resolved_minecraft_version,
+        minecraft_version_display: server.display_minecraft_version,
         owner_email_address: server.owner.email_address,
         access_role: access_role_for(server),
         updated_at: server.updated_at.iso8601,
@@ -231,6 +233,8 @@ class ServersController < InertiaController
       summary.merge(
         fqdn: server.fqdn,
         minecraft_version: server.minecraft_version,
+        resolved_minecraft_version: server.resolved_minecraft_version,
+        minecraft_version_display: server.display_minecraft_version,
         last_error_message: server.last_error_message,
         last_started_at: server.last_started_at&.iso8601,
         owner_id: server.owner_id,

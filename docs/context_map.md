@@ -92,6 +92,7 @@ This file tells any contributor or agent where to find authoritative information
 - Index/detail screens now show both Minecraft version and runtime `Type`, keeping the operator-facing display aligned with the new runtime-family model.
 - The UI now shows stable Minecraft version labels instead of Docker image tags; submitted values are stable version keys, with `latest` remaining a special symbolic option.
 - For `itzg/minecraft-server`, the official docs treat Minecraft version selection as the `TYPE` + `VERSION` container contract, not as a guarantee that image tag equals Minecraft version; keep that distinction in mind when touching `T-1102` and later runtime work.
+- `T-1102` is complete: servers now persist `resolved_minecraft_version`, so list/detail screens can show a concrete numeric Minecraft version even when the stored selection is `latest`.
 - The current live sources are Mojang's `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`.
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.

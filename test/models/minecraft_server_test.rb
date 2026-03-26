@@ -110,6 +110,14 @@ class MinecraftServerTest < ActiveSupport::TestCase
     assert_equal "mc-server-main-survival:25565", server.backend
   end
 
+  test "prefers resolved minecraft version for display" do
+    server = minecraft_servers(:one)
+    server.minecraft_version = "latest"
+    server.resolved_minecraft_version = "26.1"
+
+    assert_equal "26.1", server.display_minecraft_version
+  end
+
   test "keeps router publication enabled only for routable statuses" do
     assert_equal true, minecraft_servers(:one).route_should_be_enabled?
     assert_equal false, minecraft_servers(:two).route_should_be_enabled?

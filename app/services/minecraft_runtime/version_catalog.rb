@@ -28,6 +28,14 @@ module MinecraftRuntime
       end
     end
 
+    def resolve_version(runtime_family:, version:)
+      normalized_runtime_family = MinecraftRuntime.normalize_runtime_family(runtime_family)
+      normalized_version = version.to_s
+      return normalized_version if normalized_version.present? && normalized_version != MinecraftRuntime.default_version_tag
+
+      latest_version_for_options(version_options(runtime_family: normalized_runtime_family)) || MinecraftRuntime.default_version_tag
+    end
+
     private
       attr_reader :cache, :logger, :http_client, :cache_ttl
 
@@ -82,6 +90,12 @@ module MinecraftRuntime
 
       def cache_key(runtime_family)
         "minecraft_runtime/version_options/#{runtime_family}"
+      end
+
+      def latest_version_for_options(options)
+        latest_option = Array(options).find { |option| option[:value] == MinecraftRuntime.default_version_tag || option["value"] == MinecraftRuntime.default_version_tag }
+        label = latest_option&.[](:label) || latest_option&.[]("label")
+        label.to_s.sub(/\s+\(latest\)\z/, "").presence
       end
 
       class HttpClient
