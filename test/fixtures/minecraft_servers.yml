@@ -34,4 +34,4 @@ two:
   minecraft_version: 1.21.4
   memory_mb: 4096
   disk_mb: 30720
-  template_kind: velocity
+  template_kind: paper

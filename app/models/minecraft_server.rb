@@ -1,5 +1,6 @@
 class MinecraftServer < ApplicationRecord
   LEGACY_TEMPLATE_KIND = "paper"
+  RUNTIME_FAMILIES = %w[paper vanilla].freeze
   MANAGED_CONTAINER_PORT = 25_565
   MIN_MEMORY_MB = 512
   MAX_MEMORY_MB = 4096
@@ -18,6 +19,7 @@ class MinecraftServer < ApplicationRecord
   before_validation :assign_managed_resource_names
 
   validates :name, :hostname, :status, :minecraft_version, :template_kind, :container_name, :volume_name, presence: true
+  validates :template_kind, inclusion: { in: RUNTIME_FAMILIES }
   validates :hostname, hostname_format: true, reserved_hostname: true
   validates :hostname, uniqueness: true
   validates :container_name, :volume_name, uniqueness: true
@@ -35,6 +37,10 @@ class MinecraftServer < ApplicationRecord
 
   def fqdn
     MinecraftPublicEndpoint.fqdn_for(hostname)
+  end
+
+  def runtime_family
+    template_kind.presence || LEGACY_TEMPLATE_KIND
   end
 
   def slug

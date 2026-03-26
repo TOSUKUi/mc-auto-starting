@@ -158,6 +158,7 @@ class ServersController < InertiaController
 
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
+        runtime_family_options: MinecraftRuntime.runtime_family_options,
         minecraft_version_options: MinecraftRuntime.version_options,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
@@ -172,6 +173,7 @@ class ServersController < InertiaController
       {
         name: "",
         hostname: "",
+        runtime_family: MinecraftRuntime.default_runtime_family,
         minecraft_version: MinecraftRuntime.default_version_tag,
         memory_mb: MinecraftServer::MAX_MEMORY_MB,
         disk_mb: 20480,
@@ -179,7 +181,7 @@ class ServersController < InertiaController
     end
 
     def create_server_params
-      params.expect(minecraft_server: [ :name, :hostname, :minecraft_version, :memory_mb, :disk_mb ]).to_h
+      params.expect(minecraft_server: [ :name, :hostname, :runtime_family, :minecraft_version, :memory_mb, :disk_mb ]).to_h
     end
 
     def normalized_hostname(value)
@@ -195,6 +197,7 @@ class ServersController < InertiaController
         hostname: server.hostname,
         fqdn: server.fqdn,
         status: server.status,
+        runtime_family: server.runtime_family,
         connection_target: server.connection_target,
         minecraft_version: server.minecraft_version,
         owner_email_address: server.owner.email_address,

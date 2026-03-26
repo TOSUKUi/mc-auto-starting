@@ -52,7 +52,8 @@ Current baseline:
 - `T-1002` is complete: authenticated users can issue Discord-user-bound invite records, see invite status in the app, copy the raw invite URL at creation time, and revoke issued invites without email delivery.
 - `T-1004` is complete: `/invites/:token` now stores pending invite context, Discord OAuth callbacks can create the first linked local user from a matching invite, and consumed invites are marked used.
 - After the Discord bot/RCON track, the next planned operator UI work is `T-1010` through `T-1012` for player-count visibility and browser-side log / command operations.
-- A later runtime-catalog track is planned at `T-1101`, then `T-1100` through `T-1103`, so Java runtime family selection lands before concrete version resolution for symbolic tags such as `latest` and version-choice sourcing.
+- `T-1101` is complete: create flow now exposes runtime family selection with `paper` as the default and a standard Java `vanilla` option wired through the existing direct-Docker provisioning path.
+- The remaining runtime-catalog track is now `T-1100` through `T-1103` for concrete version resolution for symbolic tags such as `latest` and version-choice sourcing on top of that runtime-family support.
 
 Development seed login is available as `dev@example.com` / `password`.
 The initial Discord owner can be bootstrapped with `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed`; use this before the Discord-only login flow replaces the local password baseline.
@@ -150,7 +151,7 @@ Use these as the default command set.
 - `docker compose run --rm -p 3000:3000 -p 3036:3036 app bin/dev`
 - `docker compose run --rm app bin/rails test`
 
-- `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE` values used by Compose.
+- `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, `MINECRAFT_RUNTIME_IMAGE`, and `MINECRAFT_RUNTIME_VANILLA_IMAGE` values used by Compose.
 - `.env.example` is the checked-in template for those values; keep the real `.env` local and out of Git, treat it as the single local source for Compose, Discord OAuth, bootstrap-owner, and future bot secrets, and leave only the current local/bootstrap baseline uncommented while keeping non-required variables as commented examples.
 - If the host user or Docker socket group differs, update `.env` before running Compose.
 Do not install Ruby gems on the host unless there is an explicit exception.

@@ -13,9 +13,11 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     get new_server_url(format: :json)
 
     assert_response :success
+    assert_equal "paper", response.parsed_body.fetch("form_defaults").fetch("runtime_family")
     assert_equal "latest", response.parsed_body.fetch("form_defaults").fetch("minecraft_version")
     assert_equal 4096, response.parsed_body.fetch("form_defaults").fetch("memory_mb")
     assert_equal 20480, response.parsed_body.fetch("form_defaults").fetch("disk_mb")
+    assert_equal "paper", response.parsed_body.fetch("runtime_family_options").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
     assert_not response.parsed_body.fetch("form_defaults").key?("template_kind")
     assert_not response.parsed_body.key?("template_kind")
@@ -33,6 +35,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
         minecraft_server: {
           name: "Sky Lab",
           hostname: "  SKY-lab ",
+          runtime_family: "paper",
           minecraft_version: "1.21.11",
           memory_mb: 4096,
           disk_mb: 40960,
@@ -48,6 +51,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "sky-lab.mc.tosukui.xyz", server.fetch("fqdn")
     assert_equal "sky-lab.mc.tosukui.xyz:42434", server.fetch("connection_target")
     assert_equal "provisioning", server.fetch("status")
+    assert_equal "paper", server.fetch("runtime_family")
     assert_not server.key?("template_kind")
     assert_equal "mc-server-sky-lab", server.fetch("runtime").fetch("container_name")
     assert_equal "mc-data-sky-lab", server.fetch("runtime").fetch("volume_name")
@@ -62,6 +66,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
         minecraft_server: {
           name: "Too Big",
           hostname: "bad host",
+          runtime_family: "paper",
           minecraft_version: "1.21.11",
           memory_mb: 4608,
           disk_mb: 40960,
@@ -72,5 +77,28 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_includes response.parsed_body.fetch("errors").fetch("hostname"), "Hostname must use lowercase letters, numbers, and internal hyphens only"
     assert_includes response.parsed_body.fetch("errors").fetch("memory_mb"), "Memory mb must be less than or equal to 4096"
+  end
+
+  test "create accepts the standard java runtime family" do
+    sign_in_as(users(:one))
+
+    assert_difference("MinecraftServer.count", 1) do
+      post servers_url(format: :json), params: {
+        minecraft_server: {
+          name: "Vanilla World",
+          hostname: "vanilla-world",
+          runtime_family: "vanilla",
+          minecraft_version: "latest",
+          memory_mb: 2048,
+          disk_mb: 20480,
+        },
+      }
+    end
+
+    assert_response :created
+
+    server = MinecraftServer.order(:id).last
+    assert_equal "vanilla", server.template_kind
+    assert_equal "vanilla", response.parsed_body.fetch("server").fetch("runtime_family")
   end
 end

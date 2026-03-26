@@ -21,7 +21,11 @@ module Servers
       attr_reader :actor, :attributes
 
       def server_attributes
-        attributes.symbolize_keys.merge(
+        normalized_attributes = attributes.symbolize_keys
+        runtime_family = normalized_attributes.delete(:runtime_family)
+
+        normalized_attributes.merge(
+          template_kind: runtime_family,
           status: :provisioning,
         )
       end

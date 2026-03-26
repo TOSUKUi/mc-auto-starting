@@ -25,6 +25,8 @@ This document fixes the initial environment and configuration contract for the d
   Shared public Minecraft ingress port shown to users. Default: `42434`.
 - `MINECRAFT_RUNTIME_IMAGE`
   Baseline Minecraft container image family used by create flow and UI previews. Default: `marctv/minecraft-papermc-server`.
+- `MINECRAFT_RUNTIME_VANILLA_IMAGE`
+  Standard Java server image family used when the create flow selects the `vanilla` runtime family. Default: `itzg/minecraft-server`.
 - `MC_ROUTER_IMAGE`
   Compose-managed `mc-router` image. Default: `itzg/mc-router`.
 - `MINECRAFT_RUNTIME_NETWORK_NAME`
@@ -103,7 +105,8 @@ This document fixes the initial environment and configuration contract for the d
 ## App Usage Contract
 - `MinecraftPublicEndpoint` is the single source of truth for public FQDN and connection-target formatting.
 - `MinecraftRuntime` is the single source of truth for the baseline runtime image, shared bridge network name, and `marctv/minecraft-papermc-server` create env payload.
-- The create form `minecraft_version` value is treated as a `marctv` image tag such as `latest` or `1.21.11`.
+- `MinecraftRuntime` also resolves the standard Java `vanilla` runtime image family and the per-family container env payload.
+- The create form now separates `runtime_family` from `minecraft_version`; `minecraft_version` remains the selected image tag such as `latest` or `1.21.11`.
 - `MEMORYSIZE` is derived from the selected container memory with reserved JVM headroom; it is not equal to the Docker memory limit.
 - `DockerEngine` reads only Docker transport settings.
 - `Router` reads only route file and reload settings.

@@ -33,12 +33,17 @@ function endpointPreview(hostname, publicEndpoint) {
   }
 }
 
-export default function ServersNew({ form_defaults, minecraft_version_options, public_endpoint }) {
+function selectedRuntimeLabel(value, options) {
+  return options.find((option) => option.value === value)?.label || value
+}
+
+export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const resourceHints = [
+    { label: '種類', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
     { label: 'バージョン', value: form.data.minecraft_version },
     { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: '接続先', value: preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434' },
@@ -120,6 +125,15 @@ export default function ServersNew({ form_defaults, minecraft_version_options, p
                     placeholder="main-survival"
                     required
                     value={form.data.hostname}
+                  />
+                  <Select
+                    data={runtime_family_options}
+                    description="Paper と通常の Java サーバーから選べます。"
+                    error={form.errors.runtime_family}
+                    label="サーバー種類"
+                    onChange={(value) => form.setData('runtime_family', value || '')}
+                    required
+                    value={form.data.runtime_family}
                   />
                   <Select
                     data={minecraft_version_options}

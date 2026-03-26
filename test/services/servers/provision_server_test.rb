@@ -73,15 +73,23 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
 
   setup do
     @original_runtime_image = Rails.application.config.x.minecraft_runtime.image
+    @original_vanilla_image = Rails.application.config.x.minecraft_runtime.vanilla_image
     @original_runtime_image_for = MinecraftRuntime.method(:image_for)
     Rails.application.config.x.minecraft_runtime.image = "marctv/minecraft-papermc-server"
-    MinecraftRuntime.define_singleton_method(:image_for) do |version_tag:|
-      "marctv/minecraft-papermc-server:#{normalize_version_tag(version_tag)}"
+    Rails.application.config.x.minecraft_runtime.vanilla_image = "itzg/minecraft-server"
+    MinecraftRuntime.define_singleton_method(:image_for) do |runtime_family: DEFAULT_RUNTIME_FAMILY, version_tag:|
+      case normalize_runtime_family(runtime_family)
+      when "vanilla"
+        "itzg/minecraft-server:#{normalize_version_tag(version_tag)}"
+      else
+        "marctv/minecraft-papermc-server:#{normalize_version_tag(version_tag)}"
+      end
     end
   end
 
   teardown do
     Rails.application.config.x.minecraft_runtime.image = @original_runtime_image
+    Rails.application.config.x.minecraft_runtime.vanilla_image = @original_vanilla_image
     MinecraftRuntime.define_singleton_method(:image_for, @original_runtime_image_for)
   end
 
@@ -122,14 +130,14 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal "marctv/minecraft-papermc-server:1.21.4", create_call.fetch(1).fetch(:image)
     assert_equal(
       {
-        "MEMORYSIZE" => "5632M",
+        "MEMORYSIZE" => "3584M",
         "PAPERMC_FLAGS" => "",
       },
       create_call.fetch(1).fetch(:env),
     )
     assert_equal [ { Type: "volume", Source: "mc-data-event-server", Target: "/data" } ], create_call.fetch(1).fetch(:mounts)
     assert_equal MinecraftRuntime.network_name, create_call.fetch(1).fetch(:network_name)
-    assert_equal 6144, create_call.fetch(1).fetch(:memory_mb)
+    assert_equal 4096, create_call.fetch(1).fetch(:memory_mb)
     assert_equal 1, router_applier.calls.size
   end
 
@@ -212,5 +220,33 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
 
     assert_equal [ :pull_image, { image: "marctv/minecraft-papermc-server:1.21.4" } ], docker_client.calls.fetch(2)
     assert_equal :create_container, docker_client.calls.fetch(3).fetch(0)
+  end
+
+  test "uses the vanilla runtime image and env when the runtime family is vanilla" do
+    server = minecraft_servers(:two)
+    server.update!(template_kind: "vanilla", minecraft_version: "latest", memory_mb: 2048)
+    docker_client = FakeDockerClient.new(
+      calls: [],
+      container_id: "container-902",
+      inspect_state: "running",
+    )
+
+    Servers::ProvisionServer.new(
+      server: server,
+      docker_client: docker_client,
+      router_applier: FakeRouterApplier.new([]),
+    ).call
+
+    create_call = docker_client.calls.fetch(1)
+    assert_equal "itzg/minecraft-server:latest", create_call.fetch(1).fetch(:image)
+    assert_equal(
+      {
+        "EULA" => "TRUE",
+        "TYPE" => "VANILLA",
+        "VERSION" => "latest",
+        "MEMORY" => "1536M",
+      },
+      create_call.fetch(1).fetch(:env),
+    )
   end
 end

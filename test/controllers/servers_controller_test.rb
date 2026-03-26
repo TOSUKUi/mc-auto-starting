@@ -60,6 +60,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "main-survival", visible_server.fetch("hostname")
     assert_equal "main-survival.mc.tosukui.xyz", visible_server.fetch("fqdn")
     assert_equal "main-survival.mc.tosukui.xyz:42434", visible_server.fetch("connection_target")
+    assert_equal "paper", visible_server.fetch("runtime_family")
     assert_equal "1.21.4", visible_server.fetch("minecraft_version")
     assert_equal users(:one).email_address, visible_server.fetch("owner_email_address")
     assert_equal "viewer", visible_server.fetch("access_role")
@@ -126,6 +127,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
             minecraft_server: {
               name: "Creative Build",
               hostname: "Creative-Build",
+              runtime_family: "paper",
               minecraft_version: "1.21.4",
               memory_mb: 4096,
               disk_mb: 40960,
@@ -161,6 +163,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
           minecraft_server: {
             name: "",
             hostname: "bad host",
+            runtime_family: "paper",
             minecraft_version: "1.21.4",
             memory_mb: 0,
             disk_mb: 0,

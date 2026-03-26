@@ -41,7 +41,10 @@ module Servers
       end
 
       def create_container!
-        image = MinecraftRuntime.image_for(version_tag: server.minecraft_version)
+        image = MinecraftRuntime.image_for(
+          runtime_family: server.runtime_family,
+          version_tag: server.minecraft_version,
+        )
 
         response = docker_client.create_container(
           name: server.container_name,
