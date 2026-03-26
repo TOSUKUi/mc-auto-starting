@@ -52,6 +52,7 @@ Current baseline:
 - `T-1002` is complete: authenticated users can issue Discord-user-bound invite records, see invite status in the app, copy the raw invite URL at creation time, and revoke issued invites without email delivery.
 
 Development seed login is available as `dev@example.com` / `password`.
+The initial Discord owner can be bootstrapped with `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed`; use this before the Discord-only login flow replaces the local password baseline.
 
 ## Locked Technical Decisions
 These are already decided and should be treated as defaults unless explicitly changed.

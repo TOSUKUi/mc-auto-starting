@@ -127,3 +127,4 @@ The current critical path is:
 - `T-1000`: the strategy contract for Discord auth, invite URLs, and bot mediated RCON now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001`: `users` now carry Discord identity fields, and Rails can complete a Discord OAuth callback to resolve already-linked users.
 - `T-1002`: manual invite issuance now uses digest-only stored tokens; the raw invite URL is shown only once when an authenticated user creates the invite from `/discord-invitations`.
+- Initial owner bootstrap is expected to use `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed` until the Discord-only login and invite redemption path is complete.
