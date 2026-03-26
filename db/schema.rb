@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_25_162943) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_26_214724) do
   create_table "minecraft_servers", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.string "backend_host"
     t.integer "backend_port"
@@ -80,9 +80,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_25_162943) do
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "discord_avatar"
+    t.string "discord_email"
+    t.string "discord_global_name"
+    t.string "discord_user_id"
+    t.string "discord_username"
     t.string "email_address", null: false
+    t.datetime "last_discord_login_at"
     t.string "password_digest", null: false
     t.datetime "updated_at", null: false
+    t.index ["discord_user_id"], name: "index_users_on_discord_user_id", unique: true
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 

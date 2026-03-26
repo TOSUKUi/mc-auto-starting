@@ -5,4 +5,10 @@ class UserTest < ActiveSupport::TestCase
     user = User.new(email_address: " DOWNCASED@EXAMPLE.COM ")
     assert_equal("downcased@example.com", user.email_address)
   end
+
+  test "finds an existing user by discord auth uid" do
+    auth = { "uid" => users(:one).discord_user_id }
+
+    assert_equal users(:one), User.find_by_discord_auth(auth)
+  end
 end

@@ -61,3 +61,5 @@ gem "pundit", "~> 2.5"
 
 gem "vite_rails", "~> 3.10"
 gem "excon", "~> 1.2"
+gem "omniauth", "~> 2.1"
+gem "omniauth-discord", "~> 1.2"
