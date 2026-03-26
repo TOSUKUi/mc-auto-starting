@@ -92,6 +92,7 @@
   - operator には Minecraft version 名だけを見せる
   - form submit の `value` は runtime family ごとの安定した version key として扱う
   - `vanilla` と `paper` は別 source から候補を取得できる前提で設計する
+  - 候補取得は create 画面表示時に Rails が upstream API を呼んで解決し、短い TTL cache と fallback を持つ
 - バリデーション:
   - `hostname` 形式
   - `hostname` 一意性

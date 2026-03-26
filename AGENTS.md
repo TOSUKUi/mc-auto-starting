@@ -59,6 +59,7 @@ Current baseline:
 - The remaining runtime-catalog follow-up is `T-1102` for concrete version resolution for symbolic tags such as `latest`.
 - Important runtime nuance: `itzg/minecraft-server` should be treated as a VERSION-driven image family, not as a runtime where image tag always equals the Minecraft version; use the official docs page `https://docker-minecraft-server.readthedocs.io/en/latest/versions/minecraft/` as the source of truth for that distinction.
 - The next refinement after the file-backed catalog is to split live version sources by runtime family, using Mojang's version manifest for `vanilla` and a Paper-specific list for `paper`, while showing only the human-facing version label to operators and keeping a stable internal value for form submission.
+- The active strategy for that refinement is server-side resolution at create-page load time, with Rails calling the upstream sources, caching for a short TTL, and falling back safely if upstream data is unavailable.
 
 Development seed login is available as `dev@example.com` / `password`.
 The initial Discord owner can be bootstrapped with `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed`; use this before the Discord-only login flow replaces the local password baseline.

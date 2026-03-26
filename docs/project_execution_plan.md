@@ -349,6 +349,7 @@
 
 - `vanilla` は Mojang version manifest を参照して候補を作る
 - `paper` は Paper-specific version source を参照して候補を作る
+- 候補取得は create 画面表示時に Rails 側で upstream API を呼び、短い TTL cache を挟む
 - source ごとに到達不能時の fallback を持つ
 - 完了条件:
   - runtime family に応じて候補生成の source が分かれ、誤った source の混用がなくなる

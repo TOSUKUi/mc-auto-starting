@@ -137,6 +137,7 @@ The current critical path is:
 - `T-1103`: version option `value` is treated as the runtime tag actually sent to the container image, while `label` is the operator-facing version display; they do not need to match.
 - `itzg/minecraft-server` nuance: the official Minecraft-version docs use the `VERSION` environment variable as the Minecraft version selector, so future runtime/version work must not blindly assume image tag equals Minecraft version on that runtime family.
 - Future dynamic-option work should split sources by runtime family: `vanilla` from Mojang's version manifest, `paper` from a Paper-specific version list, and the visible UI should show only the human-facing version label while keeping a stable submitted value internally.
+- Dynamic version options should be resolved on the Rails side when the create screen is opened, cached for a short TTL, and only fall back to checked-in defaults when the upstream source is unavailable.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.
