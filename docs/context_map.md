@@ -77,5 +77,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-501` and `T-502` are complete: detail/index UI now center connection targets, runtime/container state, and router publication data.
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider inventory is documented, provider services/initializer/tests are removed, and create requests no longer expose provider-era template input.
 - `T-803` is complete: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline.
-- Live `mc-router` ingress is not yet verified end-to-end; current checks stop at generated routes plus managed-container runtime checks.
-- The next implementation critical path starts at `T-804`.
+- `compose.yaml` now defines a compose-managed `mc-router` service on the shared `mc_router_net` bridge network.
+- `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
+- The current remaining router gap is live route reload on bind-mounted config changes; `mc-router` restart reloads correctly, but file-watch pickup still needs follow-up.
+- The next implementation critical path starts at `T-805`.

@@ -30,6 +30,7 @@ module Router
       def write_config(rendered_config)
         path = Pathname.new(configuration.routes_config_path)
         FileUtils.mkdir_p(path.dirname)
+        return write_config_in_place(path, rendered_config) if configuration.watch?
 
         Tempfile.create([ path.basename.to_s, ".tmp" ], path.dirname.to_s) do |file|
           file.write(rendered_config)
@@ -38,6 +39,16 @@ module Router
           file.close
 
           FileUtils.mv(file.path, path.to_s)
+        end
+      end
+
+      def write_config_in_place(path, rendered_config)
+        File.open(path, File::RDWR | File::CREAT, 0o644) do |file|
+          file.rewind
+          file.truncate(0)
+          file.write(rendered_config)
+          file.flush
+          file.fsync
         end
       end
 

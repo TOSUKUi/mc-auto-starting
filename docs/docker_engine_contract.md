@@ -68,7 +68,9 @@ The wrapper does not expose:
 ## Compose Strategy
 - The `app` service mounts `/var/run/docker.sock`.
 - The `mc-router` service is defined and lifecycle-managed in `compose.yaml`.
-- The `mc-router` service joins the shared bridge network.
+- The `mc-router` service joins the shared bridge network as an external named Docker network.
+- The `mc-router` service reads the generated routes file from a bind-mounted host path and watches it for changes.
+- The `mc-router` service publishes `${MINECRAFT_PUBLIC_PORT}:25565`.
 - App-created Minecraft containers join the same shared bridge network at create time.
 - No Docker socket proxy is introduced in the initial implementation.
 

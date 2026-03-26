@@ -59,7 +59,8 @@
 | T-801 | P7 | Add request and authorization tests | T-400,T-401,T-402,T-500,T-501 | todo | Access control and create/lifecycle/delete flows are covered |
 | T-802 | P7 | Add service tests for Docker client and allocators | T-302,T-303,T-400,T-401,T-402 | todo | Critical Docker orchestration paths are covered |
 | T-803 | P7 | Add acceptance checks for direct-Docker requirement criteria | T-400,T-401,T-402,T-500,T-501 | done | Main create/detail/delete/lifecycle paths are verifiable by automated checks |
-| T-804 | P7 | Verify compose-managed `mc-router` ingress against managed containers | T-303,T-400,T-803 | todo | A compose-managed `mc-router` service can load generated routes, reach `mc-server-<hostname>:25565` on `mc_router_net`, and accept an end-to-end connection on the shared public port |
+| T-804 | P7 | Verify compose-managed `mc-router` ingress against managed containers | T-303,T-400,T-803 | done | A compose-managed `mc-router` service can load generated routes, reach `mc-server-<hostname>:25565` on `mc_router_net`, and accept an end-to-end connection on the shared public port |
+| T-805 | P7 | Fix `mc-router` live route reload on bind-mounted config changes | T-303,T-804 | todo | Route changes written by Rails are picked up by the running compose-managed `mc-router` service without requiring a manual restart |
 | T-900 | P8 | Document single-host setup and local development workflow | T-300,T-304,T-400 | todo | New contributor can boot the project with docker.sock mounted |
 | T-901 | P8 | Document direct-Docker operations and safety notes | T-302,T-401,T-402 | todo | Operators can manage containers and understand docker.sock risks |
 | T-902 | P8 | Document release, migration, and rollback procedure | T-803,T-900,T-901 | todo | Release workflow is written and reviewable for the new architecture |
@@ -68,7 +69,7 @@
 
 The current critical path is:
 
-`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-304 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-804 -> T-900 -> T-901 -> T-902`
+`T-110 -> T-200 -> T-201 -> T-202 -> T-203 -> T-204 -> T-300 -> T-301 -> T-302 -> T-303 -> T-304 -> T-400 -> T-402 -> T-500 -> T-501 -> T-803 -> T-804 -> T-805 -> T-900 -> T-901 -> T-902`
 
 ## Known Blockers
 
@@ -97,7 +98,9 @@ The current critical path is:
 - `T-400`: create retries once with `DockerEngine#pull_image` when the selected runtime image is missing locally.
 - `T-400`: `MEMORYSIZE` now reserves JVM headroom below the Docker memory limit to avoid immediate OOM kill on boot.
 - `T-803`: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync flows against the direct-Docker baseline.
-- `T-804`: live ingress verification still needs a compose-managed `mc-router` service; current checks only prove route file generation plus direct container reachability.
+- `T-804`: compose-managed `mc-router` ingress is verified end-to-end on the shared public port after loading the generated routes.
+- `T-805`: Rails route rewrites are not yet being picked up live by `mc-router` file-watch on the current bind-mounted config path; restarting `mc-router` reloads correctly.
+- `T-804`: `compose.yaml` now defines a compose-managed `mc-router` service on the shared bridge network; live ingress verification remains to be executed against it.
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.

@@ -17,6 +17,22 @@ class Router::ConfigApplierTest < ActiveSupport::TestCase
     end
   end
 
+  test "watch mode rewrites the existing config file in place" do
+    Dir.mktmpdir do |dir|
+      config_path = File.join(dir, "routes.json")
+      File.write(config_path, %({"mappings":{}}))
+      original_inode = File.stat(config_path).ino
+      configuration = Router::Configuration.new(routes_config_path: config_path, reload_strategy: "watch")
+
+      Router::ConfigApplier.new(configuration: configuration).call(routes: [ router_routes(:one) ])
+
+      payload = JSON.parse(File.read(config_path))
+
+      assert_equal original_inode, File.stat(config_path).ino
+      assert_equal({ "main-survival.mc.tosukui.xyz" => "mc-server-main-survival:25565" }, payload.fetch("mappings"))
+    end
+  end
+
   test "runs the configured reload command when requested" do
     Dir.mktmpdir do |dir|
       config_path = File.join(dir, "routes.json")

@@ -41,8 +41,9 @@ Current baseline:
 - `T-501` and `T-502` are complete: detail/index UI now emphasize connection target, container runtime state, and router publication instead of provider-era framing.
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider dependency inventory exists, provider services/initializer/tests are removed, and controller create flow now treats `template_kind` as internal schema debt instead of an exposed input.
 - `T-803` is complete: automated acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline with router publication checks.
-- Live `mc-router` ingress verification is not implemented yet; the current baseline proves route file generation and managed-container startup, but not end-to-end routing through a running `mc-router` service.
-- The next implementation critical-path task is `T-804`.
+- `T-804` is complete: compose-managed `mc-router` now runs on the shared bridge network and a live status ping through the shared public port reached a managed Minecraft container.
+- `mc-router` route-file watch still does not pick up Rails route rewrites reliably on the current bind-mount setup; restarting `mc-router` reloads the generated routes correctly.
+- The next implementation critical-path task is `T-805`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -55,6 +56,8 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Topology: single host only in the initial version
 - Router/container topology: `mc-router` and app-managed Minecraft containers share one bridge network
 - `mc-router` itself is managed by `compose.yaml`, not created or lifecycle-managed by Rails
+- `compose.yaml` defines a compose-managed `mc-router` service that publishes `${MINECRAFT_PUBLIC_PORT}:25565`
+- `compose.yaml` attaches `mc-router` to the external shared network `${MINECRAFT_RUNTIME_NETWORK_NAME}`
 - Ruby: `3.4.9`
 - Rails: `8.1.2`
 - Database: MariaDB `10.11.16` (via `mysql2` adapter)
@@ -172,5 +175,5 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 If no other instruction is given, start from the current critical path:
 
 1. `T-200` through `T-400` are complete
-2. `T-205`, `T-700`, `T-702`, `T-703`, and `T-803` are complete while keeping `mc-router`
-3. Next, verify compose-managed `mc-router` ingress and then add the remaining direct-Docker operations docs
+2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, and `T-804` are complete while keeping `mc-router`
+3. Next, fix live route reload without `mc-router` restart and then add the remaining direct-Docker operations docs

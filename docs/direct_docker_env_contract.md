@@ -20,6 +20,8 @@ This document fixes the initial environment and configuration contract for the d
   Shared public Minecraft ingress port shown to users. Default: `42434`.
 - `MINECRAFT_RUNTIME_IMAGE`
   Baseline Minecraft container image family used by create flow and UI previews. Default: `marctv/minecraft-papermc-server`.
+- `MC_ROUTER_IMAGE`
+  Compose-managed `mc-router` image. Default: `itzg/mc-router`.
 - `MINECRAFT_RUNTIME_NETWORK_NAME`
   Shared bridge network name joined by `mc-router` and app-managed Minecraft containers. Default: `mc_router_net`.
 - `MC_ROUTER_ROUTES_CONFIG_PATH`
@@ -37,11 +39,14 @@ This document fixes the initial environment and configuration contract for the d
 - Local development should keep `LOCAL_UID`, `LOCAL_GID`, and `DOCKER_GID` in the repository `.env` file so `docker compose up` uses the same user/group mapping consistently.
 - The Rails `app` service mounts `/var/run/docker.sock`.
 - `mc-router` is expected to be a compose-managed sibling service, not a container created by Rails.
+- The `mc-router` compose service should publish `${MINECRAFT_PUBLIC_PORT}:25565` and read the shared routes file via a bind mount such as `./tmp/mc-router:/config`.
+- The shared `MINECRAFT_RUNTIME_NETWORK_NAME` network is treated as an external named bridge network so compose-managed `mc-router` can join the same network as Rails-created Minecraft containers.
 - The Rails `app` service should join the host Docker group via `group_add`, using the host Docker group GID from `DOCKER_GID`.
 - On Linux development hosts, derive `DOCKER_GID` from the `docker` group, for example with `grep '^docker:' /etc/group | cut -d: -f3`.
 - The Rails `app` service should export the direct-Docker defaults above unless deployment overrides them.
 - The Rails `app` service should leave `DOCKER_ENGINE_API_VERSION` unset unless the target daemon requires an explicit override.
 - The same `MINECRAFT_RUNTIME_NETWORK_NAME` value must be used by both Rails and the eventual `mc-router` service definition.
+- On the current local bind-mount setup, `mc-router` reliably reloads the generated routes on process start, but live file-watch pickup of Rails rewrites still needs follow-up work.
 
 ## App Usage Contract
 - `MinecraftPublicEndpoint` is the single source of truth for public FQDN and connection-target formatting.
