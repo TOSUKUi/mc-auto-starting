@@ -155,5 +155,5 @@ The current critical path is:
 - `T-1000`: the strategy contract for Discord auth, invite URLs, and bot mediated RCON now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001`: `users` now carry Discord identity fields, and Rails can complete a Discord OAuth callback to resolve already-linked users.
 - `T-1002`: manual invite issuance now uses digest-only stored tokens; the raw invite URL is shown only once when an authenticated user creates the invite from `/discord-invitations`.
-- `T-1003`: `/login` is now a Discord-only entry page with no email/password form, invite-only signup still starts at `/invites/:token`, and bootstrap-owner startup logs can point the initial operator at `/login`.
+- `T-1003`: `/login` is now a Discord-only entry page with no email/password form, `/discord/login` guards the Discord OAuth start path before handing off to OmniAuth, invite-only signup still starts at `/invites/:token`, and bootstrap-owner startup logs can point the initial operator at `/login`.
 - `T-1004`: invite redemption now begins at `/invites/:token`; a matching pending invite can create the first local user during the Discord OAuth callback, and mismatched or inactive invites are rejected.

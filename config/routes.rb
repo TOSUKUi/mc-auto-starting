@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "discord/login", to: "discord_oauth#start", as: :discord_login
   get "auth/:provider/callback", to: "discord_oauth#callback"
   get "auth/failure", to: "discord_oauth#failure"
   get "invites/:token", to: "invites#show", as: :invite

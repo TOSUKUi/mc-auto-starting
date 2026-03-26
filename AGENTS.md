@@ -50,7 +50,7 @@ Current baseline:
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.
 - `T-1002` is complete: authenticated users can issue Discord-user-bound invite records, see invite status in the app, copy the raw invite URL at creation time, and revoke issued invites without email delivery.
-- `T-1003` is complete: `/login` now serves as a Discord-only entry page for existing users, local password and password-reset routes are no longer part of the active path, and bootstrap-owner startup logs can point the initial operator at the first `/login` link.
+- `T-1003` is complete: `/login` now serves as a Discord-only entry page for existing users, a Rails-owned `/discord/login` handoff guards the Discord OAuth start path, local password and password-reset routes are no longer part of the active path, and bootstrap-owner startup logs can point the initial operator at the first `/login` link.
 - `T-1004` is complete: `/invites/:token` now stores pending invite context, Discord OAuth callbacks can create the first linked local user from a matching invite, and consumed invites are marked used.
 - After the Discord bot/RCON track, the next planned operator UI work is `T-1010` through `T-1012` for player-count visibility and browser-side log / command operations.
 - `T-1101` is complete: create flow now exposes runtime family selection with `paper` as the default, and both `paper` and `vanilla` provision through the `itzg/minecraft-server` runtime family.

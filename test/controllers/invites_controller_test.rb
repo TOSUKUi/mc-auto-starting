@@ -11,7 +11,7 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
 
     get invite_url(raw_token)
 
-    assert_redirected_to "/auth/discord"
+    assert_redirected_to discord_login_path
 
     get "/auth/discord/callback", headers: {
       "omniauth.auth" => {

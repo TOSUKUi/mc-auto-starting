@@ -6,7 +6,7 @@ class InvitesController < ApplicationController
 
     if invitation&.active?
       session[:pending_discord_invite_token] = params[:token]
-      redirect_to "/auth/discord", allow_other_host: false
+      redirect_to discord_login_path
     else
       redirect_to login_path, alert: "招待リンクが無効か期限切れです。発行者に確認してください。"
     end
