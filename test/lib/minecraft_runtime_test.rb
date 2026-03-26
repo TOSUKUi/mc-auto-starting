@@ -102,6 +102,8 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
     assert_equal(
       [
         { value: "latest", label: "最新 (latest)" },
+        { value: "1.21.11", label: "1.21.11" },
+        { value: "1.21", label: "1.21 系の最新" },
       ],
       MinecraftRuntime.version_options(runtime_family: "vanilla"),
     )
@@ -115,6 +117,8 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
         ],
         "vanilla" => [
           { value: "latest", label: "最新 (latest)" },
+          { value: "1.21.11", label: "1.21.11" },
+          { value: "1.21", label: "1.21 系の最新" },
         ],
       },
       MinecraftRuntime.version_options_by_runtime_family,

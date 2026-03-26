@@ -22,6 +22,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").first.fetch("value")
+    assert_equal "1.21.11", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").second.fetch("value")
     assert_match(/marctv\/minecraft-papermc-server\/tags/, response.parsed_body.fetch("minecraft_version_tag_list_urls").fetch("paper"))
     assert_match(/itzg\/minecraft-server\/tags/, response.parsed_body.fetch("minecraft_version_tag_list_urls").fetch("vanilla"))
     assert_not response.parsed_body.fetch("form_defaults").key?("template_kind")

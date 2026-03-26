@@ -13,3 +13,7 @@ vanilla:
   version_options:
     - value: latest
       label: 最新 (latest)
+    - value: 1.21.11
+      label: 1.21.11
+    - value: "1.21"
+      label: 1.21 系の最新
