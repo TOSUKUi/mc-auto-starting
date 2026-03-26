@@ -1,4 +1,4 @@
-import { Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
+import { Anchor, Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
 import { useEffect } from 'react'
 import { IconPlugConnected, IconSparkles } from '@tabler/icons-react'
@@ -38,15 +38,16 @@ function selectedRuntimeLabel(value, options) {
   return options.find((option) => option.value === value)?.label || value
 }
 
-export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint }) {
+export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, minecraft_version_tag_list_urls, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const minecraftVersionOptions = minecraft_version_options_by_runtime_family[form.data.runtime_family] || []
+  const selectedTagListUrl = minecraft_version_tag_list_urls[form.data.runtime_family]
   const resourceHints = [
     { label: '種類', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
-    { label: 'バージョン', value: form.data.minecraft_version },
+    { label: 'バージョン', value: form.data.custom_minecraft_version.trim() || form.data.minecraft_version },
     { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: '接続先', value: preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434' },
   ]
@@ -152,6 +153,23 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
                     onChange={(value) => form.setData('minecraft_version', value || '')}
                     required
                     value={form.data.minecraft_version}
+                  />
+                  <TextInput
+                    description={
+                      <>
+                        一覧にないタグを使うときはこちらを優先します。{' '}
+                        {selectedTagListUrl ? (
+                          <Anchor href={selectedTagListUrl} target="_blank" rel="noreferrer">
+                            タグ一覧を見る
+                          </Anchor>
+                        ) : null}
+                      </>
+                    }
+                    error={form.errors.custom_minecraft_version}
+                    label="バージョンタグを自由入力"
+                    onChange={(event) => form.setData('custom_minecraft_version', event.currentTarget.value.trim())}
+                    placeholder="例: 1.21.11-127 / latest"
+                    value={form.data.custom_minecraft_version}
                   />
                   <Divider label="起動設定" labelPosition="center" />
                   <Grid gutter="md">

@@ -88,6 +88,7 @@ This file tells any contributor or agent where to find authoritative information
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
 - `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and can also provision a standard Java `vanilla` server path through the existing direct-Docker flow.
 - `T-1100` and `T-1103` are complete: version choices are now sourced from the checked-in `config/minecraft_runtime_catalog.yml` catalog rather than live registry access or DB-backed storage.
+- The create UI now keeps catalog-backed version choices, allows freeform tag input, and links to the runtime-family-specific Docker Hub tag list as an operator reference.
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.

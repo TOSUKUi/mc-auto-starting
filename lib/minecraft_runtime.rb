@@ -7,6 +7,10 @@ module MinecraftRuntime
   JVM_HEADROOM_MB = 512
   MIN_JVM_MEMORY_MB = 512
   CATALOG_PATH = Rails.root.join("config/minecraft_runtime_catalog.yml")
+  TAG_LIST_URLS = {
+    "paper" => "https://hub.docker.com/r/marctv/minecraft-papermc-server/tags",
+    "vanilla" => "https://hub.docker.com/r/itzg/minecraft-server/tags",
+  }.freeze
 
   module_function
 
@@ -56,6 +60,14 @@ module MinecraftRuntime
     catalog.to_h do |runtime_family, attributes|
       [ runtime_family, attributes.fetch("version_options").map { |option| option.symbolize_keys } ]
     end
+  end
+
+  def tag_list_url(runtime_family: DEFAULT_RUNTIME_FAMILY)
+    TAG_LIST_URLS.fetch(normalize_runtime_family(runtime_family))
+  end
+
+  def tag_list_urls
+    TAG_LIST_URLS.dup
   end
 
   def container_env(server:)

@@ -120,4 +120,9 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
       MinecraftRuntime.version_options_by_runtime_family,
     )
   end
+
+  test "returns tag list urls by runtime family" do
+    assert_match(/marctv\/minecraft-papermc-server\/tags/, MinecraftRuntime.tag_list_url(runtime_family: "paper"))
+    assert_match(/itzg\/minecraft-server\/tags/, MinecraftRuntime.tag_list_url(runtime_family: "vanilla"))
+  end
 end

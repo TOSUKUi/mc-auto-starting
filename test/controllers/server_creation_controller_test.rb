@@ -17,10 +17,13 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "latest", response.parsed_body.fetch("form_defaults").fetch("minecraft_version")
     assert_equal 4096, response.parsed_body.fetch("form_defaults").fetch("memory_mb")
     assert_equal 20480, response.parsed_body.fetch("form_defaults").fetch("disk_mb")
+    assert_equal "", response.parsed_body.fetch("form_defaults").fetch("custom_minecraft_version")
     assert_equal "paper", response.parsed_body.fetch("runtime_family_options").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").first.fetch("value")
+    assert_match(/marctv\/minecraft-papermc-server\/tags/, response.parsed_body.fetch("minecraft_version_tag_list_urls").fetch("paper"))
+    assert_match(/itzg\/minecraft-server\/tags/, response.parsed_body.fetch("minecraft_version_tag_list_urls").fetch("vanilla"))
     assert_not response.parsed_body.fetch("form_defaults").key?("template_kind")
     assert_not response.parsed_body.key?("template_kind")
     assert_not response.parsed_body.key?("runtime_image")
@@ -102,5 +105,24 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     server = MinecraftServer.order(:id).last
     assert_equal "vanilla", server.template_kind
     assert_equal "vanilla", response.parsed_body.fetch("server").fetch("runtime_family")
+  end
+
+  test "create prefers a custom minecraft version tag when provided" do
+    sign_in_as(users(:one))
+
+    post servers_url(format: :json), params: {
+      minecraft_server: {
+        name: "Custom Tag World",
+        hostname: "custom-tag-world",
+        runtime_family: "paper",
+        minecraft_version: "latest",
+        custom_minecraft_version: "1.21.11-127",
+        memory_mb: 2048,
+        disk_mb: 20480,
+      },
+    }
+
+    assert_response :created
+    assert_equal "1.21.11-127", MinecraftServer.order(:id).last.minecraft_version
   end
 end

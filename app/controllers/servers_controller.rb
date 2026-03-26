@@ -163,6 +163,7 @@ class ServersController < InertiaController
           runtime_family: form_values[:runtime_family] || form_values["runtime_family"] || MinecraftRuntime.default_runtime_family,
         ),
         minecraft_version_options_by_runtime_family: MinecraftRuntime.version_options_by_runtime_family,
+        minecraft_version_tag_list_urls: MinecraftRuntime.tag_list_urls,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,
@@ -178,13 +179,14 @@ class ServersController < InertiaController
         hostname: "",
         runtime_family: MinecraftRuntime.default_runtime_family,
         minecraft_version: MinecraftRuntime.default_version_tag,
+        custom_minecraft_version: "",
         memory_mb: MinecraftServer::MAX_MEMORY_MB,
         disk_mb: 20480,
       }
     end
 
     def create_server_params
-      params.expect(minecraft_server: [ :name, :hostname, :runtime_family, :minecraft_version, :memory_mb, :disk_mb ]).to_h
+      params.expect(minecraft_server: [ :name, :hostname, :runtime_family, :minecraft_version, :custom_minecraft_version, :memory_mb, :disk_mb ]).to_h
     end
 
     def normalized_hostname(value)
