@@ -57,6 +57,7 @@ Current baseline:
 - The create UI now supports both catalog-backed version selection and freeform tag entry, with runtime-family-specific Docker Hub tag-list links for operator reference.
 - Runtime catalog option `value` now represents the actual image/runtime tag, while `label` is the user-facing version display and does not need to match the tag verbatim.
 - The remaining runtime-catalog follow-up is `T-1102` for concrete version resolution for symbolic tags such as `latest`.
+- Important runtime nuance: `itzg/minecraft-server` should be treated as a VERSION-driven image family, not as a runtime where image tag always equals the Minecraft version; use the official docs page `https://docker-minecraft-server.readthedocs.io/en/latest/versions/minecraft/` as the source of truth for that distinction.
 
 Development seed login is available as `dev@example.com` / `password`.
 The initial Discord owner can be bootstrapped with `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed`; use this before the Discord-only login flow replaces the local password baseline.
@@ -86,7 +87,7 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Bot integration direction: Discord Bot calls Rails-owned APIs
 - Minecraft command operation direction: Rails executes lifecycle/RCON actions; bots must not talk directly to Docker or server containers
 - Minecraft runtime image family: `marctv/minecraft-papermc-server`
-- The create-form `minecraft_version` field is treated as the selected `marctv` image tag
+- The create-form `minecraft_version` field is treated as runtime-version input; for `marctv` it maps cleanly to the image tag, but for `itzg` the Minecraft version is driven by the container `VERSION` environment contract rather than assuming image tag equals version
 - `MEMORYSIZE` should leave JVM headroom below the Docker memory limit
 - Public connection format: `<server-fqdn>:<shared_public_port>`
 - Public ingress port: single shared public port
