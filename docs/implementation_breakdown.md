@@ -82,7 +82,7 @@
   - ディスク
 - 表示項目:
   - 生成予定の接続先 `<hostname>.<public_domain>:<shared_public_port>`
-  - 使う標準イメージ
+  - 単一ホスト標準構成で作成されることの説明
 - バリデーション:
   - `hostname` 形式
   - `hostname` 一意性

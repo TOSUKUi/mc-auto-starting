@@ -1,6 +1,6 @@
-import { Button, Code, Divider, Grid, Group, NumberInput, Paper, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
+import { Alert, Button, Code, Divider, Grid, Group, NumberInput, Paper, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { IconCircleCheck, IconPlugConnected, IconServer2, IconSparkles } from '@tabler/icons-react'
+import { IconAlertCircle, IconPlugConnected, IconServer2 } from '@tabler/icons-react'
 
 function normalizeHostname(value) {
   return value.trim().toLowerCase()
@@ -16,7 +16,7 @@ function endpointPreview(hostname, publicEndpoint) {
   }
 }
 
-export default function ServersNew({ form_defaults, public_endpoint, runtime_image, template_kind }) {
+export default function ServersNew({ form_defaults, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
@@ -55,11 +55,13 @@ export default function ServersNew({ form_defaults, public_endpoint, runtime_ima
                   <ThemeIcon color="cyan" radius="xl" size={36} variant="light">
                     <IconServer2 size={18} />
                   </ThemeIcon>
-                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">
-                    Create Server
-                  </Text>
+                  <Text c="dimmed" fw={700} size="sm" tt="uppercase">New Server</Text>
                 </Group>
                 <Title order={1}>新しいサーバーを作成</Title>
+                <Text c="dimmed" maw={640}>
+                  入力するのは名前、アドレス名、バージョン、初期リソースだけです。作成後は Docker 上で managed container を起動し、
+                  同じ bridge network 上の `mc-router` へ公開設定を反映します。
+                </Text>
               </Stack>
 
               <Button
@@ -116,15 +118,7 @@ export default function ServersNew({ form_defaults, public_endpoint, runtime_ima
                       />
                     </Grid.Col>
                   </Grid>
-                  <Paper p="md" radius="lg" style={{ background: 'rgba(13, 110, 253, 0.06)' }} withBorder>
-                    <Stack gap={4}>
-                      <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                        サーバー方式
-                      </Text>
-                      <Text fw={800} size="lg">標準</Text>
-                    </Stack>
-                  </Paper>
-                  <Divider label="詳細設定（通常はそのままでOK）" labelPosition="center" />
+                  <Divider label="初期リソース" labelPosition="center" />
                   <Text c="dimmed" size="sm">
                     メモリとディスクはあとから見直せます。まずは初期値のままで作って、足りなくなってから増やす運用で十分です。
                   </Text>
@@ -230,12 +224,9 @@ export default function ServersNew({ form_defaults, public_endpoint, runtime_ima
 
               <Paper p="lg" radius="lg" shadow="sm" withBorder>
                 <Stack gap="sm">
-                  <Text c="dimmed" size="sm">
-                    実行イメージ: {runtime_image}
-                  </Text>
-                  <Text c="dimmed" size="sm">
-                    サーバー方式: {template_kind}
-                  </Text>
+                  <Alert color="blue" icon={<IconAlertCircle size={16} />} radius="md" variant="light">
+                    この画面では単一ホストの標準構成だけを扱います。作成時に Paper ベースの managed container と volume が自動で作られます。
+                  </Alert>
                 </Stack>
               </Paper>
             </Stack>

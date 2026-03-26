@@ -15,9 +15,10 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "1.21.4", response.parsed_body.fetch("form_defaults").fetch("minecraft_version")
     assert_equal 4096, response.parsed_body.fetch("form_defaults").fetch("memory_mb")
-    assert_equal "paper", response.parsed_body.fetch("form_defaults").fetch("template_kind")
-    assert_equal "paper", response.parsed_body.fetch("template_kind")
-    assert_equal "itzg/minecraft-server", response.parsed_body.fetch("runtime_image")
+    assert_equal 20480, response.parsed_body.fetch("form_defaults").fetch("disk_mb")
+    assert_not response.parsed_body.fetch("form_defaults").key?("template_kind")
+    assert_not response.parsed_body.key?("template_kind")
+    assert_not response.parsed_body.key?("runtime_image")
     assert_equal "mc.tosukui.xyz", response.parsed_body.fetch("public_endpoint").fetch("public_domain")
     assert_equal 42434, response.parsed_body.fetch("public_endpoint").fetch("public_port")
     assert_nil response.parsed_body.fetch("public_endpoint").fetch("fqdn")

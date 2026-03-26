@@ -258,5 +258,6 @@
 1. Pivot 方針の文書を固定する
 2. Docker socket の compose 方針を固める
 3. `T-303` と `T-304` は完了
-4. `T-400` と `T-401` / `T-402` は完了し、次は `T-500` / `T-501` で create/detail UI を direct-Docker 前提へ簡素化する
-5. そのあとに provider coupling cleanup を進める
+4. `T-400` と `T-401` / `T-402` は完了し、`T-500` で create UI を direct-Docker 前提へ簡素化した
+5. 次は `T-501` / `T-502` で detail/index UI を direct-Docker 前提へ簡素化する
+6. そのあとに provider coupling cleanup を進める

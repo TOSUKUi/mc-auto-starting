@@ -157,9 +157,7 @@ class ServersController < InertiaController
       hostname = normalized_hostname(form_values[:hostname])
 
       {
-        form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
-        template_kind: fixed_template_kind,
-        runtime_image: MinecraftRuntime.image,
+        form_defaults: default_new_server_form.merge(form_values.symbolize_keys.except(:template_kind)),
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
           public_port: MinecraftPublicEndpoint.public_port,
@@ -176,7 +174,6 @@ class ServersController < InertiaController
         minecraft_version: "1.21.4",
         memory_mb: 4096,
         disk_mb: 20480,
-        template_kind: fixed_template_kind,
       }
     end
 

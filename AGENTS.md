@@ -36,7 +36,8 @@ Current baseline:
 - `T-400` is complete: create requests now provision managed Docker volume/container resources, start the container, persist runtime identifiers, and publish the router route.
 - The direct-Docker lifecycle/delete contract is fixed in `docs/direct_docker_lifecycle_contract.md` before `T-401` / `T-402` implementation.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now operate on managed Docker containers and volumes instead of the legacy provider path.
-- The next implementation critical-path task is `T-500`.
+- `T-500` is complete: create UI and controller props are reduced to the direct-Docker baseline inputs plus hostname/FQDN preview metadata.
+- The next implementation critical-path task is `T-501`.
 
 Development seed login is available as `dev@example.com` / `password`.
 
@@ -160,5 +161,5 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 If no other instruction is given, start from the current critical path:
 
 1. `T-200` through `T-400` are complete
-2. `T-401` and `T-402` are complete, so the next critical path is the direct-Docker detail/create UI simplification while keeping `mc-router`
+2. `T-500` is complete, so the next critical path is the direct-Docker detail/index UI simplification while keeping `mc-router`
 3. Remove provider coupling after the direct-Docker path is working end to end

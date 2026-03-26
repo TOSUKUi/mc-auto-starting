@@ -45,7 +45,7 @@
 | T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | done | Delete removes managed container resources and unpublishes the router route |
 | T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | done | Lifecycle operations update Docker state and Rails status correctly |
 | T-403 | P3 | Persist container runtime details on sync | T-302,T-402 | todo | `container_state`, timestamps, and last error fields stay reconcilable |
-| T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | todo | Create UI exposes only the fields needed for single-host Docker provisioning while keeping hostname/FQDN guidance |
+| T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | done | Create UI exposes only the fields needed for single-host Docker provisioning while keeping hostname/FQDN guidance |
 | T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | todo | Detail UI shows connection target, container/runtime info, and router publication instead of provider info |
 | T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | todo | Index UI reflects FQDN-based connection targets and container status cleanly |
 | T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | todo | Default operator-facing copy is Japanese across the active screens |
@@ -94,3 +94,4 @@ The current critical path is:
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.
+- `T-500`: create page props are reduced to the direct-Docker baseline form fields and connection preview metadata, dropping fixed runtime/template display props from the controller contract.
