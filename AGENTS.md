@@ -115,7 +115,7 @@ Follow these rules unless the user overrides them.
 ## Build and Bootstrap Commands
 Use these as the default command set.
 
-- `export LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) DOCKER_SOCKET_GID=$(stat -c '%g' /var/run/docker.sock)` if your host user is not `1000:1000` or the Docker socket group differs
+- `export LOCAL_UID=$(id -u) LOCAL_GID=$(id -g) DOCKER_GID=$(grep '^docker:' /etc/group | cut -d: -f3)` if your host user is not `1000:1000` or the Docker group differs
 - `docker compose build app`
 - `docker compose up --build`
 - `docker compose run --rm app bin/rails db:prepare`
