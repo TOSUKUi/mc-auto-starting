@@ -61,7 +61,7 @@
 | T-803 | P7 | Add acceptance checks for direct-Docker requirement criteria | T-400,T-401,T-402,T-500,T-501 | done | Main create/detail/delete/lifecycle paths are verifiable by automated checks |
 | T-804 | P7 | Verify compose-managed `mc-router` ingress against managed containers | T-303,T-400,T-803 | done | A compose-managed `mc-router` service can load generated routes, reach `mc-server-<hostname>:25565` on `mc_router_net`, and accept an end-to-end connection on the shared public port |
 | T-805 | P7 | Fix `mc-router` live route reload on bind-mounted config changes | T-303,T-804 | done | Route changes written by Rails are picked up by the running compose-managed `mc-router` service without requiring a manual restart |
-| T-900 | P8 | Document single-host setup and local development workflow | T-300,T-304,T-400 | todo | New contributor can boot the project with docker.sock mounted |
+| T-900 | P8 | Document single-host setup and local development workflow | T-300,T-304,T-400 | done | New contributor can boot the project with docker.sock mounted |
 | T-903 | P8 | Audit `.env` ownership, required keys, and `.env.example` coverage | T-304,T-900 | done | `.env` remains untracked, every actively consumed env key is classified as required or optional, required local/bootstrap keys stay uncommented, and optional keys are safe to leave commented in `.env.example` |
 | T-904 | P8 | Define Kamal deployment topology and env/secret mapping | T-903 | todo | Kamal target host roles, accessory strategy, secret injection path, and the mapping from local `.env` keys to deploy-time env are fixed before implementation |
 | T-901 | P8 | Document direct-Docker operations and safety notes | T-302,T-401,T-402 | todo | Operators can manage containers and understand docker.sock risks |
@@ -126,6 +126,7 @@ The current critical path is:
 - `T-805`: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, avoiding unreliable bind-mounted file-watch behavior.
 - `T-805`: the compose-managed `mc-router` service now carries a stable Docker label so Rails can resolve the reload target without depending on generated container names.
 - `T-804`: `compose.yaml` now defines a compose-managed `mc-router` service on the shared bridge network, and shared-port ingress has been verified against it.
+- `T-900`: `README.md` now acts as the setup entrypoint, while `docs/single_host_setup.md` documents the external network prerequisite, local `.env` adjustments, Dockerized boot path, and bootstrap-owner flow for new contributors.
 - `T-903` planning direction: `.env` stays untracked as the live local file, `.env.example` is the checked-in template, uncommented entries should be limited to required local/bootstrap values, and optional deploy-era keys should stay commented until needed.
 - `T-904` / `T-905` planning direction: the eventual deployment baseline should use Kamal while preserving the current env key names so local Compose and deploy automation do not drift.
 - `T-903`: `.env.example` now keeps the local Compose and bootstrap-owner baseline uncommented, while optional Discord OAuth, bot, router-command, and Docker API override examples stay commented until needed.
