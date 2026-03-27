@@ -20,6 +20,7 @@ Current important files:
 - `docs/direct_docker_env_contract.md`
 - `docs/discord_auth_and_bot_strategy.md`
 - `docs/implementation_breakdown.md`
+- `docs/access_policy_and_quota_contract.md`
 - `docs/server_ui_display_review.md`
 - `docs/provider_cleanup_inventory.md`
 - `docs/project_execution_plan.md`
@@ -65,6 +66,7 @@ Current baseline:
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
 - `T-507` is complete: the server detail page now polls only while `starting`, `stopping`, or `restarting`, and the status badge shows a simple spinner instead of timestamps or countdown-style progress.
 - `T-1013` is complete: Discord OAuth now requests only `identify`, bootstrap/invite/login flows no longer persist email fields, and the remaining member-management UI resolves users by `discord_user_id` instead of email lookup.
+- `T-1014` is complete: role hierarchy, invitation authority, reader read-only behavior, and the per-owner `5120 MB` create quota now live in `docs/access_policy_and_quota_contract.md`.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.
@@ -105,8 +107,10 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Frontend bundler: `vite_rails` + Vite
 - Authentication target direction: Discord OAuth2 only
 - Account onboarding direction: manually issued invite URLs
+- Role hierarchy direction: `owner` / `operator` / `reader`
 - Bot integration direction: Discord Bot calls Rails-owned APIs
 - Minecraft command operation direction: Rails executes lifecycle/RCON actions; bots must not talk directly to Docker or server containers
+- Server creation quota direction: owner-owned servers are limited by summed `memory_mb <= 5120`
 - Minecraft runtime image family: `itzg/minecraft-server`
 - `paper` and `vanilla` both run on `itzg/minecraft-server`, selected through `TYPE=PAPER` or `TYPE=VANILLA`
 - The create-form `minecraft_version` field is treated as runtime-version input and is passed through the container `VERSION` environment contract rather than mapped to a Docker image tag
@@ -144,16 +148,17 @@ The active system has four parts.
 3. `docs/project_execution_plan.md`
 4. `docs/task_board.md`
 5. `docs/implementation_breakdown.md`
-6. `docs/server_ui_display_review.md`
-7. `docs/provider_cleanup_inventory.md`
-8. `docs/single_host_setup.md`
-9. `docs/operator_runbook.md`
-10. `docs/kamal_deployment_topology.md`
-11. `config/deploy.yml`
-12. `config/deploy.production.yml`
-13. `docs/direct_docker_env_contract.md`
-14. `docs/direct_docker_lifecycle_contract.md`
-15. `docs/discord_auth_and_bot_strategy.md`
+6. `docs/access_policy_and_quota_contract.md`
+7. `docs/server_ui_display_review.md`
+8. `docs/provider_cleanup_inventory.md`
+9. `docs/single_host_setup.md`
+10. `docs/operator_runbook.md`
+11. `docs/kamal_deployment_topology.md`
+12. `config/deploy.yml`
+13. `config/deploy.production.yml`
+14. `docs/direct_docker_env_contract.md`
+15. `docs/direct_docker_lifecycle_contract.md`
+16. `docs/discord_auth_and_bot_strategy.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.

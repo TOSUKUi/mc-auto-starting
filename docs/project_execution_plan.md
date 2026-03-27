@@ -52,6 +52,8 @@
 - `mc-router` 連携の維持に必要な FQDN / route 設定の整合確認は並行可能
 - provider schema debt の棚卸しは `docs/provider_cleanup_inventory.md` を正本にする
 - Discord auth / invite / bot command 実装は P8 の運用 docs で基本運用を固めたあとに着手する
+- role 階層は `owner` / `operator` / `reader` を正本とし、招待権限は `owner -> operator/reader`, `operator -> reader` に制限する
+- サーバー作成は owner 限定とし、所有サーバーの合計 `memory_mb` は `5120 MB` 上限で扱う
 - プレイヤー人数表示とブラウザ console UI は RCON/command trust boundary を先に固めてから進める
 - Java runtime family の選択自体は先に進め、`latest` 解決と version catalog はその後に固める
 
@@ -91,7 +93,7 @@
 
 #### P1-2 `server_members` と認可の継続方針整理
 
-- owner / operator / viewer モデルを継続する
+- owner / operator / reader モデルを正本とする
 - create/delete/start/stop/restart/sync の権限境界を再確認する
 - 完了条件:
   - direct-Docker でも既存 policy 方針を再利用できる

@@ -49,6 +49,7 @@ This document fixes the strategy for Discord-based authentication, manual invite
 - The app does not send invitation emails automatically.
 - Invite redemption is tied to Discord login and validated against the Discord identity returned by OAuth.
 - Invitations should be revocable, expirable, and single-use or otherwise explicitly state their reuse policy in implementation docs.
+- Invitation authority and target-role limits should follow `docs/access_policy_and_quota_contract.md`.
 
 ### Bot Integration
 
@@ -83,6 +84,14 @@ This document fixes the strategy for Discord-based authentication, manual invite
 - `discord_user_id` should be unique and required for active users after the migration is complete.
 - Local user visibility, membership, and ownership logic continue to use local `users.id`; Discord identity is the external lookup key that resolves to that local user.
 
+### Role Model
+
+- The active membership vocabulary should be `owner`, `operator`, and `reader`.
+- `owner` may invite both `operator` and `reader`.
+- `operator` may invite only `reader`.
+- `reader` is a read-only member and must not gain lifecycle, create, or invitation authority.
+- Bot authorization should inherit the same role semantics rather than introducing a Discord-only permission model.
+
 ### Invite Model
 
 - Invitations should be stored as app-owned records rather than inferred from Discord guild membership.
@@ -103,6 +112,8 @@ This document fixes the strategy for Discord-based authentication, manual invite
 6. Rails executes the requested lifecycle or RCON action.
 7. Rails returns a bounded result for the bot to present back in Discord.
 
+For future read-only bot operations, `reader` may access read surfaces only; write surfaces remain restricted above that role.
+
 ## Security Boundaries
 
 ### Browser/User Boundary
@@ -116,6 +127,8 @@ This document fixes the strategy for Discord-based authentication, manual invite
 - The bot is trusted only to relay commands to Rails, not to enforce final authorization.
 - Rails must treat every bot request as untrusted until the bot credential is validated and the acting Discord user is resolved.
 - The bot should supply the acting Discord user id with each request; Rails must not rely on Discord display names for authorization.
+- `reader` should be able to use only read-class bot endpoints such as status and future player-count/log reads.
+- `reader` must not gain lifecycle, command, invite, or create privileges through the bot path.
 
 ### Infrastructure Boundary
 

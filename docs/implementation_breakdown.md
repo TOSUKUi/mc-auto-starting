@@ -73,7 +73,6 @@
   - container 状態
   - route publication 状態
   - 所有者 / 自分の権限
-  - 最終更新日時
 - 操作:
   - サーバー詳細へ遷移
   - サーバー作成画面へ遷移
@@ -92,6 +91,7 @@
   - メモリ
 - 表示項目:
   - 生成予定の接続先 `<hostname>.<public_domain>:<shared_public_port>`
+  - owner に対する合計メモリ上限 `5120 MB` と現在使用量
   - `latest` など symbolic tag を選んだ場合の concrete version 表示方針
   - live source から解決し、失敗時は checked-in catalog に落ちる runtime family ごとの version 候補
   - 単一ホスト標準構成で作成されることの説明
@@ -104,6 +104,7 @@
   - `hostname` 形式
   - `hostname` 一意性
   - メモリ / ディスク上限
+  - owner ごとの合計メモリ上限 `5120 MB`
   - runtime family ごとの version/tag 契約に従うこと
 
 ### 3.4 サーバー詳細
@@ -199,7 +200,10 @@ GET /api/servers/:id/container
 
 ### 5.3 server_members
 
-- 既存の owner / operator / viewer モデルを継続
+- active role は `owner` / `operator` / `reader`
+- `owner` は `operator` / `reader` を招待可能
+- `operator` は `reader` のみ招待可能
+- `reader` は read-only member とする
 
 ### 5.4 router_routes の扱い
 

@@ -19,6 +19,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for the single-host production destination, proxy host, and web host mapping added in `T-905`.
 - `docs/implementation_breakdown.md`
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
+- `docs/access_policy_and_quota_contract.md`
+  Use for the active role hierarchy, invitation authority, reader read-only expectations, and the owner-scoped `5120 MB` server-create quota fixed by `T-1014`.
 - `docs/server_ui_display_review.md`
   Use for the agreed display contract for the server index/detail screens, including owner-name display, lifecycle-action visibility, and transition-state polling expectations captured in `T-505`.
 - `docs/provider_cleanup_inventory.md`
@@ -109,6 +111,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
 - `T-507` is complete: the server detail page now polls only while `starting`, `stopping`, or `restarting`, and the status badge shows a simple spinner instead of timestamps or countdown-style progress.
 - `T-1013` is complete: Discord OAuth now requests only `identify`, bootstrap/invite/login flows no longer persist email fields, and the remaining member-management UI resolves users by `discord_user_id` instead of email lookup.
+- `T-1014` is complete: role hierarchy, invitation authority, reader read-only behavior, and the owner-scoped `5120 MB` create quota are now fixed in `docs/access_policy_and_quota_contract.md`.
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
 - `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and both runtime families provision through `itzg/minecraft-server`.
 - `T-1100` and `T-1103` are complete: a checked-in `config/minecraft_runtime_catalog.yml` file remains as the fallback version source rather than live registry access or DB-backed storage.

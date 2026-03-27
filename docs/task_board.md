@@ -45,6 +45,7 @@
 | T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | done | Delete removes managed container resources and unpublishes the router route |
 | T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | done | Lifecycle operations update Docker state and Rails status correctly |
 | T-403 | P3 | Persist container runtime details on sync | T-302,T-402 | done | `container_state`, timestamps, and last error fields stay reconcilable |
+| T-404 | P3 | Enforce per-owner total memory quota for server creation | T-400,T-107 | todo | Create flow rejects requests when the owner's summed `memory_mb` plus the requested server exceeds `5120 MB`, and the UI shows current usage/remaining quota |
 | T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | done | Create UI exposes only the fields needed for single-host Docker provisioning while keeping hostname/FQDN guidance |
 | T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | done | Detail UI shows connection target, container/runtime info, and router publication instead of provider info |
 | T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | done | Index UI reflects FQDN-based connection targets and container status cleanly |
@@ -81,6 +82,11 @@
 | T-1007 | P9 | Implement bot-facing lifecycle and RCON command endpoints | T-1005,T-1006,T-402 | todo | Discord bot can invoke start/stop/restart/status plus bounded RCON actions through Rails APIs without bypassing policy checks |
 | T-1008 | P9 | Add tests for Discord auth, invite redemption, and bot commands | T-1003,T-1004,T-1007 | todo | OAuth login, invite consumption, rejected access, and bot command flows are covered by automated tests |
 | T-1009 | P9 | Document Discord auth, invite issuance, and bot operations | T-1008,T-900,T-901 | todo | Operators can issue invites manually, configure Discord OAuth/Bot credentials, and understand the RCON security model |
+| T-1014 | P9 | Define role hierarchy and invitation authority contract | T-1000,T-1002,T-106 | done | `owner` / `operator` / `reader` semantics, invite authority, create permissions, and reader read-only bot expectations are fixed in `docs/access_policy_and_quota_contract.md` |
+| T-1015 | P9 | Rename member read role from `viewer` to `reader` across policies and UI | T-1014,T-106,T-107 | todo | Active role terminology, displays, and policy checks no longer use `viewer` as the user-facing or stored read-role name |
+| T-1016 | P9 | Restrict invitation authority by role hierarchy | T-1014,T-1002,T-1015 | todo | Owners can issue `operator` or `reader` invites, operators can issue only `reader` invites, and readers cannot issue invites |
+| T-1017 | P9 | Restrict server creation to owners and reserve reader for read-only access | T-1014,T-107 | todo | Only owners can create servers, readers cannot create, and create authorization aligns with the quota model |
+| T-1018 | P9 | Align future bot/browser read surfaces with the `reader` role | T-1014,T-1005,T-1010 | todo | Bot and browser read-only features explicitly allow `reader` access while keeping lifecycle/command paths above reader |
 | T-1010 | P9 | Define player count, server logs, and browser command-console contract | T-402,T-1006 | todo | The source of truth, refresh strategy, authorization rules, and payload shape for player counts, recent logs, and browser-issued commands are fixed before UI work starts |
 | T-1011 | P9 | Surface player counts in server index and detail views | T-1010,T-502 | todo | Server index and detail show current player count prominently ahead of secondary operator metadata |
 | T-1012 | P9 | Add browser log viewer and command console UI | T-1010,T-1007,T-501 | todo | Authorized operators can view recent server logs and issue bounded commands from the web UI with clear success/failure feedback |
@@ -161,6 +167,7 @@ The current critical path is:
 - Discord login direction is now fixed as Discord OAuth-only sign-in with manual invite URLs instead of local password distribution.
 - Discord bot integration will call Rails-owned APIs for lifecycle and RCON operations; the bot must not talk to Docker or Minecraft containers directly.
 - `T-1000`: the strategy contract for Discord auth, invite URLs, and bot mediated RCON now lives in `docs/discord_auth_and_bot_strategy.md`.
+- `T-1014`: role hierarchy and create/invite quota policy now live in `docs/access_policy_and_quota_contract.md`; active terminology moves toward `owner` / `operator` / `reader`, server creation is owner-only, and per-owner total memory quota is `5120 MB`.
 - `T-1001`: `users` now carry Discord identity fields, and Rails can complete a Discord OAuth callback to resolve already-linked users.
 - `T-1002`: manual invite issuance now uses digest-only stored tokens; the raw invite URL is shown only once when an authenticated user creates the invite from `/discord-invitations`.
 - `T-1003`: `/login` is now a Discord-only entry page with no email/password form, `/discord/login` guards the Discord OAuth start path before handing off to OmniAuth, invite-only signup still starts at `/invites/:token`, and bootstrap-owner startup logs can point the initial operator at `/login`.
