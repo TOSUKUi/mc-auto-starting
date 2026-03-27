@@ -21,9 +21,96 @@ That is the current usable deployment and operations path in this repository.
 
 ### Not Yet Checked In
 
-Kamal is the planned deployment baseline, but the executable Kamal config and helper files are still `T-905` work.
+Kamal is the planned deployment baseline, and the initial config files are now checked in under:
 
-Use [docs/kamal_deployment_topology.md](kamal_deployment_topology.md) as the source of truth for the intended production shape, but do not expect the repository to be deployable with `kamal` commands yet.
+- [config/deploy.yml](../config/deploy.yml)
+- [config/deploy.production.yml](../config/deploy.production.yml)
+- [docker/mc-router/deploy.compose.yml](../docker/mc-router/deploy.compose.yml)
+- [bin/deploy-mc-router](../bin/deploy-mc-router)
+
+The full release and rollback runbook is still `T-902`, but the baseline deployment shape is now implemented.
+
+## Kamal Deployment Baseline
+
+Use this path when you are ready to move from the current Compose-operated host to the Kamal-based single-host deployment.
+
+### 1. Prepare local deploy secrets
+
+Copy the example files:
+
+```bash
+cp .kamal/secrets-common.example .kamal/secrets-common
+cp .kamal/secrets.production.example .kamal/secrets.production
+```
+
+Then fill in at least:
+
+- `KAMAL_REGISTRY_PASSWORD`
+- `RAILS_MASTER_KEY`
+- `DB_PASSWORD`
+- `DB_ROOT_PASSWORD`
+- `DISCORD_CLIENT_ID`
+- `DISCORD_CLIENT_SECRET`
+
+### 2. Export the required non-secret deploy variables
+
+```bash
+export KAMAL_IMAGE=registry.example.com/mc-auto-starting
+export KAMAL_REGISTRY_USERNAME=your-registry-user
+export KAMAL_REGISTRY_SERVER=registry.example.com
+export DEPLOY_WEB_HOST=app.example.com
+export APP_BASE_URL=https://app.example.com
+export DB_USERNAME=app_user
+export DB_NAME_PRODUCTION=app_production
+export MINECRAFT_PUBLIC_DOMAIN=mc.example.com
+export MINECRAFT_PUBLIC_PORT=25565
+```
+
+Optional overrides can also be exported if you need non-default Docker or runtime settings.
+
+### 3. Prepare the target host for `mc-router`
+
+SSH to the target host and run:
+
+```bash
+bin/deploy-mc-router
+```
+
+This helper:
+
+- creates the shared runtime network if it is missing
+- creates the shared router config directory
+- starts the long-lived `mc-router` sibling service
+
+### 4. Run the first Kamal setup
+
+From the repository checkout used for deployment:
+
+```bash
+kamal setup -d production
+```
+
+This should bootstrap accessories, push env, and deploy the app using the checked-in baseline.
+
+### 5. Verify the deployed app
+
+- open `${APP_BASE_URL}`
+- check `${APP_BASE_URL}/up`
+- confirm `/login` works
+- confirm the `mc-router` container is still present with `app.kubos.dev/component=mc-router`
+
+### 6. Later app updates
+
+```bash
+kamal deploy -d production
+```
+
+If an accessory image changes, reboot that accessory explicitly:
+
+```bash
+kamal accessory reboot mariadb -d production
+kamal accessory reboot redis -d production
+```
 
 ## Current Single-Host Deployment Procedure
 
@@ -277,6 +364,8 @@ docker network create "${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}"
 
 - [docs/single_host_setup.md](single_host_setup.md)
 - [docs/kamal_deployment_topology.md](kamal_deployment_topology.md)
+- [config/deploy.yml](../config/deploy.yml)
+- [config/deploy.production.yml](../config/deploy.production.yml)
 - [docs/direct_docker_env_contract.md](direct_docker_env_contract.md)
 - [docs/direct_docker_lifecycle_contract.md](direct_docker_lifecycle_contract.md)
 - [docs/docker_engine_contract.md](docker_engine_contract.md)

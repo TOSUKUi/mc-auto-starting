@@ -13,6 +13,10 @@ This file tells any contributor or agent where to find authoritative information
   Use for the current operator-facing deploy procedure, host-side verification commands, direct-Docker safety notes, and day-2 operations fixed by `T-901`.
 - `docs/kamal_deployment_topology.md`
   Use for the single-host Kamal deployment shape, accessory strategy, secret injection path, and `.env` to deploy-time env mapping fixed by `T-904`.
+- `config/deploy.yml`
+  Use for the checked-in Kamal base configuration added in `T-905`.
+- `config/deploy.production.yml`
+  Use for the single-host production destination, proxy host, and web host mapping added in `T-905`.
 - `docs/implementation_breakdown.md`
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
 - `docs/provider_cleanup_inventory.md`
@@ -93,7 +97,8 @@ This file tells any contributor or agent where to find authoritative information
 - `T-900` is complete: the single-host bootstrap path, external network prerequisite, local `.env` handling, and Dockerized development workflow are now documented for new contributors.
 - `T-904` is complete: the single-host Kamal deployment topology, accessory strategy, secret-file split, shared router-routes mount, and local `.env` to deploy env mapping are now fixed in docs before implementation.
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
-- The next implementation critical path starts at `T-905`, then `T-902` to finish the first Kamal implementation pass and the release docs before the remaining Discord bot/RCON work; after that, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
+- `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
+- The next implementation critical path starts at `T-902` to finish the release docs before the remaining Discord bot/RCON work; after that, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
 - `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and both runtime families provision through `itzg/minecraft-server`.
 - `T-1100` and `T-1103` are complete: a checked-in `config/minecraft_runtime_catalog.yml` file remains as the fallback version source rather than live registry access or DB-backed storage.

@@ -14,6 +14,8 @@ Current important files:
 - `docs/single_host_setup.md`
 - `docs/operator_runbook.md`
 - `docs/kamal_deployment_topology.md`
+- `config/deploy.yml`
+- `config/deploy.production.yml`
 - `docs/direct_docker_lifecycle_contract.md`
 - `docs/direct_docker_env_contract.md`
 - `docs/discord_auth_and_bot_strategy.md`
@@ -52,7 +54,8 @@ Current baseline:
 - `T-900` is complete: `README.md` now points at a concrete single-host bootstrap path, and `docs/single_host_setup.md` documents the local `.env` setup, external network prerequisite, Dockerized boot flow, and bootstrap-owner seed path for new contributors.
 - `T-904` is complete: `docs/kamal_deployment_topology.md` now fixes the single-host Kamal deployment shape, keeping MariaDB and Redis as Kamal accessories, `mc-router` as a long-lived sibling service, and deploy secrets outside Git while preserving the current env key names.
 - `T-901` is complete: `docs/operator_runbook.md` now gives operators a current Compose-based single-host deployment procedure, host-side verification commands, direct-Docker lifecycle guidance, and explicit Docker safety notes.
-- The next implementation critical-path tasks are `T-905` and `T-902`.
+- `T-905` is complete: the repository now includes `config/deploy.yml`, `config/deploy.production.yml`, `.kamal` secret templates and hooks, plus the `mc-router` deployment helper needed for the first Kamal-based single-host rollout.
+- The next implementation critical-path task is `T-902`.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.
@@ -136,9 +139,11 @@ The active system has four parts.
 7. `docs/single_host_setup.md`
 8. `docs/operator_runbook.md`
 9. `docs/kamal_deployment_topology.md`
-10. `docs/direct_docker_env_contract.md`
-11. `docs/direct_docker_lifecycle_contract.md`
-12. `docs/discord_auth_and_bot_strategy.md`
+10. `config/deploy.yml`
+11. `config/deploy.production.yml`
+12. `docs/direct_docker_env_contract.md`
+13. `docs/direct_docker_lifecycle_contract.md`
+14. `docs/discord_auth_and_bot_strategy.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.
@@ -212,5 +217,5 @@ If no other instruction is given, start from the current critical path:
 
 1. `T-200` through `T-400` are complete
 2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, `T-804`, and `T-805` are complete while keeping `mc-router`
-3. `T-900`, `T-901`, `T-903`, and `T-904` are complete
-4. Next, implement the Kamal baseline in `T-905`, and close the P8 docs track with `T-902`
+3. `T-900`, `T-901`, `T-903`, `T-904`, and `T-905` are complete
+4. Next, close the P8 docs track with `T-902`

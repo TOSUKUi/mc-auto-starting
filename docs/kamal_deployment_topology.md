@@ -4,7 +4,12 @@
 
 This document fixes the `T-904` deployment baseline for running the app on a single host with Kamal while preserving the current direct-Docker and `mc-router` architecture.
 
-`T-905` should implement this document rather than inventing a new deployment shape.
+`T-905` implements this document through:
+
+- [config/deploy.yml](../config/deploy.yml)
+- [config/deploy.production.yml](../config/deploy.production.yml)
+- [docker/mc-router/deploy.compose.yml](../docker/mc-router/deploy.compose.yml)
+- [bin/deploy-mc-router](../bin/deploy-mc-router)
 
 ## Scope
 

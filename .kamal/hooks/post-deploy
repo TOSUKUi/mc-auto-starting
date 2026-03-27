@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cat <<'EOF'
+Kamal deploy completed.
+
+If this is the first production boot on the host, ensure the long-lived mc-router sibling service is running:
+  bin/deploy-mc-router
+
+The app expects mc-router to keep the label:
+  app.kubos.dev/component=mc-router
+EOF
