@@ -59,6 +59,7 @@ Current baseline:
 - The next implementation critical-path task is `T-902`.
 - Additional requested follow-up tasks are queued for a review of server index/detail display content captured in `docs/server_ui_display_review.md` (`T-505`), lifecycle-aware detail-page actions (`T-506`), transition-state polling on the detail page (`T-507`), and removal of persisted user email data from the Discord-only auth path (`T-1013`).
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
+- `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.

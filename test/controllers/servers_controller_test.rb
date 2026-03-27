@@ -103,11 +103,59 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "operator", server.fetch("access_role")
     assert_equal "1.21.4", server.fetch("minecraft_version_display")
     assert_equal "runtime unavailable", server.fetch("last_error_message")
-    assert_equal true, server.fetch("can_start")
     assert_equal true, server.fetch("can_stop")
     assert_equal true, server.fetch("can_restart")
     assert_equal true, server.fetch("can_sync")
+    assert_equal false, server.fetch("can_start")
     assert_equal false, server.fetch("can_destroy")
+  end
+
+  test "show exposes start and sync for stopped servers" do
+    server = minecraft_servers(:one)
+    server.update_columns(status: MinecraftServer.statuses.fetch(:stopped), container_state: "exited")
+    sign_in_as(users(:three))
+
+    get server_url(server, format: :json)
+
+    assert_response :success
+    payload = response.parsed_body.fetch("server")
+
+    assert_equal true, payload.fetch("can_start")
+    assert_equal false, payload.fetch("can_stop")
+    assert_equal false, payload.fetch("can_restart")
+    assert_equal true, payload.fetch("can_sync")
+  end
+
+  test "show exposes only sync during transitional statuses" do
+    server = minecraft_servers(:one)
+    server.update_columns(status: MinecraftServer.statuses.fetch(:starting), container_state: "running")
+    sign_in_as(users(:three))
+
+    get server_url(server, format: :json)
+
+    assert_response :success
+    payload = response.parsed_body.fetch("server")
+
+    assert_equal false, payload.fetch("can_start")
+    assert_equal false, payload.fetch("can_stop")
+    assert_equal false, payload.fetch("can_restart")
+    assert_equal true, payload.fetch("can_sync")
+  end
+
+  test "show exposes only sync for degraded servers" do
+    server = minecraft_servers(:one)
+    server.update_columns(status: MinecraftServer.statuses.fetch(:degraded), container_state: "unknown")
+    sign_in_as(users(:three))
+
+    get server_url(server, format: :json)
+
+    assert_response :success
+    payload = response.parsed_body.fetch("server")
+
+    assert_equal false, payload.fetch("can_start")
+    assert_equal false, payload.fetch("can_stop")
+    assert_equal false, payload.fetch("can_restart")
+    assert_equal true, payload.fetch("can_sync")
   end
 
   test "show returns not found for invisible server" do

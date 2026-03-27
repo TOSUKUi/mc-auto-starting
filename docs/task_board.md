@@ -51,7 +51,7 @@
 | T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | in_progress | Default operator-facing copy is Japanese across the active screens |
 | T-504 | P4 | Show owner username instead of email on server index | T-502,T-1001 | done | Server index owner display now uses `discord_global_name` / `discord_username` fallback instead of `email_address` |
 | T-505 | P4 | Review and fix server index/detail display contract | T-501,T-502,T-503 | todo | The intended fields, labels, ordering, and omissions for server index/detail are reviewed and captured in `docs/server_ui_display_review.md` before follow-up UI edits |
-| T-506 | P4 | Gate server detail actions by lifecycle state | T-402,T-501,T-503,T-505 | todo | The server detail page only shows or enables the next valid lifecycle actions for the current state, so running servers do not still present a start action and transitional states avoid conflicting operations |
+| T-506 | P4 | Gate server detail actions by lifecycle state | T-402,T-501,T-503,T-505 | done | The server detail page now only exposes lifecycle actions that match the current server state, so running servers no longer show a start action and transitional states converge on sync-only controls |
 | T-507 | P4 | Poll server detail state during lifecycle transitions | T-402,T-501,T-506 | todo | The server detail page refreshes server state while statuses such as `starting`, `stopping`, and `restarting` are in flight, so badges and available actions converge automatically without a manual reload |
 | T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
 | T-601 | P5 | Build login page | T-100,T-004 | done | UI login works |

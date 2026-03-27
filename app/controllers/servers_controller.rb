@@ -230,6 +230,7 @@ class ServersController < InertiaController
 
     def server_detail(server)
       summary = server_summary(server)
+      visible_actions = detail_visible_actions_for(server)
 
       summary.merge(
         fqdn: server.fqdn,
@@ -244,10 +245,10 @@ class ServersController < InertiaController
         ),
         can_manage_members: policy(server).manage_members?,
         can_destroy: policy(server).destroy?,
-        can_start: policy(server).start?,
-        can_stop: policy(server).stop?,
-        can_restart: policy(server).restart?,
-        can_sync: policy(server).sync?,
+        can_start: visible_actions[:start],
+        can_stop: visible_actions[:stop],
+        can_restart: visible_actions[:restart],
+        can_sync: visible_actions[:sync],
       )
     end
 
@@ -264,6 +265,17 @@ class ServersController < InertiaController
         member: servers.count { |server| server.owner_id != Current.user.id },
         ready: servers.count(&:status_ready?),
         attention_needed: servers.count { |server| !server.status_ready? || server.router_route&.last_apply_status == "failed" },
+      }
+    end
+
+    def detail_visible_actions_for(server)
+      status = server.status.to_sym
+
+      {
+        start: policy(server).start? && status == :stopped,
+        stop: policy(server).stop? && status == :ready,
+        restart: policy(server).restart? && status == :ready,
+        sync: policy(server).sync? && %i[ready stopped starting stopping restarting degraded failed].include?(status),
       }
     end
 
