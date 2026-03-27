@@ -56,6 +56,7 @@ Current baseline:
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider dependency inventory exists, provider services/initializer/tests are removed, and controller create flow now treats `template_kind` as internal schema debt instead of an exposed input.
 - `T-701` is complete: legacy provider design docs remain only as historical references and are no longer part of the active restart workflow.
 - `T-803` is complete: automated acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline with router publication checks.
+- `T-800` through `T-802` are complete: the direct-Docker baseline now has model, request/authorization, and Docker/router/server service coverage, so the earlier P7 test-hardening placeholders are no longer open.
 - `T-804` is complete: compose-managed `mc-router` now runs on the shared bridge network and a live status ping through the shared public port reached a managed Minecraft container.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after rewriting the routes file, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - `T-900` is complete: `README.md` now points at a concrete single-host bootstrap path, and `docs/single_host_setup.md` documents the local `.env` setup, external network prerequisite, Dockerized boot flow, and bootstrap-owner seed path for new contributors.

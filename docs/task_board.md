@@ -60,9 +60,9 @@
 | T-702 | P6 | Remove provider-era initializers and tests | T-205,T-700 | done | Provider initializers, provider service tests, and related fixtures are removed or replaced while router tests remain active |
 | T-703 | P6 | Remove provider fields and references from controllers and UI | T-205,T-500,T-501,T-502,T-700 | done | Server controller responses and Inertia pages no longer expose provider concepts while preserving router data |
 | T-701 | P6 | Remove legacy provider docs from active workflow | T-110,T-700 | done | Restart docs no longer point to old provider docs as current truth |
-| T-800 | P7 | Add model tests for direct-Docker rules | T-200,T-201,T-202,T-203 | todo | Core direct-Docker domain logic is covered |
-| T-801 | P7 | Add request and authorization tests | T-400,T-401,T-402,T-500,T-501 | todo | Access control and create/lifecycle/delete flows are covered |
-| T-802 | P7 | Add service tests for Docker client and allocators | T-302,T-303,T-400,T-401,T-402 | todo | Critical Docker orchestration paths are covered |
+| T-800 | P7 | Add model tests for direct-Docker rules | T-200,T-201,T-202,T-203 | done | Core direct-Docker domain logic is covered |
+| T-801 | P7 | Add request and authorization tests | T-400,T-401,T-402,T-500,T-501 | done | Access control and create/lifecycle/delete flows are covered |
+| T-802 | P7 | Add service tests for Docker client and allocators | T-302,T-303,T-400,T-401,T-402 | done | Critical Docker orchestration paths are covered |
 | T-803 | P7 | Add acceptance checks for direct-Docker requirement criteria | T-400,T-401,T-402,T-500,T-501 | done | Main create/detail/delete/lifecycle paths are verifiable by automated checks |
 | T-804 | P7 | Verify compose-managed `mc-router` ingress against managed containers | T-303,T-400,T-803 | done | A compose-managed `mc-router` service can load generated routes, reach `mc-server-<hostname>:25565` on `mc_router_net`, and accept an end-to-end connection on the shared public port |
 | T-805 | P7 | Fix `mc-router` live route reload on bind-mounted config changes | T-303,T-804 | done | Route changes written by Rails are picked up by the running compose-managed `mc-router` service without requiring a manual restart |

@@ -101,6 +101,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider inventory is documented, provider services/initializer/tests are removed, and create requests no longer expose provider-era template input.
 - `T-701` is complete: legacy provider design docs are explicitly historical references and no longer sit in the active restart path.
 - `T-803` is complete: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline.
+- `T-800` through `T-802` are complete: model, request/authorization, and Docker/router/server service coverage now exist for the direct-Docker baseline, so the earlier P7 test-hardening placeholders no longer represent open work.
 - `compose.yaml` now defines a compose-managed `mc-router` service on the shared `mc_router_net` bridge network.
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
