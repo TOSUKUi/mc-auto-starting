@@ -49,6 +49,8 @@
 | T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | done | Detail UI shows connection target, container/runtime info, and router publication instead of provider info |
 | T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | done | Index UI reflects FQDN-based connection targets and container status cleanly |
 | T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | in_progress | Default operator-facing copy is Japanese across the active screens |
+| T-504 | P4 | Show owner username instead of email on server index | T-502,T-1001 | todo | Server index owner display uses the operator-facing username/Discord identity instead of `email_address` |
+| T-505 | P4 | Review and fix server index/detail display contract | T-501,T-502,T-503 | todo | The intended fields, labels, ordering, and omissions for server index/detail are reviewed and captured before follow-up UI edits |
 | T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
 | T-601 | P5 | Build login page | T-100,T-004 | done | UI login works |
 | T-700 | P6 | Remove provider coupling from app services | T-400,T-401,T-402 | done | Direct-Docker implementation no longer depends on execution-provider services |
@@ -80,6 +82,7 @@
 | T-1010 | P9 | Define player count, server logs, and browser command-console contract | T-402,T-1006 | todo | The source of truth, refresh strategy, authorization rules, and payload shape for player counts, recent logs, and browser-issued commands are fixed before UI work starts |
 | T-1011 | P9 | Surface player counts in server index and detail views | T-1010,T-502 | todo | Server index and detail show current player count prominently ahead of secondary operator metadata |
 | T-1012 | P9 | Add browser log viewer and command console UI | T-1010,T-1007,T-501 | todo | Authorized operators can view recent server logs and issue bounded commands from the web UI with clear success/failure feedback |
+| T-1013 | P9 | Stop storing email addresses for Discord-auth users | T-1001,T-1004 | todo | Discord auth/invite/bootstrap flows no longer persist `email_address`, Discord scopes do not request email, and dependent screens/tests/docs are updated |
 | T-1101 | P10 | Add Java server runtime family selection to create flow | T-304,T-400,T-500 | done | Operators can choose between the current runtime family and a standard Java-server path without breaking provisioning defaults |
 | T-1100 | P10 | Research latest-version resolution and dynamic tag sourcing for the expanded Java runtimes | T-1101 | done | After Java runtime family selection exists, the source of truth for resolving `latest` to a concrete Minecraft version and the feasibility/fallback plan for dynamically building tag choices are documented |
 | T-1102 | P10 | Persist and display resolved Minecraft version metadata | T-1100,T-1101,T-501,T-502 | done | When a runtime tag such as `latest` is selected, the app stores and shows the concrete Minecraft server version returned by the managed server instead of only the symbolic tag |
