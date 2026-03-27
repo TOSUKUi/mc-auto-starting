@@ -34,13 +34,6 @@ const ROUTE_COLORS = {
   failed: 'red',
 }
 
-const HEALTH_COLORS = {
-  healthy: 'teal',
-  unknown: 'gray',
-  unreachable: 'orange',
-  rejected: 'red',
-}
-
 const TRANSITION_STATUSES = [ 'starting', 'stopping', 'restarting' ]
 
 function labelize(value) {
@@ -71,14 +64,6 @@ function labelize(value) {
       return '失敗'
     case 'deleting':
       return '削除中'
-    case 'healthy':
-      return '正常'
-    case 'unknown':
-      return '不明'
-    case 'unreachable':
-      return '未到達'
-    case 'rejected':
-      return '拒否'
     default:
       return value
   }
@@ -203,9 +188,6 @@ export default function ServersShow({ server }) {
                   <Badge color="blue" variant="light">
                     {labelize(server.access_role)}
                   </Badge>
-                  <Badge color="grape" variant="light">
-                    種類 {runtimeFamilyLabel(server.runtime_family)}
-                  </Badge>
                   <Badge
                     color={STATUS_COLORS[server.status] ?? 'gray'}
                     leftSection={transitionState ? <Loader color="currentColor" size={12} type="dots" /> : null}
@@ -215,9 +197,6 @@ export default function ServersShow({ server }) {
                   </Badge>
                   <Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">
                     {server.route.enabled ? '公開中' : '非公開'}
-                  </Badge>
-                  <Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">
-                    応答 {labelize(server.route.last_healthcheck_status)}
                   </Badge>
                 </Group>
               </Stack>
@@ -261,7 +240,7 @@ export default function ServersShow({ server }) {
               </Group>
             </Group>
 
-            <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
               <Paper p="lg" radius="lg" withBorder>
                 <Stack gap={4}>
                   <Group gap="xs">
@@ -285,30 +264,6 @@ export default function ServersShow({ server }) {
                   <Text fw={600}>{server.route.enabled ? 'プレイヤーから接続できます' : '現在は公開されていません'}</Text>
                 </Stack>
               </Paper>
-
-              <Paper p="lg" radius="lg" withBorder>
-                <Stack gap={4}>
-                  <Group gap="xs">
-                    <ThemeIcon color="teal" radius="xl" size={28} variant="light">
-                      <IconActivityHeartbeat size={15} />
-                    </ThemeIcon>
-                    <Text fw={700}>最終起動</Text>
-                  </Group>
-                  <Text fw={600}>{formatTimestamp(server.last_started_at)}</Text>
-                </Stack>
-              </Paper>
-
-              <Paper p="lg" radius="lg" withBorder>
-                <Stack gap={4}>
-                  <Group gap="xs">
-                    <ThemeIcon color="cyan" radius="xl" size={28} variant="light">
-                      <IconRefresh size={15} />
-                    </ThemeIcon>
-                    <Text fw={700}>連続稼働時間</Text>
-                  </Group>
-                  <Text fw={600}>{formatUptime(server.uptime_seconds)}</Text>
-                </Stack>
-              </Paper>
             </SimpleGrid>
           </Stack>
         </Paper>
@@ -323,10 +278,8 @@ export default function ServersShow({ server }) {
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
               <Stack gap="md">
-                <Text fw={700}>サーバー情報</Text>
+                <Text fw={700}>運用情報</Text>
                 <Divider />
-                <DetailLine label="接続先" value={<Code>{server.connection_target}</Code>} />
-                <DetailLine label="アドレス" value={<Code>{server.fqdn}</Code>} />
                 <DetailLine label="種類" value={<Badge color="grape" variant="light">{runtimeFamilyLabel(server.runtime_family)}</Badge>} />
                 <DetailLine
                   label="Minecraft バージョン"
@@ -339,11 +292,6 @@ export default function ServersShow({ server }) {
                 />
                 <DetailLine label="オーナー" value={server.owner_display_name} />
                 <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{labelize(server.access_role)}</Badge>} />
-                <DetailLine label="現在の状態" value={<Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">{labelize(server.status)}</Badge>} />
-                <DetailLine label="ホスト名" value={<Code>{server.hostname}</Code>} />
-                <DetailLine label="FQDN" value={<Code>{server.fqdn}</Code>} />
-                <DetailLine label="最終起動" value={formatTimestamp(server.last_started_at)} />
-                <DetailLine label="連続稼働時間" value={formatUptime(server.uptime_seconds)} />
               </Stack>
             </Paper>
           </Grid.Col>
@@ -351,12 +299,12 @@ export default function ServersShow({ server }) {
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
               <Stack gap="md">
-                <Text fw={700}>公開情報</Text>
+                <Text fw={700}>補助情報</Text>
                 <Divider />
-                <DetailLine label="公開状態" value={<Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">{server.route.enabled ? '公開中' : '非公開'}</Badge>} />
-                <DetailLine label="応答状態" value={<Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">{labelize(server.route.last_healthcheck_status)}</Badge>} />
-                <DetailLine label="最終反映" value={formatTimestamp(server.route.last_applied_at)} />
-                <DetailLine label="最終ヘルスチェック" value={formatTimestamp(server.route.last_healthchecked_at)} />
+                <DetailLine label="ホスト名" value={<Code>{server.hostname}</Code>} />
+                <DetailLine label="FQDN" value={<Code>{server.fqdn}</Code>} />
+                <DetailLine label="最終起動" value={formatTimestamp(server.last_started_at)} />
+                <DetailLine label="連続稼働時間" value={formatUptime(server.uptime_seconds)} />
               </Stack>
             </Paper>
           </Grid.Col>
