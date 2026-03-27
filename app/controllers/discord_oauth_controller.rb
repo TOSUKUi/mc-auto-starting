@@ -68,6 +68,7 @@ class DiscordOauthController < ApplicationController
         discord_global_name: info["global_name"],
         discord_avatar: info["image"],
         last_discord_login_at: Time.current,
+        user_type: invitation.invited_user_type,
         password: password,
         password_confirmation: password,
       )

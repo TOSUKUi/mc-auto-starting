@@ -1,14 +1,14 @@
 class DiscordInvitationPolicy < ApplicationPolicy
   def index?
-    logged_in?
+    invitation_access?
   end
 
   def create?
-    logged_in?
+    invitation_access?
   end
 
   def revoke?
-    issued_by_user?
+    invitation_access? && issued_by_user?
   end
 
   class Scope < Scope
@@ -20,6 +20,10 @@ class DiscordInvitationPolicy < ApplicationPolicy
   end
 
   private
+    def invitation_access?
+      user.present? && user.manageable_user_types.any?
+    end
+
     def issued_by_user?
       user.present? && record.invited_by_id == user.id
     end

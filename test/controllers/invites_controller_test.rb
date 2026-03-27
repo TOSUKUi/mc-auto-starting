@@ -5,6 +5,7 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
     invitation, raw_token = DiscordInvitation.issue!(
       invited_by: users(:one),
       discord_user_id: "777777777777777777",
+      invited_user_type: "reader",
       expires_at: 7.days.from_now,
       note: "test invite",
     )
@@ -27,6 +28,7 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     user = User.order(:id).last
     assert_equal invitation.discord_user_id, user.discord_user_id
+    assert_equal "reader", user.user_type
     assert_nil user.email_address
     assert invitation.reload.used_at.present?
   end

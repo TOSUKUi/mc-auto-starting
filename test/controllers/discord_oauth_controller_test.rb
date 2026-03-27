@@ -43,6 +43,7 @@ class DiscordOauthControllerTest < ActionDispatch::IntegrationTest
     invitation, raw_token = DiscordInvitation.issue!(
       invited_by: users(:one),
       discord_user_id: "999999999999999999",
+      invited_user_type: "operator",
       expires_at: 7.days.from_now,
       note: "callback invite",
     )
@@ -67,6 +68,7 @@ class DiscordOauthControllerTest < ActionDispatch::IntegrationTest
     assert cookies[:session_id]
     user = User.order(:id).last
     assert_equal invitation.discord_user_id, user.discord_user_id
+    assert_equal "operator", user.user_type
     assert_nil user.email_address
     assert invitation.reload.used_at.present?
   end
@@ -75,6 +77,7 @@ class DiscordOauthControllerTest < ActionDispatch::IntegrationTest
     invitation, raw_token = DiscordInvitation.issue!(
       invited_by: users(:one),
       discord_user_id: "999999999999999998",
+      invited_user_type: "reader",
       expires_at: 7.days.from_now,
       note: "mismatch invite",
     )

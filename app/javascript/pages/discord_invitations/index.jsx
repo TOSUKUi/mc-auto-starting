@@ -47,7 +47,20 @@ function labelizeStatus(value) {
   }
 }
 
-export default function DiscordInvitationsIndex({ expiration_options, form_defaults, invitations, pending_invite_url }) {
+function labelizeUserType(value) {
+  switch (value) {
+    case 'admin':
+      return '管理者'
+    case 'operator':
+      return '運用者'
+    case 'reader':
+      return '閲覧者'
+    default:
+      return value
+  }
+}
+
+export default function DiscordInvitationsIndex({ available_user_types, expiration_options, form_defaults, invitations, pending_invite_url }) {
   const form = useForm(form_defaults)
 
   const submit = (event) => {
@@ -128,6 +141,15 @@ export default function DiscordInvitationsIndex({ expiration_options, form_defau
               />
 
               <Select
+                data={available_user_types}
+                error={form.errors.invited_user_type}
+                label="招待する権限"
+                onChange={(value) => form.setData('invited_user_type', value ?? form_defaults.invited_user_type)}
+                required
+                value={form.data.invited_user_type}
+              />
+
+              <Select
                 data={expiration_options}
                 error={form.errors.expires_at}
                 label="有効期限"
@@ -173,6 +195,7 @@ export default function DiscordInvitationsIndex({ expiration_options, form_defau
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>Discord user ID</Table.Th>
+                    <Table.Th>権限</Table.Th>
                     <Table.Th>状態</Table.Th>
                     <Table.Th>期限</Table.Th>
                     <Table.Th>メモ</Table.Th>
@@ -190,6 +213,7 @@ export default function DiscordInvitationsIndex({ expiration_options, form_defau
                           </Text>
                         </Stack>
                       </Table.Td>
+                      <Table.Td>{labelizeUserType(invitation.invited_user_type)}</Table.Td>
                       <Table.Td>
                         <Badge color={STATUS_COLORS[invitation.status] ?? 'gray'} variant="light">
                           {labelizeStatus(invitation.status)}

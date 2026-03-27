@@ -16,13 +16,14 @@ class DiscordInvitationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ discord_invitations(:one).id, discord_invitations(:two).id ].sort, response.parsed_body.fetch("invitations").map { |invitation| invitation.fetch("id") }.sort
   end
 
-  test "signed in user can create an invitation" do
+  test "admin can create an operator invitation" do
     sign_in_as(users(:one))
 
     assert_difference("DiscordInvitation.count", 1) do
       post discord_invitations_url(format: :json), params: {
         discord_invitation: {
           discord_user_id: "777777777777777777",
+          invited_user_type: "operator",
           expires_in_days: "7 days",
           note: "ops member",
         },
@@ -34,7 +35,52 @@ class DiscordInvitationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_match(%r{\Ahttp://www\.example\.com/invites/}, payload.fetch("invite_url"))
     assert_equal "777777777777777777", payload.fetch("invitation").fetch("discord_user_id")
+    assert_equal "operator", payload.fetch("invitation").fetch("invited_user_type")
     assert_equal "active", payload.fetch("invitation").fetch("status")
+  end
+
+  test "operator can create a reader invitation" do
+    sign_in_as(users(:two))
+
+    assert_difference("DiscordInvitation.count", 1) do
+      post discord_invitations_url(format: :json), params: {
+        discord_invitation: {
+          discord_user_id: "777777777777777777",
+          invited_user_type: "reader",
+          expires_in_days: "7 days",
+          note: "reader invite",
+        },
+      }
+    end
+
+    assert_response :created
+    assert_equal "reader", response.parsed_body.fetch("invitation").fetch("invited_user_type")
+  end
+
+  test "operator cannot create an operator invitation" do
+    sign_in_as(users(:two))
+
+    assert_no_difference("DiscordInvitation.count") do
+      post discord_invitations_url(format: :json), params: {
+        discord_invitation: {
+          discord_user_id: "777777777777777777",
+          invited_user_type: "operator",
+          expires_in_days: "7 days",
+          note: "forbidden",
+        },
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes response.parsed_body.fetch("errors").fetch("invited_user_type"), "Invited user type is not included in the list"
+  end
+
+  test "reader cannot access invitation index" do
+    sign_in_as(users(:three))
+
+    get discord_invitations_url(format: :json)
+
+    assert_response :forbidden
   end
 
   test "invalid expiration selection returns validation errors" do
@@ -43,6 +89,7 @@ class DiscordInvitationsControllerTest < ActionDispatch::IntegrationTest
     post discord_invitations_url(format: :json), params: {
       discord_invitation: {
         discord_user_id: "777777777777777777",
+        invited_user_type: "reader",
         expires_in_days: "30 days",
         note: "",
       },

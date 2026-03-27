@@ -5,12 +5,14 @@ class DiscordInvitationTest < ActiveSupport::TestCase
     invitation, raw_token = DiscordInvitation.issue!(
       invited_by: users(:one),
       discord_user_id: "777777777777777777",
+      invited_user_type: "operator",
       expires_at: 3.days.from_now,
       note: "manual issue",
     )
 
     assert invitation.persisted?
     assert_equal "777777777777777777", invitation.discord_user_id
+    assert_equal "operator", invitation.invited_user_type
     assert_equal "manual issue", invitation.note
     assert_not_equal raw_token, invitation.token_digest
     assert_equal DiscordInvitation.digest_token(raw_token), invitation.token_digest
@@ -26,6 +28,7 @@ class DiscordInvitationTest < ActiveSupport::TestCase
     invitation = DiscordInvitation.new(
       invited_by: users(:one),
       discord_user_id: "discord-user",
+      invited_user_type: "reader",
       expires_at: 1.day.from_now,
       token_digest: "digest",
     )

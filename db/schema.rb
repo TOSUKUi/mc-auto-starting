@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_033715) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_035000) do
   create_table "discord_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "discord_user_id", null: false
     t.datetime "expires_at", null: false
     t.bigint "invited_by_id", null: false
+    t.string "invited_user_type", default: "reader", null: false
     t.string "note"
     t.datetime "revoked_at"
     t.string "token_digest", null: false
@@ -23,6 +24,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_033715) do
     t.datetime "used_at"
     t.index ["discord_user_id"], name: "index_discord_invitations_on_discord_user_id"
     t.index ["invited_by_id"], name: "index_discord_invitations_on_invited_by_id"
+    t.index ["invited_user_type"], name: "index_discord_invitations_on_invited_user_type"
     t.index ["token_digest"], name: "index_discord_invitations_on_token_digest", unique: true
   end
 

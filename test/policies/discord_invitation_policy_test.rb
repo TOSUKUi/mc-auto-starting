@@ -1,11 +1,25 @@
 require "test_helper"
 
 class DiscordInvitationPolicyTest < ActiveSupport::TestCase
-  test "logged in user can list and create invitations" do
+  test "admin can list and create invitations" do
     policy = DiscordInvitationPolicy.new(users(:one), DiscordInvitation)
 
     assert policy.index?
     assert policy.create?
+  end
+
+  test "operator can list and create invitations" do
+    policy = DiscordInvitationPolicy.new(users(:two), DiscordInvitation)
+
+    assert policy.index?
+    assert policy.create?
+  end
+
+  test "reader cannot list or create invitations" do
+    policy = DiscordInvitationPolicy.new(users(:three), DiscordInvitation)
+
+    assert_not policy.index?
+    assert_not policy.create?
   end
 
   test "issuer can revoke their own invitation" do

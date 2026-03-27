@@ -27,6 +27,7 @@ class DiscordInvitationsController < InertiaController
     invitation, raw_token = DiscordInvitation.issue!(
       invited_by: Current.user,
       discord_user_id: invitation_params[:discord_user_id],
+      invited_user_type: invitation_params[:invited_user_type],
       expires_at: expires_at_from_params,
       note: invitation_params[:note],
     )
@@ -72,7 +73,9 @@ class DiscordInvitationsController < InertiaController
     end
 
     def invitation_params
-      params.expect(discord_invitation: [ :discord_user_id, :note, :expires_in_days ])
+      permitted = params.expect(discord_invitation: [ :discord_user_id, :invited_user_type, :note, :expires_in_days ])
+      validate_invited_user_type!(permitted[:invited_user_type])
+      permitted
     end
 
     def expires_at_from_params
@@ -89,9 +92,11 @@ class DiscordInvitationsController < InertiaController
         invitations: invitations.map { |invitation| invitation_payload(invitation) },
         form_defaults: {
           discord_user_id: "",
+          invited_user_type: Current.user.manageable_user_types.first || "reader",
           note: "",
           expires_in_days: EXPIRATION_OPTIONS.keys.third,
         },
+        available_user_types: Current.user.manageable_user_types.map { |value| { value: value, label: invited_user_type_label(value) } },
         expiration_options: EXPIRATION_OPTIONS.keys.map { |value| { value: value, label: expiration_option_label(value) } },
         pending_invite_url: flash[:invite_url],
       }
@@ -101,6 +106,7 @@ class DiscordInvitationsController < InertiaController
       {
         id: invitation.id,
         discord_user_id: invitation.discord_user_id,
+        invited_user_type: invitation.invited_user_type,
         note: invitation.note,
         status: invitation.status,
         expires_at: invitation.expires_at&.iso8601,
@@ -123,6 +129,27 @@ class DiscordInvitationsController < InertiaController
       else
         value
       end
+    end
+
+    def invited_user_type_label(value)
+      case value
+      when "admin"
+        "管理者"
+      when "operator"
+        "運用者"
+      when "reader"
+        "閲覧者"
+      else
+        value
+      end
+    end
+
+    def validate_invited_user_type!(value)
+      return if Current.user.manageable_user_types.include?(value)
+
+      record = DiscordInvitation.new
+      record.errors.add(:invited_user_type, "is not included in the list")
+      raise ActiveRecord::RecordInvalid, record
     end
 
     def invite_url_for(raw_token)
