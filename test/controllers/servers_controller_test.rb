@@ -41,6 +41,15 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ minecraft_servers(:two).id, minecraft_servers(:one).id ], response.parsed_body.fetch("servers").map { |server| server.fetch("id") }
   end
 
+  test "admin index returns all servers" do
+    sign_in_as(users(:one))
+
+    get servers_url(format: :json)
+
+    assert_response :success
+    assert_equal [ minecraft_servers(:two).id, minecraft_servers(:one).id ].sort, response.parsed_body.fetch("servers").map { |server| server.fetch("id") }.sort
+  end
+
   test "index returns server summary fields for the listing UI" do
     sign_in_as(users(:two))
 
@@ -349,6 +358,30 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :forbidden
+  end
+
+  test "admin can delete a non-owned server" do
+    sign_in_as(users(:one))
+    server = minecraft_servers(:two)
+    original_new = Servers::DestroyServer.method(:new)
+    fake_service = Object.new
+    fake_service.define_singleton_method(:call) do
+      server.destroy!
+    end
+
+    Servers::DestroyServer.define_singleton_method(:new) do |*|
+      fake_service
+    end
+
+    assert_difference("MinecraftServer.count", -1) do
+      assert_difference("RouterRoute.count", -1) do
+        delete server_url(server, format: :json)
+      end
+    end
+
+    assert_response :no_content
+  ensure
+    Servers::DestroyServer.define_singleton_method(:new, original_new)
   end
 
   test "manager membership can start a visible server" do

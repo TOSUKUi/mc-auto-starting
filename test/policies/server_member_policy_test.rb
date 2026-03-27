@@ -11,6 +11,16 @@ class ServerMemberPolicyTest < ActiveSupport::TestCase
     assert policy.destroy?
   end
 
+  test "admin can manage memberships on non-owned server" do
+    policy = ServerMemberPolicy.new(users(:one), server_members(:one))
+
+    assert policy.index?
+    assert policy.show?
+    assert policy.create?
+    assert policy.update?
+    assert policy.destroy?
+  end
+
   test "non-owner cannot manage memberships" do
     policy = ServerMemberPolicy.new(users(:two), server_members(:one))
 
@@ -29,5 +39,11 @@ class ServerMemberPolicyTest < ActiveSupport::TestCase
 
   test "scope is empty for non-owners without owned servers" do
     assert_empty ServerMemberPolicy::Scope.new(users(:three), ServerMember).resolve
+  end
+
+  test "scope includes all memberships for admin" do
+    visible_memberships = ServerMemberPolicy::Scope.new(users(:one), ServerMember).resolve.order(:id).to_a
+
+    assert_equal [ server_members(:two), server_members(:one) ], visible_memberships
   end
 end

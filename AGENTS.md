@@ -74,6 +74,7 @@ Current baseline:
 - `T-1019` is complete: server-local membership terminology now uses `manager` instead of `operator`, so membership roles no longer collide with the global `operator` user type.
 - `T-1016` is complete: invitation issuance now stores the invited global user type, admins can invite `admin` / `operator` / `reader`, operators can invite only `reader`, readers are denied at the policy/controller layer, and invite-based first login now applies the invited global role to the created user.
 - `T-1017` is complete: server create authorization is now enforced at the policy/controller layer so `admin` and `operator` can open the create flow, while `reader` is denied before request handling reaches provisioning logic.
+- `T-1018` is complete: server authorization now combines global type and server-local membership so `admin` has full visibility/management, `manager` membership grants lifecycle access, `viewer` grants read-only visibility, and destroy/member-management remain owner-or-admin only.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.

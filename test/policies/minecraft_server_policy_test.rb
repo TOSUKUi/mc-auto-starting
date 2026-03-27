@@ -20,6 +20,14 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert policy.sync?
   end
 
+  test "admin can view operate destroy and manage a non-owned server" do
+    policy = MinecraftServerPolicy.new(users(:one), minecraft_servers(:two))
+
+    assert policy.show?
+    assert policy.destroy?
+    assert policy.manage_members?
+  end
+
   test "manager membership can view and operate but not manage ownership actions" do
     policy = MinecraftServerPolicy.new(users(:three), minecraft_servers(:one))
 
@@ -52,6 +60,12 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
 
   test "scope includes owned and member servers only" do
     visible_servers = MinecraftServerPolicy::Scope.new(users(:two), MinecraftServer).resolve.order(:id).to_a
+
+    assert_equal [ minecraft_servers(:two), minecraft_servers(:one) ], visible_servers
+  end
+
+  test "scope includes all servers for admin" do
+    visible_servers = MinecraftServerPolicy::Scope.new(users(:one), MinecraftServer).resolve.order(:id).to_a
 
     assert_equal [ minecraft_servers(:two), minecraft_servers(:one) ], visible_servers
   end

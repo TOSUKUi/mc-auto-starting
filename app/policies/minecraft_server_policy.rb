@@ -12,15 +12,15 @@ class MinecraftServerPolicy < ApplicationPolicy
   end
 
   def update?
-    owner?
+    admin_user? || owner?
   end
 
   def destroy?
-    owner?
+    admin_user? || owner?
   end
 
   def manage_members?
-    owner?
+    admin_user? || owner?
   end
 
   def start?
@@ -42,6 +42,7 @@ class MinecraftServerPolicy < ApplicationPolicy
   class Scope < Scope
     def resolve
       return scope.none unless user
+      return scope.all if user.admin?
 
       scope
         .left_outer_joins(:server_members)
@@ -70,10 +71,10 @@ class MinecraftServerPolicy < ApplicationPolicy
     end
 
     def visible_to_user?
-      owner? || manager_membership? || viewer?
+      admin_user? || owner? || manager_membership? || viewer?
     end
 
     def lifecycle_access?
-      (owner? || manager_membership?) && record.lifecycle_ready?
+      (admin_user? || owner? || manager_membership?) && record.lifecycle_ready?
     end
 end

@@ -19,6 +19,15 @@ class ServerMembersControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
+  test "admin can view memberships for non-owned server" do
+    sign_in_as(users(:one))
+
+    get server_members_url(minecraft_servers(:two), format: :json)
+
+    assert_response :success
+    assert_equal minecraft_servers(:two).id, response.parsed_body.fetch("server").fetch("id")
+  end
+
   test "owner can add an existing user as a member by discord user id" do
     sign_in_as(users(:two))
 
@@ -70,5 +79,19 @@ class ServerMembersControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :success
+  end
+
+  test "admin can add membership on non-owned server" do
+    sign_in_as(users(:one))
+
+    post server_members_url(minecraft_servers(:two), format: :json), params: {
+      server_member: {
+        discord_user_id: "100000000000000003",
+        role: "manager",
+      },
+    }
+
+    assert_response :success
+    assert_equal "manager", minecraft_servers(:two).server_members.find_by!(user: users(:three)).role
   end
 end

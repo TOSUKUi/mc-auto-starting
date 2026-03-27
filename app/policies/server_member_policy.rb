@@ -22,6 +22,7 @@ class ServerMemberPolicy < ApplicationPolicy
   class Scope < Scope
     def resolve
       return scope.none unless user
+      return scope.all if user.admin?
 
       scope.joins(:minecraft_server).where(minecraft_servers: { owner_id: user.id })
     end
@@ -29,6 +30,6 @@ class ServerMemberPolicy < ApplicationPolicy
 
   private
     def manage?
-      user.present? && record.minecraft_server.owner_id == user.id
+      user.present? && (user.admin? || record.minecraft_server.owner_id == user.id)
     end
 end
