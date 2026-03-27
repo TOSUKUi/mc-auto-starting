@@ -179,7 +179,7 @@ GET /api/servers/:id/container
 ### 5.1 users
 
 - 既存 auth baseline を利用
-- 将来的に global user type `admin` / `operator` / `reader` を持つ
+- global user type `admin` / `operator` / `reader` を持つ
 
 ### 5.2 minecraft_servers
 
@@ -203,7 +203,10 @@ GET /api/servers/:id/container
 ### 5.3 server_members
 
 - server membership は server visibility / participation の局所権限として維持する
-- app-wide authorization は別途 user type `admin` / `operator` / `reader` を正本とする
+- membership role は `viewer` / `manager` を正本とする
+- app-wide authorization は別途 global user type `admin` / `operator` / `reader` を正本とする
+- `viewer` は閲覧のみ、`manager` は対象サーバーに限った lifecycle 操作までを許可する
+- 削除と membership 管理は owner または global `admin` に限定する
 
 ### 5.4 router_routes の扱い
 

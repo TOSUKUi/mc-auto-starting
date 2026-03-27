@@ -87,9 +87,11 @@ This document fixes the strategy for Discord-based authentication, manual invite
 ### Role Model
 
 - The active global user-type vocabulary should be `admin`, `operator`, and `reader`.
+- The active server-membership vocabulary should be `viewer` and `manager`.
 - `admin` may invite without restriction and is not quota-limited on server creation.
 - `operator` may invite only `reader` and is limited to `5120 MB` total owned server memory for create actions.
-- `reader` is a read-only user type and must not gain create or invitation authority.
+- `reader` must not gain create or invitation authority.
+- Both global `reader` and global `operator` may be granted server-local `viewer` or `manager` membership, and Rails authorization should evaluate both layers together.
 - Bot authorization should inherit the same user-type semantics rather than introducing a Discord-only permission model.
 
 ### Invite Model
@@ -112,7 +114,7 @@ This document fixes the strategy for Discord-based authentication, manual invite
 6. Rails executes the requested lifecycle or RCON action.
 7. Rails returns a bounded result for the bot to present back in Discord.
 
-For future read-only bot operations, `reader` may access read surfaces only; write surfaces remain restricted above that user type.
+For future bot operations, `reader` may access read surfaces by default, and may access server-local lifecycle surfaces only when the acting user holds membership `manager` on that server.
 
 ## Security Boundaries
 
@@ -127,8 +129,9 @@ For future read-only bot operations, `reader` may access read surfaces only; wri
 - The bot is trusted only to relay commands to Rails, not to enforce final authorization.
 - Rails must treat every bot request as untrusted until the bot credential is validated and the acting Discord user is resolved.
 - The bot should supply the acting Discord user id with each request; Rails must not rely on Discord display names for authorization.
-- `reader` should be able to use only read-class bot endpoints such as status and future player-count/log reads.
-- `reader` must not gain lifecycle, command, invite, or create privileges through the bot path.
+- `reader` should be able to use read-class bot endpoints such as status and future player-count/log reads.
+- `reader` must not gain create, destroy, invite, or membership-management privileges through the bot path.
+- lifecycle bot operations should be allowed only when the acting user is `admin`, the server owner, or a server-local membership `manager`.
 
 ### Infrastructure Boundary
 

@@ -52,8 +52,11 @@
 - `mc-router` 連携の維持に必要な FQDN / route 設定の整合確認は並行可能
 - provider schema debt の棚卸しは `docs/provider_cleanup_inventory.md` を正本にする
 - Discord auth / invite / bot command 実装は P8 の運用 docs で基本運用を固めたあとに着手する
-- global user type は `admin` / `operator` / `reader` を正本とし、招待権限は `admin -> unrestricted`, `operator -> reader only` に制限する
+- global user type は `admin` / `operator` / `reader` を正本とし、server membership role は `viewer` / `manager` を正本とする
+- 招待権限は `admin -> unrestricted`, `operator -> reader only` に制限する
 - サーバー作成は `admin unrestricted`, `operator quota-limited`, `reader denied` とし、operator の所有サーバー合計 `memory_mb` は `5120 MB` 上限で扱う
+- サーバー閲覧 / lifecycle 操作は ownership と membership を併用し、`manager` は global `reader` / `operator` のどちらにも付与可能とする
+- サーバー削除と membership 管理は owner または global `admin` に限定する
 - プレイヤー人数表示とブラウザ console UI は RCON/command trust boundary を先に固めてから進める
 - Java runtime family の選択自体は先に進め、`latest` 解決と version catalog はその後に固める
 
