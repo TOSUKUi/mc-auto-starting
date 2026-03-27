@@ -55,7 +55,7 @@ class ServerMembersControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_response :unprocessable_entity
-    assert_includes response.parsed_body.fetch("errors").fetch("user"), "User must exist"
+    assert_includes response.parsed_body.fetch("errors").fetch("user"), "User が見つかりません"
   end
 
   test "owner can update a membership role" do

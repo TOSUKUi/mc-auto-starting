@@ -87,7 +87,7 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
                 <IconUserPlus size={18} />
               </ThemeIcon>
               <Text c="stone.5" fw={700} size="sm" tt="uppercase">
-                Invite
+                招待管理
               </Text>
             </Group>
             <Title order={1}>Discord 招待リンク</Title>
@@ -131,9 +131,9 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
               <Title order={3}>新しい招待を発行</Title>
 
               <TextInput
-                description="招待したい相手の Discord user ID をそのまま入力します。"
+                description="招待したい相手の Discord ユーザー ID をそのまま入力します。"
                 error={form.errors.discord_user_id}
-                label="Discord user ID"
+                label="Discord ユーザー ID"
                 onChange={(event) => form.setData('discord_user_id', event.currentTarget.value)}
                 placeholder="123456789012345678"
                 required
@@ -194,7 +194,7 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
               <Table highlightOnHover striped>
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Discord user ID</Table.Th>
+                    <Table.Th>Discord ユーザー ID</Table.Th>
                     <Table.Th>権限</Table.Th>
                     <Table.Th>状態</Table.Th>
                     <Table.Th>期限</Table.Th>

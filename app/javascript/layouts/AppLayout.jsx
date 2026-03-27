@@ -3,6 +3,19 @@ import { useDisclosure } from '@mantine/hooks'
 import { Head, Link, router, usePage } from '@inertiajs/react'
 import { IconAlertCircle, IconCircleCheck } from '@tabler/icons-react'
 
+function labelizeUserType(value) {
+  switch (value) {
+    case 'admin':
+      return '管理者'
+    case 'operator':
+      return '運用者'
+    case 'reader':
+      return '閲覧者'
+    default:
+      return value ?? '-'
+  }
+}
+
 export default function AppLayout({ children }) {
   const page = usePage()
   const [opened, { close, toggle }] = useDisclosure(false)
@@ -13,7 +26,7 @@ export default function AppLayout({ children }) {
 
   return (
     <>
-      <Head title="Minecraft Server Control Plane" />
+      <Head title="Minecraft サーバー管理" />
       <AppShell
         padding={{ base: 'md', sm: 'lg' }}
         header={{ height: { base: 72, sm: 88 } }}
@@ -40,7 +53,7 @@ export default function AppLayout({ children }) {
                 <Burger aria-label="Toggle navigation" hiddenFrom="sm" opened={opened} onClick={toggle} size="sm" />
                 <Stack gap={0}>
                   <Title order={3} size="h4">
-                    Minecraft Servers
+                    Minecraft サーバー
                   </Title>
                   <Text c="stone.3" size="sm" visibleFrom="sm">
                     サーバーの作成と公開先をまとめて管理
@@ -51,13 +64,13 @@ export default function AppLayout({ children }) {
               <Group gap="sm" wrap="nowrap">
                 <Paper px={{ base: 'sm', sm: 'md' }} py={8} radius="xl" style={{ background: '#2a261f', borderColor: '#4a4338' }} withBorder>
                   <Group gap="sm" wrap="nowrap">
-                    <Box visibleFrom="sm">
+                    <Box>
                       <Stack gap={0}>
                         <Text fw={600} size="sm">
                           {currentUser?.operator_display_name}
                         </Text>
                         <Text c="stone.4" size="xs">
-                          signed in
+                          {labelizeUserType(currentUser?.user_type)}
                         </Text>
                       </Stack>
                     </Box>
@@ -68,7 +81,7 @@ export default function AppLayout({ children }) {
                       type="button"
                       variant="light"
                     >
-                      Logout
+                      ログアウト
                     </Button>
                   </Group>
                 </Paper>
@@ -80,7 +93,7 @@ export default function AppLayout({ children }) {
         <AppShell.Navbar p="md">
           <Stack gap="md">
             <Text c="stone.5" fw={700} size="xs" tt="uppercase">
-              Navigation
+              メニュー
             </Text>
             {navigation.map((item) => (
               <NavLink

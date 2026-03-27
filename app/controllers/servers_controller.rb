@@ -24,7 +24,7 @@ class ServersController < InertiaController
     if server.persisted?
       respond_to do |format|
         format.html do
-          redirect_to server_path(server), notice: "Server create request accepted. Provisioning is running in the background."
+          redirect_to server_path(server), notice: "サーバーの作成を受け付けました。バックグラウンドで準備を進めています。"
         end
 
         format.json do
@@ -93,7 +93,7 @@ class ServersController < InertiaController
 
     respond_to do |format|
       format.html do
-        redirect_to servers_path, notice: "Server deletion completed."
+        redirect_to servers_path, notice: "サーバーを削除しました。"
       end
 
       format.json do
@@ -103,7 +103,7 @@ class ServersController < InertiaController
   rescue DockerEngine::Error, Router::ApplyError => error
     respond_to do |format|
       format.html do
-        redirect_to server_path(server), alert: "Server deletion failed: #{error.message}"
+        redirect_to server_path(server), alert: "サーバーの削除に失敗しました: #{error.message}"
       end
 
       format.json do
@@ -117,7 +117,7 @@ class ServersController < InertiaController
     authorize server, :start?
 
     Servers::StartServer.new(server: server).call
-    respond_with_server_action(server, notice: "Server start accepted.")
+    respond_with_server_action(server, notice: "サーバーを起動しました。")
   rescue DockerEngine::Error => error
     respond_with_server_error(server, error)
   end
@@ -127,7 +127,7 @@ class ServersController < InertiaController
     authorize server, :stop?
 
     Servers::StopServer.new(server: server).call
-    respond_with_server_action(server, notice: "Server stop accepted.")
+    respond_with_server_action(server, notice: "サーバーを停止しました。")
   rescue DockerEngine::Error => error
     respond_with_server_error(server, error)
   end
@@ -137,7 +137,7 @@ class ServersController < InertiaController
     authorize server, :restart?
 
     Servers::RestartServer.new(server: server).call
-    respond_with_server_action(server, notice: "Server restart accepted.")
+    respond_with_server_action(server, notice: "サーバーを再起動しました。")
   rescue DockerEngine::Error => error
     respond_with_server_error(server, error)
   end
@@ -147,7 +147,7 @@ class ServersController < InertiaController
     authorize server, :sync?
 
     Servers::SyncServerState.new(server: server).call
-    respond_with_server_action(server, notice: "Server status synchronized.")
+    respond_with_server_action(server, notice: "サーバーの状態を同期しました。")
   rescue DockerEngine::Error => error
     respond_with_server_error(server, error)
   end
@@ -303,7 +303,7 @@ class ServersController < InertiaController
     def respond_with_server_error(server, error)
       respond_to do |format|
         format.html do
-          redirect_to server_path(server), alert: "Server operation failed: #{error.message}"
+          redirect_to server_path(server), alert: "サーバー操作に失敗しました: #{error.message}"
         end
 
         format.json do

@@ -44,10 +44,44 @@ const HEALTH_COLORS = {
 const TRANSITION_STATUSES = [ 'starting', 'stopping', 'restarting' ]
 
 function labelize(value) {
-  return value
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
+  switch (value) {
+    case 'owner':
+      return 'オーナー'
+    case 'manager':
+      return '運用担当'
+    case 'viewer':
+      return '閲覧のみ'
+    case 'provisioning':
+      return '準備中'
+    case 'ready':
+      return '稼働中'
+    case 'stopped':
+      return '停止中'
+    case 'starting':
+      return '起動中'
+    case 'stopping':
+      return '停止処理中'
+    case 'restarting':
+      return '再起動中'
+    case 'degraded':
+      return '要確認'
+    case 'unpublished':
+      return '非公開'
+    case 'failed':
+      return '失敗'
+    case 'deleting':
+      return '削除中'
+    case 'healthy':
+      return '正常'
+    case 'unknown':
+      return '不明'
+    case 'unreachable':
+      return '未到達'
+    case 'rejected':
+      return '拒否'
+    default:
+      return value
+  }
 }
 
 function runtimeFamilyLabel(value) {
@@ -159,7 +193,7 @@ export default function ServersShow({ server }) {
                   <ThemeIcon color="teal" radius="xl" size={36} variant="light">
                     <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">Server Detail</Text>
+                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">詳細</Text>
                 </Group>
                 <Title order={1} style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.name}</Title>
                 <Text c="stone.3" size="md" style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
@@ -167,10 +201,10 @@ export default function ServersShow({ server }) {
                 </Text>
                 <Group gap="xs">
                   <Badge color="blue" variant="light">
-                    {server.access_role}
+                    {labelize(server.access_role)}
                   </Badge>
                   <Badge color="grape" variant="light">
-                    Type {runtimeFamilyLabel(server.runtime_family)}
+                    種類 {runtimeFamilyLabel(server.runtime_family)}
                   </Badge>
                   <Badge
                     color={STATUS_COLORS[server.status] ?? 'gray'}
@@ -293,7 +327,7 @@ export default function ServersShow({ server }) {
                 <Divider />
                 <DetailLine label="接続先" value={<Code>{server.connection_target}</Code>} />
                 <DetailLine label="アドレス" value={<Code>{server.fqdn}</Code>} />
-                <DetailLine label="Type" value={<Badge color="grape" variant="light">{runtimeFamilyLabel(server.runtime_family)}</Badge>} />
+                <DetailLine label="種類" value={<Badge color="grape" variant="light">{runtimeFamilyLabel(server.runtime_family)}</Badge>} />
                 <DetailLine
                   label="Minecraft バージョン"
                   value={
@@ -304,7 +338,7 @@ export default function ServersShow({ server }) {
                   }
                 />
                 <DetailLine label="オーナー" value={server.owner_display_name} />
-                <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{server.access_role}</Badge>} />
+                <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{labelize(server.access_role)}</Badge>} />
                 <DetailLine label="現在の状態" value={<Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">{labelize(server.status)}</Badge>} />
                 <DetailLine label="ホスト名" value={<Code>{server.hostname}</Code>} />
                 <DetailLine label="FQDN" value={<Code>{server.fqdn}</Code>} />

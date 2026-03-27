@@ -90,7 +90,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   <ThemeIcon color="teal" radius="xl" size={36} variant="light">
                     <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">New Server</Text>
+                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">作成</Text>
                 </Group>
                 <Title order={1}>新しいサーバーを作成</Title>
                 <Text c="stone.3" maw={640}>

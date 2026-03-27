@@ -12,7 +12,7 @@ class InertiaController < ApplicationController
         operator_display_name: Current.user.operator_display_name,
       },
       navigation: [
-        { name: "Servers", href: "/servers" },
+        { name: "サーバー", href: "/servers" },
         { name: "招待", href: "/discord-invitations" },
       ],
       flash: {

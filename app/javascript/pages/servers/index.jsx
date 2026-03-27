@@ -42,10 +42,44 @@ const HEALTH_COLORS = {
 }
 
 function labelize(value) {
-  return value
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
+  switch (value) {
+    case 'owner':
+      return 'オーナー'
+    case 'manager':
+      return '運用担当'
+    case 'viewer':
+      return '閲覧のみ'
+    case 'provisioning':
+      return '準備中'
+    case 'ready':
+      return '稼働中'
+    case 'stopped':
+      return '停止中'
+    case 'starting':
+      return '起動中'
+    case 'stopping':
+      return '停止処理中'
+    case 'restarting':
+      return '再起動中'
+    case 'degraded':
+      return '要確認'
+    case 'unpublished':
+      return '非公開'
+    case 'failed':
+      return '失敗'
+    case 'deleting':
+      return '削除中'
+    case 'healthy':
+      return '正常'
+    case 'unknown':
+      return '不明'
+    case 'unreachable':
+      return '未到達'
+    case 'rejected':
+      return '拒否'
+    default:
+      return value
+  }
 }
 
 function runtimeFamilyLabel(value) {
@@ -109,7 +143,7 @@ export default function ServersIndex({ servers, summary }) {
 
   return (
     <>
-      <Head title="Servers" />
+      <Head title="サーバー一覧" />
 
       <Stack gap="xl">
         <Paper
@@ -126,7 +160,7 @@ export default function ServersIndex({ servers, summary }) {
                   <ThemeIcon color="teal" radius="xl" size={36} variant="light">
                     <IconSparkles size={18} />
                   </ThemeIcon>
-                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">Overview</Text>
+                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">一覧</Text>
                 </Group>
                 <Title order={1}>サーバー一覧</Title>
                 <Text c="stone.3" maw={720} size="md">
@@ -205,10 +239,10 @@ export default function ServersIndex({ servers, summary }) {
                           {server.name}
                         </Text>
                         <Badge color="blue" variant="light">
-                          {server.access_role}
+                          {labelize(server.access_role)}
                         </Badge>
                         <Badge color="grape" variant="light">
-                          Type {runtimeFamilyLabel(server.runtime_family)}
+                          種類 {runtimeFamilyLabel(server.runtime_family)}
                         </Badge>
                         <Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">
                           {labelize(server.status)}
@@ -233,7 +267,7 @@ export default function ServersIndex({ servers, summary }) {
                     <Paper p="md" radius="lg" withBorder>
                       <Stack gap={2}>
                         <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                          Type
+                          種類
                         </Text>
                         <Text fw={700}>{runtimeFamilyLabel(server.runtime_family)}</Text>
                       </Stack>

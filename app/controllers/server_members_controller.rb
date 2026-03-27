@@ -21,12 +21,12 @@ class ServerMembersController < InertiaController
     authorize membership
 
     if user.nil?
-      membership.errors.add(:user, "must exist")
+      membership.errors.add(:user, "が見つかりません")
       return render_membership_failure(server, membership, :unprocessable_entity)
     end
 
     if membership.save
-      render_membership_success(server, "Member added.")
+      render_membership_success(server, "メンバーを追加しました。")
     else
       render_membership_failure(server, membership, :unprocessable_entity)
     end
@@ -36,7 +36,7 @@ class ServerMembersController < InertiaController
     membership = managed_membership
 
     if membership.update(member_params.slice(:role))
-      render_membership_success(membership.minecraft_server, "Member role updated.")
+      render_membership_success(membership.minecraft_server, "メンバー権限を更新しました。")
     else
       render_membership_failure(membership.minecraft_server, membership, :unprocessable_entity)
     end
@@ -47,7 +47,7 @@ class ServerMembersController < InertiaController
     server = membership.minecraft_server
     membership.destroy!
 
-    render_membership_success(server, "Member removed.")
+    render_membership_success(server, "メンバーを削除しました。")
   end
 
   private

@@ -14,17 +14,13 @@ import {
 import { Head, Link, router, useForm } from '@inertiajs/react'
 
 function labelize(value) {
-  if (value === 'manager') return 'Manager'
-  if (value === 'viewer') return 'Viewer'
-
+  if (value === 'manager') return '運用担当'
+  if (value === 'viewer') return '閲覧のみ'
   return value
-    .split('_')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ')
 }
 
 function formatTimestamp(value) {
-  return new Intl.DateTimeFormat('en-US', {
+  return new Intl.DateTimeFormat('ja-JP', {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value))
@@ -45,21 +41,21 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
 
   return (
     <>
-      <Head title={`${server.name} Members`} />
+      <Head title={`${server.name} のメンバー`} />
 
       <Stack gap="xl">
         <Stack gap={4}>
           <Text href={`/servers/${server.id}`} renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />} size="sm">
-            Back to server
+            サーバー詳細へ戻る
           </Text>
           <Group justify="space-between">
             <Stack gap={0}>
-              <Title order={1}>Members</Title>
+              <Title order={1}>メンバー管理</Title>
               <Text c="dimmed">{server.name}</Text>
             </Stack>
             <Stack align="flex-end" gap={2}>
               <Text c="dimmed" size="sm">
-                Owner
+                オーナー
               </Text>
               <Code>{server.owner_display_name}</Code>
               <Text c="dimmed" size="xs">
@@ -68,7 +64,7 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
             </Stack>
           </Group>
           <Text c="dimmed">
-            Public target <Code>{server.connection_target}</Code>
+            接続先 <Code>{server.connection_target}</Code>
           </Text>
         </Stack>
 
@@ -78,7 +74,7 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
               <Group align="flex-end" grow>
                 <TextInput
                   error={form.errors.user || form.errors.discord_user_id}
-                  label="Discord user ID"
+                  label="Discord ユーザー ID"
                   onChange={(event) => form.setData('discord_user_id', event.currentTarget.value)}
                   placeholder="123456789012345678"
                   value={form.data.discord_user_id}
@@ -86,12 +82,12 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
                 <Select
                   data={roleOptions}
                   error={form.errors.role}
-                  label="Role"
+                  label="権限"
                   onChange={(value) => form.setData('role', value ?? form_defaults.role)}
                   value={form.data.role}
                 />
                 <Button loading={form.processing} type="submit">
-                  Add member
+                  追加
                 </Button>
               </Group>
             </Stack>
@@ -101,22 +97,22 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
         <Paper p="lg" radius="lg" withBorder>
           <Stack gap="md">
             <Group justify="space-between">
-              <Title order={3}>Current memberships</Title>
+              <Title order={3}>現在のメンバー</Title>
               <Badge color="blue" variant="light">
-                {memberships.length} entries
+                {memberships.length} 件
               </Badge>
             </Group>
 
             {memberships.length === 0 ? (
-              <Text c="dimmed">No members have been added yet.</Text>
+              <Text c="dimmed">まだメンバーは追加されていません。</Text>
             ) : (
               <Table highlightOnHover horizontalSpacing="md" verticalSpacing="sm">
                 <Table.Thead>
                   <Table.Tr>
                     <Table.Th>Discord</Table.Th>
-                    <Table.Th>Role</Table.Th>
-                    <Table.Th>Added</Table.Th>
-                    <Table.Th>Actions</Table.Th>
+                    <Table.Th>権限</Table.Th>
+                    <Table.Th>追加日時</Table.Th>
+                    <Table.Th>操作</Table.Th>
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
@@ -156,7 +152,7 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
                           size="xs"
                           variant="light"
                         >
-                          Remove
+                          削除
                         </Button>
                       </Table.Td>
                     </Table.Tr>
