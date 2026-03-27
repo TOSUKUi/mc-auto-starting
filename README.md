@@ -20,6 +20,7 @@ Rails is the control plane. It talks to Docker through `/var/run/docker.sock`, c
 - [AGENTS.md](AGENTS.md)
 - [docs/context_map.md](docs/context_map.md)
 - [docs/single_host_setup.md](docs/single_host_setup.md)
+- [docs/kamal_deployment_topology.md](docs/kamal_deployment_topology.md)
 
 ## Quick Start
 

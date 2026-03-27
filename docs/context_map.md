@@ -9,6 +9,8 @@ This file tells any contributor or agent where to find authoritative information
 ## Architecture and Implementation Design
 - `docs/single_host_setup.md`
   Use for the single-host bootstrap path, local Docker/Compose setup, and the day-1 development workflow fixed by `T-900`.
+- `docs/kamal_deployment_topology.md`
+  Use for the single-host Kamal deployment shape, accessory strategy, secret injection path, and `.env` to deploy-time env mapping fixed by `T-904`.
 - `docs/implementation_breakdown.md`
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
 - `docs/provider_cleanup_inventory.md`
@@ -87,7 +89,8 @@ This file tells any contributor or agent where to find authoritative information
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - `T-900` is complete: the single-host bootstrap path, external network prerequisite, local `.env` handling, and Dockerized development workflow are now documented for new contributors.
-- The next implementation critical path starts at `T-904`, then `T-901` / `T-905` / `T-902` to align the Kamal deploy baseline and remaining P8 ops docs before the remaining Discord bot/RCON work; after that, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
+- `T-904` is complete: the single-host Kamal deployment topology, accessory strategy, secret-file split, shared router-routes mount, and local `.env` to deploy env mapping are now fixed in docs before implementation.
+- The next implementation critical path starts at `T-901`, then `T-905` / `T-902` to finish the remaining P8 ops docs and the first Kamal implementation pass before the remaining Discord bot/RCON work; after that, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
 - `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and both runtime families provision through `itzg/minecraft-server`.
 - `T-1100` and `T-1103` are complete: a checked-in `config/minecraft_runtime_catalog.yml` file remains as the fallback version source rather than live registry access or DB-backed storage.
