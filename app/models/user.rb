@@ -13,6 +13,10 @@ class User < ApplicationRecord
 
   validates :discord_user_id, uniqueness: true, allow_nil: true
 
+  def operator_display_name
+    discord_global_name.presence || discord_username.presence || "未設定ユーザー"
+  end
+
   def self.find_by_discord_auth(auth)
     discord_user_id = auth.dig("uid")
     return if discord_user_id.blank?

@@ -64,7 +64,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "1.21.4", visible_server.fetch("minecraft_version")
     assert_equal "1.21.4", visible_server.fetch("resolved_minecraft_version")
     assert_equal "1.21.4", visible_server.fetch("minecraft_version_display")
-    assert_equal users(:one).email_address, visible_server.fetch("owner_email_address")
+    assert_equal users(:one).discord_global_name, visible_server.fetch("owner_display_name")
     assert_equal "viewer", visible_server.fetch("access_role")
     assert_equal "success", visible_server.fetch("route").fetch("last_apply_status")
     assert_equal "healthy", visible_server.fetch("route").fetch("last_healthcheck_status")
@@ -74,6 +74,20 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "running", visible_server.fetch("runtime").fetch("container_state")
     assert_equal "mc-data-main-survival", visible_server.fetch("runtime").fetch("volume_name")
     assert_not visible_server.fetch("runtime").key?("backend")
+  end
+
+  test "index falls back to a fixed owner display label when discord names are missing" do
+    owner = users(:one)
+    owner.update!(discord_global_name: nil, discord_username: nil)
+    sign_in_as(users(:two))
+
+    get servers_url(format: :json)
+
+    assert_response :success
+
+    visible_server = response.parsed_body.fetch("servers").detect { |server| server.fetch("id") == minecraft_servers(:one).id }
+
+    assert_equal "未設定ユーザー", visible_server.fetch("owner_display_name")
   end
 
   test "show allows visible server for member" do

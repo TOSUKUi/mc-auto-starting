@@ -109,7 +109,7 @@ export default function ServersIndex({ servers, summary }) {
           server.fqdn,
           server.connection_target,
           server.minecraft_version,
-          server.owner_email_address,
+          server.owner_display_name,
           server.access_role,
           server.status,
         ].some((value) => value?.toLowerCase().includes(normalizedQuery)),
@@ -263,7 +263,7 @@ export default function ServersIndex({ servers, summary }) {
                         <Text c="dimmed" fw={700} size="xs" tt="uppercase">
                           オーナー
                         </Text>
-                        <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.owner_email_address}</Text>
+                        <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.owner_display_name}</Text>
                       </Stack>
                     </Paper>
                     <Paper p="md" radius="lg" withBorder>
