@@ -1,4 +1,10 @@
 class User < ApplicationRecord
+  USER_TYPES = {
+    admin: "admin",
+    operator: "operator",
+    reader: "reader",
+  }.freeze
+
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :owned_minecraft_servers, class_name: "MinecraftServer", foreign_key: :owner_id, inverse_of: :owner, dependent: :restrict_with_exception
@@ -6,13 +12,23 @@ class User < ApplicationRecord
   has_many :member_minecraft_servers, through: :server_members, source: :minecraft_server
   has_many :issued_discord_invitations, class_name: "DiscordInvitation", foreign_key: :invited_by_id, inverse_of: :invited_by, dependent: :restrict_with_exception
 
+  enum :user_type, USER_TYPES, validate: true
+
   normalizes :discord_user_id, with: ->(value) { value.present? ? value.to_s.strip : nil }
   normalizes :discord_username, with: ->(value) { value.present? ? value.to_s.strip : nil }
 
   validates :discord_user_id, uniqueness: true, allow_nil: true
+  validates :user_type, presence: true
 
   def operator_display_name
     discord_global_name.presence || discord_username.presence || "未設定ユーザー"
+  end
+
+  def manageable_user_types
+    return USER_TYPES.keys.map(&:to_s) if admin?
+    return [ "reader" ] if operator?
+
+    []
   end
 
   def self.find_by_discord_auth(auth)

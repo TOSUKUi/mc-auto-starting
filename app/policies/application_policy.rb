@@ -51,4 +51,16 @@ class ApplicationPolicy
     def logged_in?
       user.present?
     end
+
+    def admin_user?
+      user.present? && user.admin?
+    end
+
+    def operator_user?
+      user.present? && user.operator?
+    end
+
+    def reader_user?
+      user.present? && user.reader?
+    end
 end

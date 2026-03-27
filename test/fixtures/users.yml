@@ -1,18 +1,21 @@
 <% password_digest = BCrypt::Password.create("password") %>
 
 one:
+  user_type: admin
   discord_user_id: "100000000000000001"
   discord_username: discord-one
   discord_global_name: Discord One
   password_digest: <%= password_digest %>
 
 two:
+  user_type: operator
   discord_user_id: "100000000000000002"
   discord_username: discord-two
   discord_global_name: Discord Two
   password_digest: <%= password_digest %>
 
 three:
+  user_type: reader
   discord_user_id: "100000000000000003"
   discord_username: discord-three
   discord_global_name: Discord Three

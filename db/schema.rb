@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_001000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_001001) do
   create_table "discord_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "discord_user_id", null: false
@@ -104,8 +104,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_001000) do
     t.datetime "last_discord_login_at"
     t.string "password_digest", null: false
     t.datetime "updated_at", null: false
+    t.string "user_type", default: "reader", null: false
     t.index ["discord_user_id"], name: "index_users_on_discord_user_id", unique: true
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["user_type"], name: "index_users_on_user_type"
   end
 
   add_foreign_key "discord_invitations", "users", column: "invited_by_id"

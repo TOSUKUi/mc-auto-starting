@@ -7,6 +7,7 @@ def bootstrap_discord_owner
 
   user = User.find_or_initialize_by(discord_user_id: discord_user_id)
   user.discord_username = discord_username
+  user.user_type = "admin"
 
   if user.new_record?
     user.password = password

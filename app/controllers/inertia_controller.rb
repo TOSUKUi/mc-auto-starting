@@ -5,6 +5,7 @@ class InertiaController < ApplicationController
     {
       current_user: Current.user && {
         id: Current.user.id,
+        user_type: Current.user.user_type,
         discord_user_id: Current.user.discord_user_id,
         discord_username: Current.user.discord_username,
         discord_global_name: Current.user.discord_global_name,
