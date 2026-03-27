@@ -186,7 +186,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create stores a provisional server and enqueues provisioning job" do
-    sign_in_as(users(:two))
+    sign_in_as(users(:one))
 
     assert_difference("MinecraftServer.count", 1) do
       assert_difference("RouterRoute.count", 1) do
@@ -208,7 +208,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     server = MinecraftServer.order(:id).last
 
     assert_redirected_to server_path(server)
-    assert_equal users(:two).id, server.owner_id
+    assert_equal users(:one).id, server.owner_id
     assert_equal "creative-build", server.hostname
     assert_equal "provisioning", server.status
     assert_equal "mc-server-creative-build", server.container_name
@@ -220,6 +220,39 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "unpublished", server.router_route.publication_state
     assert_equal "pending", server.router_route.last_apply_status
     assert_equal "unknown", server.router_route.last_healthcheck_status
+  end
+
+  test "new exposes operator memory quota summary" do
+    sign_in_as(users(:two))
+
+    get new_server_url(format: :json)
+
+    assert_response :success
+    quota = response.parsed_body.fetch("create_quota")
+    assert_equal true, quota.fetch("applies")
+    assert_equal 5120, quota.fetch("limit_mb")
+    assert_equal 4096, quota.fetch("used_mb")
+    assert_equal 1024, quota.fetch("remaining_mb")
+  end
+
+  test "create rejects operator request above memory quota" do
+    sign_in_as(users(:two))
+
+    assert_no_difference("MinecraftServer.count") do
+      post servers_url(format: :json), params: {
+        minecraft_server: {
+          name: "Quota Breaker",
+          hostname: "quota-breaker",
+          runtime_family: "paper",
+          minecraft_version: "1.21.4",
+          memory_mb: 3584,
+          disk_mb: 20480,
+        },
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes response.parsed_body.fetch("errors").fetch("memory_mb"), "Memory mb は上限 5120 MB を超えます。残りは 1024 MB です。"
   end
 
   test "create returns validation errors without storing a server" do

@@ -44,7 +44,7 @@ function runtimeFamilyDescription(value) {
   return '最新のバージョンに対応していない場合があるが、高速。'
 }
 
-export default function ServersNew({ form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint }) {
+export default function ServersNew({ create_quota, form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
@@ -56,6 +56,7 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
     { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: '接続先', value: preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434' },
   ]
+  const projectedMemoryTotal = (create_quota?.used_mb || 0) + form.data.memory_mb
 
   const submit = (event) => {
     event?.preventDefault()
@@ -249,6 +250,28 @@ export default function ServersNew({ form_defaults, runtime_family_options, mine
                   </Stack>
                 </Stack>
               </Paper>
+
+              {create_quota?.applies ? (
+                <Paper p="lg" radius="lg" shadow="sm" withBorder>
+                  <Stack gap="md">
+                    <Title order={3}>作成上限</Title>
+                    <Text c="dimmed" size="sm">
+                      運用者は所有サーバーの合計メモリを {create_quota.limit_mb.toLocaleString()} MB まで使えます。
+                    </Text>
+                    <Stack gap={6}>
+                      <Text size="sm">
+                        現在使用中 <Code>{create_quota.used_mb.toLocaleString()} MB</Code>
+                      </Text>
+                      <Text size="sm">
+                        残り <Code>{(create_quota.remaining_mb || 0).toLocaleString()} MB</Code>
+                      </Text>
+                      <Text size="sm">
+                        今回作成後の見込み <Code>{projectedMemoryTotal.toLocaleString()} MB</Code>
+                      </Text>
+                    </Stack>
+                  </Stack>
+                </Paper>
+              ) : null}
             </Stack>
           </Grid.Col>
         </Grid>

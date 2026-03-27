@@ -4,6 +4,7 @@ class User < ApplicationRecord
     operator: "operator",
     reader: "reader",
   }.freeze
+  OPERATOR_CREATE_MEMORY_QUOTA_MB = 5120
 
   has_secure_password
   has_many :sessions, dependent: :destroy
@@ -29,6 +30,23 @@ class User < ApplicationRecord
     return [ "reader" ] if operator?
 
     []
+  end
+
+  def create_memory_quota_limit_mb
+    return unless operator?
+
+    OPERATOR_CREATE_MEMORY_QUOTA_MB
+  end
+
+  def owned_server_memory_mb_total
+    owned_minecraft_servers.sum(:memory_mb)
+  end
+
+  def remaining_create_memory_quota_mb
+    limit = create_memory_quota_limit_mb
+    return if limit.blank?
+
+    [ limit - owned_server_memory_mb_total, 0 ].max
   end
 
   def self.find_by_discord_auth(auth)

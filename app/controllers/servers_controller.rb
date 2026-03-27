@@ -160,6 +160,7 @@ class ServersController < InertiaController
 
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
+        create_quota: create_quota_payload,
         runtime_family_options: MinecraftRuntime.runtime_family_options,
         minecraft_version_options: minecraft_version_options_by_runtime_family.fetch(
           MinecraftRuntime.normalize_runtime_family(selected_runtime_family),
@@ -264,6 +265,15 @@ class ServersController < InertiaController
         member: servers.count { |server| server.owner_id != Current.user.id },
         ready: servers.count(&:status_ready?),
         attention_needed: servers.count { |server| !server.status_ready? || server.router_route&.last_apply_status == "failed" },
+      }
+    end
+
+    def create_quota_payload
+      {
+        applies: Current.user.operator?,
+        limit_mb: Current.user.create_memory_quota_limit_mb,
+        used_mb: Current.user.owned_server_memory_mb_total,
+        remaining_mb: Current.user.remaining_create_memory_quota_mb,
       }
     end
 

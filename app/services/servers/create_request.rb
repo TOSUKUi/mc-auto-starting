@@ -8,6 +8,8 @@ module Servers
     def call
       server = actor.owned_minecraft_servers.build(server_attributes)
       return server if server.errors.any?
+      enforce_memory_quota(server)
+      return server if server.errors.any?
       return server unless server.save
 
       return server unless server.persisted?
@@ -33,6 +35,17 @@ module Servers
           template_kind: runtime_family,
           status: :provisioning,
         )
+      end
+
+      def enforce_memory_quota(server)
+        limit = actor.create_memory_quota_limit_mb
+        return if limit.blank?
+
+        projected_total = actor.owned_server_memory_mb_total + server.memory_mb.to_i
+        return if projected_total <= limit
+
+        remaining = actor.remaining_create_memory_quota_mb
+        server.errors.add(:memory_mb, "は上限 #{limit} MB を超えます。残りは #{remaining} MB です。")
       end
   end
 end

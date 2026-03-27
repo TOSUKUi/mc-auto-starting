@@ -45,7 +45,7 @@
 | T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | done | Delete removes managed container resources and unpublishes the router route |
 | T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | done | Lifecycle operations update Docker state and Rails status correctly |
 | T-403 | P3 | Persist container runtime details on sync | T-302,T-402 | done | `container_state`, timestamps, and last error fields stay reconcilable |
-| T-404 | P3 | Enforce operator total-memory quota for server creation | T-400,T-107 | todo | Create flow rejects operator requests when their owned servers' summed `memory_mb` plus the requested server exceeds `5120 MB`, while admins remain unrestricted and the UI shows current usage/remaining quota |
+| T-404 | P3 | Enforce operator total-memory quota for server creation | T-400,T-107 | done | Create flow rejects operator requests when their owned servers' summed `memory_mb` plus the requested server exceeds `5120 MB`, while admins remain unrestricted and the UI shows current usage/remaining quota |
 | T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | done | Create UI exposes only the fields needed for single-host Docker provisioning while keeping hostname/FQDN guidance |
 | T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | done | Detail UI shows connection target, container/runtime info, and router publication instead of provider info |
 | T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | done | Index UI reflects FQDN-based connection targets and container status cleanly |

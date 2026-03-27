@@ -93,6 +93,7 @@ This file tells any contributor or agent where to find authoritative information
 - The direct-Docker lifecycle/delete contract is now fixed in `docs/direct_docker_lifecycle_contract.md` ahead of service replacement work.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
 - `T-403` is complete: manual sync now also reconciles `last_started_at` from Docker inspect so runtime timestamps and error state stay aligned.
+- `T-404` is complete: operator create requests are now quota-limited by owned `memory_mb` total `<= 5120`, the server-side create flow rejects over-quota requests, and the create UI shows current usage plus remaining quota.
 - `T-500` is complete: create UI now exposes only the direct-Docker baseline inputs and the public connection preview contract.
 - `T-501` and `T-502` are complete: detail/index UI now center connection targets and publication data, while current active screens de-emphasize Docker backend identifiers.
 - `T-503` is in progress: operator-facing copy and layout polish are being moved further toward a Japanese-first, simpler presentation; the unused home page has been removed in favor of routing `/` to the server index, the active app shell now uses a flat Minecraft-inspired dark theme, and the server create form now caps memory at 4GB while blocking invalid hostname characters earlier.

@@ -35,4 +35,15 @@ class UserTest < ActiveSupport::TestCase
     assert_equal [ "reader" ], users(:two).manageable_user_types
     assert_equal [], users(:three).manageable_user_types
   end
+
+  test "returns create quota helpers for operator only" do
+    assert_nil users(:one).create_memory_quota_limit_mb
+    assert_equal 5120, users(:two).create_memory_quota_limit_mb
+    assert_nil users(:three).create_memory_quota_limit_mb
+  end
+
+  test "computes owned memory totals and remaining quota" do
+    assert_equal 4096, users(:two).owned_server_memory_mb_total
+    assert_equal 1024, users(:two).remaining_create_memory_quota_mb
+  end
 end
