@@ -123,12 +123,16 @@ function DetailLine({ label, value }) {
 export default function ServersShow({ server }) {
   const reloadInFlight = useRef(false)
   const transitionState = isTransitioning(server.status)
+  const routeIssueMessage = server.route_issue_message || (server.route.last_apply_status === 'failed' ? '公開設定の反映に失敗しています。' : null)
   const pollServer = useEffectEvent(() => {
     if (reloadInFlight.current) return
 
     reloadInFlight.current = true
     router.reload({
       only: [ 'server' ],
+      headers: {
+        'X-Server-Poll': '1',
+      },
       preserveState: true,
       preserveScroll: true,
       onFinish: () => {
@@ -267,6 +271,12 @@ export default function ServersShow({ server }) {
             </SimpleGrid>
           </Stack>
         </Paper>
+
+        {routeIssueMessage ? (
+          <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="公開反映エラー" variant="light">
+            {routeIssueMessage}
+          </Alert>
+        ) : null}
 
         {server.last_error_message ? (
           <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="直近の失敗" variant="light">

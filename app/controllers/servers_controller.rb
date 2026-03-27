@@ -71,16 +71,19 @@ class ServersController < InertiaController
   def show
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :show?
+    sync_server_for_transition_poll!(server)
+    route_issue = audit_route!(server)
+    server.reload
 
     respond_to do |format|
       format.html do
         render inertia: "servers/show", props: {
-          server: server_detail(server),
+          server: server_detail(server, route_issue_message: route_issue),
         }
       end
 
       format.json do
-        render json: { server: server_detail(server) }
+        render json: { server: server_detail(server, route_issue_message: route_issue) }
       end
     end
   end
@@ -227,7 +230,7 @@ class ServersController < InertiaController
       }
     end
 
-    def server_detail(server)
+    def server_detail(server, route_issue_message: nil)
       summary = server_summary(server)
       visible_actions = detail_visible_actions_for(server)
 
@@ -243,6 +246,7 @@ class ServersController < InertiaController
         runtime: summary.fetch(:runtime).merge(
           backend: server.backend,
         ),
+        route_issue_message: route_issue_message,
         can_manage_members: policy(server).manage_members?,
         can_destroy: policy(server).destroy?,
         can_start: visible_actions[:start],
@@ -317,5 +321,20 @@ class ServersController < InertiaController
       return unless %w[running restarting].include?(server.container_state)
 
       (Time.current - server.last_started_at).to_i
+    end
+
+    def sync_server_for_transition_poll!(server)
+      return unless server.status.in?(%w[starting stopping restarting])
+      return unless request.headers["X-Server-Poll"] == "1"
+      return unless policy(server).sync?
+
+      Servers::SyncServerState.new(server: server).call
+    rescue DockerEngine::Error => error
+      Rails.logger.warn("Transition poll sync failed for server=#{server.id}: #{error.class}: #{error.message}")
+    end
+
+    def audit_route!(server)
+      result = Router::PublicationAudit.new.call(router_route: server.router_route)
+      result.ok ? nil : result.message
     end
 end

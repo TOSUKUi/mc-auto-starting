@@ -237,9 +237,16 @@ export default function ServersIndex({ servers, summary }) {
                     </Stack>
 
                     {needsAttention(server) ? (
-                      <Badge color="orange" leftSection={<IconAlertTriangle size={12} />} variant="light">
-                        要確認
-                      </Badge>
+                      <Group gap="xs">
+                        {server.route.last_apply_status === 'failed' ? (
+                          <Badge color="red" leftSection={<IconAlertTriangle size={12} />} variant="light">
+                            公開反映エラー
+                          </Badge>
+                        ) : null}
+                        <Badge color="orange" leftSection={<IconAlertTriangle size={12} />} variant="light">
+                          要確認
+                        </Badge>
+                      </Group>
                     ) : null}
                   </Group>
 

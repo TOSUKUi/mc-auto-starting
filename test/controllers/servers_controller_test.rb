@@ -154,6 +154,48 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal true, payload.fetch("can_sync")
   end
 
+  test "show polls sync during transitional partial reloads" do
+    server = minecraft_servers(:one)
+    server.update_columns(status: MinecraftServer.statuses.fetch(:starting), container_state: "running")
+    original_new = Servers::SyncServerState.method(:new)
+    sync_called = false
+    sign_in_as(users(:three))
+
+    Servers::SyncServerState.define_singleton_method(:new) do |*args, **kwargs|
+      sync_called = true
+      original_new.call(*args, **kwargs)
+    end
+
+    get server_url(server, format: :json), headers: { "X-Server-Poll" => "1" }
+
+    assert_response :success
+    assert_equal true, sync_called
+  ensure
+    Servers::SyncServerState.define_singleton_method(:new, original_new) if original_new
+  end
+
+  test "show exposes a route issue message when publication audit fails" do
+    server = minecraft_servers(:one)
+    server.router_route.update!(last_apply_status: :success, enabled: true)
+    sign_in_as(users(:one))
+
+    original_path = Router.config.routes_config_path
+    Dir.mktmpdir do |dir|
+      broken_path = File.join(dir, "routes.json")
+      File.write(broken_path, { "default-server" => nil, "mappings" => {} }.to_json)
+      Router.instance_variable_set(:@config, Router.config.with_overrides(routes_config_path: broken_path))
+
+      get server_url(server, format: :json)
+
+      assert_response :success
+      payload = response.parsed_body.fetch("server")
+      assert_match "公開設定の反映を確認できませんでした", payload.fetch("route_issue_message")
+      assert_equal "failed", server.router_route.reload.last_apply_status
+    end
+  ensure
+    Router.instance_variable_set(:@config, Router.config.with_overrides(routes_config_path: original_path)) if original_path
+  end
+
   test "show exposes only sync for degraded servers" do
     server = minecraft_servers(:one)
     server.update_columns(status: MinecraftServer.statuses.fetch(:degraded), container_state: "unknown")
