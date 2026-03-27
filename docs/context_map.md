@@ -19,6 +19,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for the single-host production destination, proxy host, and web host mapping added in `T-905`.
 - `docs/implementation_breakdown.md`
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
+- `docs/server_ui_display_review.md`
+  Use for the agreed display contract for the server index/detail screens, including owner-name display, lifecycle-action visibility, and transition-state polling expectations captured in `T-505`.
 - `docs/provider_cleanup_inventory.md`
   Use for the legacy provider dependency inventory and the remaining schema/doc cleanup debt after `T-700` / `T-702` / `T-703`.
 - `docs/docker_engine_contract.md`
@@ -99,7 +101,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
 - `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
 - The next implementation critical path starts at `T-902` to finish the release docs before the remaining Discord bot/RCON work; after that, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
-- Additional queued follow-up tasks now exist for server index owner display (`T-504`), a review of server index/detail display content (`T-505`), lifecycle-aware detail-page actions (`T-506`), transition-state polling on the detail page (`T-507`), and removing persisted user email data from the Discord-only auth path (`T-1013`).
+- Additional queued follow-up tasks now exist for server index owner display (`T-504`), a review of server index/detail display content captured in `docs/server_ui_display_review.md` (`T-505`), lifecycle-aware detail-page actions (`T-506`), transition-state polling on the detail page (`T-507`), and removing persisted user email data from the Discord-only auth path (`T-1013`).
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
 - `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and both runtime families provision through `itzg/minecraft-server`.
 - `T-1100` and `T-1103` are complete: a checked-in `config/minecraft_runtime_catalog.yml` file remains as the fallback version source rather than live registry access or DB-backed storage.

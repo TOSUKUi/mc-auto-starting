@@ -20,6 +20,7 @@ Current important files:
 - `docs/direct_docker_env_contract.md`
 - `docs/discord_auth_and_bot_strategy.md`
 - `docs/implementation_breakdown.md`
+- `docs/server_ui_display_review.md`
 - `docs/provider_cleanup_inventory.md`
 - `docs/project_execution_plan.md`
 - `docs/task_board.md`
@@ -56,7 +57,7 @@ Current baseline:
 - `T-901` is complete: `docs/operator_runbook.md` now gives operators a current Compose-based single-host deployment procedure, host-side verification commands, direct-Docker lifecycle guidance, and explicit Docker safety notes.
 - `T-905` is complete: the repository now includes `config/deploy.yml`, `config/deploy.production.yml`, `.kamal` secret templates and hooks, plus the `mc-router` deployment helper needed for the first Kamal-based single-host rollout.
 - The next implementation critical-path task is `T-902`.
-- Additional requested follow-up tasks are queued for owner username display on the server index (`T-504`), a review of server index/detail display content (`T-505`), lifecycle-aware detail-page actions (`T-506`), transition-state polling on the detail page (`T-507`), and removal of persisted user email data from the Discord-only auth path (`T-1013`).
+- Additional requested follow-up tasks are queued for owner username display on the server index (`T-504`), a review of server index/detail display content captured in `docs/server_ui_display_review.md` (`T-505`), lifecycle-aware detail-page actions (`T-506`), transition-state polling on the detail page (`T-507`), and removal of persisted user email data from the Discord-only auth path (`T-1013`).
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.
@@ -136,15 +137,16 @@ The active system has four parts.
 3. `docs/project_execution_plan.md`
 4. `docs/task_board.md`
 5. `docs/implementation_breakdown.md`
-6. `docs/provider_cleanup_inventory.md`
-7. `docs/single_host_setup.md`
-8. `docs/operator_runbook.md`
-9. `docs/kamal_deployment_topology.md`
-10. `config/deploy.yml`
-11. `config/deploy.production.yml`
-12. `docs/direct_docker_env_contract.md`
-13. `docs/direct_docker_lifecycle_contract.md`
-14. `docs/discord_auth_and_bot_strategy.md`
+6. `docs/server_ui_display_review.md`
+7. `docs/provider_cleanup_inventory.md`
+8. `docs/single_host_setup.md`
+9. `docs/operator_runbook.md`
+10. `docs/kamal_deployment_topology.md`
+11. `config/deploy.yml`
+12. `config/deploy.production.yml`
+13. `docs/direct_docker_env_contract.md`
+14. `docs/direct_docker_lifecycle_contract.md`
+15. `docs/discord_auth_and_bot_strategy.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.
