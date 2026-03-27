@@ -177,7 +177,6 @@ These keys are not part of the steady-state app env. They are injected only for 
 
 - `BOOTSTRAP_DISCORD_USER_ID`
 - `BOOTSTRAP_DISCORD_USERNAME`
-- `BOOTSTRAP_EMAIL_ADDRESS`
 
 ### Deploy-Time Mapping Table
 

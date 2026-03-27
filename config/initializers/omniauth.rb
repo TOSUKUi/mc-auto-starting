@@ -8,7 +8,7 @@ if defined?(OmniAuth)
         :discord,
         ENV.fetch("DISCORD_CLIENT_ID"),
         ENV.fetch("DISCORD_CLIENT_SECRET"),
-        scope: "identify email",
+        scope: "identify",
       )
     end
   end

@@ -13,21 +13,21 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to discord_login_path
 
-    get "/auth/discord/callback", headers: {
-      "omniauth.auth" => {
-        "provider" => "discord",
-        "uid" => invitation.discord_user_id,
-        "info" => {
-          "name" => "invited-user",
-          "global_name" => "Invited User",
-          "email" => "invited@example.com",
-          "image" => "https://cdn.discordapp.test/new-avatar.png",
-        },
+    with_mocked_discord_auth(
+      uid: invitation.discord_user_id,
+      info: {
+        "name" => "invited-user",
+        "global_name" => "Invited User",
+        "image" => "https://cdn.discordapp.test/new-avatar.png",
       },
-    }
+    ) do
+      get "/auth/discord/callback"
+    end
 
     assert_redirected_to root_path
-    assert_equal invitation.discord_user_id, User.order(:id).last.discord_user_id
+    user = User.order(:id).last
+    assert_equal invitation.discord_user_id, user.discord_user_id
+    assert_nil user.email_address
     assert invitation.reload.used_at.present?
   end
 
@@ -36,4 +36,22 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to login_path
   end
+
+  private
+    def with_mocked_discord_auth(uid:, info:)
+      original_test_mode = OmniAuth.config.test_mode
+      original_mock = OmniAuth.config.mock_auth[:discord]
+
+      OmniAuth.config.test_mode = true
+      OmniAuth.config.mock_auth[:discord] = OmniAuth::AuthHash.new(
+        provider: "discord",
+        uid: uid,
+        info: info,
+      )
+
+      yield
+    ensure
+      OmniAuth.config.mock_auth[:discord] = original_mock
+      OmniAuth.config.test_mode = original_test_mode
+    end
 end

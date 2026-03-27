@@ -19,12 +19,12 @@ class ServerMembersControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "owner can add an existing user as a member by email address" do
+  test "owner can add an existing user as a member by discord user id" do
     sign_in_as(users(:two))
 
     post server_members_url(minecraft_servers(:two), format: :json), params: {
       server_member: {
-        email_address: " three@example.com ",
+        discord_user_id: "100000000000000003",
         role: "viewer",
       },
     }
@@ -40,7 +40,7 @@ class ServerMembersControllerTest < ActionDispatch::IntegrationTest
 
     post server_members_url(minecraft_servers(:two), format: :json), params: {
       server_member: {
-        email_address: "missing@example.com",
+        discord_user_id: "999999999999999999",
         role: "viewer",
       },
     }

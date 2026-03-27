@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_27_153000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_001000) do
   create_table "discord_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "discord_user_id", null: false
@@ -97,11 +97,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_27_153000) do
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "discord_avatar"
-    t.string "discord_email"
     t.string "discord_global_name"
     t.string "discord_user_id"
     t.string "discord_username"
-    t.string "email_address", null: false
+    t.string "email_address"
     t.datetime "last_discord_login_at"
     t.string "password_digest", null: false
     t.datetime "updated_at", null: false

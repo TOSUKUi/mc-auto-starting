@@ -58,7 +58,10 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
               <Text c="dimmed" size="sm">
                 Owner
               </Text>
-              <Code>{server.owner_email_address}</Code>
+              <Code>{server.owner_display_name}</Code>
+              <Text c="dimmed" size="xs">
+                {server.owner_discord_user_id}
+              </Text>
             </Stack>
           </Group>
           <Text c="dimmed">
@@ -71,11 +74,11 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
             <Stack gap="md">
               <Group align="flex-end" grow>
                 <TextInput
-                  error={form.errors.user || form.errors.email_address}
-                  label="User email"
-                  onChange={(event) => form.setData('email_address', event.currentTarget.value)}
-                  placeholder="member@example.com"
-                  value={form.data.email_address}
+                  error={form.errors.user || form.errors.discord_user_id}
+                  label="Discord user ID"
+                  onChange={(event) => form.setData('discord_user_id', event.currentTarget.value)}
+                  placeholder="123456789012345678"
+                  value={form.data.discord_user_id}
                 />
                 <Select
                   data={roleOptions}
@@ -107,7 +110,7 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
               <Table highlightOnHover horizontalSpacing="md" verticalSpacing="sm">
                 <Table.Thead>
                   <Table.Tr>
-                    <Table.Th>Email</Table.Th>
+                    <Table.Th>Discord</Table.Th>
                     <Table.Th>Role</Table.Th>
                     <Table.Th>Added</Table.Th>
                     <Table.Th>Actions</Table.Th>
@@ -117,7 +120,12 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
                   {memberships.map((membership) => (
                     <Table.Tr key={membership.id}>
                       <Table.Td>
-                        <Code>{membership.email_address}</Code>
+                        <Stack gap={2}>
+                          <Code>{membership.display_name}</Code>
+                          <Text c="dimmed" size="xs">
+                            {membership.discord_user_id}
+                          </Text>
+                        </Stack>
                       </Table.Td>
                       <Table.Td>
                         <Select

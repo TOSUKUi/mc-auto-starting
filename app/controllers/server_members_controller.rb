@@ -16,7 +16,7 @@ class ServerMembersController < InertiaController
 
   def create
     server = managed_server
-    user = User.find_by(email_address: normalized_email_address)
+    user = User.find_by(discord_user_id: normalized_discord_user_id)
     membership = server.server_members.new(user: user, role: member_params[:role])
     authorize membership
 
@@ -66,11 +66,11 @@ class ServerMembersController < InertiaController
     end
 
     def member_params
-      params.expect(server_member: [ :email_address, :role ])
+      params.expect(server_member: [ :discord_user_id, :role ])
     end
 
-    def normalized_email_address
-      member_params[:email_address].to_s.strip.downcase
+    def normalized_discord_user_id
+      member_params[:discord_user_id].to_s.strip
     end
 
     def memberships_for(server)
@@ -78,7 +78,7 @@ class ServerMembersController < InertiaController
         .where(minecraft_server: server)
         .joins(:user)
         .includes(:user)
-        .order("users.email_address ASC", id: :asc)
+        .order(Arel.sql("COALESCE(users.discord_global_name, users.discord_username, users.discord_user_id) ASC"), id: :asc)
     end
 
     def members_page_props(server, memberships)
@@ -88,19 +88,21 @@ class ServerMembersController < InertiaController
           name: server.name,
           fqdn: server.fqdn,
           connection_target: server.connection_target,
-          owner_email_address: server.owner.email_address,
+          owner_display_name: server.owner.operator_display_name,
+          owner_discord_user_id: server.owner.discord_user_id,
         },
         available_roles: ServerMember.roles.keys,
         memberships: memberships.map do |membership|
           {
             id: membership.id,
-            email_address: membership.user.email_address,
+            display_name: membership.user.operator_display_name,
+            discord_user_id: membership.user.discord_user_id,
             role: membership.role,
             created_at: membership.created_at.iso8601,
           }
         end,
         form_defaults: {
-          email_address: "",
+          discord_user_id: "",
           role: ServerMember.roles.keys.first,
         },
       }

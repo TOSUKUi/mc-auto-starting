@@ -64,8 +64,6 @@ This document fixes the initial environment and configuration contract for the d
   Optional Discord user id used by `bin/rails db:seed` to create the initial owner. Default: unset.
 - `BOOTSTRAP_DISCORD_USERNAME`
   Optional Discord username used during bootstrap seeding. Default: unset.
-- `BOOTSTRAP_EMAIL_ADDRESS`
-  Optional fallback local email used during bootstrap seeding. Default: unset.
 - `DISCORD_BOT_TOKEN`
   Reserved for the future Discord bot process and local integration testing. Default: unset.
 - `DISCORD_BOT_PUBLIC_KEY`

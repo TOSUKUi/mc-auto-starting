@@ -124,7 +124,6 @@ The bootstrap seed uses:
 
 - `BOOTSTRAP_DISCORD_USER_ID`
 - `BOOTSTRAP_DISCORD_USERNAME`
-- `BOOTSTRAP_EMAIL_ADDRESS`
 
 ## Accessing The App
 

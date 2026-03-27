@@ -141,7 +141,6 @@ Review at minimum:
 - `DISCORD_CLIENT_SECRET`
 - `BOOTSTRAP_DISCORD_USER_ID`
 - `BOOTSTRAP_DISCORD_USERNAME`
-- `BOOTSTRAP_EMAIL_ADDRESS`
 
 If the host UID, GID, or Docker group differ from the local defaults, also update:
 
@@ -180,7 +179,6 @@ This seed path uses:
 
 - `BOOTSTRAP_DISCORD_USER_ID`
 - `BOOTSTRAP_DISCORD_USERNAME`
-- `BOOTSTRAP_EMAIL_ADDRESS`
 
 ### 7. Verify the app
 

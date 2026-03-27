@@ -209,7 +209,6 @@ class ServersController < InertiaController
         resolved_minecraft_version: server.resolved_minecraft_version,
         minecraft_version_display: server.display_minecraft_version,
         owner_display_name: server.owner.operator_display_name,
-        owner_email_address: server.owner.email_address,
         access_role: access_role_for(server),
         updated_at: server.updated_at.iso8601,
         route: {

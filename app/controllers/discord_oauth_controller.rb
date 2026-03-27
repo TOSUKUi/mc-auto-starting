@@ -61,15 +61,12 @@ class DiscordOauthController < ApplicationController
     def build_user_from_invitation!(invitation)
       info = discord_auth.fetch("info", {})
       password = SecureRandom.base58(24)
-      email_address = info["email"].presence || "discord-user-#{discord_auth.fetch("uid")}@example.invalid"
 
       User.create!(
-        email_address: email_address,
         discord_user_id: discord_auth.fetch("uid"),
         discord_username: info["name"].presence || "discord-user",
         discord_global_name: info["global_name"],
         discord_avatar: info["image"],
-        discord_email: info["email"],
         last_discord_login_at: Time.current,
         password: password,
         password_confirmation: password,

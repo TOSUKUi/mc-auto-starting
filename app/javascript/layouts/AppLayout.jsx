@@ -54,7 +54,7 @@ export default function AppLayout({ children }) {
                     <Box visibleFrom="sm">
                       <Stack gap={0}>
                         <Text fw={600} size="sm">
-                          {currentUser?.discord_username || currentUser?.email_address}
+                          {currentUser?.operator_display_name}
                         </Text>
                         <Text c="stone.4" size="xs">
                           signed in

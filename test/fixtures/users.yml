@@ -1,21 +1,19 @@
 <% password_digest = BCrypt::Password.create("password") %>
 
 one:
-  email_address: one@example.com
   discord_user_id: "100000000000000001"
   discord_username: discord-one
   discord_global_name: Discord One
-  discord_email: one@example.com
   password_digest: <%= password_digest %>
 
 two:
-  email_address: two@example.com
   discord_user_id: "100000000000000002"
   discord_username: discord-two
   discord_global_name: Discord Two
-  discord_email: two@example.com
   password_digest: <%= password_digest %>
 
 three:
-  email_address: three@example.com
+  discord_user_id: "100000000000000003"
+  discord_username: discord-three
+  discord_global_name: Discord Three
   password_digest: <%= password_digest %>
