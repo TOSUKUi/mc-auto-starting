@@ -1,6 +1,12 @@
 require "test_helper"
 
 class MinecraftServerPolicyTest < ActiveSupport::TestCase
+  test "create is allowed for admin and operator but denied for reader" do
+    assert MinecraftServerPolicy.new(users(:one), MinecraftServer).create?
+    assert MinecraftServerPolicy.new(users(:two), MinecraftServer).create?
+    assert_not MinecraftServerPolicy.new(users(:three), MinecraftServer).create?
+  end
+
   test "owner can manage and operate the server" do
     policy = MinecraftServerPolicy.new(users(:one), minecraft_servers(:one))
 

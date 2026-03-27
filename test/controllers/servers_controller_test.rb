@@ -169,6 +169,22 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "reader cannot open new server page" do
+    sign_in_as(users(:three))
+
+    get new_server_url(format: :json)
+
+    assert_response :forbidden
+  end
+
+  test "operator can open new server page" do
+    sign_in_as(users(:two))
+
+    get new_server_url(format: :json)
+
+    assert_response :success
+  end
+
   test "show hides lifecycle controls when container id is missing" do
     server = minecraft_servers(:one)
     server.update_columns(container_id: nil)
@@ -253,6 +269,25 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_entity
     assert_includes response.parsed_body.fetch("errors").fetch("memory_mb"), "Memory mb は上限 5120 MB を超えます。残りは 1024 MB です。"
+  end
+
+  test "reader cannot create a server" do
+    sign_in_as(users(:three))
+
+    assert_no_difference("MinecraftServer.count") do
+      post servers_url(format: :json), params: {
+        minecraft_server: {
+          name: "Reader Blocked",
+          hostname: "reader-blocked",
+          runtime_family: "paper",
+          minecraft_version: "1.21.4",
+          memory_mb: 1024,
+          disk_mb: 20480,
+        },
+      }
+    end
+
+    assert_response :forbidden
   end
 
   test "create returns validation errors without storing a server" do

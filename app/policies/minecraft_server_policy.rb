@@ -8,7 +8,7 @@ class MinecraftServerPolicy < ApplicationPolicy
   end
 
   def create?
-    logged_in?
+    admin_user? || operator_user?
   end
 
   def update?
