@@ -9,7 +9,8 @@ It is written for the current repository state on `2026-03-27`:
 - direct Docker lifecycle is implemented
 - local single-host bootstrap is documented
 - Kamal topology is defined
-- Kamal deployment automation is not yet checked into the repository
+- the initial Kamal deployment baseline is checked into the repository
+- the dedicated release and rollback runbook is still `T-902`
 
 ## Which Deployment Path To Use Today
 
