@@ -86,11 +86,11 @@ This document fixes the strategy for Discord-based authentication, manual invite
 
 ### Role Model
 
-- The active membership vocabulary should be `owner`, `operator`, and `reader`.
-- `owner` may invite both `operator` and `reader`.
-- `operator` may invite only `reader`.
-- `reader` is a read-only member and must not gain lifecycle, create, or invitation authority.
-- Bot authorization should inherit the same role semantics rather than introducing a Discord-only permission model.
+- The active global user-type vocabulary should be `admin`, `operator`, and `reader`.
+- `admin` may invite without restriction and is not quota-limited on server creation.
+- `operator` may invite only `reader` and is limited to `5120 MB` total owned server memory for create actions.
+- `reader` is a read-only user type and must not gain create or invitation authority.
+- Bot authorization should inherit the same user-type semantics rather than introducing a Discord-only permission model.
 
 ### Invite Model
 
@@ -112,7 +112,7 @@ This document fixes the strategy for Discord-based authentication, manual invite
 6. Rails executes the requested lifecycle or RCON action.
 7. Rails returns a bounded result for the bot to present back in Discord.
 
-For future read-only bot operations, `reader` may access read surfaces only; write surfaces remain restricted above that role.
+For future read-only bot operations, `reader` may access read surfaces only; write surfaces remain restricted above that user type.
 
 ## Security Boundaries
 

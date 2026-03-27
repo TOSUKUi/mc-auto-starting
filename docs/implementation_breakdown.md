@@ -91,7 +91,7 @@
   - メモリ
 - 表示項目:
   - 生成予定の接続先 `<hostname>.<public_domain>:<shared_public_port>`
-  - owner に対する合計メモリ上限 `5120 MB` と現在使用量
+  - operator に対する合計メモリ上限 `5120 MB` と現在使用量
   - `latest` など symbolic tag を選んだ場合の concrete version 表示方針
   - live source から解決し、失敗時は checked-in catalog に落ちる runtime family ごとの version 候補
   - 単一ホスト標準構成で作成されることの説明
@@ -104,7 +104,8 @@
   - `hostname` 形式
   - `hostname` 一意性
   - メモリ / ディスク上限
-  - owner ごとの合計メモリ上限 `5120 MB`
+  - user type ごとの create 可否
+  - operator ごとの合計メモリ上限 `5120 MB`
   - runtime family ごとの version/tag 契約に従うこと
 
 ### 3.4 サーバー詳細
@@ -178,6 +179,7 @@ GET /api/servers/:id/container
 ### 5.1 users
 
 - 既存 auth baseline を利用
+- 将来的に global user type `admin` / `operator` / `reader` を持つ
 
 ### 5.2 minecraft_servers
 
@@ -200,10 +202,8 @@ GET /api/servers/:id/container
 
 ### 5.3 server_members
 
-- active role は `owner` / `operator` / `reader`
-- `owner` は `operator` / `reader` を招待可能
-- `operator` は `reader` のみ招待可能
-- `reader` は read-only member とする
+- server membership は server visibility / participation の局所権限として維持する
+- app-wide authorization は別途 user type `admin` / `operator` / `reader` を正本とする
 
 ### 5.4 router_routes の扱い
 

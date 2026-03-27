@@ -66,7 +66,7 @@ Current baseline:
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
 - `T-507` is complete: the server detail page now polls only while `starting`, `stopping`, or `restarting`, and the status badge shows a simple spinner instead of timestamps or countdown-style progress.
 - `T-1013` is complete: Discord OAuth now requests only `identify`, bootstrap/invite/login flows no longer persist email fields, and the remaining member-management UI resolves users by `discord_user_id` instead of email lookup.
-- `T-1014` is complete: role hierarchy, invitation authority, reader read-only behavior, and the per-owner `5120 MB` create quota now live in `docs/access_policy_and_quota_contract.md`.
+- `T-1014` is complete: global user types, invitation authority, reader read-only behavior, and the operator-scoped `5120 MB` create quota now live in `docs/access_policy_and_quota_contract.md`.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.
@@ -107,10 +107,10 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Frontend bundler: `vite_rails` + Vite
 - Authentication target direction: Discord OAuth2 only
 - Account onboarding direction: manually issued invite URLs
-- Role hierarchy direction: `owner` / `operator` / `reader`
+- User-type hierarchy direction: `admin` / `operator` / `reader`
 - Bot integration direction: Discord Bot calls Rails-owned APIs
 - Minecraft command operation direction: Rails executes lifecycle/RCON actions; bots must not talk directly to Docker or server containers
-- Server creation quota direction: owner-owned servers are limited by summed `memory_mb <= 5120`
+- Server creation quota direction: `admin` is unrestricted, `operator` is limited by summed owned `memory_mb <= 5120`, and `reader` cannot create servers
 - Minecraft runtime image family: `itzg/minecraft-server`
 - `paper` and `vanilla` both run on `itzg/minecraft-server`, selected through `TYPE=PAPER` or `TYPE=VANILLA`
 - The create-form `minecraft_version` field is treated as runtime-version input and is passed through the container `VERSION` environment contract rather than mapped to a Docker image tag
