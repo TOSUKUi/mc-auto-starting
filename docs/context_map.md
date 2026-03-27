@@ -24,7 +24,7 @@ This file tells any contributor or agent where to find authoritative information
 - `docs/access_policy_and_quota_contract.md`
   Use for the active global user types, server-local `viewer` / `manager` roles, invitation authority, ownership-vs-membership authorization rules, and the operator-scoped `5120 MB` server-create quota fixed by `T-1014`.
 - `docs/server_ui_display_review.md`
-  Use for the agreed display contract for the server index/detail screens, including owner-name display, lifecycle-action visibility, and transition-state polling expectations captured in `T-505`.
+  Use for the agreed display contract for the server index/detail screens, including owner-name display, lifecycle-action visibility, transition-state polling expectations from `T-505`, and the next de-dup/layout cleanup plan captured in `T-508`.
 - `docs/provider_cleanup_inventory.md`
   Use for the legacy provider dependency inventory and the remaining schema/doc cleanup debt after `T-700` / `T-702` / `T-703`.
 - `docs/docker_engine_contract.md`
@@ -98,6 +98,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-501` and `T-502` are complete: detail/index UI now center connection targets and publication data, while current active screens de-emphasize Docker backend identifiers.
 - `T-503` is in progress: operator-facing copy and layout polish are being moved further toward a Japanese-first, simpler presentation; the unused home page has been removed in favor of routing `/` to the server index, the active app shell now uses a flat Minecraft-inspired dark theme, the header now exposes the signed-in user's global role, shared navigation/member/invite copy is being localized, and the server create form caps memory at 4GB while blocking invalid hostname characters earlier.
 - `T-505` is complete: the agreed index/detail display contract in `docs/server_ui_display_review.md` is now reflected in the active screens, including Discord-based owner labels and an uptime-oriented detail summary.
+- `T-508` is planned: the next server-screen cleanup removes `応答状態` and router timestamp noise from index/detail, then rebalances the detail layout so repeated status/connection/runtime facts appear only once.
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider inventory is documented, provider services/initializer/tests are removed, and create requests no longer expose provider-era template input.
 - `T-701` is complete: legacy provider design docs are explicitly historical references and no longer sit in the active restart path.
 - `T-803` is complete: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline.
