@@ -14,6 +14,9 @@ import {
 import { Head, Link, router, useForm } from '@inertiajs/react'
 
 function labelize(value) {
+  if (value === 'manager') return 'Manager'
+  if (value === 'viewer') return 'Viewer'
+
   return value
     .split('_')
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))

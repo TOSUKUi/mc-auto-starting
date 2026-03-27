@@ -14,7 +14,7 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert policy.sync?
   end
 
-  test "operator can view and operate but not manage ownership actions" do
+  test "manager membership can view and operate but not manage ownership actions" do
     policy = MinecraftServerPolicy.new(users(:three), minecraft_servers(:one))
 
     assert policy.show?
@@ -27,7 +27,7 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert_not policy.manage_members?
   end
 
-  test "viewer can only read the server" do
+  test "viewer membership can only read the server" do
     policy = MinecraftServerPolicy.new(users(:two), minecraft_servers(:one))
 
     assert policy.show?

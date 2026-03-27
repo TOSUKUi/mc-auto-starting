@@ -55,11 +55,11 @@ class MinecraftServerPolicy < ApplicationPolicy
       user.present? && record.owner_id == user.id
     end
 
-    def operator?
+    def manager_membership?
       return false unless user
       return false if owner?
 
-      record.server_members.exists?(user_id: user.id, role: ServerMember.roles[:operator])
+      record.server_members.exists?(user_id: user.id, role: ServerMember.roles[:manager])
     end
 
     def viewer?
@@ -70,10 +70,10 @@ class MinecraftServerPolicy < ApplicationPolicy
     end
 
     def visible_to_user?
-      owner? || operator? || viewer?
+      owner? || manager_membership? || viewer?
     end
 
     def lifecycle_access?
-      (owner? || operator?) && record.lifecycle_ready?
+      (owner? || manager_membership?) && record.lifecycle_ready?
     end
 end

@@ -29,7 +29,7 @@
 - Minecraft バージョン
 - Type (`Paper` / `Vanilla`)
 - オーナー表示名
-- 自分の権限 (`owner` / `operator` / `viewer`)
+- 自分の権限 (`owner` / `manager` / `viewer`)
 
 ### Hide
 - email address

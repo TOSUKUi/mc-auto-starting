@@ -70,6 +70,7 @@ Current baseline:
 - `T-1013` is complete: Discord OAuth now requests only `identify`, bootstrap/invite/login flows no longer persist email fields, and the remaining member-management UI resolves users by `discord_user_id` instead of email lookup.
 - `T-1014` is complete: global user types, server-local `viewer` / `manager` roles, invitation authority, ownership-vs-membership authorization rules, and the operator-scoped `5120 MB` create quota now live in `docs/access_policy_and_quota_contract.md`.
 - `T-1015` is complete: `users.user_type` now persists the global `admin` / `operator` / `reader` role, existing users are backfilled to `operator`, new users default to `reader`, bootstrap owner seeding assigns `admin`, and shared controller/policy code can resolve the global role independently from server membership.
+- `T-1019` is complete: server-local membership terminology now uses `manager` instead of `operator`, so membership roles no longer collide with the global `operator` user type.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.

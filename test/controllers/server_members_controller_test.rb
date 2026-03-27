@@ -54,12 +54,12 @@ class ServerMembersControllerTest < ActionDispatch::IntegrationTest
 
     patch server_member_url(minecraft_servers(:one), server_members(:one), format: :json), params: {
       server_member: {
-        role: "operator",
+        role: "manager",
       },
     }
 
     assert_response :success
-    assert_equal "operator", server_members(:one).reload.role
+    assert_equal "manager", server_members(:one).reload.role
   end
 
   test "owner can remove a membership" do

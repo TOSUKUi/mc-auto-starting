@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_001001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_033715) do
   create_table "discord_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "discord_user_id", null: false

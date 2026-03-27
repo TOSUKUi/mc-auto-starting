@@ -251,7 +251,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_not mappings.key?("main-survival.mc.tosukui.xyz")
   end
 
-  test "operator can start a visible server and sync it back to ready" do
+  test "manager membership can start a visible server and sync it back to ready" do
     sign_in_as(users(:three))
     server = minecraft_servers(:one)
     server.update_columns(status: "stopped", container_state: "exited")

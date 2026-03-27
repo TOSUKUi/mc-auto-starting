@@ -8,4 +8,4 @@ one:
 two:
   minecraft_server: one
   user: three
-  role: operator
+  role: manager

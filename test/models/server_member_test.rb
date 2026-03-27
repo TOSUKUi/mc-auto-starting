@@ -10,11 +10,11 @@ class ServerMemberTest < ActiveSupport::TestCase
 
   test "defines allowed roles" do
     assert ServerMember.roles.key?("viewer")
-    assert ServerMember.roles.key?("operator")
+    assert ServerMember.roles.key?("manager")
   end
 
   test "rejects duplicate membership for the same server" do
-    membership = ServerMember.new(minecraft_server: minecraft_servers(:one), user: users(:two), role: :operator)
+    membership = ServerMember.new(minecraft_server: minecraft_servers(:one), user: users(:two), role: :manager)
 
     assert_not membership.valid?
     assert_includes membership.errors[:user_id], "has already been taken"

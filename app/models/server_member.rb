@@ -4,7 +4,7 @@ class ServerMember < ApplicationRecord
 
   enum :role, {
     viewer: "viewer",
-    operator: "operator",
+    manager: "manager",
   }, prefix: true
 
   validates :role, presence: true

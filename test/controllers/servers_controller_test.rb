@@ -100,7 +100,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     server = response.parsed_body.fetch("server")
 
     assert_equal minecraft_servers(:one).id, server.fetch("id")
-    assert_equal "operator", server.fetch("access_role")
+    assert_equal "manager", server.fetch("access_role")
     assert_equal "1.21.4", server.fetch("minecraft_version_display")
     assert_equal "runtime unavailable", server.fetch("last_error_message")
     assert_equal users(:one).discord_global_name, server.fetch("owner_display_name")
@@ -283,7 +283,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "operator can start a visible server" do
+  test "manager membership can start a visible server" do
     sign_in_as(users(:three))
     server = minecraft_servers(:one)
     original_new = Servers::StartServer.method(:new)
