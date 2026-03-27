@@ -52,7 +52,7 @@
 | T-504 | P4 | Show owner username instead of email on server index | T-502,T-1001 | done | Server index owner display now uses `discord_global_name` / `discord_username` fallback instead of `email_address` |
 | T-505 | P4 | Review and fix server index/detail display contract | T-501,T-502,T-503 | todo | The intended fields, labels, ordering, and omissions for server index/detail are reviewed and captured in `docs/server_ui_display_review.md` before follow-up UI edits |
 | T-506 | P4 | Gate server detail actions by lifecycle state | T-402,T-501,T-503,T-505 | done | The server detail page now only exposes lifecycle actions that match the current server state, so running servers no longer show a start action and transitional states converge on sync-only controls |
-| T-507 | P4 | Poll server detail state during lifecycle transitions | T-402,T-501,T-506 | todo | The server detail page refreshes server state while statuses such as `starting`, `stopping`, and `restarting` are in flight, so badges and available actions converge automatically without a manual reload |
+| T-507 | P4 | Poll server detail state during lifecycle transitions | T-402,T-501,T-506 | done | The server detail page now reloads its `server` props while `starting`, `stopping`, and `restarting` are in flight, and shows a simple spinner on the status badge until a stable state returns |
 | T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
 | T-601 | P5 | Build login page | T-100,T-004 | done | UI login works |
 | T-700 | P6 | Remove provider coupling from app services | T-400,T-401,T-402 | done | Direct-Docker implementation no longer depends on execution-provider services |

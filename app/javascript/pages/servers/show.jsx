@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Code, Divider, Grid, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core'
+import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core'
 import { Head, Link, router } from '@inertiajs/react'
 import {
   IconActivityHeartbeat,
@@ -13,6 +13,7 @@ import {
   IconUsers,
   IconWorldWww,
 } from '@tabler/icons-react'
+import { useEffect, useEffectEvent, useRef } from 'react'
 
 const STATUS_COLORS = {
   provisioning: 'violet',
@@ -39,6 +40,8 @@ const HEALTH_COLORS = {
   unreachable: 'orange',
   rejected: 'red',
 }
+
+const TRANSITION_STATUSES = [ 'starting', 'stopping', 'restarting' ]
 
 function labelize(value) {
   return value
@@ -70,6 +73,10 @@ function formatTimestamp(value) {
   }).format(new Date(value))
 }
 
+function isTransitioning(status) {
+  return TRANSITION_STATUSES.includes(status)
+}
+
 function DetailLine({ label, value }) {
   return (
     <Stack gap={2}>
@@ -82,6 +89,38 @@ function DetailLine({ label, value }) {
 }
 
 export default function ServersShow({ server }) {
+  const reloadInFlight = useRef(false)
+  const transitionState = isTransitioning(server.status)
+  const pollServer = useEffectEvent(() => {
+    if (reloadInFlight.current) return
+
+    reloadInFlight.current = true
+    router.reload({
+      only: [ 'server' ],
+      preserveState: true,
+      preserveScroll: true,
+      onFinish: () => {
+        reloadInFlight.current = false
+      },
+    })
+  })
+
+  useEffect(() => {
+    reloadInFlight.current = false
+  }, [server.id, server.status])
+
+  useEffect(() => {
+    if (!transitionState) return undefined
+
+    const intervalId = window.setInterval(() => {
+      pollServer()
+    }, 3000)
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [pollServer, transitionState])
+
   return (
     <>
       <Head title={server.name} />
@@ -120,7 +159,11 @@ export default function ServersShow({ server }) {
                   <Badge color="grape" variant="light">
                     Type {runtimeFamilyLabel(server.runtime_family)}
                   </Badge>
-                  <Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">
+                  <Badge
+                    color={STATUS_COLORS[server.status] ?? 'gray'}
+                    leftSection={transitionState ? <Loader color="currentColor" size={12} type="dots" /> : null}
+                    variant="light"
+                  >
                     {labelize(server.status)}
                   </Badge>
                   <Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">
