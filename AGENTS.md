@@ -45,10 +45,13 @@ Current baseline:
 - `T-400` now retries container create once by pulling the selected runtime image when Docker returns `No such image`.
 - The direct-Docker lifecycle/delete contract is fixed in `docs/direct_docker_lifecycle_contract.md` before `T-401` / `T-402` implementation.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now operate on managed Docker containers and volumes instead of the legacy provider path.
+- `T-403` is complete: sync now reconciles `container_state`, `last_started_at`, and `last_error_message` from Docker inspect so runtime details stay aligned after manual syncs.
 - `T-500` is complete: create UI and controller props are reduced to the direct-Docker baseline inputs plus hostname/FQDN preview metadata.
 - `T-501` and `T-502` are complete: detail/index UI now emphasize connection target and router publication instead of provider-era framing, while active screens no longer foreground Docker backend identifiers.
 - `T-503` is in progress: operator-facing UI copy and layout polish are being shifted toward a simpler Japanese-first presentation, the root route now lands on the server index, the active app shell uses a flat Minecraft-inspired dark theme instead of gradient-heavy panels, and current server forms now enforce a 4GB memory cap plus hostname character restrictions in both JS and Rails validations.
+- `T-505` is complete: the server index/detail display contract is fixed in `docs/server_ui_display_review.md`, and the active screens now follow that contract with Discord owner display, connection-first ordering, and lower-priority metadata pushed below the primary state/action area.
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider dependency inventory exists, provider services/initializer/tests are removed, and controller create flow now treats `template_kind` as internal schema debt instead of an exposed input.
+- `T-701` is complete: legacy provider design docs remain only as historical references and are no longer part of the active restart workflow.
 - `T-803` is complete: automated acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline with router publication checks.
 - `T-804` is complete: compose-managed `mc-router` now runs on the shared bridge network and a live status ping through the shared public port reached a managed Minecraft container.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after rewriting the routes file, so live ingress updates no longer depend on bind-mounted file-watch behavior.
@@ -57,7 +60,7 @@ Current baseline:
 - `T-901` is complete: `docs/operator_runbook.md` now gives operators a current Compose-based single-host deployment procedure, host-side verification commands, direct-Docker lifecycle guidance, and explicit Docker safety notes.
 - `T-905` is complete: the repository now includes `config/deploy.yml`, `config/deploy.production.yml`, `.kamal` secret templates and hooks, plus the `mc-router` deployment helper needed for the first Kamal-based single-host rollout.
 - The next implementation critical-path task is `T-902`.
-- Additional requested follow-up tasks are queued for a review of server index/detail display content captured in `docs/server_ui_display_review.md` (`T-505`), lifecycle-aware detail-page actions (`T-506`), transition-state polling on the detail page (`T-507`), and removal of persisted user email data from the Discord-only auth path (`T-1013`).
+- Follow-up UI tasks for the server screens have been partially closed: `T-505`, `T-506`, and `T-507` are complete, and `docs/server_ui_display_review.md` remains the display-contract reference for future adjustments.
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
 - `T-507` is complete: the server detail page now polls only while `starting`, `stopping`, or `restarting`, and the status badge shows a simple spinner instead of timestamps or countdown-style progress.

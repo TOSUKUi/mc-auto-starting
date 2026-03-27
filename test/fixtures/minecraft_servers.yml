@@ -9,6 +9,7 @@ one:
   container_id: container-001
   volume_name: mc-data-main-survival
   container_state: running
+  last_started_at: 2026-03-25 17:00:00
   provider_server_id: srv-001
   provider_server_identifier: abc12345
   backend_host: 10.0.0.21

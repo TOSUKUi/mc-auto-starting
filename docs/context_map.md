@@ -88,10 +88,13 @@ This file tells any contributor or agent where to find authoritative information
 - `T-400` now pulls the selected runtime image on demand when Docker create fails with `No such image`.
 - The direct-Docker lifecycle/delete contract is now fixed in `docs/direct_docker_lifecycle_contract.md` ahead of service replacement work.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
+- `T-403` is complete: manual sync now also reconciles `last_started_at` from Docker inspect so runtime timestamps and error state stay aligned.
 - `T-500` is complete: create UI now exposes only the direct-Docker baseline inputs and the public connection preview contract.
 - `T-501` and `T-502` are complete: detail/index UI now center connection targets and publication data, while current active screens de-emphasize Docker backend identifiers.
 - `T-503` is in progress: operator-facing copy and layout polish are being moved further toward a Japanese-first, simpler presentation; the unused home page has been removed in favor of routing `/` to the server index, the active app shell now uses a flat Minecraft-inspired dark theme, and the server create form now caps memory at 4GB while blocking invalid hostname characters earlier.
+- `T-505` is complete: the agreed index/detail display contract in `docs/server_ui_display_review.md` is now reflected in the active screens, including Discord-based owner labels and an uptime-oriented detail summary.
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider inventory is documented, provider services/initializer/tests are removed, and create requests no longer expose provider-era template input.
+- `T-701` is complete: legacy provider design docs are explicitly historical references and no longer sit in the active restart path.
 - `T-803` is complete: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline.
 - `compose.yaml` now defines a compose-managed `mc-router` service on the shared `mc_router_net` bridge network.
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
@@ -101,7 +104,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
 - `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
 - The next implementation critical path starts at `T-902` to finish the release docs before the remaining Discord bot/RCON work; after that, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
-- Additional queued follow-up tasks now exist for a review of server index/detail display content captured in `docs/server_ui_display_review.md` (`T-505`), lifecycle-aware detail-page actions (`T-506`), transition-state polling on the detail page (`T-507`), and removing persisted user email data from the Discord-only auth path (`T-1013`).
+- The earlier server-screen follow-up tasks `T-505`, `T-506`, and `T-507` are now complete; `docs/server_ui_display_review.md` remains the display-contract reference for any future server-screen cleanup.
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
 - `T-507` is complete: the server detail page now polls only while `starting`, `stopping`, or `restarting`, and the status badge shows a simple spinner instead of timestamps or countdown-style progress.

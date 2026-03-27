@@ -97,7 +97,10 @@ class Servers::LifecycleOperationTest < ActiveSupport::TestCase
       calls: [],
       inspect_result: {
         "Id" => "container-001",
-        "State" => { "Status" => "exited" },
+        "State" => {
+          "Status" => "exited",
+          "StartedAt" => "2026-03-25T08:00:00Z",
+        },
       },
     )
 
@@ -106,6 +109,7 @@ class Servers::LifecycleOperationTest < ActiveSupport::TestCase
     assert_equal [ [ :inspect_container, { id_or_name: "container-001" } ] ], docker_client.calls
     assert_equal "stopped", server.reload.status
     assert_equal "exited", server.container_state
+    assert_equal Time.zone.parse("2026-03-25T08:00:00Z"), server.last_started_at
     assert_nil server.last_error_message
   end
 

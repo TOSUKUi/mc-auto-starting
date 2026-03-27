@@ -46,6 +46,7 @@ These services operate only on app-managed Minecraft containers and their paired
   - `last_started_at` should be refreshed
 - `sync`
   - inspect result is mapped onto both `container_state` and Rails `status`
+  - when Docker reports a valid `State.StartedAt`, `last_started_at` should be refreshed from inspect
   - conflicting or missing runtime state degrades the server instead of trusting stale DB values
 
 ## Docker State to Rails Status Mapping
@@ -67,6 +68,7 @@ Unknown Docker states should map to `degraded`.
 - When inspect succeeds:
   - persist canonical `container_id`
   - persist `container_state`
+  - persist `last_started_at` when inspect reports a valid start timestamp
   - clear `last_error_message`
   - transition Rails status to the mapped state when that transition is allowed
 - When inspect returns `NotFound`:

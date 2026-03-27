@@ -44,13 +44,13 @@
 | T-400 | P3 | Implement direct-Docker create flow | T-200,T-201,T-202,T-203,T-302,T-303 | done | Create request persists a server, creates Docker resources, updates router publication, and stores identifiers |
 | T-401 | P3 | Implement delete flow for direct-Docker servers | T-302,T-303,T-400 | done | Delete removes managed container resources and unpublishes the router route |
 | T-402 | P3 | Implement start/stop/restart/sync flows | T-302,T-400 | done | Lifecycle operations update Docker state and Rails status correctly |
-| T-403 | P3 | Persist container runtime details on sync | T-302,T-402 | todo | `container_state`, timestamps, and last error fields stay reconcilable |
+| T-403 | P3 | Persist container runtime details on sync | T-302,T-402 | done | `container_state`, timestamps, and last error fields stay reconcilable |
 | T-500 | P4 | Simplify create UI for direct-Docker baseline | T-400,T-202,T-600 | done | Create UI exposes only the fields needed for single-host Docker provisioning while keeping hostname/FQDN guidance |
 | T-501 | P4 | Simplify detail UI for container-first operations | T-402,T-600 | done | Detail UI shows connection target, container/runtime info, and router publication instead of provider info |
 | T-502 | P4 | Update index UI for direct-Docker summary fields | T-202,T-600 | done | Index UI reflects FQDN-based connection targets and container status cleanly |
 | T-503 | P4 | Localize operator-facing UI copy to Japanese baseline | T-500,T-501,T-502 | in_progress | Default operator-facing copy is Japanese across the active screens |
 | T-504 | P4 | Show owner username instead of email on server index | T-502,T-1001 | done | Server index owner display now uses `discord_global_name` / `discord_username` fallback instead of `email_address` |
-| T-505 | P4 | Review and fix server index/detail display contract | T-501,T-502,T-503 | todo | The intended fields, labels, ordering, and omissions for server index/detail are reviewed and captured in `docs/server_ui_display_review.md` before follow-up UI edits |
+| T-505 | P4 | Review and fix server index/detail display contract | T-501,T-502,T-503 | done | The intended fields, labels, ordering, and omissions for server index/detail are reviewed and captured in `docs/server_ui_display_review.md` before follow-up UI edits |
 | T-506 | P4 | Gate server detail actions by lifecycle state | T-402,T-501,T-503,T-505 | done | The server detail page now only exposes lifecycle actions that match the current server state, so running servers no longer show a start action and transitional states converge on sync-only controls |
 | T-507 | P4 | Poll server detail state during lifecycle transitions | T-402,T-501,T-506 | done | The server detail page now reloads its `server` props while `starting`, `stopping`, and `restarting` are in flight, and shows a simple spinner on the status badge until a stable state returns |
 | T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
@@ -58,7 +58,7 @@
 | T-700 | P6 | Remove provider coupling from app services | T-400,T-401,T-402 | done | Direct-Docker implementation no longer depends on execution-provider services |
 | T-702 | P6 | Remove provider-era initializers and tests | T-205,T-700 | done | Provider initializers, provider service tests, and related fixtures are removed or replaced while router tests remain active |
 | T-703 | P6 | Remove provider fields and references from controllers and UI | T-205,T-500,T-501,T-502,T-700 | done | Server controller responses and Inertia pages no longer expose provider concepts while preserving router data |
-| T-701 | P6 | Remove legacy provider docs from active workflow | T-110,T-700 | todo | Restart docs no longer point to old provider docs as current truth |
+| T-701 | P6 | Remove legacy provider docs from active workflow | T-110,T-700 | done | Restart docs no longer point to old provider docs as current truth |
 | T-800 | P7 | Add model tests for direct-Docker rules | T-200,T-201,T-202,T-203 | todo | Core direct-Docker domain logic is covered |
 | T-801 | P7 | Add request and authorization tests | T-400,T-401,T-402,T-500,T-501 | todo | Access control and create/lifecycle/delete flows are covered |
 | T-802 | P7 | Add service tests for Docker client and allocators | T-302,T-303,T-400,T-401,T-402 | todo | Critical Docker orchestration paths are covered |

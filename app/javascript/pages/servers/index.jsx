@@ -62,15 +62,6 @@ function selectedVersionNote(server) {
   return `指定: ${server.minecraft_version}`
 }
 
-function formatTimestamp(value) {
-  if (!value) return '未更新'
-
-  return new Intl.DateTimeFormat('ja-JP', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value))
-}
-
 function routeLabel(route) {
   const applyLabel = route.enabled ? '公開中' : '非公開'
   return `${applyLabel} / ${labelize(route.last_healthcheck_status)}`
@@ -264,14 +255,6 @@ export default function ServersIndex({ servers, summary }) {
                           オーナー
                         </Text>
                         <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.owner_display_name}</Text>
-                      </Stack>
-                    </Paper>
-                    <Paper p="md" radius="lg" withBorder>
-                      <Stack gap={2}>
-                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                          更新
-                        </Text>
-                        <Text fw={700}>{formatTimestamp(server.updated_at)}</Text>
                       </Stack>
                     </Paper>
                   </SimpleGrid>

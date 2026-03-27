@@ -73,6 +73,19 @@ function formatTimestamp(value) {
   }).format(new Date(value))
 }
 
+function formatUptime(seconds) {
+  if (seconds == null || seconds < 0) return '停止中'
+
+  const days = Math.floor(seconds / 86400)
+  const hours = Math.floor((seconds % 86400) / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+
+  if (days > 0) return `${days}日 ${hours}時間`
+  if (hours > 0) return `${hours}時間 ${minutes}分`
+
+  return `${Math.max(minutes, 0)}分`
+}
+
 function isTransitioning(status) {
   return TRANSITION_STATUSES.includes(status)
 }
@@ -250,6 +263,18 @@ export default function ServersShow({ server }) {
                   <Text fw={600}>{formatTimestamp(server.last_started_at)}</Text>
                 </Stack>
               </Paper>
+
+              <Paper p="lg" radius="lg" withBorder>
+                <Stack gap={4}>
+                  <Group gap="xs">
+                    <ThemeIcon color="cyan" radius="xl" size={28} variant="light">
+                      <IconRefresh size={15} />
+                    </ThemeIcon>
+                    <Text fw={700}>連続稼働時間</Text>
+                  </Group>
+                  <Text fw={600}>{formatUptime(server.uptime_seconds)}</Text>
+                </Stack>
+              </Paper>
             </SimpleGrid>
           </Stack>
         </Paper>
@@ -278,9 +303,13 @@ export default function ServersShow({ server }) {
                     </Stack>
                   }
                 />
+                <DetailLine label="オーナー" value={server.owner_display_name} />
                 <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{server.access_role}</Badge>} />
                 <DetailLine label="現在の状態" value={<Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">{labelize(server.status)}</Badge>} />
+                <DetailLine label="ホスト名" value={<Code>{server.hostname}</Code>} />
+                <DetailLine label="FQDN" value={<Code>{server.fqdn}</Code>} />
                 <DetailLine label="最終起動" value={formatTimestamp(server.last_started_at)} />
+                <DetailLine label="連続稼働時間" value={formatUptime(server.uptime_seconds)} />
               </Stack>
             </Paper>
           </Grid.Col>
@@ -292,7 +321,6 @@ export default function ServersShow({ server }) {
                 <Divider />
                 <DetailLine label="公開状態" value={<Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">{server.route.enabled ? '公開中' : '非公開'}</Badge>} />
                 <DetailLine label="応答状態" value={<Badge color={HEALTH_COLORS[server.route.last_healthcheck_status] ?? 'gray'} variant="light">{labelize(server.route.last_healthcheck_status)}</Badge>} />
-                <DetailLine label="公開" value={server.route.enabled ? '有効' : '無効'} />
                 <DetailLine label="最終反映" value={formatTimestamp(server.route.last_applied_at)} />
                 <DetailLine label="最終ヘルスチェック" value={formatTimestamp(server.route.last_healthchecked_at)} />
               </Stack>

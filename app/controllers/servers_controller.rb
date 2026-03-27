@@ -210,7 +210,6 @@ class ServersController < InertiaController
         minecraft_version_display: server.display_minecraft_version,
         owner_display_name: server.owner.operator_display_name,
         access_role: access_role_for(server),
-        updated_at: server.updated_at.iso8601,
         route: {
           enabled: route&.enabled || false,
           last_apply_status: route&.last_apply_status || "pending",
@@ -238,6 +237,7 @@ class ServersController < InertiaController
         minecraft_version_display: server.display_minecraft_version,
         last_error_message: server.last_error_message,
         last_started_at: server.last_started_at&.iso8601,
+        uptime_seconds: uptime_seconds_for(server),
         owner_id: server.owner_id,
         runtime: summary.fetch(:runtime).merge(
           backend: server.backend,
@@ -300,5 +300,12 @@ class ServersController < InertiaController
           render json: { error: error.message }, status: :unprocessable_entity
         end
       end
+    end
+
+    def uptime_seconds_for(server)
+      return unless server.last_started_at.present?
+      return unless %w[running restarting].include?(server.container_state)
+
+      (Time.current - server.last_started_at).to_i
     end
 end

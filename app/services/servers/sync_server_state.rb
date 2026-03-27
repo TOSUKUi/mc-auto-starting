@@ -36,6 +36,7 @@ module Servers
         server.update!(
           container_id: inspection.fetch("Id", server.container_id),
           container_state: container_state,
+          last_started_at: inspected_started_at(inspection) || server.last_started_at,
           last_error_message: nil,
         )
 
@@ -64,6 +65,16 @@ module Servers
 
       def transition_to_degraded!
         server.transition_to!(:degraded) if server.can_transition_to?(:degraded)
+      end
+
+      def inspected_started_at(inspection)
+        started_at = inspection.dig("State", "StartedAt").presence
+        return if started_at.blank?
+        return if started_at == "0001-01-01T00:00:00Z"
+
+        Time.zone.parse(started_at)
+      rescue ArgumentError
+        nil
       end
   end
 end
