@@ -13,6 +13,7 @@ Current important files:
 - `compose.yaml`
 - `docs/single_host_setup.md`
 - `docs/operator_runbook.md`
+- `docs/release_runbook.md`
 - `docs/kamal_deployment_topology.md`
 - `config/deploy.yml`
 - `config/deploy.production.yml`
@@ -60,7 +61,8 @@ Current baseline:
 - `T-904` is complete: `docs/kamal_deployment_topology.md` now fixes the single-host Kamal deployment shape, keeping MariaDB and Redis as Kamal accessories, `mc-router` as a long-lived sibling service, and deploy secrets outside Git while preserving the current env key names.
 - `T-901` is complete: `docs/operator_runbook.md` now gives operators a current Compose-based single-host deployment procedure, host-side verification commands, direct-Docker lifecycle guidance, and explicit Docker safety notes.
 - `T-905` is complete: the repository now includes `config/deploy.yml`, `config/deploy.production.yml`, `.kamal` secret templates and hooks, plus the `mc-router` deployment helper needed for the first Kamal-based single-host rollout.
-- The next implementation critical-path task is `T-902`.
+- `T-902` is complete: `docs/release_runbook.md` now documents the Kamal-based release, migration, and rollback procedure for the current single-host deployment baseline.
+- The next implementation critical-path task is `T-1005`.
 - Follow-up UI tasks for the server screens have been partially closed: `T-505`, `T-506`, and `T-507` are complete, and `docs/server_ui_display_review.md` remains the display-contract reference for future adjustments.
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
@@ -153,12 +155,13 @@ The active system has four parts.
 8. `docs/provider_cleanup_inventory.md`
 9. `docs/single_host_setup.md`
 10. `docs/operator_runbook.md`
-11. `docs/kamal_deployment_topology.md`
-12. `config/deploy.yml`
-13. `config/deploy.production.yml`
-14. `docs/direct_docker_env_contract.md`
-15. `docs/direct_docker_lifecycle_contract.md`
-16. `docs/discord_auth_and_bot_strategy.md`
+11. `docs/release_runbook.md`
+12. `docs/kamal_deployment_topology.md`
+13. `config/deploy.yml`
+14. `config/deploy.production.yml`
+15. `docs/direct_docker_env_contract.md`
+16. `docs/direct_docker_lifecycle_contract.md`
+17. `docs/discord_auth_and_bot_strategy.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.
@@ -233,4 +236,4 @@ If no other instruction is given, start from the current critical path:
 1. `T-200` through `T-400` are complete
 2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, `T-804`, and `T-805` are complete while keeping `mc-router`
 3. `T-900`, `T-901`, `T-903`, `T-904`, and `T-905` are complete
-4. Next, close the P8 docs track with `T-902`
+4. Next, continue from `T-1005` on the Discord bot/RCON track, unless a higher-priority auth/quota task such as `T-1015` is explicitly chosen

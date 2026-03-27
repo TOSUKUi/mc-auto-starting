@@ -4,13 +4,13 @@
 
 This document is the `T-901` operator-facing runbook for the current direct-Docker architecture.
 
-It is written for the current repository state on `2026-03-27`:
+It is written for the current repository state on `2026-03-28`:
 
 - direct Docker lifecycle is implemented
 - local single-host bootstrap is documented
 - Kamal topology is defined
 - the initial Kamal deployment baseline is checked into the repository
-- the dedicated release and rollback runbook is still `T-902`
+- the dedicated release and rollback runbook is now checked in
 
 ## Which Deployment Path To Use Today
 
@@ -29,7 +29,7 @@ Kamal is the planned deployment baseline, and the initial config files are now c
 - [docker/mc-router/deploy.compose.yml](../docker/mc-router/deploy.compose.yml)
 - [bin/deploy-mc-router](../bin/deploy-mc-router)
 
-The full release and rollback runbook is still `T-902`, but the baseline deployment shape is now implemented.
+The dedicated release and rollback procedure now lives in [docs/release_runbook.md](release_runbook.md).
 
 ## Kamal Deployment Baseline
 
