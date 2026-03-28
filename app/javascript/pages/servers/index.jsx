@@ -216,13 +216,7 @@ export default function ServersIndex({ servers, summary }) {
                   <Group align="flex-start" justify="space-between">
                     <Stack gap={4}>
                       <Group gap="sm">
-                        <Text
-                          href={`/servers/${server.id}`}
-                          fw={700}
-                          renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />}
-                          size="lg"
-                          style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
-                        >
+                        <Text fw={700} size="lg" style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                           {server.name}
                         </Text>
                         <Badge color="blue" variant="light">
@@ -255,6 +249,17 @@ export default function ServersIndex({ servers, summary }) {
                         </Badge>
                       </Group>
                     ) : null}
+                  </Group>
+
+                  <Group justify="flex-end">
+                    <Button
+                      href={`/servers/${server.id}`}
+                      renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />}
+                      size="xs"
+                      variant="light"
+                    >
+                      詳細を見る
+                    </Button>
                   </Group>
 
                   <SimpleGrid cols={{ base: 1, sm: 4 }} spacing="sm">
