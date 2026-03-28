@@ -5,7 +5,7 @@
     <div class="auth-header__brand">
       <p class="auth-eyebrow">Minecraft サーバー</p>
       <h1>ログイン</h1>
-      <p class="auth-copy">Minecraft サーバーの作成と管理を行います。</p>
+      <p class="auth-copy">Minecraft サーバーの作成と管理を行います。招待済みの Discord アカウントで続行します。</p>
     </div>
   </div>
 
@@ -17,10 +17,6 @@
     <% if flash[:notice] %>
       <div class="auth-flash auth-flash--notice"><%= flash[:notice] %></div>
     <% end %>
-
-    <div class="auth-card__header">
-      <p>招待済みの Discord アカウントで続行します。</p>
-    </div>
 
     <div class="auth-form">
       <%= link_to "Discordでログイン", discord_login_path, class: "auth-submit" %>

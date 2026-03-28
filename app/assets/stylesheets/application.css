@@ -113,6 +113,7 @@ code {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
   appearance: none;
   border: 0;
   border-radius: 14px;

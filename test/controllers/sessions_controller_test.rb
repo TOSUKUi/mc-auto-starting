@@ -6,7 +6,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     get login_path
 
     assert_response :success
-    assert_select "a.auth-submit[href='#{discord_login_path}']", text: "Discord でログイン"
+    assert_select "a.auth-submit[href='#{discord_login_path}']", text: "Discordでログイン"
     assert_select "input[type=email]", count: 0
     assert_select "input[type=password]", count: 0
   end
