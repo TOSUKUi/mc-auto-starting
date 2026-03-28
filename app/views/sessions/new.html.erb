@@ -1,39 +1,30 @@
-<% content_for :title, "Discord Login" %>
+<% content_for :title, "ログイン" %>
 
 <div class="auth-shell">
-  <section class="auth-panel auth-panel--brand">
-    <p class="auth-eyebrow">Minecraft Servers</p>
-    <h1>Discord でログイン</h1>
-    <p class="auth-copy">
-      このアプリは招待制です。既存ユーザーは Discord でログインし、新規参加者は受け取った招待リンクから開始してください。
-    </p>
-
-    <ul class="auth-feature-list">
-      <li>一般公開のサインアップはありません。</li>
-      <li>招待済みの Discord アカウントだけが参加できます。</li>
-      <li>ログイン後にサーバー一覧と招待管理へ進めます。</li>
-    </ul>
-  </section>
-
-  <section class="auth-panel auth-panel--form">
-    <div class="auth-card">
-      <div class="auth-card__header">
-        <p class="auth-kicker">Discord Login</p>
-        <h2>招待制ログイン</h2>
-        <p>既存ユーザーは Discord でログインしてください。招待リンクを受け取った場合は、リンクからそのまま開始できます。</p>
-      </div>
-
-      <% if flash[:alert] %>
-        <div class="auth-flash auth-flash--alert"><%= flash[:alert] %></div>
-      <% end %>
-
-      <% if flash[:notice] %>
-        <div class="auth-flash auth-flash--notice"><%= flash[:notice] %></div>
-      <% end %>
-
-      <div class="auth-form">
-        <%= link_to "Discord でログイン", discord_login_path, class: "auth-submit" %>
-      </div>
+  <div class="auth-header">
+    <div class="auth-header__brand">
+      <p class="auth-eyebrow">Minecraft サーバー</p>
+      <h1>ログイン</h1>
+      <p class="auth-copy">招待済みの Discord アカウントでログインします。</p>
     </div>
-  </section>
+  </div>
+
+  <div class="auth-card">
+    <% if flash[:alert] %>
+      <div class="auth-flash auth-flash--alert"><%= flash[:alert] %></div>
+    <% end %>
+
+    <% if flash[:notice] %>
+      <div class="auth-flash auth-flash--notice"><%= flash[:notice] %></div>
+    <% end %>
+
+    <div class="auth-card__header">
+      <h2>Discord でログイン</h2>
+      <p>招待リンクを受け取った場合は、リンクからそのまま開始してください。</p>
+    </div>
+
+    <div class="auth-form">
+      <%= link_to "Discord でログイン", discord_login_path, class: "auth-submit" %>
+    </div>
+  </div>
 </div>
