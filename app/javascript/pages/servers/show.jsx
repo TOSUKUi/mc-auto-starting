@@ -204,6 +204,8 @@ export default function ServersShow({ server }) {
   const [ selectedDifficulty, setSelectedDifficulty ] = useState(server.startup_settings.difficulty)
   const [ selectedWeather, setSelectedWeather ] = useState('clear')
   const [ selectedTime, setSelectedTime ] = useState('day')
+  const [ selectedGamemode, setSelectedGamemode ] = useState('survival')
+  const [ gamemodePlayerName, setGamemodePlayerName ] = useState('')
   const transitionState = isTransitioning(server.status)
   const canManageWhitelist = server.can_manage_whitelist
   const canRunRconCommand = server.can_run_rcon_command
@@ -342,6 +344,8 @@ export default function ServersShow({ server }) {
     setSelectedDifficulty(server.startup_settings.difficulty)
     setSelectedWeather('clear')
     setSelectedTime('day')
+    setSelectedGamemode('survival')
+    setGamemodePlayerName('')
   }, [server.id])
 
   useEffect(() => {
@@ -378,7 +382,7 @@ export default function ServersShow({ server }) {
     loadRecentLogs()
   }, [server.id])
 
-  async function executeRconCommand(command, { onSuccess } = {}) {
+  async function executeRconCommand(payload, { onSuccess } = {}) {
     setRconLoading(true)
     setRconError(null)
     setRconResult(null)
@@ -392,7 +396,7 @@ export default function ServersShow({ server }) {
           'Content-Type': 'application/json',
           'X-CSRF-Token': csrfToken(),
         },
-        body: JSON.stringify({ command }),
+        body: JSON.stringify(payload),
       })
       const body = await readJsonResponse(response, 'RCON コマンドの応答が不正です。')
 
@@ -704,7 +708,7 @@ export default function ServersShow({ server }) {
                     <Text fw={700}>難易度</Text>
                     <Group align="flex-end" grow>
                       <Select data={DIFFICULTY_OPTIONS} onChange={(value) => setSelectedDifficulty(value || 'easy')} value={selectedDifficulty} />
-                      <Button onClick={() => executeRconCommand(`difficulty ${selectedDifficulty}`)} type="button">
+                      <Button onClick={() => executeRconCommand({ command_key: 'difficulty', args: { difficulty: selectedDifficulty } })} type="button">
                         変更
                       </Button>
                     </Group>
@@ -715,7 +719,7 @@ export default function ServersShow({ server }) {
                     <Text fw={700}>天気</Text>
                     <Group align="flex-end" grow>
                       <Select data={WEATHER_OPTIONS} onChange={(value) => setSelectedWeather(value || 'clear')} value={selectedWeather} />
-                      <Button onClick={() => executeRconCommand(`weather ${selectedWeather}`)} type="button">
+                      <Button onClick={() => executeRconCommand({ command_key: 'weather', args: { weather: selectedWeather } })} type="button">
                         変更
                       </Button>
                     </Group>
@@ -726,7 +730,7 @@ export default function ServersShow({ server }) {
                     <Text fw={700}>時刻</Text>
                     <Group align="flex-end" grow>
                       <Select data={TIME_OPTIONS} onChange={(value) => setSelectedTime(value || 'day')} value={selectedTime} />
-                      <Button onClick={() => executeRconCommand(`time set ${selectedTime}`)} type="button">
+                      <Button onClick={() => executeRconCommand({ command_key: 'time_set', args: { time: selectedTime } })} type="button">
                         変更
                       </Button>
                     </Group>
@@ -735,9 +739,44 @@ export default function ServersShow({ server }) {
                 <Paper p="md" radius="lg" withBorder>
                   <Stack gap="sm">
                     <Text fw={700}>保存</Text>
-                    <Button onClick={() => executeRconCommand('save-all')} type="button" variant="light">
+                    <Button onClick={() => executeRconCommand({ command_key: 'save_all', args: {} })} type="button" variant="light">
                       save-all
                     </Button>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" withBorder>
+                  <Stack gap="sm">
+                    <Text fw={700}>ゲームモード</Text>
+                    <Select
+                      data={[
+                        { value: 'survival', label: 'Survival' },
+                        { value: 'creative', label: 'Creative' },
+                        { value: 'adventure', label: 'Adventure' },
+                        { value: 'spectator', label: 'Spectator' },
+                      ]}
+                      onChange={(value) => setSelectedGamemode(value || 'survival')}
+                      value={selectedGamemode}
+                    />
+                    <TextInput
+                      label="プレイヤー名"
+                      onChange={(event) => setGamemodePlayerName(event.currentTarget.value)}
+                      placeholder="未入力で全体"
+                      value={gamemodePlayerName}
+                    />
+                    <Group justify="flex-end">
+                      <Button
+                        onClick={() => executeRconCommand({
+                          command_key: 'gamemode',
+                          args: {
+                            gamemode: selectedGamemode,
+                            player_name: gamemodePlayerName,
+                          },
+                        }, { onSuccess: () => setGamemodePlayerName('') })}
+                        type="button"
+                      >
+                        変更
+                      </Button>
+                    </Group>
                   </Stack>
                 </Paper>
                 <Paper p="md" radius="lg" withBorder>
@@ -751,7 +790,7 @@ export default function ServersShow({ server }) {
                       />
                       <Button
                         disabled={sayMessage.trim().length === 0}
-                        onClick={() => executeRconCommand(`say ${sayMessage}`, { onSuccess: () => setSayMessage('') })}
+                        onClick={() => executeRconCommand({ command_key: 'say', args: { message: sayMessage } }, { onSuccess: () => setSayMessage('') })}
                         type="button"
                       >
                         送信
@@ -778,7 +817,13 @@ export default function ServersShow({ server }) {
                       <Button
                         color="red"
                         disabled={kickPlayerName.trim().length === 0}
-                        onClick={() => executeRconCommand(`kick ${kickPlayerName}${kickReason.trim().length > 0 ? ` ${kickReason}` : ''}`, {
+                        onClick={() => executeRconCommand({
+                          command_key: 'kick',
+                          args: {
+                            player_name: kickPlayerName,
+                            reason: kickReason,
+                          },
+                        }, {
                           onSuccess: () => {
                             setKickPlayerName('')
                             setKickReason('')

@@ -377,11 +377,29 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     sign_in_as(users(:one))
     stub_bounded_rcon("Difficulty set to hard")
 
-    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command: "difficulty hard" }
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: {
+      command_key: "difficulty",
+      args: { difficulty: "hard" },
+    }
 
     assert_response :success
+    assert_equal "difficulty", response.parsed_body.fetch("command_key")
     assert_equal "difficulty hard", response.parsed_body.fetch("command")
     assert_equal "Difficulty set to hard", response.parsed_body.fetch("response_body")
+  end
+
+  test "owner can execute structured gamemode command with optional player" do
+    sign_in_as(users(:one))
+    stub_bounded_rcon("Changed game mode")
+
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: {
+      command_key: "gamemode",
+      args: { gamemode: "creative", player_name: "TOSUKUi2" },
+    }
+
+    assert_response :success
+    assert_equal "gamemode", response.parsed_body.fetch("command_key")
+    assert_equal "gamemode creative TOSUKUi2", response.parsed_body.fetch("command")
   end
 
   test "viewer cannot execute bounded rcon command" do
@@ -401,6 +419,19 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_equal false, response.parsed_body.fetch("ok")
     assert_equal "rcon_command_forbidden", response.parsed_body.fetch("error_code")
+  end
+
+  test "owner receives validation error for invalid structured rcon args" do
+    sign_in_as(users(:one))
+
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: {
+      command_key: "gamemode",
+      args: { gamemode: "creative", player_name: "bad-name" },
+    }
+
+    assert_response :unprocessable_entity
+    assert_equal false, response.parsed_body.fetch("ok")
+    assert_equal "structured_rcon_invalid", response.parsed_body.fetch("error_code")
   end
 
   test "reader cannot open new server page" do

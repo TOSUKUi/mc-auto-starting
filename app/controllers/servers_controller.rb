@@ -248,13 +248,23 @@ class ServersController < InertiaController
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :rcon_command?
 
-    response_body = Servers::BoundedRconCommand.new(server: server).execute(command: params.fetch(:command, "").to_s)
+    command = if params[:command_key].present?
+      Servers::StructuredRconCommand.new(
+        command_key: params[:command_key],
+        args: structured_rcon_args,
+      ).build
+    else
+      params.fetch(:command, "").to_s
+    end
+
+    response_body = Servers::BoundedRconCommand.new(server: server).execute(command: command)
 
     respond_to do |format|
       format.json do
         render json: {
           ok: true,
-          command: params.fetch(:command, "").to_s,
+          command_key: params[:command_key].presence,
+          command: command,
           response_body: response_body,
         }
       end
@@ -263,6 +273,8 @@ class ServersController < InertiaController
         redirect_to server_path(server), notice: "コマンドを実行しました。"
       end
     end
+  rescue Servers::StructuredRconCommand::InvalidCommandError => error
+    respond_with_rcon_command_error(server, error, error_code: "structured_rcon_invalid")
   rescue Servers::BoundedRconCommand::ForbiddenCommandError => error
     respond_with_rcon_command_error(server, error, error_code: "rcon_command_forbidden")
   rescue MinecraftRcon::Error => error
@@ -562,6 +574,14 @@ class ServersController < InertiaController
       return unless %w[running restarting].include?(server.container_state)
 
       (Time.current - server.last_started_at).to_i
+    end
+
+    def structured_rcon_args
+      args = params[:args]
+      return {} unless args.present?
+      return args.to_unsafe_h if args.respond_to?(:to_unsafe_h)
+
+      args.to_h
     end
 
     def whitelist_payload(server)
