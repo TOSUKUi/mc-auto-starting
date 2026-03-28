@@ -54,6 +54,7 @@
 - Discord auth / invite / bot command 実装は P8 の運用 docs で基本運用を固めたあとに着手する
 - bot command 実装は `docs/discord_bot_api_contract.md` で bot credential, acting-user resolution, whitelist scope, and response envelope を固定してから着手する
 - Discord OAuth / invite / bot relay docs are now checked in; the next operator-facing follow-up is the `T-1010` to `T-1012` player-count and browser-console track
+- `T-1010` is now fixed at the contract layer; next implementation starts at `T-1011` for player-count UI and then `T-1012` for recent-log / bounded-command browser surfaces
 - global user type は `admin` / `operator` / `reader` を正本とし、server membership role は `viewer` / `manager` を正本とする
 - 招待権限は `admin -> unrestricted`, `operator -> reader only` に制限する
 - サーバー作成は `admin unrestricted`, `operator quota-limited`, `reader denied` とし、operator の所有サーバー合計 `memory_mb` は `5120 MB` 上限で扱う

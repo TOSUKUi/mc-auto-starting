@@ -17,6 +17,7 @@
 - 最終同期時刻の表示
 
 プレイヤー数は重要だが、`RCON` 周りの後続実装で扱う。現時点の UI 契約には含めない。
+その後続契約は [docs/player_observability_and_browser_console_contract.md](player_observability_and_browser_console_contract.md) を正本とする。
 
 将来の詳細画面では、owner/admin 限定で bounded RCON command 入力欄を持てる。ただし lifecycle 系コマンドと whitelist 系コマンドは専用 UI に分離し、`stop` などの forbidden command は自由入力経路から受け付けない。
 
