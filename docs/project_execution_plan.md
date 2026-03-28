@@ -301,6 +301,8 @@
 - Discord Bot が叩く Rails API の trust boundary を定義する
 - Rails 側に RCON client service を追加する
 - lifecycle 操作と制限付き RCON 実行を Bot 経由で扱えるようにする
+- server whitelist 操作は同じ Rails-owned RCON boundary に乗せる
+- `mc-router` の source IP 制限は per-server bot command ではなく host-wide ingress policy として別管理にする
 - 完了条件:
   - Bot は Rails API 経由でサーバー操作でき、Docker やコンテナへ直接触れない
 

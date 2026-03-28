@@ -23,6 +23,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
 - `docs/access_policy_and_quota_contract.md`
   Use for the active global user types, server-local `viewer` / `manager` roles, invitation authority, ownership-vs-membership authorization rules, and the operator-scoped `5120 MB` server-create quota fixed by `T-1014`.
+- `docs/whitelist_and_access_control_strategy.md`
+  Use for the whitelist-over-RCON plan, whitelist authority boundary, and the host-wide-only `mc-router` IP allow/deny scope fixed by `T-1020`.
 - `docs/server_ui_display_review.md`
   Use for the agreed display contract for the server index/detail screens, including owner-name display, lifecycle-action visibility, transition-state polling expectations from `T-505`, and the next de-dup/layout cleanup plan captured in `T-508`.
 - `docs/provider_cleanup_inventory.md`
@@ -126,6 +128,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-1016` is complete: invitation issuance now stores the invited global user type, admins can invite `admin` / `operator` / `reader`, operators can invite only `reader`, readers are denied at the policy/controller layer, and invite-based first login now applies the invited global role to the created user.
 - `T-1017` is complete: server create authorization is now enforced at the policy/controller layer so `admin` and `operator` can open the create flow, while `reader` is denied before request handling reaches provisioning logic.
 - `T-1018` is complete: server authorization now combines global type and server-local membership so `admin` has full visibility/management, `manager` membership grants lifecycle access, `viewer` grants read-only visibility, and destroy/member-management remain owner-or-admin only.
+- `T-1020` is complete: whitelist and access-restriction planning now splits Rails-owned RCON whitelist mutations from host-wide `mc-router` client IP allow/deny policy, and the resulting contract lives in `docs/whitelist_and_access_control_strategy.md`.
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
 - `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and both runtime families provision through `itzg/minecraft-server`.
 - `T-1100` and `T-1103` are complete: a checked-in `config/minecraft_runtime_catalog.yml` file remains as the fallback version source rather than live registry access or DB-backed storage.
