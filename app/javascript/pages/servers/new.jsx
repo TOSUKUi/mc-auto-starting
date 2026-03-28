@@ -38,10 +38,14 @@ function selectedRuntimeLabel(value, options) {
   return options.find((option) => option.value === value)?.label || value
 }
 
-function runtimeFamilyDescription(value) {
-  if (value === 'vanilla') return '公式提供で、最新のバージョンに対応。'
+function selectedVersionLabel(value, options) {
+  return options.find((option) => option.value === value)?.label || value
+}
 
-  return '最新のバージョンに対応していない場合があるが、高速。'
+function runtimeFamilyDescription(value) {
+  if (value === 'vanilla') return '標準の Java Edition サーバーです。まずはこちらを選べば十分です。'
+
+  return '軽量化や拡張に向いた Paper 系サーバーです。'
 }
 
 export default function ServersNew({ create_quota, form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint }) {
@@ -51,8 +55,8 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
   const hasTouchedHostname = form.data.hostname.trim().length > 0
   const minecraftVersionOptions = minecraft_version_options_by_runtime_family[form.data.runtime_family] || []
   const resourceHints = [
-    { label: '種類', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
-    { label: 'バージョン', value: form.data.minecraft_version },
+    { label: 'サーバーソフト', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
+    { label: 'バージョン', value: selectedVersionLabel(form.data.minecraft_version, minecraftVersionOptions) },
     { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: '接続先', value: preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434' },
   ]
@@ -146,7 +150,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                     data={runtime_family_options}
                     description={runtimeFamilyDescription(form.data.runtime_family)}
                     error={form.errors.runtime_family}
-                    label="サーバー種類"
+                    label="サーバーソフト"
                     onChange={(value) => form.setData('runtime_family', value || '')}
                     required
                     value={form.data.runtime_family}

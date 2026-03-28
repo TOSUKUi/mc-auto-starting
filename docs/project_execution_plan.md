@@ -55,6 +55,7 @@
 - bot command 実装は `docs/discord_bot_api_contract.md` で bot credential, acting-user resolution, whitelist scope, and response envelope を固定してから着手する
 - Discord OAuth / invite / bot relay docs are now checked in, and the `T-1010` to `T-1012` player-count / browser-console track is complete
 - The runtime-catalog track is now contract-complete through `T-1104`, so any remaining follow-up should be treated as incremental UX/runtime work rather than a missing contract baseline
+- Current near-term UI polish remains under `T-503`, including Japanese-first runtime labels and keeping `Java Edition` as the default create-flow choice
 - global user type は `admin` / `operator` / `reader` を正本とし、server membership role は `viewer` / `manager` を正本とする
 - 招待権限は `admin -> unrestricted`, `operator -> reader only` に制限する
 - サーバー作成は `admin unrestricted`, `operator quota-limited`, `reader denied` とし、operator の所有サーバー合計 `memory_mb` は `5120 MB` 上限で扱う

@@ -68,7 +68,7 @@ function labelize(value) {
 }
 
 function runtimeFamilyLabel(value) {
-  if (value === 'vanilla') return 'Vanilla'
+  if (value === 'vanilla') return 'Java Edition'
   if (value === 'paper') return 'Paper'
 
   return value

@@ -42,6 +42,12 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
         "TYPE" => "PAPER",
         "VERSION" => "1.21.4",
         "MEMORY" => "3584M",
+        "ENABLE_RCON" => "TRUE",
+        "ENABLE_WHITELIST" => "TRUE",
+        "WHITELIST" => "",
+        "EXISTING_WHITELIST_FILE" => "SYNCHRONIZE",
+        "RCON_PORT" => "25575",
+        "RCON_PASSWORD" => MinecraftRcon.password_for(server),
       },
       MinecraftRuntime.container_env(server: server),
     )
@@ -59,6 +65,12 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
         "TYPE" => "VANILLA",
         "VERSION" => "latest",
         "MEMORY" => "3584M",
+        "ENABLE_RCON" => "TRUE",
+        "ENABLE_WHITELIST" => "TRUE",
+        "WHITELIST" => "",
+        "EXISTING_WHITELIST_FILE" => "SYNCHRONIZE",
+        "RCON_PORT" => "25575",
+        "RCON_PASSWORD" => MinecraftRcon.password_for(server),
       },
       MinecraftRuntime.container_env(server: server),
     )
@@ -82,10 +94,10 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
   test "returns the fallback version options" do
     assert_equal(
       [
-        { value: "latest", label: "1.21.11 (latest)" },
+        { value: "latest", label: "26.1 (latest)" },
+        { value: "26.1", label: "26.1" },
         { value: "1.21.11", label: "1.21.11" },
-        { value: "1.21.10", label: "1.21.10" },
-        { value: "1.21.9", label: "1.21.9" },
+        { value: "1.20.6", label: "1.20.6" },
       ],
       MinecraftRuntime.fallback_version_options,
     )
@@ -94,8 +106,8 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
   test "returns the runtime family options" do
     assert_equal(
       [
+        { value: "vanilla", label: "Java Edition" },
         { value: "paper", label: "Paper" },
-        { value: "vanilla", label: "Java" },
       ],
       MinecraftRuntime.runtime_family_options,
     )

@@ -13,11 +13,12 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     get new_server_url(format: :json)
 
     assert_response :success
-    assert_equal "paper", response.parsed_body.fetch("form_defaults").fetch("runtime_family")
+    assert_equal "vanilla", response.parsed_body.fetch("form_defaults").fetch("runtime_family")
     assert_equal "latest", response.parsed_body.fetch("form_defaults").fetch("minecraft_version")
     assert_equal 4096, response.parsed_body.fetch("form_defaults").fetch("memory_mb")
     assert_equal 20480, response.parsed_body.fetch("form_defaults").fetch("disk_mb")
-    assert_equal "paper", response.parsed_body.fetch("runtime_family_options").first.fetch("value")
+    assert_equal "vanilla", response.parsed_body.fetch("runtime_family_options").first.fetch("value")
+    assert_equal "Java Edition", response.parsed_body.fetch("runtime_family_options").first.fetch("label")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").first.fetch("value")

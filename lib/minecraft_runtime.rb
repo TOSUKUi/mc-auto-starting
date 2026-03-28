@@ -1,5 +1,5 @@
 module MinecraftRuntime
-  DEFAULT_RUNTIME_FAMILY = "paper".freeze
+  DEFAULT_RUNTIME_FAMILY = "vanilla".freeze
   DEFAULT_IMAGE = "itzg/minecraft-server".freeze
   DEFAULT_VANILLA_IMAGE = "itzg/minecraft-server".freeze
   DEFAULT_NETWORK_NAME = "mc_router_net".freeze
