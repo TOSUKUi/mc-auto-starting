@@ -22,6 +22,9 @@
 - `difficulty`
   - `peaceful / easy / normal / hard`
   - もっとも意味が分かりやすく、UI 化しやすい
+- `hardcore`
+  - on / off
+  - サーバー方針を大きく変えるので、早い段階で選べる価値がある
 - `gamemode`
   - `survival / creative / adventure / spectator`
   - サーバー用途が明確に変わる
@@ -88,6 +91,7 @@
 
 bot でも扱える前提にする候補:
 
+- `hardcore`
 - `difficulty`
 - `gamemode`
 - `max_players`
@@ -104,6 +108,7 @@ bot でも扱える前提にする候補:
 - 変更結果は `server.properties` 系の desired state として Rails 側で保持し、起動中は可能なら live apply、停止中は次回起動時反映に寄せる
 - 列挙型の設定は freeform input ではなく `Select` を使う
 - 想定対象:
+  - `hardcore`
   - `difficulty`
   - `gamemode`
   - 将来追加する列挙型 setting
@@ -123,10 +128,11 @@ bot でも扱える前提にする候補:
 ## Suggested Order
 
 1. `difficulty`
-2. `max_players`
-3. `motd`
-4. `pvp`
-5. `gamemode`
+2. `hardcore`
+3. `max_players`
+4. `motd`
+5. `pvp`
+6. `gamemode`
 
 ## Related Existing Contracts
 

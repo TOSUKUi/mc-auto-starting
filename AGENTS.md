@@ -111,7 +111,7 @@ Current baseline:
 - `T-1100` and `T-1103` are complete: a checked-in synchronized catalog file remains as the safe fallback instead of live registry access or DB-backed storage.
 - `T-1104` is complete: the runtime contract is now explicitly fixed to Mojang manifest for `vanilla`, the Paper-specific source for `paper`, and a UI/storage split where operators see `label`, forms submit stable `value`, and list/detail screens can show persisted `resolved_minecraft_version`.
 - `T-1105` through `T-1107` are complete: the create UI now resolves version options server-side on page load, caches them briefly, falls back to the checked-in catalog, and exposes only the runtime-family-specific select choices without a freeform version field.
-- `T-1110` is complete: the startup-setting candidate contract now lives in `docs/server_startup_settings_candidates.md`, with the first recommended batch focused on `difficulty`, `max_players`, `motd`, `pvp`, and `gamemode`.
+- `T-1110` is complete: the startup-setting candidate contract now lives in `docs/server_startup_settings_candidates.md`, with the first recommended batch focused on `hardcore`, `difficulty`, `max_players`, `motd`, `pvp`, and `gamemode`.
 - `T-1110` also fixes the surface direction: startup settings should be shared across create, detail, and bot flows, and enum-like values such as `difficulty` / `gamemode` should use `Select` controls by default.
 - Index/detail screens now surface both Minecraft version and runtime `Type` so the current `paper` / `vanilla` selection is visible outside the create flow.
 - Runtime catalog option `label` is the user-facing Minecraft version display, while submitted `value` is the stable version key sent through the runtime `VERSION` contract.
