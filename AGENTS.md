@@ -194,6 +194,7 @@ Follow these rules unless the user overrides them.
 - Never let Rails operate on Docker resources that are not explicitly labeled as app-managed.
 - Show end users the exact connection target as `<server-fqdn>:<shared_public_port>`.
 - Restrict visibility so users only see servers they own or belong to.
+- Before implementing a feature that depends on managed-container env or runtime toggles, verify the end-to-end behavior of the underlying image/runtime contract first; do not assume that storing data or exposing UI alone is sufficient if the runtime feature flag itself may still be disabled.
 - Treat `/var/run/docker.sock` access as high risk and document it clearly.
 - Keep `DOCKER_ENGINE_API_VERSION` unset by default unless a deployment needs an explicit Engine API override.
 - When touching a flow that still references provider-specific concepts, prefer removing those references as part of the same progress step instead of leaving dead compatibility layers behind.
