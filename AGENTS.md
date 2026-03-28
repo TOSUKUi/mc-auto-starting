@@ -83,6 +83,8 @@ Current baseline:
 - `T-1017` is complete: server create authorization is now enforced at the policy/controller layer so `admin` and `operator` can open the create flow, while `reader` is denied before request handling reaches provisioning logic.
 - `T-1018` is complete: server authorization now combines global type and server-local membership so `admin` has full visibility/management, `manager` membership grants lifecycle access, `viewer` grants read-only visibility, and destroy/member-management remain owner-or-admin only.
 - `T-1020` is complete: whitelist planning now treats server whitelist changes as Rails-owned RCON operations, with the resulting contract fixed in `docs/whitelist_and_access_control_strategy.md`.
+- `T-1006` is complete: Rails now has an app-owned RCON connection layer, managed containers enable RCON by default, and per-server RCON passwords are derived from a stable secret plus server identity instead of being stored as plain DB fields.
+- `T-1021` is complete: Rails now has a bounded whitelist service over RCON for list/add/remove/on/off/reload operations against running managed servers.
 - After the P8 docs track, the planned next feature track is `T-1000` through `T-1009` for Discord OAuth invites and Discord Bot mediated server operations.
 - `T-1000` is complete: the strategy contract for Discord OAuth-only login, manual invite URLs, and Discord Bot to Rails to RCON operations now lives in `docs/discord_auth_and_bot_strategy.md`.
 - `T-1001` is complete: `User` now has Discord identity fields and Rails can complete Discord OAuth callbacks for already-linked users while invite gating remains future work.

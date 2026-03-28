@@ -94,6 +94,9 @@ module MinecraftRuntime
         "TYPE" => "VANILLA",
         "VERSION" => normalize_version_tag(server.minecraft_version),
         "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
+        "ENABLE_RCON" => "TRUE",
+        "RCON_PORT" => MinecraftRcon.port.to_s,
+        "RCON_PASSWORD" => MinecraftRcon.password_for(server),
       }
     else
       {
@@ -101,6 +104,9 @@ module MinecraftRuntime
         "TYPE" => "PAPER",
         "VERSION" => normalize_version_tag(server.minecraft_version),
         "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
+        "ENABLE_RCON" => "TRUE",
+        "RCON_PORT" => MinecraftRcon.port.to_s,
+        "RCON_PASSWORD" => MinecraftRcon.password_for(server),
       }
     end
   end

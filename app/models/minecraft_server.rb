@@ -69,6 +69,18 @@ class MinecraftServer < ApplicationRecord
     "#{container_name}:#{MANAGED_CONTAINER_PORT}"
   end
 
+  def rcon_host
+    MinecraftRcon.host_for(self)
+  end
+
+  def rcon_port
+    MinecraftRcon.port
+  end
+
+  def rcon_password
+    MinecraftRcon.password_for(self)
+  end
+
   def lifecycle_ready?
     container_id.present?
   end

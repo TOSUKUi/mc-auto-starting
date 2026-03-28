@@ -129,6 +129,8 @@ This file tells any contributor or agent where to find authoritative information
 - `T-1017` is complete: server create authorization is now enforced at the policy/controller layer so `admin` and `operator` can open the create flow, while `reader` is denied before request handling reaches provisioning logic.
 - `T-1018` is complete: server authorization now combines global type and server-local membership so `admin` has full visibility/management, `manager` membership grants lifecycle access, `viewer` grants read-only visibility, and destroy/member-management remain owner-or-admin only.
 - `T-1020` is complete: whitelist planning now fixes Rails-owned RCON whitelist mutations and their authority boundary in `docs/whitelist_and_access_control_strategy.md`.
+- `T-1006` is complete: Rails now has an app-owned RCON connection layer, managed containers enable RCON by default, and per-server RCON passwords are derived from a stable secret plus server identity instead of being stored as plain DB fields.
+- `T-1021` is complete: Rails now has a bounded whitelist service over RCON for list/add/remove/on/off/reload operations against running managed servers.
 - A later runtime-catalog track is planned starting with `T-1101`, then `T-1100` through `T-1103`, to cover Java runtime family selection first, then `latest` version resolution and dynamic or synchronized version-choice sourcing.
 - `T-1101` is complete: server create flow now offers runtime family selection, defaults to `paper`, and both runtime families provision through `itzg/minecraft-server`.
 - `T-1100` and `T-1103` are complete: a checked-in `config/minecraft_runtime_catalog.yml` file remains as the fallback version source rather than live registry access or DB-backed storage.

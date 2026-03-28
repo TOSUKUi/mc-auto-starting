@@ -27,6 +27,14 @@ This document fixes the initial environment and configuration contract for the d
   Baseline Minecraft container image family used by create flow and UI previews. Default: `itzg/minecraft-server`.
 - `MINECRAFT_RUNTIME_VANILLA_IMAGE`
   Optional override for the standard Java server image family used when the create flow selects the `vanilla` runtime family. Default: `itzg/minecraft-server`.
+- `MINECRAFT_RCON_PORT`
+  Shared in-container RCON port used by Rails-owned command integrations. Default: `25575`.
+- `MINECRAFT_RCON_CONNECT_TIMEOUT`
+  Timeout in seconds for establishing a Rails-to-server RCON session. Default: `5`.
+- `MINECRAFT_RCON_COMMAND_TIMEOUT`
+  Timeout in seconds for a single RCON command round trip. Default: `5`.
+- `MINECRAFT_RCON_SEGMENTED_RESPONSE_WAIT`
+  Wait interval in seconds for segmented Minecraft RCON responses such as whitelist lists. Default: `0.15`.
 - `MINECRAFT_RUNTIME_VANILLA_VERSION_MANIFEST_URL`
   Optional override for the live `vanilla` version source. Default: `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json`.
 - `MINECRAFT_RUNTIME_PAPER_VERSION_MANIFEST_URL`
@@ -72,6 +80,8 @@ This document fixes the initial environment and configuration contract for the d
   Reserved for future Discord bot setup and command registration. Default: unset.
 - `DISCORD_BOT_SHARED_SECRET`
   Reserved for future bot-to-Rails machine authentication. Default: unset.
+- `MINECRAFT_RCON_PASSWORD_SECRET`
+  Optional stable secret used to derive per-server RCON passwords. Default: falls back to `secret_key_base`; set it explicitly in deployments to avoid accidental rotation.
 - `DB_HOST`
   Database host. Default: `db`.
 - `DB_PORT`
@@ -111,10 +121,12 @@ This document fixes the initial environment and configuration contract for the d
 - `MinecraftPublicEndpoint` is the single source of truth for public FQDN and connection-target formatting.
 - `MinecraftRuntime` is the single source of truth for the baseline runtime image, shared bridge network name, live version-source URLs, and per-family container env payload.
 - `MinecraftRuntime` resolves both `paper` and `vanilla` against the `itzg/minecraft-server` image family, switching only the `TYPE` env value.
+- `MinecraftRuntime` also enables RCON for managed servers and injects the per-server `RCON_PASSWORD` derived by `MinecraftRcon`.
 - The create form now separates `runtime_family` from `minecraft_version`; `minecraft_version` is runtime-version input passed through the container `VERSION` contract rather than a Docker image tag.
 - `MEMORY` is derived from the selected container memory with reserved JVM headroom; it is not equal to the Docker memory limit.
 - `DockerEngine` reads only Docker transport settings.
 - `Router` reads only route file and reload settings.
+- `MinecraftRcon` is the single source of truth for RCON host/port/password derivation and timeout defaults.
 
 ## Non-Goals
 - Per-server host port publishing is not supported.
