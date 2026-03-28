@@ -89,6 +89,25 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.parsed_body.fetch("errors").fetch("memory_mb"), "Memory mb must be less than or equal to 4096"
   end
 
+  test "html create failure includes validation errors for the inertia form" do
+    sign_in_as(users(:one))
+
+    post servers_url, params: {
+      minecraft_server: {
+        name: "",
+        hostname: "bad host",
+        runtime_family: "vanilla",
+        minecraft_version: "latest",
+        memory_mb: 4608,
+        disk_mb: 40960,
+      },
+    }
+
+    assert_response :unprocessable_entity
+    assert_includes response.body, "\"validation_errors\""
+    assert_includes response.body, "Hostname must use lowercase letters, numbers, and internal hyphens only"
+  end
+
   test "create accepts the standard java runtime family" do
     sign_in_as(users(:one))
 

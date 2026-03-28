@@ -36,6 +36,7 @@ class ServersController < InertiaController
         format.html do
           render inertia: "servers/new", props: new_server_page_props(
             form_values: create_server_params.to_h,
+            validation_errors: server.errors.to_hash(true),
           ), status: :unprocessable_entity
         end
 
@@ -298,13 +299,14 @@ class ServersController < InertiaController
   end
 
   private
-    def new_server_page_props(form_values: {})
+    def new_server_page_props(form_values: {}, validation_errors: {})
       hostname = normalized_hostname(form_values[:hostname])
       selected_runtime_family = form_values[:runtime_family] || form_values["runtime_family"] || MinecraftRuntime.default_runtime_family
       minecraft_version_options_by_runtime_family = MinecraftRuntime.version_options_by_runtime_family
 
       {
         form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
+        validation_errors: validation_errors,
         create_quota: create_quota_payload,
         runtime_family_options: MinecraftRuntime.runtime_family_options,
         minecraft_version_options: minecraft_version_options_by_runtime_family.fetch(

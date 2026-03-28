@@ -43,12 +43,12 @@ function selectedVersionLabel(value, options) {
 }
 
 function runtimeFamilyDescription(value) {
-  if (value === 'vanilla') return '標準の Java Edition サーバーです。まずはこちらを選べば十分です。'
+  if (value === 'vanilla') return '公式が提供するサーバーで、最新バージョンへの対応がされています。'
 
   return '軽量化や拡張に向いた Paper 系サーバーです。'
 }
 
-export default function ServersNew({ create_quota, form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint }) {
+export default function ServersNew({ create_quota, form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint, validation_errors = {} }) {
   const form = useForm(form_defaults)
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
@@ -74,6 +74,13 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
 
     form.setData('minecraft_version', minecraftVersionOptions[0].value)
   }, [form, minecraftVersionOptions, form.data.minecraft_version])
+
+  useEffect(() => {
+    form.clearErrors()
+    if (Object.keys(validation_errors || {}).length > 0) {
+      form.setError(validation_errors)
+    }
+  }, [form, validation_errors])
 
   return (
     <>
