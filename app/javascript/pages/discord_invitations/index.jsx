@@ -91,7 +91,7 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
               </Text>
             </Group>
             <Title order={1}>Discord 招待リンク</Title>
-            <Text c="stone.3" maw={720}>Discord ユーザーを指定して招待リンクを発行します。</Text>
+            <Text c="stone.3" maw={720}>Discord ユーザー向けの招待リンクを発行します。</Text>
           </Stack>
         </Paper>
 

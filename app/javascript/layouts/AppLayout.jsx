@@ -55,9 +55,6 @@ export default function AppLayout({ children }) {
                   <Title order={3} size="h4">
                     Minecraft サーバー
                   </Title>
-                  <Text c="stone.3" size="sm" visibleFrom="sm">
-                    サーバーの作成と公開先をまとめて管理
-                  </Text>
                 </Stack>
               </Group>
 

@@ -1,5 +1,6 @@
 import {
   Badge,
+  Box,
   Button,
   Card,
   Group,
@@ -102,9 +103,7 @@ function StatCard({ label, value, tone = 'gray' }) {
         <Text fw={800} size="2rem">
           {value}
         </Text>
-        <Text c={`${tone}.6`} size="sm">
-          現在の表示
-        </Text>
+        <Box h={20} />
       </Stack>
     </Card>
   )
@@ -151,7 +150,7 @@ export default function ServersIndex({ servers, summary }) {
                 </Group>
                 <Title order={1}>サーバー一覧</Title>
                 <Text c="stone.3" maw={720} size="md">
-                  自分のサーバーと共有中のサーバーを、接続先と状態中心で確認できます。
+                  自分のサーバーと共有中のサーバーを確認できます。
                 </Text>
               </Stack>
 
@@ -186,9 +185,6 @@ export default function ServersIndex({ servers, summary }) {
             <Stack align="flex-end" gap={2}>
               <Text c="dimmed" size="sm">
                 {filteredServers.length} / {servers.length} 件を表示
-              </Text>
-              <Text c="dimmed" size="xs">
-                プレイヤーには接続先だけ共有すれば十分です。
               </Text>
             </Stack>
           </Group>
