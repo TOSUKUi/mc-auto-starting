@@ -31,10 +31,7 @@
 body {
   margin: 0;
   color: var(--auth-ink);
-  background:
-    radial-gradient(circle at top left, rgba(111, 168, 122, 0.12), transparent 24%),
-    radial-gradient(circle at bottom right, rgba(121, 95, 56, 0.18), transparent 28%),
-    linear-gradient(180deg, #181613 0%, #14120f 100%);
+  background: #181613;
   font-family: "IBM Plex Sans", "Hiragino Sans", "Yu Gothic", sans-serif;
   min-height: 100vh;
 }
@@ -119,17 +116,18 @@ code {
   appearance: none;
   border: 0;
   border-radius: 14px;
-  background: linear-gradient(180deg, var(--auth-accent) 0%, var(--auth-accent-strong) 100%);
-  color: #132117;
+  background: #5865f2;
+  color: #ffffff;
   padding: 14px 18px;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
   text-decoration: none;
-  box-shadow: 0 16px 32px rgba(36, 88, 53, 0.22);
+  box-shadow: 0 16px 32px rgba(88, 101, 242, 0.24);
 }
 
 .auth-submit:hover {
+  background: #4752c4;
   transform: translateY(-1px);
 }
 

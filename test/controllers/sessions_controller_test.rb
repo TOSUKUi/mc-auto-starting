@@ -25,4 +25,22 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_path
     assert_empty cookies[:session_id]
   end
+
+  test "destroy uses inertia location for inertia requests" do
+    sign_in_as(User.take)
+
+    delete logout_path, headers: inertia_headers
+
+    assert_response :conflict
+    assert_equal login_path, response.headers["X-Inertia-Location"]
+    assert_empty cookies[:session_id]
+  end
+
+  private
+    def inertia_headers
+      {
+        "X-Inertia" => "true",
+        "X-Inertia-Version" => InertiaRails.configuration.version.to_s,
+      }
+    end
 end

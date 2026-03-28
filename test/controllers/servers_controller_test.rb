@@ -24,6 +24,13 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_path
   end
 
+  test "unauthenticated inertia request gets location redirect instead of html redirect" do
+    get servers_url, headers: inertia_headers
+
+    assert_response :conflict
+    assert_equal login_path, response.headers["X-Inertia-Location"]
+  end
+
   test "root redirects unauthenticated users to login" do
     get root_url
 
@@ -691,5 +698,12 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
         end
       end.new(error)
     end
+  end
+
+  def inertia_headers
+    {
+      "X-Inertia" => "true",
+      "X-Inertia-Version" => InertiaRails.configuration.version.to_s,
+    }
   end
 end

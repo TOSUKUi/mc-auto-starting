@@ -31,7 +31,11 @@ module Authentication
 
     def request_authentication
       session[:return_to_after_authenticating] = request.url
-      redirect_to login_path
+      if request.headers["X-Inertia"].present?
+        inertia_location(login_path)
+      else
+        redirect_to login_path
+      end
     end
 
     def after_authentication_url

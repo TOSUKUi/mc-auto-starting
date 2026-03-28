@@ -6,6 +6,10 @@ class SessionsController < ApplicationController
 
   def destroy
     terminate_session
-    redirect_to login_path, status: :see_other
+    if request.headers["X-Inertia"].present?
+      inertia_location(login_path)
+    else
+      redirect_to login_path, status: :see_other
+    end
   end
 end
