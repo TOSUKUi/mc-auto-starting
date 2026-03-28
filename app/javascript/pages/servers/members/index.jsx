@@ -9,9 +9,11 @@ import {
   Table,
   Text,
   TextInput,
+  ThemeIcon,
   Title,
 } from '@mantine/core'
 import { Head, Link, router, useForm } from '@inertiajs/react'
+import { IconSparkles, IconUsers } from '@tabler/icons-react'
 
 function labelize(value) {
   if (value === 'manager') return '運用担当'
@@ -44,54 +46,80 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
       <Head title={`${server.name} のメンバー`} />
 
       <Stack gap="xl">
-        <Stack gap={4}>
-          <Text href={`/servers/${server.id}`} renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />} size="sm">
-            サーバー詳細へ戻る
-          </Text>
-          <Group justify="space-between">
-            <Stack gap={0}>
-              <Title order={1}>メンバー管理</Title>
-              <Text c="dimmed">{server.name}</Text>
-            </Stack>
-            <Stack align="flex-end" gap={2}>
-              <Text c="dimmed" size="sm">
-                オーナー
-              </Text>
-              <Code>{server.owner_display_name}</Code>
-              <Text c="dimmed" size="xs">
-                {server.owner_discord_user_id}
-              </Text>
-            </Stack>
-          </Group>
-          <Text c="dimmed">
-            接続先 <Code>{server.connection_target}</Code>
-          </Text>
-        </Stack>
+        <Paper
+          p="xl"
+          radius="xl"
+          shadow="sm"
+          style={{ background: '#26231e', borderColor: '#4a4338' }}
+          withBorder
+        >
+          <Stack gap="lg">
+            <Text href={`/servers/${server.id}`} renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />} size="sm">
+              サーバー詳細へ戻る
+            </Text>
+            <Group justify="space-between" align="flex-start" wrap="wrap">
+              <Stack gap={6}>
+                <Group gap="xs">
+                  <ThemeIcon color="teal" radius="xl" size={36} variant="light">
+                    <IconSparkles size={18} />
+                  </ThemeIcon>
+                  <Text c="stone.5" fw={700} size="sm" tt="uppercase">
+                    メンバー
+                  </Text>
+                </Group>
+                <Title order={1}>メンバー管理</Title>
+                <Text c="stone.3">{server.name}</Text>
+                <Text c="stone.3">
+                  <Code>{server.connection_target}</Code>
+                </Text>
+              </Stack>
+              <Paper p="md" radius="lg" withBorder style={{ background: '#23211d', borderColor: '#4a4338', minWidth: 220 }}>
+                <Stack gap={4}>
+                  <Text c="stone.5" fw={700} size="xs" tt="uppercase">
+                    オーナー
+                  </Text>
+                  <Code>{server.owner_display_name}</Code>
+                  <Text c="stone.4" size="xs">
+                    {server.owner_discord_user_id}
+                  </Text>
+                </Stack>
+              </Paper>
+            </Group>
+          </Stack>
+        </Paper>
 
         <Paper p="lg" radius="lg" withBorder>
-          <form onSubmit={submit}>
-            <Stack gap="md">
-              <Group align="flex-end" grow>
-                <TextInput
-                  error={form.errors.user || form.errors.discord_user_id}
-                  label="Discord ユーザー ID"
-                  onChange={(event) => form.setData('discord_user_id', event.currentTarget.value)}
-                  placeholder="123456789012345678"
-                  value={form.data.discord_user_id}
-                />
-                <Select
-                  data={roleOptions}
-                  error={form.errors.role}
-                  label="権限"
-                  onChange={(value) => form.setData('role', value ?? form_defaults.role)}
-                  value={form.data.role}
-                />
-                <Button loading={form.processing} type="submit">
-                  追加
-                </Button>
-              </Group>
-            </Stack>
-          </form>
+          <Stack gap="md">
+            <Group gap="xs">
+              <ThemeIcon color="blue" radius="xl" size={30} variant="light">
+                <IconUsers size={16} />
+              </ThemeIcon>
+              <Title order={3}>追加</Title>
+            </Group>
+            <form onSubmit={submit}>
+              <Stack gap="md">
+                <Group align="flex-end" grow>
+                  <TextInput
+                    error={form.errors.user || form.errors.discord_user_id}
+                    label="Discord ユーザー ID"
+                    onChange={(event) => form.setData('discord_user_id', event.currentTarget.value)}
+                    placeholder="123456789012345678"
+                    value={form.data.discord_user_id}
+                  />
+                  <Select
+                    data={roleOptions}
+                    error={form.errors.role}
+                    label="権限"
+                    onChange={(value) => form.setData('role', value ?? form_defaults.role)}
+                    value={form.data.role}
+                  />
+                  <Button loading={form.processing} type="submit">
+                    追加
+                  </Button>
+                </Group>
+              </Stack>
+            </form>
+          </Stack>
         </Paper>
 
         <Paper p="lg" radius="lg" withBorder>
