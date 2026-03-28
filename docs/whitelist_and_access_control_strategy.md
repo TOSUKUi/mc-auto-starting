@@ -67,18 +67,18 @@ Rationale:
 
 ### Server detail
 
-- Add a whitelist card only when the server is running.
 - Add a whitelist card on server detail for owner/admin users.
+- Place the whitelist card above the generic server-operations area because access control matters before lifecycle actions.
 - Show current whitelist mode and current desired entries.
-- Offer explicit actions:
-  - `ホワイトリストを有効化`
-  - `ホワイトリストを無効化`
-  - `プレイヤーを追加`
-  - `プレイヤーを削除`
-  - `再読込`
+- Use a toggle-style control for `有効 / 無効` rather than separate verb buttons.
+- Keep add/remove/reload actions inside the card, but do not place a dense add-player form directly inside warning copy.
 - Running servers should mutate live state through RCON.
 - Stopped servers should show a staged-mode note and allow the same edits, but explain that they apply on the next start.
 - If the acting user lacks whitelist authority, show nothing or read-only state depending on the finalized UI contract.
+- When whitelist is `有効` and the desired entry list is empty, show a strong warning because the server is effectively closed.
+- That empty-enabled warning should point to the existing add-player section with a page-local action such as `プレイヤーを追加`, not embed a second form beside the warning itself.
+- When whitelist is `無効`, keep a persistent warning visible because anyone can connect.
+- When whitelist is `有効` and at least one player is listed, do not show a warning.
 
 ### Error handling
 

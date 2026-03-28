@@ -122,6 +122,8 @@
 | T-1117 | P10 | Add Rails-side structured RCON command builder and validation | T-1116 | done | Rails now converts `command_key + args` into bounded RCON commands server-side via `Servers::StructuredRconCommand`, validates required/optional arguments and optional-target schemas such as `gamemode(gamemode, player_name?)`, and keeps mutable live-setting changes out of DB-backed desired-state storage |
 | T-1118 | P10 | Replace detail RCON cards with command-select plus argument form UI | T-1116,T-1117 | done | Server detail now exposes one structured RCON surface with a command select, schema-driven argument inputs, and shared result rendering instead of separate action cards or freeform command input |
 | T-1119 | P10 | Align bot RCON contract with the structured command catalog | T-1116,T-1117,T-1007 | todo | Discord bot stops sending raw command strings for the bounded live-setting surface and instead uses the shared structured command catalog and argument schema |
+| T-1120 | P10 | Rework whitelist detail UX around toggle state and warnings | T-1023,T-505,T-508 | todo | The whitelist card moves above generic server operations, uses a toggle-style `有効 / 無効` control, warns strongly when enabled with zero entries, keeps a persistent warning while disabled, and points to the existing add-player area instead of embedding a dense warning-adjacent form |
+| T-1121 | P10 | Revisit index-detail primary action visibility using list/card UI best practices | T-503,T-505,T-512 | todo | The server index primary path to detail is re-audited so `詳細を見る` is visually obvious, adequately sized, and positioned as a stable primary action instead of a small right-edge control |
 
 ## Critical Path Tasks
 
