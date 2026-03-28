@@ -139,6 +139,23 @@ const TIME_OPTIONS = [
   { value: 'midnight', label: '深夜' },
 ]
 
+const GAMEMODE_OPTIONS = [
+  { value: 'survival', label: 'Survival' },
+  { value: 'creative', label: 'Creative' },
+  { value: 'adventure', label: 'Adventure' },
+  { value: 'spectator', label: 'Spectator' },
+]
+
+const RCON_COMMAND_OPTIONS = [
+  { value: 'difficulty', label: '難易度' },
+  { value: 'weather', label: '天気' },
+  { value: 'time_set', label: '時刻' },
+  { value: 'gamemode', label: 'ゲームモード' },
+  { value: 'say', label: 'お知らせ' },
+  { value: 'kick', label: 'キック' },
+  { value: 'save_all', label: 'save-all' },
+]
+
 function startupValueLabel(setting, value) {
   if (setting === 'difficulty') return DIFFICULTY_OPTIONS.find((option) => option.value === value)?.label || value
   if (setting === 'pvp') return toSelectBoolean(value) === 'true' ? '有効' : '無効'
@@ -198,14 +215,16 @@ export default function ServersShow({ server }) {
   const [ rconLoading, setRconLoading ] = useState(false)
   const [ rconResult, setRconResult ] = useState(null)
   const [ rconError, setRconError ] = useState(null)
-  const [ sayMessage, setSayMessage ] = useState('')
-  const [ kickPlayerName, setKickPlayerName ] = useState('')
-  const [ kickReason, setKickReason ] = useState('')
-  const [ selectedDifficulty, setSelectedDifficulty ] = useState(server.startup_settings.difficulty)
-  const [ selectedWeather, setSelectedWeather ] = useState('clear')
-  const [ selectedTime, setSelectedTime ] = useState('day')
-  const [ selectedGamemode, setSelectedGamemode ] = useState('survival')
-  const [ gamemodePlayerName, setGamemodePlayerName ] = useState('')
+  const [ selectedRconCommand, setSelectedRconCommand ] = useState('difficulty')
+  const [ rconArgs, setRconArgs ] = useState({
+    difficulty: server.startup_settings.difficulty,
+    weather: 'clear',
+    time: 'day',
+    gamemode: 'survival',
+    player_name: '',
+    message: '',
+    reason: '',
+  })
   const transitionState = isTransitioning(server.status)
   const canManageWhitelist = server.can_manage_whitelist
   const canRunRconCommand = server.can_run_rcon_command
@@ -338,14 +357,16 @@ export default function ServersShow({ server }) {
     setRecentLogsError(null)
     setRconResult(null)
     setRconError(null)
-    setSayMessage('')
-    setKickPlayerName('')
-    setKickReason('')
-    setSelectedDifficulty(server.startup_settings.difficulty)
-    setSelectedWeather('clear')
-    setSelectedTime('day')
-    setSelectedGamemode('survival')
-    setGamemodePlayerName('')
+    setSelectedRconCommand('difficulty')
+    setRconArgs({
+      difficulty: server.startup_settings.difficulty,
+      weather: 'clear',
+      time: 'day',
+      gamemode: 'survival',
+      player_name: '',
+      message: '',
+      reason: '',
+    })
   }, [server.id])
 
   useEffect(() => {
@@ -410,6 +431,68 @@ export default function ServersShow({ server }) {
       setRconError(error.message)
     } finally {
       setRconLoading(false)
+    }
+  }
+
+  function updateRconArg(name, value) {
+    setRconArgs((current) => ({ ...current, [name]: value }))
+  }
+
+  function currentRconPayload() {
+    switch (selectedRconCommand) {
+      case 'difficulty':
+        return { command_key: 'difficulty', args: { difficulty: rconArgs.difficulty } }
+      case 'weather':
+        return { command_key: 'weather', args: { weather: rconArgs.weather } }
+      case 'time_set':
+        return { command_key: 'time_set', args: { time: rconArgs.time } }
+      case 'gamemode':
+        return {
+          command_key: 'gamemode',
+          args: {
+            gamemode: rconArgs.gamemode,
+            player_name: rconArgs.player_name,
+          },
+        }
+      case 'say':
+        return { command_key: 'say', args: { message: rconArgs.message } }
+      case 'kick':
+        return {
+          command_key: 'kick',
+          args: {
+            player_name: rconArgs.player_name,
+            reason: rconArgs.reason,
+          },
+        }
+      case 'save_all':
+        return { command_key: 'save_all', args: {} }
+      default:
+        return { command_key: 'difficulty', args: { difficulty: rconArgs.difficulty } }
+    }
+  }
+
+  function currentRconCommandReady() {
+    switch (selectedRconCommand) {
+      case 'say':
+        return rconArgs.message.trim().length > 0
+      case 'kick':
+        return rconArgs.player_name.trim().length > 0
+      default:
+        return true
+    }
+  }
+
+  function resetRconFieldsAfterSuccess() {
+    if (selectedRconCommand === 'say') {
+      updateRconArg('message', '')
+    }
+
+    if (selectedRconCommand === 'kick') {
+      setRconArgs((current) => ({ ...current, player_name: '', reason: '' }))
+    }
+
+    if (selectedRconCommand === 'gamemode') {
+      updateRconArg('player_name', '')
     }
   }
 
@@ -702,142 +785,98 @@ export default function ServersShow({ server }) {
                 {rconLoading ? <Loader size="sm" /> : null}
               </Group>
               <Divider />
-              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack gap="sm">
-                    <Text fw={700}>難易度</Text>
-                    <Group align="flex-end" grow>
-                      <Select data={DIFFICULTY_OPTIONS} onChange={(value) => setSelectedDifficulty(value || 'easy')} value={selectedDifficulty} />
-                      <Button onClick={() => executeRconCommand({ command_key: 'difficulty', args: { difficulty: selectedDifficulty } })} type="button">
-                        変更
-                      </Button>
-                    </Group>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack gap="sm">
-                    <Text fw={700}>天気</Text>
-                    <Group align="flex-end" grow>
-                      <Select data={WEATHER_OPTIONS} onChange={(value) => setSelectedWeather(value || 'clear')} value={selectedWeather} />
-                      <Button onClick={() => executeRconCommand({ command_key: 'weather', args: { weather: selectedWeather } })} type="button">
-                        変更
-                      </Button>
-                    </Group>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack gap="sm">
-                    <Text fw={700}>時刻</Text>
-                    <Group align="flex-end" grow>
-                      <Select data={TIME_OPTIONS} onChange={(value) => setSelectedTime(value || 'day')} value={selectedTime} />
-                      <Button onClick={() => executeRconCommand({ command_key: 'time_set', args: { time: selectedTime } })} type="button">
-                        変更
-                      </Button>
-                    </Group>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack gap="sm">
-                    <Text fw={700}>保存</Text>
-                    <Button onClick={() => executeRconCommand({ command_key: 'save_all', args: {} })} type="button" variant="light">
-                      save-all
-                    </Button>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack gap="sm">
-                    <Text fw={700}>ゲームモード</Text>
+              <Paper p="md" radius="lg" withBorder>
+                <Stack gap="md">
+                  <Select
+                    data={RCON_COMMAND_OPTIONS}
+                    label="コマンド"
+                    onChange={(value) => setSelectedRconCommand(value || 'difficulty')}
+                    value={selectedRconCommand}
+                  />
+
+                  {selectedRconCommand === 'difficulty' ? (
                     <Select
-                      data={[
-                        { value: 'survival', label: 'Survival' },
-                        { value: 'creative', label: 'Creative' },
-                        { value: 'adventure', label: 'Adventure' },
-                        { value: 'spectator', label: 'Spectator' },
-                      ]}
-                      onChange={(value) => setSelectedGamemode(value || 'survival')}
-                      value={selectedGamemode}
+                      data={DIFFICULTY_OPTIONS}
+                      label="難易度"
+                      onChange={(value) => updateRconArg('difficulty', value || 'easy')}
+                      value={rconArgs.difficulty}
                     />
-                    <TextInput
-                      label="プレイヤー名"
-                      onChange={(event) => setGamemodePlayerName(event.currentTarget.value)}
-                      placeholder="未入力で全体"
-                      value={gamemodePlayerName}
+                  ) : null}
+
+                  {selectedRconCommand === 'weather' ? (
+                    <Select
+                      data={WEATHER_OPTIONS}
+                      label="天気"
+                      onChange={(value) => updateRconArg('weather', value || 'clear')}
+                      value={rconArgs.weather}
                     />
-                    <Group justify="flex-end">
-                      <Button
-                        onClick={() => executeRconCommand({
-                          command_key: 'gamemode',
-                          args: {
-                            gamemode: selectedGamemode,
-                            player_name: gamemodePlayerName,
-                          },
-                        }, { onSuccess: () => setGamemodePlayerName('') })}
-                        type="button"
-                      >
-                        変更
-                      </Button>
-                    </Group>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack gap="sm">
-                    <Text fw={700}>お知らせ</Text>
-                    <Group align="flex-end" grow>
-                      <TextInput
-                        onChange={(event) => setSayMessage(event.currentTarget.value)}
-                        placeholder="再起動を開始します"
-                        value={sayMessage}
+                  ) : null}
+
+                  {selectedRconCommand === 'time_set' ? (
+                    <Select
+                      data={TIME_OPTIONS}
+                      label="時刻"
+                      onChange={(value) => updateRconArg('time', value || 'day')}
+                      value={rconArgs.time}
+                    />
+                  ) : null}
+
+                  {selectedRconCommand === 'gamemode' ? (
+                    <>
+                      <Select
+                        data={GAMEMODE_OPTIONS}
+                        label="ゲームモード"
+                        onChange={(value) => updateRconArg('gamemode', value || 'survival')}
+                        value={rconArgs.gamemode}
                       />
-                      <Button
-                        disabled={sayMessage.trim().length === 0}
-                        onClick={() => executeRconCommand({ command_key: 'say', args: { message: sayMessage } }, { onSuccess: () => setSayMessage('') })}
-                        type="button"
-                      >
-                        送信
-                      </Button>
-                    </Group>
-                  </Stack>
-                </Paper>
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack gap="sm">
-                    <Text fw={700}>キック</Text>
+                      <TextInput
+                        label="プレイヤー名"
+                        onChange={(event) => updateRconArg('player_name', event.currentTarget.value)}
+                        placeholder="未入力で全体"
+                        value={rconArgs.player_name}
+                      />
+                    </>
+                  ) : null}
+
+                  {selectedRconCommand === 'say' ? (
                     <TextInput
-                      label="プレイヤー名"
-                      onChange={(event) => setKickPlayerName(event.currentTarget.value)}
-                      placeholder="Steve"
-                      value={kickPlayerName}
+                      label="メッセージ"
+                      onChange={(event) => updateRconArg('message', event.currentTarget.value)}
+                      placeholder="再起動を開始します"
+                      value={rconArgs.message}
                     />
-                    <TextInput
-                      label="理由"
-                      onChange={(event) => setKickReason(event.currentTarget.value)}
-                      placeholder="メンテナンス中です"
-                      value={kickReason}
-                    />
-                    <Group justify="flex-end">
-                      <Button
-                        color="red"
-                        disabled={kickPlayerName.trim().length === 0}
-                        onClick={() => executeRconCommand({
-                          command_key: 'kick',
-                          args: {
-                            player_name: kickPlayerName,
-                            reason: kickReason,
-                          },
-                        }, {
-                          onSuccess: () => {
-                            setKickPlayerName('')
-                            setKickReason('')
-                          },
-                        })}
-                        type="button"
-                        variant="light"
-                      >
-                        実行
-                      </Button>
-                    </Group>
-                  </Stack>
-                </Paper>
-              </SimpleGrid>
+                  ) : null}
+
+                  {selectedRconCommand === 'kick' ? (
+                    <>
+                      <TextInput
+                        label="プレイヤー名"
+                        onChange={(event) => updateRconArg('player_name', event.currentTarget.value)}
+                        placeholder="Steve"
+                        value={rconArgs.player_name}
+                      />
+                      <TextInput
+                        label="理由"
+                        onChange={(event) => updateRconArg('reason', event.currentTarget.value)}
+                        placeholder="メンテナンス中です"
+                        value={rconArgs.reason}
+                      />
+                    </>
+                  ) : null}
+
+                  <Group justify="flex-end">
+                    <Button
+                      color={selectedRconCommand === 'kick' ? 'red' : undefined}
+                      disabled={rconLoading || !currentRconCommandReady()}
+                      onClick={() => executeRconCommand(currentRconPayload(), { onSuccess: () => resetRconFieldsAfterSuccess() })}
+                      type="button"
+                      variant={selectedRconCommand === 'kick' ? 'light' : 'filled'}
+                    >
+                      実行
+                    </Button>
+                  </Group>
+                </Stack>
+              </Paper>
               {rconError ? (
                 <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="操作を実行できませんでした" variant="light">
                   {rconError}
