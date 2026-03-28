@@ -174,12 +174,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   <Stack gap="md">
                     <Paper p="md" radius="lg" withBorder>
                       <Stack gap="sm">
-                        <Stack gap={2}>
-                          <Text fw={700}>リソースと参加条件</Text>
-                          <Text c="dimmed" size="sm">
-                            まずはメモリと参加人数を決めます。
-                          </Text>
-                        </Stack>
+                        <Text fw={700}>リソースと参加条件</Text>
                         <Grid gutter="md">
                           <Grid.Col span={{ base: 12, sm: 6 }}>
                             <NumberInput
@@ -215,12 +210,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
 
                     <Paper p="md" radius="lg" withBorder>
                       <Stack gap="sm">
-                        <Stack gap={2}>
-                          <Text fw={700}>ワールド設定</Text>
-                          <Text c="dimmed" size="sm">
-                            難易度やゲームモードなど、プレイ感に関わる設定です。
-                          </Text>
-                        </Stack>
+                        <Text fw={700}>ワールド設定</Text>
                         <Grid gutter="md">
                           <Grid.Col span={{ base: 12, sm: 6 }}>
                             <Select
@@ -230,7 +220,6 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                                 { value: 'hard', label: 'Hard' },
                                 { value: 'peaceful', label: 'Peaceful' },
                               ]}
-                              description="モンスターや飢餓の強さを決めます。"
                               error={fieldError('difficulty')}
                               label="難易度"
                               onChange={(value) => form.setData('difficulty', value || '')}
@@ -246,7 +235,6 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                                 { value: 'adventure', label: 'Adventure' },
                                 { value: 'spectator', label: 'Spectator' },
                               ]}
-                              description="新規参加時の標準ゲームモードです。"
                               error={fieldError('gamemode')}
                               label="ゲームモード"
                               onChange={(value) => form.setData('gamemode', value || '')}
@@ -260,7 +248,6 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                                 { value: 'true', label: '有効' },
                                 { value: 'false', label: '無効' },
                               ]}
-                              description="プレイヤー同士の攻撃を許可するかどうかです。"
                               error={fieldError('pvp')}
                               label="PvP"
                               onChange={(value) => form.setData('pvp', value === 'true')}
@@ -269,16 +256,20 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                             />
                           </Grid.Col>
                           <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <Switch
-                              checked={!!form.data.hardcore}
-                              description="有効にすると死亡時に観戦者モードになります。"
-                              error={fieldError('hardcore')}
-                              label="ハードコア"
-                              onChange={(event) => {
-                                const checked = event.currentTarget.checked
-                                form.setData('hardcore', checked)
-                              }}
-                            />
+                            <Paper p="sm" radius="md" withBorder>
+                              <Stack gap={8}>
+                                <Text fw={500} size="sm">ハードコア</Text>
+                                <Switch
+                                  checked={!!form.data.hardcore}
+                                  error={fieldError('hardcore')}
+                                  label={form.data.hardcore ? '有効' : '無効'}
+                                  onChange={(event) => {
+                                    const checked = event.currentTarget.checked
+                                    form.setData('hardcore', checked)
+                                  }}
+                                />
+                              </Stack>
+                            </Paper>
                           </Grid.Col>
                         </Grid>
                       </Stack>
@@ -286,14 +277,8 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
 
                     <Paper p="md" radius="lg" withBorder>
                       <Stack gap="sm">
-                        <Stack gap={2}>
-                          <Text fw={700}>サーバー表示</Text>
-                          <Text c="dimmed" size="sm">
-                            サーバー一覧などで見える紹介文です。
-                          </Text>
-                        </Stack>
+                        <Text fw={700}>サーバー表示</Text>
                         <TextInput
-                          description="空欄でも作成できます。"
                           error={fieldError('motd')}
                           label="MOTD"
                           onChange={(event) => form.setData('motd', event.currentTarget.value)}

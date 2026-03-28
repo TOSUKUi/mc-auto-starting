@@ -640,17 +640,9 @@ export default function ServersShow({ server }) {
                   {startupSettingsLoading ? <Loader size="sm" /> : null}
                 </Group>
                 <Divider />
-                <Alert color="gray" radius="lg" title="いま反映できる設定" variant="light">
-                  現在の baseline では、ここで扱う起動設定はまだリアルタイム反映しません。保存後、次回の起動または再起動で反映します。
-                </Alert>
                 <Paper p="md" radius="lg" withBorder>
                   <Stack gap="sm">
-                    <Stack gap={2}>
-                      <Text fw={700}>再起動で反映する設定</Text>
-                      <Text c="dimmed" size="sm">
-                        保存した内容が次回の起動または再起動で server.properties 系へ反映されます。
-                      </Text>
-                    </Stack>
+                    <Text fw={700}>再起動で反映する設定</Text>
                     <Grid gutter="md">
                       <Grid.Col span={{ base: 12, md: 6 }}>
                         <Select
@@ -713,15 +705,20 @@ export default function ServersShow({ server }) {
                         />
                       </Grid.Col>
                       <Grid.Col span={12}>
-                        <Switch
-                          checked={!!startupSettings.hardcore}
-                          disabled={!canManageStartupSettings}
-                          label="ハードコア"
-                          onChange={(event) => {
-                            const checked = event.currentTarget.checked
-                            setStartupSettings((current) => ({ ...current, hardcore: checked }))
-                          }}
-                        />
+                        <Paper p="sm" radius="md" withBorder>
+                          <Stack gap={8}>
+                            <Text fw={500} size="sm">ハードコア</Text>
+                            <Switch
+                              checked={!!startupSettings.hardcore}
+                              disabled={!canManageStartupSettings}
+                              label={startupSettings.hardcore ? '有効' : '無効'}
+                              onChange={(event) => {
+                                const checked = event.currentTarget.checked
+                                setStartupSettings((current) => ({ ...current, hardcore: checked }))
+                              }}
+                            />
+                          </Stack>
+                        </Paper>
                       </Grid.Col>
                     </Grid>
                   </Stack>
@@ -748,7 +745,7 @@ export default function ServersShow({ server }) {
                   </Group>
                 ) : (
                   <Text c="dimmed" size="sm">
-                    ここで内容は確認できますが、変更はオーナーまたは管理者のみ可能です。
+                    変更はオーナーまたは管理者のみ可能です。
                   </Text>
                 )}
               </Stack>
