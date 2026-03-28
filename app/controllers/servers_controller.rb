@@ -180,6 +180,46 @@ class ServersController < InertiaController
     end
   end
 
+  def recent_logs
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :show?
+
+    respond_to do |format|
+      format.json do
+        render json: { recent_logs: recent_logs_payload_for(server) }
+      end
+
+      format.html do
+        redirect_to server_path(server)
+      end
+    end
+  end
+
+  def rcon_command
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :rcon_command?
+
+    response_body = Servers::BoundedRconCommand.new(server: server).execute(command: params.fetch(:command, "").to_s)
+
+    respond_to do |format|
+      format.json do
+        render json: {
+          ok: true,
+          command: params.fetch(:command, "").to_s,
+          response_body: response_body,
+        }
+      end
+
+      format.html do
+        redirect_to server_path(server), notice: "コマンドを実行しました。"
+      end
+    end
+  rescue Servers::BoundedRconCommand::ForbiddenCommandError => error
+    respond_with_rcon_command_error(server, error, error_code: "rcon_command_forbidden")
+  rescue MinecraftRcon::Error => error
+    respond_with_rcon_command_error(server, error, error_code: "rcon_command_failed")
+  end
+
   def whitelist
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :manage_whitelist?
@@ -353,6 +393,7 @@ class ServersController < InertiaController
         can_repair_publication: policy(server).repair_publication?,
         can_manage_members: policy(server).manage_members?,
         can_manage_whitelist: policy(server).manage_whitelist?,
+        can_run_rcon_command: policy(server).rcon_command?,
         can_destroy: policy(server).destroy?,
         can_start: visible_actions[:start],
         can_stop: visible_actions[:stop],
@@ -364,6 +405,10 @@ class ServersController < InertiaController
 
     def player_presence_payload_for(server)
       Servers::PlayerPresence.new(server: server).read
+    end
+
+    def recent_logs_payload_for(server)
+      Servers::RecentLogs.new(server: server).read
     end
 
     def access_role_for(server)
@@ -494,6 +539,18 @@ class ServersController < InertiaController
 
         format.json do
           render json: { error: message, desired_state_saved: desired_state_saved }, status: :unprocessable_entity
+        end
+      end
+    end
+
+    def respond_with_rcon_command_error(server, error, error_code:)
+      respond_to do |format|
+        format.html do
+          redirect_to server_path(server), alert: "RCON コマンドに失敗しました: #{error.message}"
+        end
+
+        format.json do
+          render json: { ok: false, error_code: error_code, error: error.message }, status: :unprocessable_entity
         end
       end
     end

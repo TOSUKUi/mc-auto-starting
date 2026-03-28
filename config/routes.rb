@@ -18,6 +18,8 @@ Rails.application.routes.draw do
       post :sync
       post :repair_publication
       get :player_presence
+      get :recent_logs
+      post :rcon_command
       get :whitelist
       post :enable_whitelist
       post :disable_whitelist

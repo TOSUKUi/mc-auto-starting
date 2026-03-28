@@ -146,4 +146,22 @@ class DockerEngine::ClientTest < ActiveSupport::TestCase
     assert_equal "/containers/router-123/kill", request.fetch(:path)
     assert_equal({ signal: "HUP" }, request.fetch(:query))
   end
+
+  test "reads container logs with bounded tail" do
+    connection = FakeConnection.new(
+      responses: [ DockerEngine::Response.new(status: 200, headers: { "content-type" => "application/octet-stream" }, body: "log line" ) ],
+      requests: [],
+    )
+
+    result = DockerEngine::Client.new(configuration: @configuration, connection: connection).container_logs(
+      id: "container-001",
+      tail: 120,
+    )
+
+    request = connection.requests.fetch(0)
+
+    assert_equal "log line", result
+    assert_equal "/containers/container-001/logs", request.fetch(:path)
+    assert_equal({ stdout: 1, stderr: 1, timestamps: 0, tail: 120 }, request.fetch(:query))
+  end
 end

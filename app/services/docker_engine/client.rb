@@ -118,6 +118,19 @@ module DockerEngine
       ).status == 204
     end
 
+    def container_logs(id:, tail:, stdout: true, stderr: true, timestamps: false)
+      connection.request(
+        method: :get,
+        path: "/containers/#{escape_path(id)}/logs",
+        query: {
+          stdout: stdout ? 1 : 0,
+          stderr: stderr ? 1 : 0,
+          timestamps: timestamps ? 1 : 0,
+          tail: Integer(tail),
+        },
+      ).body.to_s
+    end
+
     def remove_container(id:, force: false)
       connection.request(
         method: :delete,

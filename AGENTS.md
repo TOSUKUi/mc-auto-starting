@@ -94,6 +94,7 @@ Current baseline:
 - `T-1009` is complete: the repository now includes `docs/discord_operator_runbook.md`, which gives operators one place to configure Discord OAuth, issue invite URLs, and run the internal bot relay safely.
 - `T-1010` is complete: `docs/player_observability_and_browser_console_contract.md` now fixes the source of truth, refresh behavior, authorization, and payload contracts for player count, recent logs, and owner/admin-only browser bounded RCON input before UI work starts.
 - `T-1011` is complete: server index and detail now surface RCON-derived player counts when available, and the detail page refreshes player presence separately from whitelist or lifecycle state.
+- `T-1012` is complete: server detail now includes a manual-refresh recent-log panel for visible users plus an owner/admin-only bounded RCON console that reuses the bot-side allowlist and returns inline success/failure feedback.
 - Managed runtime env now also defaults `ENABLE_WHITELIST=TRUE`, so newly provisioned servers enforce whitelist mode from first boot.
 - `T-1021` is complete: Rails now has a bounded whitelist service over RCON for list/add/remove/on/off/reload operations against running managed servers, explicitly loads `rconrb`, and authenticates with the Minecraft-compatible `ignore_first_packet` handling.
 - `T-1022` is complete: whitelist endpoints are now controller/policy-gated to admins and owners, and request/service coverage includes unauthorized access plus stopped-server and RCON-failure handling.
@@ -105,7 +106,7 @@ Current baseline:
 - `T-1002` is complete: authenticated users can issue Discord-user-bound invite records, see invite status in the app, copy the raw invite URL at creation time, and revoke issued invites without email delivery.
 - `T-1003` is complete: `/login` now serves as a Discord-only entry page for existing users, a Rails-owned `/discord/login` handoff guards the Discord OAuth start path, local password and password-reset routes are no longer part of the active path, and bootstrap-owner startup logs can point the initial operator at the first `/login` link.
 - `T-1004` is complete: `/invites/:token` now stores pending invite context, Discord OAuth callbacks can create the first linked local user from a matching invite, and consumed invites are marked used.
-- After the Discord bot/RCON track, the next planned operator UI work is `T-1012` for browser-side log / command operations.
+- After the Discord bot/RCON track, the next planned follow-up is `T-1104` for the per-runtime version-source/display contract cleanup.
 - `T-1101` is complete: create flow now exposes runtime family selection with `paper` as the default, and both `paper` and `vanilla` provision through the `itzg/minecraft-server` runtime family.
 - `T-1100` and `T-1103` are complete: a checked-in synchronized catalog file remains as the safe fallback instead of live registry access or DB-backed storage.
 - `T-1105` through `T-1107` are complete: the create UI now resolves version options server-side on page load, caches them briefly, falls back to the checked-in catalog, and exposes only the runtime-family-specific select choices without a freeform version field.

@@ -7,11 +7,15 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     ActiveJob::Base.queue_adapter = :test
     clear_enqueued_jobs
     @original_player_presence_new = Servers::PlayerPresence.method(:new)
+    @original_recent_logs_new = Servers::RecentLogs.method(:new)
+    @original_bounded_rcon_new = Servers::BoundedRconCommand.method(:new)
   end
 
   teardown do
     clear_enqueued_jobs
     Servers::PlayerPresence.define_singleton_method(:new, @original_player_presence_new) if @original_player_presence_new
+    Servers::RecentLogs.define_singleton_method(:new, @original_recent_logs_new) if @original_recent_logs_new
+    Servers::BoundedRconCommand.define_singleton_method(:new, @original_bounded_rcon_new) if @original_bounded_rcon_new
   end
 
   test "redirects unauthenticated users to login for index" do
@@ -124,6 +128,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, server.fetch("player_presence").fetch("online_count")
     assert_kind_of Integer, server.fetch("uptime_seconds")
     assert_equal false, server.fetch("can_manage_whitelist")
+    assert_equal false, server.fetch("can_run_rcon_command")
     assert_equal true, server.fetch("can_stop")
     assert_equal true, server.fetch("can_restart")
     assert_equal true, server.fetch("can_sync")
@@ -269,6 +274,48 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal 3, response.parsed_body.fetch("player_presence").fetch("online_count")
+  end
+
+  test "visible member can fetch recent logs" do
+    stub_recent_logs(minecraft_servers(:one).id => { available: true, lines: [ "[12:00:01] joined" ], truncated: false })
+    sign_in_as(users(:three))
+
+    get recent_logs_server_url(minecraft_servers(:one), format: :json)
+
+    assert_response :success
+    assert_equal true, response.parsed_body.fetch("recent_logs").fetch("available")
+    assert_equal [ "[12:00:01] joined" ], response.parsed_body.fetch("recent_logs").fetch("lines")
+  end
+
+  test "owner can execute bounded rcon command" do
+    sign_in_as(users(:one))
+    stub_bounded_rcon("players online")
+
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command: "list" }
+
+    assert_response :success
+    assert_equal true, response.parsed_body.fetch("ok")
+    assert_equal "list", response.parsed_body.fetch("command")
+    assert_equal "players online", response.parsed_body.fetch("response_body")
+  end
+
+  test "viewer cannot execute bounded rcon command" do
+    sign_in_as(users(:two))
+
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command: "list" }
+
+    assert_response :forbidden
+  end
+
+  test "owner receives forbidden error for blocked rcon command" do
+    sign_in_as(users(:one))
+    stub_bounded_rcon_error(Servers::BoundedRconCommand::ForbiddenCommandError.new("この RCON コマンドは許可されていません。"))
+
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command: "stop" }
+
+    assert_response :unprocessable_entity
+    assert_equal false, response.parsed_body.fetch("ok")
+    assert_equal "rcon_command_forbidden", response.parsed_body.fetch("error_code")
   end
 
   test "reader cannot open new server page" do
@@ -534,6 +581,36 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
           payload
         end
       end.new(payloads.fetch(server.id, { available: false, error_code: "player_count_unavailable" }))
+    end
+  end
+
+  def stub_recent_logs(payloads)
+    Servers::RecentLogs.define_singleton_method(:new) do |server:, **|
+      Struct.new(:payload) do
+        def read(...)
+          payload
+        end
+      end.new(payloads.fetch(server.id, { available: false, error_code: "logs_unavailable" }))
+    end
+  end
+
+  def stub_bounded_rcon(response_body)
+    Servers::BoundedRconCommand.define_singleton_method(:new) do |**|
+      Struct.new(:response_body) do
+        def execute(command:)
+          response_body
+        end
+      end.new(response_body)
+    end
+  end
+
+  def stub_bounded_rcon_error(error)
+    Servers::BoundedRconCommand.define_singleton_method(:new) do |**|
+      Struct.new(:error) do
+        def execute(command:)
+          raise error
+        end
+      end.new(error)
     end
   end
 end

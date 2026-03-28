@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, SimpleGrid, Stack, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
+import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, ScrollArea, SimpleGrid, Stack, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
 import { Head, Link, router } from '@inertiajs/react'
 import {
   IconAlertCircle,
@@ -151,8 +151,16 @@ export default function ServersShow({ server }) {
   const [ playerName, setPlayerName ] = useState('')
   const [ playerPresence, setPlayerPresence ] = useState(server.player_presence)
   const [ playerPresenceLoading, setPlayerPresenceLoading ] = useState(false)
+  const [ recentLogs, setRecentLogs ] = useState({ available: false, lines: [], error_code: null })
+  const [ recentLogsLoading, setRecentLogsLoading ] = useState(false)
+  const [ recentLogsError, setRecentLogsError ] = useState(null)
+  const [ rconCommand, setRconCommand ] = useState('')
+  const [ rconLoading, setRconLoading ] = useState(false)
+  const [ rconResult, setRconResult ] = useState(null)
+  const [ rconError, setRconError ] = useState(null)
   const transitionState = isTransitioning(server.status)
   const canManageWhitelist = server.can_manage_whitelist
+  const canRunRconCommand = server.can_run_rcon_command
   const whitelistLiveMode = canManageWhitelist && server.runtime.container_state === 'running'
   const routeIssueMessage = server.route_issue_message || (server.route.last_apply_status === 'failed' ? '公開設定の反映に失敗しています。' : null)
   const pollServer = useEffectEvent(() => {
@@ -278,11 +286,76 @@ export default function ServersShow({ server }) {
     setWhitelistEnabled(true)
     setWhitelistStagedOnly(false)
     setWhitelistError(null)
+    setRecentLogs({ available: false, lines: [], error_code: null })
+    setRecentLogsError(null)
+    setRconCommand('')
+    setRconResult(null)
+    setRconError(null)
   }, [server.id])
 
   useEffect(() => {
     loadWhitelist()
   }, [canManageWhitelist, server.id])
+
+  const loadRecentLogs = useEffectEvent(async () => {
+    setRecentLogsLoading(true)
+    setRecentLogsError(null)
+
+    try {
+      const response = await fetch(`/servers/${server.id}/recent_logs.json`, {
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+        },
+      })
+      const body = await readJsonResponse(response, 'ログ取得の応答が不正です。')
+
+      if (!response.ok) {
+        throw new Error(body.error || 'ログを取得できませんでした。')
+      }
+
+      setRecentLogs(body.recent_logs)
+    } catch (error) {
+      setRecentLogs({ available: false, lines: [], error_code: 'logs_unavailable' })
+      setRecentLogsError(error.message)
+    } finally {
+      setRecentLogsLoading(false)
+    }
+  })
+
+  useEffect(() => {
+    loadRecentLogs()
+  }, [server.id])
+
+  async function submitRconCommand() {
+    setRconLoading(true)
+    setRconError(null)
+    setRconResult(null)
+
+    try {
+      const response = await fetch(`/servers/${server.id}/rcon_command.json`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken(),
+        },
+        body: JSON.stringify({ command: rconCommand }),
+      })
+      const body = await readJsonResponse(response, 'RCON コマンドの応答が不正です。')
+
+      if (!response.ok) {
+        throw new Error(body.error || 'RCON コマンドを実行できませんでした。')
+      }
+
+      setRconResult(body)
+    } catch (error) {
+      setRconError(error.message)
+    } finally {
+      setRconLoading(false)
+    }
+  }
 
   async function mutateWhitelist(url, { method = 'POST', body } = {}) {
     setWhitelistMutationLoading(true)
@@ -474,6 +547,45 @@ export default function ServersShow({ server }) {
             </Paper>
           </Grid.Col>
 
+          <Grid.Col span={12}>
+            <Paper p="lg" radius="lg" shadow="sm" withBorder>
+              <Stack gap="md">
+                <Group justify="space-between" align="center">
+                  <Text fw={700}>最近のログ</Text>
+                  <Group gap="xs">
+                    {recentLogsLoading ? <Loader size="sm" /> : null}
+                    <Button
+                      leftSection={<IconRefresh size={14} />}
+                      onClick={() => loadRecentLogs()}
+                      size="xs"
+                      type="button"
+                      variant="default"
+                    >
+                      再読込
+                    </Button>
+                  </Group>
+                </Group>
+                <Divider />
+                {recentLogsError ? (
+                  <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="ログを取得できませんでした" variant="light">
+                    {recentLogsError}
+                  </Alert>
+                ) : null}
+                {recentLogs?.available ? (
+                  <ScrollArea.Autosize mah={280} offsetScrollbars>
+                    <Code block style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                      {recentLogs.lines.join('\n')}
+                    </Code>
+                  </ScrollArea.Autosize>
+                ) : (
+                  <Text c="dimmed" size="sm">
+                    いまはログを取得できません。再読込で再確認してください。
+                  </Text>
+                )}
+              </Stack>
+            </Paper>
+          </Grid.Col>
+
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
               <Stack gap="md">
@@ -508,6 +620,51 @@ export default function ServersShow({ server }) {
             </Paper>
           </Grid.Col>
         </Grid>
+
+        {canRunRconCommand ? (
+          <Paper p="lg" radius="lg" shadow="sm" withBorder>
+            <Stack gap="md">
+              <Group justify="space-between" align="center">
+                <Text fw={700}>コマンド入力</Text>
+                {rconLoading ? <Loader size="sm" /> : null}
+              </Group>
+              <Divider />
+              <Text c="dimmed" size="sm">
+                `say` `list` `kick` `save-all` `time set` `weather` のみ実行できます。停止や OP 変更などは禁止しています。
+              </Text>
+              {rconError ? (
+                <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="コマンドを実行できませんでした" variant="light">
+                  {rconError}
+                </Alert>
+              ) : null}
+              {rconResult ? (
+                <Alert color="teal" radius="lg" title="実行結果" variant="light">
+                  <Stack gap={6}>
+                    <Code block>{rconResult.command}</Code>
+                    <Code block style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                      {rconResult.response_body || '応答は空です。'}
+                    </Code>
+                  </Stack>
+                </Alert>
+              ) : null}
+              <Group align="flex-end" grow>
+                <TextInput
+                  label="RCON コマンド"
+                  value={rconCommand}
+                  onChange={(event) => setRconCommand(event.currentTarget.value)}
+                  placeholder="say サーバーメンテナンスを開始します"
+                />
+                <Button
+                  onClick={() => submitRconCommand()}
+                  type="button"
+                  disabled={rconLoading || rconCommand.trim().length === 0}
+                >
+                  実行
+                </Button>
+              </Group>
+            </Stack>
+          </Paper>
+        ) : null}
 
         {canManageWhitelist ? (
           <Paper p="lg" radius="lg" shadow="sm" withBorder>
