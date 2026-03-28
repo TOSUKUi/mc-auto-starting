@@ -165,6 +165,73 @@ class ServersController < InertiaController
     respond_with_server_error(server, error)
   end
 
+  def whitelist
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :manage_whitelist?
+
+    respond_to do |format|
+      format.json do
+        render json: { whitelist: whitelist_payload(server) }
+      end
+
+      format.html do
+        redirect_to server_path(server)
+      end
+    end
+  rescue MinecraftRcon::Error => error
+    respond_with_whitelist_error(server, error)
+  end
+
+  def enable_whitelist
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :manage_whitelist?
+
+    whitelist_manager_for(server).enable!
+    respond_with_whitelist_action(server, notice: "ホワイトリストを有効化しました。")
+  rescue MinecraftRcon::Error => error
+    respond_with_whitelist_error(server, error)
+  end
+
+  def disable_whitelist
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :manage_whitelist?
+
+    whitelist_manager_for(server).disable!
+    respond_with_whitelist_action(server, notice: "ホワイトリストを無効化しました。")
+  rescue MinecraftRcon::Error => error
+    respond_with_whitelist_error(server, error)
+  end
+
+  def reload_whitelist
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :manage_whitelist?
+
+    whitelist_manager_for(server).reload!
+    respond_with_whitelist_action(server, notice: "ホワイトリストを再読込しました。")
+  rescue MinecraftRcon::Error => error
+    respond_with_whitelist_error(server, error)
+  end
+
+  def add_whitelist_player
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :manage_whitelist?
+
+    whitelist_manager_for(server).add_player!(whitelist_player_name)
+    respond_with_whitelist_action(server, notice: "プレイヤーを追加しました。")
+  rescue MinecraftRcon::Error => error
+    respond_with_whitelist_error(server, error)
+  end
+
+  def remove_whitelist_player
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :manage_whitelist?
+
+    whitelist_manager_for(server).remove_player!(whitelist_player_name)
+    respond_with_whitelist_action(server, notice: "プレイヤーを削除しました。")
+  rescue MinecraftRcon::Error => error
+    respond_with_whitelist_error(server, error)
+  end
+
   private
     def new_server_page_props(form_values: {})
       hostname = normalized_hostname(form_values[:hostname])
@@ -334,6 +401,20 @@ class ServersController < InertiaController
       (Time.current - server.last_started_at).to_i
     end
 
+    def whitelist_payload(server)
+      {
+        entries: whitelist_manager_for(server).list_entries,
+      }
+    end
+
+    def whitelist_manager_for(server)
+      Servers::WhitelistManager.new(server: server)
+    end
+
+    def whitelist_player_name
+      params.fetch(:player_name, "").to_s
+    end
+
     def sync_server_for_transition_poll!(server)
       return unless server.status.in?(%w[starting stopping restarting])
       return unless request.headers["X-Server-Poll"] == "1"
@@ -347,5 +428,29 @@ class ServersController < InertiaController
     def audit_route!(server)
       result = Router::PublicationAudit.new.call(router_route: server.router_route)
       result.ok ? nil : result.message
+    end
+
+    def respond_with_whitelist_action(server, notice:)
+      respond_to do |format|
+        format.html do
+          redirect_to server_path(server), notice: notice
+        end
+
+        format.json do
+          render json: { whitelist: whitelist_payload(server) }
+        end
+      end
+    end
+
+    def respond_with_whitelist_error(server, error)
+      respond_to do |format|
+        format.html do
+          redirect_to server_path(server), alert: "ホワイトリスト操作に失敗しました: #{error.message}"
+        end
+
+        format.json do
+          render json: { error: error.message }, status: :unprocessable_entity
+        end
+      end
     end
 end

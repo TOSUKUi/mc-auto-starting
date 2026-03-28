@@ -17,6 +17,12 @@ Rails.application.routes.draw do
       post :restart
       post :sync
       post :repair_publication
+      get :whitelist
+      post :enable_whitelist
+      post :disable_whitelist
+      post :reload_whitelist
+      post :add_whitelist_player
+      delete :remove_whitelist_player
     end
 
     resources :members, controller: "server_members", only: %i[index create update destroy]

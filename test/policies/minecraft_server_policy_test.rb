@@ -14,6 +14,7 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert policy.update?
     assert policy.destroy?
     assert policy.manage_members?
+    assert policy.manage_whitelist?
     assert policy.start?
     assert policy.stop?
     assert policy.restart?
@@ -21,11 +22,14 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
   end
 
   test "admin can view operate destroy and manage a non-owned server" do
-    policy = MinecraftServerPolicy.new(users(:one), minecraft_servers(:two))
+    server = minecraft_servers(:two)
+    server.update_columns(container_id: "container-002", container_state: "running", status: "ready")
+    policy = MinecraftServerPolicy.new(users(:one), server)
 
     assert policy.show?
     assert policy.destroy?
     assert policy.manage_members?
+    assert policy.manage_whitelist?
   end
 
   test "manager membership can view and operate but not manage ownership actions" do
@@ -39,6 +43,7 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert_not policy.update?
     assert_not policy.destroy?
     assert_not policy.manage_members?
+    assert_not policy.manage_whitelist?
   end
 
   test "viewer membership can only read the server" do
@@ -49,6 +54,7 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert_not policy.update?
     assert_not policy.destroy?
     assert_not policy.manage_members?
+    assert_not policy.manage_whitelist?
   end
 
   test "non-member cannot view the server" do
@@ -84,5 +90,6 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert_not policy.stop?
     assert_not policy.restart?
     assert_not policy.sync?
+    assert_not policy.manage_whitelist?
   end
 end
