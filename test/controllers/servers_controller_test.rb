@@ -6,10 +6,12 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   setup do
     ActiveJob::Base.queue_adapter = :test
     clear_enqueued_jobs
+    @original_player_presence_new = Servers::PlayerPresence.method(:new)
   end
 
   teardown do
     clear_enqueued_jobs
+    Servers::PlayerPresence.define_singleton_method(:new, @original_player_presence_new) if @original_player_presence_new
   end
 
   test "redirects unauthenticated users to login for index" do
@@ -51,6 +53,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index returns server summary fields for the listing UI" do
+    stub_player_presence(minecraft_servers(:one).id => { available: true, online_count: 2, max_players: 20, online_players: %w[Steve Alex] })
     sign_in_as(users(:two))
 
     get servers_url(format: :json)
@@ -75,6 +78,9 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "1.21.4", visible_server.fetch("minecraft_version_display")
     assert_equal users(:one).discord_global_name, visible_server.fetch("owner_display_name")
     assert_equal "viewer", visible_server.fetch("access_role")
+    assert_equal true, visible_server.fetch("player_presence").fetch("available")
+    assert_equal 2, visible_server.fetch("player_presence").fetch("online_count")
+    assert_equal 20, visible_server.fetch("player_presence").fetch("max_players")
     assert_equal "success", visible_server.fetch("route").fetch("last_apply_status")
     assert_equal "healthy", visible_server.fetch("route").fetch("last_healthcheck_status")
     assert_equal true, visible_server.fetch("route").fetch("enabled")
@@ -100,6 +106,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "show allows visible server for member" do
+    stub_player_presence(minecraft_servers(:one).id => { available: true, online_count: 1, max_players: 20, online_players: %w[Steve] })
     minecraft_servers(:one).update!(last_error_message: "runtime unavailable")
     sign_in_as(users(:three))
 
@@ -113,6 +120,8 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "1.21.4", server.fetch("minecraft_version_display")
     assert_equal "runtime unavailable", server.fetch("last_error_message")
     assert_equal users(:one).discord_global_name, server.fetch("owner_display_name")
+    assert_equal true, server.fetch("player_presence").fetch("available")
+    assert_equal 1, server.fetch("player_presence").fetch("online_count")
     assert_kind_of Integer, server.fetch("uptime_seconds")
     assert_equal false, server.fetch("can_manage_whitelist")
     assert_equal true, server.fetch("can_stop")
@@ -250,6 +259,16 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     get server_url(minecraft_servers(:two), format: :json)
 
     assert_response :not_found
+  end
+
+  test "visible member can fetch player presence" do
+    stub_player_presence(minecraft_servers(:one).id => { available: true, online_count: 3, max_players: 20, online_players: %w[Steve Alex TOSUKUi2] })
+    sign_in_as(users(:three))
+
+    get player_presence_server_url(minecraft_servers(:one), format: :json)
+
+    assert_response :success
+    assert_equal 3, response.parsed_body.fetch("player_presence").fetch("online_count")
   end
 
   test "reader cannot open new server page" do
@@ -506,5 +525,15 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "degraded", response.parsed_body.fetch("server").fetch("status")
   ensure
     Servers::SyncServerState.define_singleton_method(:new, original_new)
+  end
+
+  def stub_player_presence(payloads)
+    Servers::PlayerPresence.define_singleton_method(:new) do |server:, **|
+      Struct.new(:payload) do
+        def read
+          payload
+        end
+      end.new(payloads.fetch(server.id, { available: false, error_code: "player_count_unavailable" }))
+    end
   end
 end

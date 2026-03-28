@@ -104,6 +104,13 @@ function formatUptime(seconds) {
   return `${Math.max(minutes, 0)}分`
 }
 
+function playerCountLabel(playerPresence) {
+  if (!playerPresence?.available) return null
+  if (playerPresence.max_players == null) return `${playerPresence.online_count}人`
+
+  return `${playerPresence.online_count} / ${playerPresence.max_players}人`
+}
+
 function isTransitioning(status) {
   return TRANSITION_STATUSES.includes(status)
 }
@@ -142,6 +149,8 @@ export default function ServersShow({ server }) {
   const [ whitelistError, setWhitelistError ] = useState(null)
   const [ whitelistMutationLoading, setWhitelistMutationLoading ] = useState(false)
   const [ playerName, setPlayerName ] = useState('')
+  const [ playerPresence, setPlayerPresence ] = useState(server.player_presence)
+  const [ playerPresenceLoading, setPlayerPresenceLoading ] = useState(false)
   const transitionState = isTransitioning(server.status)
   const canManageWhitelist = server.can_manage_whitelist
   const whitelistLiveMode = canManageWhitelist && server.runtime.container_state === 'running'
@@ -168,6 +177,10 @@ export default function ServersShow({ server }) {
   }, [server.id, server.status])
 
   useEffect(() => {
+    setPlayerPresence(server.player_presence)
+  }, [server.id, server.player_presence])
+
+  useEffect(() => {
     if (!transitionState) return undefined
 
     const intervalId = window.setInterval(() => {
@@ -178,6 +191,49 @@ export default function ServersShow({ server }) {
       window.clearInterval(intervalId)
     }
   }, [transitionState, server.id])
+
+  const loadPlayerPresence = useEffectEvent(async () => {
+    if (server.runtime.container_state !== 'running') {
+      setPlayerPresence(server.player_presence)
+      return
+    }
+
+    setPlayerPresenceLoading(true)
+
+    try {
+      const response = await fetch(`/servers/${server.id}/player_presence.json`, {
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+        },
+      })
+      const body = await readJsonResponse(response, 'プレイヤー数の取得に失敗しました。')
+
+      if (!response.ok) {
+        throw new Error(body.error || 'プレイヤー数を取得できませんでした。')
+      }
+
+      setPlayerPresence(body.player_presence)
+    } catch (_error) {
+      setPlayerPresence({ available: false, error_code: 'player_count_unavailable' })
+    } finally {
+      setPlayerPresenceLoading(false)
+    }
+  })
+
+  useEffect(() => {
+    if (server.runtime.container_state !== 'running') return undefined
+
+    loadPlayerPresence()
+
+    const intervalId = window.setInterval(() => {
+      loadPlayerPresence()
+    }, 15000)
+
+    return () => {
+      window.clearInterval(intervalId)
+    }
+  }, [server.id, server.runtime.container_state])
 
   const loadWhitelist = useEffectEvent(async () => {
     if (!canManageWhitelist) {
@@ -392,6 +448,32 @@ export default function ServersShow({ server }) {
         ) : null}
 
         <Grid gutter="md">
+          <Grid.Col span={12}>
+            <Paper p="lg" radius="lg" shadow="sm" withBorder>
+              <Stack gap="md">
+                <Group justify="space-between" align="center">
+                  <Text fw={700}>プレイヤー</Text>
+                  {playerPresenceLoading ? <Loader size="sm" /> : null}
+                </Group>
+                <Divider />
+                {playerPresence?.available ? (
+                  <Stack gap="xs">
+                    <Text fw={700} size="lg">{playerCountLabel(playerPresence)}</Text>
+                    <Text c="dimmed" size="sm">
+                      {playerPresence.online_players?.length > 0
+                        ? playerPresence.online_players.join(', ')
+                        : '現在オンラインのプレイヤーはいません。'}
+                    </Text>
+                  </Stack>
+                ) : (
+                  <Text c="dimmed">
+                    {server.runtime.container_state === 'running' ? 'いまは取得できません。' : '停止中です。'}
+                  </Text>
+                )}
+              </Stack>
+            </Paper>
+          </Grid.Col>
+
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
               <Stack gap="md">

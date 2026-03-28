@@ -81,6 +81,13 @@ function selectedVersionNote(server) {
   return `指定: ${server.minecraft_version}`
 }
 
+function playerCountLabel(playerPresence) {
+  if (!playerPresence?.available) return null
+  if (playerPresence.max_players == null) return `${playerPresence.online_count}人`
+
+  return `${playerPresence.online_count} / ${playerPresence.max_players}人`
+}
+
 function needsAttention(server) {
   return server.status !== 'ready' || server.route.last_apply_status === 'failed'
 }
@@ -278,6 +285,16 @@ export default function ServersIndex({ servers, summary }) {
                         <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.owner_display_name}</Text>
                       </Stack>
                     </Paper>
+                    {server.player_presence?.available ? (
+                      <Paper p="md" radius="lg" withBorder>
+                        <Stack gap={2}>
+                          <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                            プレイヤー
+                          </Text>
+                          <Text fw={700}>{playerCountLabel(server.player_presence)}</Text>
+                        </Stack>
+                      </Paper>
+                    ) : null}
                   </SimpleGrid>
                 </Stack>
               </Paper>

@@ -165,6 +165,21 @@ class ServersController < InertiaController
     respond_with_server_error(server, error)
   end
 
+  def player_presence
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :show?
+
+    respond_to do |format|
+      format.json do
+        render json: { player_presence: player_presence_payload_for(server) }
+      end
+
+      format.html do
+        redirect_to server_path(server)
+      end
+    end
+  end
+
   def whitelist
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :manage_whitelist?
@@ -314,6 +329,7 @@ class ServersController < InertiaController
           container_state: server.container_state,
           volume_name: server.volume_name,
         },
+        player_presence: player_presence_payload_for(server),
       }
     end
 
@@ -342,7 +358,12 @@ class ServersController < InertiaController
         can_stop: visible_actions[:stop],
         can_restart: visible_actions[:restart],
         can_sync: visible_actions[:sync],
+        player_presence: summary.fetch(:player_presence),
       )
+    end
+
+    def player_presence_payload_for(server)
+      Servers::PlayerPresence.new(server: server).read
     end
 
     def access_role_for(server)

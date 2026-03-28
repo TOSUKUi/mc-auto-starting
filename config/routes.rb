@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       post :restart
       post :sync
       post :repair_publication
+      get :player_presence
       get :whitelist
       post :enable_whitelist
       post :disable_whitelist

@@ -120,7 +120,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
 - `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
 - `T-902` is complete: the Kamal-based release, migration, and rollback path now lives in `docs/release_runbook.md`.
-- The next implementation critical path starts at `T-1011` for operator-facing player-count visibility, with browser-side log / command work following at `T-1012`.
+- The next implementation critical path starts at `T-1012` for browser-side recent-log and bounded-command work.
 - The earlier server-screen follow-up tasks `T-505`, `T-506`, and `T-507` are now complete; `docs/server_ui_display_review.md` remains the display-contract reference for any future server-screen cleanup.
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
@@ -159,6 +159,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-1008` is complete: Discord auth, invite redemption, and bot-command controller coverage now includes invite mismatch/revocation paths, invalid/expired invite access, bot network/token/user rejection, and whitelist/RCON failure cases.
 - `T-1009` is complete: operator-facing setup and troubleshooting guidance for Discord OAuth, invite issuance, and the internal bot relay now lives in `docs/discord_operator_runbook.md`.
 - `T-1010` is complete: player count now has an RCON-based read contract, recent logs are fixed as a Docker-log read surface, and browser bounded-command input is fixed to the same allowlist boundary as the bot in `docs/player_observability_and_browser_console_contract.md`.
+- `T-1011` is complete: server index and detail now surface RCON-derived player counts when available, and the detail view refreshes player presence separately from the rest of the page.
 - `T-1001` is complete: `users` now store Discord identity fields, OmniAuth Discord is wired into the app, and linked users can complete the Discord OAuth callback into a normal Rails session.
 - `T-1002` is complete: `discord_invitations` now stores digest-backed manual invite records, authenticated users can issue/revoke invites from `/discord-invitations`, and raw invite URLs are shown only at issuance time.
 - `T-1003` is complete: `/login` is now a Discord-only entry page for existing users, `/discord/login` guards the OAuth handoff so misconfigured Discord env returns safely to `/login`, local password and password-reset routes are no longer part of the active path, and bootstrap-owner startup logs can surface the first `/login` link when Discord OAuth and bootstrap env are configured.
