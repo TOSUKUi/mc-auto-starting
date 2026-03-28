@@ -88,6 +88,7 @@ Current baseline:
 - `T-1020` is complete: whitelist planning now treats server whitelist changes as Rails-owned RCON operations, with the resulting contract fixed in `docs/whitelist_and_access_control_strategy.md`.
 - `T-1006` is complete: Rails now has an app-owned RCON connection layer, managed containers enable RCON by default, and per-server RCON passwords are derived from a stable secret plus server identity instead of being stored as plain DB fields.
 - `T-1007` is complete: Rails now has an internal-only `/api/discord/bot/*` surface gated to the Docker private network plus a dedicated bot bearer token, and the current implementation covers acting-user resolution, policy-checked status/lifecycle/whitelist endpoints, and owner/admin-only bounded RCON commands.
+- `T-1008` is complete: automated coverage now exercises Discord OAuth login, invite redemption/rejection, bot network/token/user rejection, and the main bot status/lifecycle/whitelist/bounded-RCON flows.
 - Managed runtime env now also defaults `ENABLE_WHITELIST=TRUE`, so newly provisioned servers enforce whitelist mode from first boot.
 - `T-1021` is complete: Rails now has a bounded whitelist service over RCON for list/add/remove/on/off/reload operations against running managed servers, explicitly loads `rconrb`, and authenticates with the Minecraft-compatible `ignore_first_packet` handling.
 - `T-1022` is complete: whitelist endpoints are now controller/policy-gated to admins and owners, and request/service coverage includes unauthorized access plus stopped-server and RCON-failure handling.
@@ -263,4 +264,4 @@ If no other instruction is given, start from the current critical path:
 1. `T-200` through `T-400` are complete
 2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, `T-804`, and `T-805` are complete while keeping `mc-router`
 3. `T-900`, `T-901`, `T-903`, `T-904`, and `T-905` are complete
-4. Next, continue from `T-1008` on the Discord bot/RCON track, then proceed to `T-1009` and the operator-facing player-count/browser-console tasks
+4. Next, continue from `T-1009` on the Discord bot/RCON track, then proceed to the operator-facing player-count/browser-console tasks

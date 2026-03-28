@@ -39,6 +39,21 @@ class InvitesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to login_path
   end
 
+  test "expired invite redirects back to login" do
+    invitation, raw_token = DiscordInvitation.issue!(
+      invited_by: users(:one),
+      discord_user_id: "777777777777777777",
+      invited_user_type: "reader",
+      expires_at: 1.day.from_now,
+      note: "expired invite",
+    )
+    invitation.update!(expires_at: 1.minute.ago)
+
+    get invite_url(raw_token)
+
+    assert_redirected_to login_path
+  end
+
   private
     def with_mocked_discord_auth(uid:, info:)
       original_test_mode = OmniAuth.config.test_mode

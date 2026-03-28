@@ -26,6 +26,24 @@ class Api::Discord::Bot::ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "unauthorized_bot", response.parsed_body.fetch("error_code")
   end
 
+  test "rejects missing acting discord user id" do
+    post status_api_discord_bot_server_url(minecraft_servers(:one)),
+      headers: bot_headers(discord_user_id: nil),
+      env: bot_env
+
+    assert_response :bad_request
+    assert_equal "missing_discord_user_id", response.parsed_body.fetch("error_code")
+  end
+
+  test "rejects unknown acting discord user" do
+    post status_api_discord_bot_server_url(minecraft_servers(:one)),
+      headers: bot_headers(discord_user_id: "999999999999999999"),
+      env: bot_env
+
+    assert_response :forbidden
+    assert_equal "unknown_discord_user", response.parsed_body.fetch("error_code")
+  end
+
   test "rejects requests from outside the private bot network" do
     post status_api_discord_bot_server_url(minecraft_servers(:one)),
       headers: bot_headers(discord_user_id: users(:one).discord_user_id),
@@ -91,6 +109,26 @@ class Api::Discord::Bot::ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "Steve" ], server.reload.whitelist_entries
   end
 
+  test "whitelist mutation returns saved-but-not-live-applied when rcon fails" do
+    server = minecraft_servers(:one)
+    server.update_columns(container_state: "running", status: "ready")
+    failing_manager = Object.new
+    failing_manager.define_singleton_method(:add_player!) do |_player_name|
+      raise MinecraftRcon::CommandError, "simulated rcon failure"
+    end
+    Servers::WhitelistManager.define_singleton_method(:new) { |*| failing_manager }
+
+    post whitelist_add_api_discord_bot_server_url(server),
+      headers: bot_headers(discord_user_id: users(:one).discord_user_id),
+      env: bot_env,
+      params: { player_name: "Steve" }
+
+    assert_response :unprocessable_entity
+    assert_equal "live_apply_failed", response.parsed_body.fetch("error_code")
+    assert_equal true, response.parsed_body.fetch("desired_state_saved")
+    assert_equal [ "Steve" ], server.reload.whitelist_entries
+  end
+
   test "reader can view whitelist list through bot api" do
     server = minecraft_servers(:one)
     server.update!(whitelist_entries: [ "Steve" ])
@@ -136,9 +174,8 @@ class Api::Discord::Bot::ServersControllerTest < ActionDispatch::IntegrationTest
 
   private
     def bot_headers(discord_user_id:, token: "discord-bot-token")
-      headers = {
-        "X-Discord-User-Id" => discord_user_id,
-      }
+      headers = {}
+      headers["X-Discord-User-Id"] = discord_user_id if discord_user_id
       headers["Authorization"] = "Bearer #{token}" if token
       headers
     end

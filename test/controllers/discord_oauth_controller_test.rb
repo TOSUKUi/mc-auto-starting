@@ -100,6 +100,34 @@ class DiscordOauthControllerTest < ActionDispatch::IntegrationTest
     assert_nil invitation.reload.used_at
   end
 
+  test "callback rejects a revoked pending invite" do
+    invitation, raw_token = DiscordInvitation.issue!(
+      invited_by: users(:one),
+      discord_user_id: "999999999999999999",
+      invited_user_type: "reader",
+      expires_at: 7.days.from_now,
+      note: "revoked invite",
+    )
+
+    get invite_url(raw_token)
+    assert_redirected_to discord_login_path
+    invitation.revoke!
+
+    assert_no_difference("User.count") do
+      with_mocked_discord_auth(
+        uid: invitation.discord_user_id,
+        info: {
+          "name" => "revoked-user",
+        },
+      ) do
+        get "/auth/discord/callback"
+      end
+    end
+
+    assert_redirected_to login_path
+    assert_nil invitation.reload.used_at
+  end
+
   private
     def with_discord_oauth_env
       original_client_id = ENV["DISCORD_CLIENT_ID"]
