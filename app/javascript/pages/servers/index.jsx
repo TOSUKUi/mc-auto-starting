@@ -149,9 +149,6 @@ export default function ServersIndex({ servers, summary }) {
                   <Text c="stone.5" fw={700} size="sm" tt="uppercase">一覧</Text>
                 </Group>
                 <Title order={1}>サーバー一覧</Title>
-                <Text c="stone.3" maw={720} size="md">
-                  自分のサーバーと共有中のサーバーを確認できます。
-                </Text>
               </Stack>
 
               <Button
@@ -190,21 +187,16 @@ export default function ServersIndex({ servers, summary }) {
           </Group>
         </Paper>
 
-        {filteredServers.length === 0 ? (
-          <Paper p="xl" radius="lg" withBorder>
-            <Stack align="center" gap="sm" py="xl">
-              <ThemeIcon color="gray" radius="xl" size={48} variant="light">
-                <IconServer2 size={24} />
-              </ThemeIcon>
-              <Title order={3}>{servers.length === 0 ? '表示できるサーバーがありません' : '条件に一致するサーバーがありません'}</Title>
-              <Text c="dimmed" ta="center">
-                {servers.length === 0
-                  ? '自分が所有するか、メンバーとして追加されたサーバーがここに表示されます。'
-                  : '検索条件を変更すると一致するサーバーを再表示できます。'}
-              </Text>
-            </Stack>
-          </Paper>
-        ) : (
+            {filteredServers.length === 0 ? (
+              <Paper p="xl" radius="lg" withBorder>
+                <Stack align="center" gap="sm" py="xl">
+                  <ThemeIcon color="gray" radius="xl" size={48} variant="light">
+                    <IconServer2 size={24} />
+                  </ThemeIcon>
+                  <Title order={3}>{servers.length === 0 ? '表示できるサーバーがありません' : '条件に一致するサーバーがありません'}</Title>
+                </Stack>
+              </Paper>
+            ) : (
           <Stack gap="md">
             {filteredServers.map((server) => (
               <Paper key={server.id} p="lg" radius="lg" shadow="sm" withBorder>

@@ -69,9 +69,7 @@ export default function ServerMembersIndex({ available_roles, form_defaults, mem
                 </Group>
                 <Title order={1}>メンバー管理</Title>
                 <Text c="stone.3">{server.name}</Text>
-                <Text c="stone.3">
-                  <Code>{server.connection_target}</Code>
-                </Text>
+                <Code>{server.connection_target}</Code>
               </Stack>
               <Paper p="md" radius="lg" withBorder style={{ background: '#23211d', borderColor: '#4a4338', minWidth: 220 }}>
                 <Stack gap={4}>
