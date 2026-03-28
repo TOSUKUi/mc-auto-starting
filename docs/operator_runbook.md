@@ -148,6 +148,13 @@ If the host UID, GID, or Docker group differ from the local defaults, also updat
 - `LOCAL_GID`
 - `DOCKER_GID`
 
+If you plan to run the Discord Bot relay on the same Docker private network, also set:
+
+- `DISCORD_BOT_API_TOKEN`
+- `DISCORD_BOT_ALLOWED_CIDRS`
+
+For the current baseline, `DISCORD_BOT_ALLOWED_CIDRS` should stay on the Docker private-network default unless the bot deployment shape is explicitly revised.
+
 ### 3. Create the shared runtime network
 
 ```bash
@@ -195,6 +202,28 @@ http://localhost:3000/login
 If Discord OAuth is configured correctly, the initial owner can sign in there and start issuing invite URLs from `/discord-invitations`.
 
 ## Day-2 Operations
+
+## Discord Bot API Baseline
+
+The Rails app now exposes an internal-only bot surface under `/api/discord/bot/*`.
+
+Current safety baseline:
+
+- reachable only from the Docker private network
+- requires `Authorization: Bearer <DISCORD_BOT_API_TOKEN>`
+- requires `X-Discord-User-Id` on every request
+- reuses the same Rails policy checks as the web UI
+
+Current command categories:
+
+- read/status
+- lifecycle `start/stop/restart/sync`
+- whitelist read/write
+- owner/admin-only bounded RCON commands
+
+Bounded RCON intentionally rejects lifecycle-style commands such as `stop`, `start`, `restart`, and `reload`, even for owner/admin callers.
+
+The detailed request/response contract lives in [docs/discord_bot_api_contract.md](discord_bot_api_contract.md).
 
 ### Preferred control path
 

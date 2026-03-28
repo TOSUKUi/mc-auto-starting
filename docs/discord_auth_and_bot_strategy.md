@@ -129,6 +129,7 @@ For future bot operations, `reader` may access read surfaces by default, and may
 
 - The bot is trusted only to relay commands to Rails, not to enforce final authorization.
 - Rails must treat every bot request as untrusted until the bot credential is validated and the acting Discord user is resolved.
+- The initial bot ingress must stay internal-only on the Docker private network, with a dedicated bot bearer token still required on top of that network boundary.
 - The bot should supply the acting Discord user id with each request; Rails must not rely on Discord display names for authorization.
 - `reader` should be able to use read-class bot endpoints such as status and future player-count/log reads.
 - `reader` must not gain create, destroy, invite, or membership-management privileges through the bot path.
