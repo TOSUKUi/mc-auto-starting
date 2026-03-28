@@ -13,6 +13,7 @@ This document fixes the Rails-side trust boundary and command contract for Disco
 - Reuse the existing Rails authorization model instead of creating bot-only permissions.
 - Split read-class, server-operation, whitelist, and bounded-RCON-command surfaces clearly.
 - Keep startup-settings desired-state updates on their own surface, separate from lifecycle and bounded RCON.
+- Keep structured RCON actions aligned with the shared command catalog rather than ad hoc raw command strings.
 
 ## Non-Goals
 
@@ -127,14 +128,17 @@ Allowed when the acting user is any of:
 
 Server membership `manager` is not enough for direct RCON command input in the initial contract.
 
-Initial bounded-RCON commands:
+Initial bounded-RCON commands should align with [docs/structured_rcon_command_catalog.md](structured_rcon_command_catalog.md).
 
-- `say`
-- `list`
-- `kick <player>`
-- `save-all`
-- `time set ...`
-- `weather ...`
+Initial catalog:
+
+- `say(message)`
+- `kick(player_name, reason?)`
+- `difficulty(difficulty)`
+- `time_set(time)`
+- `weather(weather)`
+- `save_all()`
+- `gamemode(gamemode, player_name?)`
 
 These commands are intentionally separate from server operations. For example, `stop` remains a server-operation capability and is not exposed through the RCON command surface.
 
@@ -225,7 +229,10 @@ Bounded-RCON payload:
 
 ```json
 {
-  "command": "say サーバーメンテナンスを開始します"
+  "command_key": "say",
+  "args": {
+    "message": "サーバーメンテナンスを開始します"
+  }
 }
 ```
 
@@ -354,4 +361,4 @@ The bot does not own the audit log; Rails does.
 - Bot controller code should call the same service objects used by the web surface.
 - Bot-specific code should translate request/response envelopes, not re-implement business logic.
 - Whitelist bot actions should call the existing Rails-owned whitelist services and inherit the same desired-state plus live-apply behavior.
-- Bot-side RCON input should use an explicit allowlist validator owned by Rails; it must not pass arbitrary text through to the Minecraft server.
+- Bot-side structured RCON actions should use the shared Rails-owned command catalog; they must not pass arbitrary text through to the Minecraft server.
