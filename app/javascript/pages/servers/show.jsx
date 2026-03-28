@@ -167,7 +167,7 @@ export default function ServersShow({ server }) {
     return () => {
       window.clearInterval(intervalId)
     }
-  }, [pollServer, transitionState])
+  }, [transitionState, server.id])
 
   const loadWhitelist = useEffectEvent(async () => {
     if (!canManageWhitelist) {
@@ -214,7 +214,7 @@ export default function ServersShow({ server }) {
 
   useEffect(() => {
     loadWhitelist()
-  }, [loadWhitelist, canManageWhitelist, server.id])
+  }, [canManageWhitelist, server.id])
 
   async function mutateWhitelist(url, { method = 'POST', body } = {}) {
     setWhitelistMutationLoading(true)
