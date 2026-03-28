@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core'
+import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, SimpleGrid, Stack, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
 import { Head, Link, router } from '@inertiajs/react'
 import {
   IconAlertCircle,
@@ -9,9 +9,10 @@ import {
   IconSparkles,
   IconTrash,
   IconUsers,
+  IconUserPlus,
   IconWorldWww,
 } from '@tabler/icons-react'
-import { useEffect, useEffectEvent, useRef } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 
 const STATUS_COLORS = {
   provisioning: 'violet',
@@ -118,9 +119,20 @@ function DetailLine({ label, value }) {
   )
 }
 
+function csrfToken() {
+  return document.querySelector('meta[name="csrf-token"]')?.content
+}
+
 export default function ServersShow({ server }) {
   const reloadInFlight = useRef(false)
+  const [ whitelistEntries, setWhitelistEntries ] = useState([])
+  const [ whitelistLoading, setWhitelistLoading ] = useState(false)
+  const [ whitelistError, setWhitelistError ] = useState(null)
+  const [ whitelistMutationLoading, setWhitelistMutationLoading ] = useState(false)
+  const [ playerName, setPlayerName ] = useState('')
   const transitionState = isTransitioning(server.status)
+  const canManageWhitelist = server.can_manage_whitelist
+  const whitelistAvailable = canManageWhitelist && server.runtime.container_state === 'running'
   const routeIssueMessage = server.route_issue_message || (server.route.last_apply_status === 'failed' ? '公開設定の反映に失敗しています。' : null)
   const pollServer = useEffectEvent(() => {
     if (reloadInFlight.current) return
@@ -154,6 +166,76 @@ export default function ServersShow({ server }) {
       window.clearInterval(intervalId)
     }
   }, [pollServer, transitionState])
+
+  const loadWhitelist = useEffectEvent(async () => {
+    if (!canManageWhitelist || !whitelistAvailable) {
+      setWhitelistEntries([])
+      setWhitelistError(null)
+      return
+    }
+
+    setWhitelistLoading(true)
+    setWhitelistError(null)
+
+    try {
+      const response = await fetch(`/servers/${server.id}/whitelist.json`, {
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+        },
+      })
+      const body = await response.json()
+
+      if (!response.ok) {
+        throw new Error(body.error || 'ホワイトリストを取得できませんでした。')
+      }
+
+      setWhitelistEntries(body.whitelist.entries || [])
+    } catch (error) {
+      setWhitelistError(error.message)
+    } finally {
+      setWhitelistLoading(false)
+    }
+  })
+
+  useEffect(() => {
+    setPlayerName('')
+    setWhitelistEntries([])
+    setWhitelistError(null)
+  }, [server.id])
+
+  useEffect(() => {
+    loadWhitelist()
+  }, [loadWhitelist, canManageWhitelist, whitelistAvailable, server.id])
+
+  async function mutateWhitelist(url, { method = 'POST', body } = {}) {
+    setWhitelistMutationLoading(true)
+    setWhitelistError(null)
+
+    try {
+      const response = await fetch(url, {
+        method,
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken(),
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      })
+      const payload = await response.json()
+
+      if (!response.ok) {
+        throw new Error(payload.error || 'ホワイトリスト操作に失敗しました。')
+      }
+
+      setWhitelistEntries(payload.whitelist.entries || [])
+    } catch (error) {
+      setWhitelistError(error.message)
+    } finally {
+      setWhitelistMutationLoading(false)
+    }
+  }
 
   return (
     <>
@@ -321,6 +403,109 @@ export default function ServersShow({ server }) {
             </Paper>
           </Grid.Col>
         </Grid>
+
+        {canManageWhitelist ? (
+          <Paper p="lg" radius="lg" shadow="sm" withBorder>
+            <Stack gap="md">
+              <Group justify="space-between" align="center">
+                <Text fw={700}>ホワイトリスト</Text>
+                {whitelistLoading ? <Loader size="sm" /> : null}
+              </Group>
+              <Divider />
+
+              {!whitelistAvailable ? (
+                <Alert color="blue" radius="lg" title="起動中のみ操作できます" variant="light">
+                  サーバーを起動すると、ホワイトリストの確認と変更ができます。
+                </Alert>
+              ) : (
+                <>
+                  {whitelistError ? (
+                    <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="ホワイトリスト操作に失敗しました" variant="light">
+                      {whitelistError}
+                    </Alert>
+                  ) : null}
+
+                  <Group gap="xs">
+                    <Button
+                      onClick={() => mutateWhitelist(`/servers/${server.id}/enable_whitelist`)}
+                      size="xs"
+                      type="button"
+                      variant="light"
+                      disabled={whitelistMutationLoading}
+                    >
+                      有効化
+                    </Button>
+                    <Button
+                      onClick={() => mutateWhitelist(`/servers/${server.id}/disable_whitelist`)}
+                      size="xs"
+                      type="button"
+                      variant="light"
+                      disabled={whitelistMutationLoading}
+                    >
+                      無効化
+                    </Button>
+                    <Button
+                      leftSection={<IconRefresh size={14} />}
+                      onClick={() => mutateWhitelist(`/servers/${server.id}/reload_whitelist`)}
+                      size="xs"
+                      type="button"
+                      variant="default"
+                      disabled={whitelistMutationLoading}
+                    >
+                      再読込
+                    </Button>
+                  </Group>
+
+                  <Group align="flex-end" grow>
+                    <TextInput
+                      label="プレイヤー名"
+                      value={playerName}
+                      onChange={(event) => setPlayerName(event.currentTarget.value)}
+                      placeholder="Steve"
+                    />
+                    <Button
+                      leftSection={<IconUserPlus size={16} />}
+                      onClick={() => {
+                        mutateWhitelist(`/servers/${server.id}/add_whitelist_player`, {
+                          body: { player_name: playerName },
+                        })
+                        setPlayerName('')
+                      }}
+                      type="button"
+                      disabled={whitelistMutationLoading || playerName.trim().length === 0}
+                    >
+                      追加
+                    </Button>
+                  </Group>
+
+                  <Stack gap="xs">
+                    <Text c="dimmed" size="sm">現在の許可プレイヤー</Text>
+                    {whitelistEntries.length === 0 ? (
+                      <Text size="sm">まだ登録はありません。</Text>
+                    ) : (
+                      <Group gap="xs">
+                        {whitelistEntries.map((entry) => (
+                          <Badge
+                            key={entry}
+                            color="blue"
+                            onClick={() => mutateWhitelist(`/servers/${server.id}/remove_whitelist_player`, {
+                              method: 'DELETE',
+                              body: { player_name: entry },
+                            })}
+                            style={{ cursor: whitelistMutationLoading ? 'default' : 'pointer' }}
+                            variant="light"
+                          >
+                            {entry} ×
+                          </Badge>
+                        ))}
+                      </Group>
+                    )}
+                  </Stack>
+                </>
+              )}
+            </Stack>
+          </Paper>
+        ) : null}
       </Stack>
     </>
   )

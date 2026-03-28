@@ -114,6 +114,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "runtime unavailable", server.fetch("last_error_message")
     assert_equal users(:one).discord_global_name, server.fetch("owner_display_name")
     assert_kind_of Integer, server.fetch("uptime_seconds")
+    assert_equal false, server.fetch("can_manage_whitelist")
     assert_equal true, server.fetch("can_stop")
     assert_equal true, server.fetch("can_restart")
     assert_equal true, server.fetch("can_sync")
@@ -135,6 +136,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal false, payload.fetch("can_stop")
     assert_equal false, payload.fetch("can_restart")
     assert_equal true, payload.fetch("can_sync")
+    assert_equal false, payload.fetch("can_manage_whitelist")
     assert_nil payload.fetch("uptime_seconds")
   end
 

@@ -326,6 +326,7 @@ class ServersController < InertiaController
         route_issue_message: route_issue_message,
         can_repair_publication: policy(server).repair_publication?,
         can_manage_members: policy(server).manage_members?,
+        can_manage_whitelist: policy(server).manage_whitelist?,
         can_destroy: policy(server).destroy?,
         can_start: visible_actions[:start],
         can_stop: visible_actions[:stop],
