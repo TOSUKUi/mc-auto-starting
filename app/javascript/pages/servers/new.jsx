@@ -94,9 +94,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   <Text c="stone.5" fw={700} size="sm" tt="uppercase">作成</Text>
                 </Group>
                 <Title order={1}>新しいサーバーを作成</Title>
-                <Text c="stone.3" maw={640}>
-                  サーバー名、ホスト名、バージョンを決めて作成します。
-                </Text>
+                <Text c="stone.3" maw={640}>サーバー名、ホスト名、バージョンを設定します。</Text>
               </Stack>
 
               <Button
@@ -120,7 +118,6 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
 
                   <TextInput
                     error={fieldError('name')}
-                    description="一覧と詳細で表示する名前です。"
                     label="サーバー名"
                     onChange={(event) => form.setData('name', event.currentTarget.value)}
                     placeholder="みんなのサバイバル"
@@ -163,7 +160,6 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   />
                   <Select
                     data={minecraftVersionOptions}
-                    description="起動する Minecraft バージョンです。"
                     error={fieldError('minecraft_version')}
                     label="Minecraft バージョン"
                     onChange={(value) => form.setData('minecraft_version', value || '')}
@@ -291,20 +287,20 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   </Stack>
 
                   <Divider label="作成内容の確認" labelPosition="center" />
-                  <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
-                    {resourceHints.map((item) => (
-                      <Paper key={item.label} p="md" radius="lg" withBorder>
-                        <Stack gap={2}>
+                  <Paper p="md" radius="lg" withBorder>
+                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                      {resourceHints.map((item) => (
+                        <Stack key={item.label} gap={2}>
                           <Text c="dimmed" fw={700} size="xs" tt="uppercase">
                             {item.label}
                           </Text>
-                          <Text fw={800} size="lg" style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
                             {item.value}
                           </Text>
                         </Stack>
-                      </Paper>
-                    ))}
-                  </SimpleGrid>
+                      ))}
+                    </SimpleGrid>
+                  </Paper>
 
                   <Group justify="flex-end">
                     <Button
