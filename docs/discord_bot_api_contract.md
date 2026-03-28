@@ -55,6 +55,13 @@ Rails behavior:
 - Reject unknown acting Discord users with `403`
 - Reject authorized bot identity but unauthorized acting user with `403`
 
+## Network Boundary Contract
+
+- `/api/discord/bot/*` is an internal-only surface and must not be exposed as part of the public web ingress.
+- Initial deployment policy allows bot API access only from the Docker private network.
+- `bot_token` remains required even on the private network; network isolation and bot credential validation are both mandatory.
+- If the bot runner moves outside the private Docker network in the future, the allowed network policy must be explicitly revised in docs and config before rollout.
+
 ## Authorization Contract
 
 The effective policy model is identical to the web surface.
