@@ -225,6 +225,8 @@ Bounded RCON intentionally rejects lifecycle-style commands such as `stop`, `sta
 
 The detailed request/response contract lives in [docs/discord_bot_api_contract.md](discord_bot_api_contract.md).
 
+Operator-facing Discord login, invite, and bot relay setup now lives in [docs/discord_operator_runbook.md](discord_operator_runbook.md).
+
 ### Preferred control path
 
 Use the web UI for normal server lifecycle operations:

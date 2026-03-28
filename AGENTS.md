@@ -13,6 +13,7 @@ Current important files:
 - `compose.yaml`
 - `docs/single_host_setup.md`
 - `docs/operator_runbook.md`
+- `docs/discord_operator_runbook.md`
 - `docs/release_runbook.md`
 - `docs/kamal_deployment_topology.md`
 - `config/deploy.yml`
@@ -89,6 +90,7 @@ Current baseline:
 - `T-1006` is complete: Rails now has an app-owned RCON connection layer, managed containers enable RCON by default, and per-server RCON passwords are derived from a stable secret plus server identity instead of being stored as plain DB fields.
 - `T-1007` is complete: Rails now has an internal-only `/api/discord/bot/*` surface gated to the Docker private network plus a dedicated bot bearer token, and the current implementation covers acting-user resolution, policy-checked status/lifecycle/whitelist endpoints, and owner/admin-only bounded RCON commands.
 - `T-1008` is complete: automated coverage now exercises Discord OAuth login, invite redemption/rejection, bot network/token/user rejection, and the main bot status/lifecycle/whitelist/bounded-RCON flows.
+- `T-1009` is complete: the repository now includes `docs/discord_operator_runbook.md`, which gives operators one place to configure Discord OAuth, issue invite URLs, and run the internal bot relay safely.
 - Managed runtime env now also defaults `ENABLE_WHITELIST=TRUE`, so newly provisioned servers enforce whitelist mode from first boot.
 - `T-1021` is complete: Rails now has a bounded whitelist service over RCON for list/add/remove/on/off/reload operations against running managed servers, explicitly loads `rconrb`, and authenticates with the Minecraft-compatible `ignore_first_packet` handling.
 - `T-1022` is complete: whitelist endpoints are now controller/policy-gated to admins and owners, and request/service coverage includes unauthorized access plus stopped-server and RCON-failure handling.
@@ -264,4 +266,4 @@ If no other instruction is given, start from the current critical path:
 1. `T-200` through `T-400` are complete
 2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, `T-804`, and `T-805` are complete while keeping `mc-router`
 3. `T-900`, `T-901`, `T-903`, `T-904`, and `T-905` are complete
-4. Next, continue from `T-1009` on the Discord bot/RCON track, then proceed to the operator-facing player-count/browser-console tasks
+4. Next, continue from `T-1010` on the operator-facing player-count/browser-console track
