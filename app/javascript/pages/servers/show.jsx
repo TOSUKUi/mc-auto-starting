@@ -123,6 +123,16 @@ function csrfToken() {
   return document.querySelector('meta[name="csrf-token"]')?.content
 }
 
+async function readJsonResponse(response, fallbackMessage) {
+  const contentType = response.headers.get('content-type') || ''
+
+  if (!contentType.includes('application/json')) {
+    throw new Error(fallbackMessage)
+  }
+
+  return response.json()
+}
+
 export default function ServersShow({ server }) {
   const reloadInFlight = useRef(false)
   const [ whitelistEntries, setWhitelistEntries ] = useState([])
@@ -175,7 +185,7 @@ export default function ServersShow({ server }) {
       setWhitelistEnabled(true)
       setWhitelistStagedOnly(false)
       setWhitelistError(null)
-      return
+      return false
     }
 
     setWhitelistLoading(true)
@@ -188,7 +198,7 @@ export default function ServersShow({ server }) {
           Accept: 'application/json',
         },
       })
-      const body = await response.json()
+      const body = await readJsonResponse(response, 'ホワイトリスト状態の取得に失敗しました。時間をおいて再読込してください。')
 
       if (!response.ok) {
         throw new Error(body.error || 'ホワイトリストを取得できませんでした。')
@@ -197,8 +207,10 @@ export default function ServersShow({ server }) {
       setWhitelistEntries(body.whitelist.entries || [])
       setWhitelistEnabled(body.whitelist.enabled !== false)
       setWhitelistStagedOnly(body.whitelist.staged_only === true)
+      return true
     } catch (error) {
       setWhitelistError(error.message)
+      return false
     } finally {
       setWhitelistLoading(false)
     }
@@ -219,6 +231,7 @@ export default function ServersShow({ server }) {
   async function mutateWhitelist(url, { method = 'POST', body } = {}) {
     setWhitelistMutationLoading(true)
     setWhitelistError(null)
+    let fallbackError = null
 
     try {
       const response = await fetch(url, {
@@ -231,18 +244,18 @@ export default function ServersShow({ server }) {
         },
         body: body ? JSON.stringify(body) : undefined,
       })
-      const payload = await response.json()
+      const payload = await readJsonResponse(response, 'ホワイトリスト操作の応答が不正です。状態を再確認します。')
 
       if (!response.ok) {
         throw new Error(payload.error || 'ホワイトリスト操作に失敗しました。')
       }
-
-      setWhitelistEntries(payload.whitelist.entries || [])
-      setWhitelistEnabled(payload.whitelist.enabled !== false)
-      setWhitelistStagedOnly(payload.whitelist.staged_only === true)
     } catch (error) {
-      setWhitelistError(error.message)
+      fallbackError = error
     } finally {
+      const refreshed = await loadWhitelist()
+      if (!refreshed && fallbackError) {
+        setWhitelistError(fallbackError.message)
+      }
       setWhitelistMutationLoading(false)
     }
   }
