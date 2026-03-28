@@ -61,6 +61,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
     { label: '接続先', value: preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434' },
   ]
   const projectedMemoryTotal = (create_quota?.used_mb || 0) + form.data.memory_mb
+  const fieldError = (name) => form.errors[name] || validation_errors[name]
 
   const submit = (event) => {
     event?.preventDefault()
@@ -74,13 +75,6 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
 
     form.setData('minecraft_version', minecraftVersionOptions[0].value)
   }, [form, minecraftVersionOptions, form.data.minecraft_version])
-
-  useEffect(() => {
-    form.clearErrors()
-    if (Object.keys(validation_errors || {}).length > 0) {
-      form.setError(validation_errors)
-    }
-  }, [form, validation_errors])
 
   return (
     <>
@@ -129,7 +123,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   <Title order={3}>基本情報</Title>
 
                   <TextInput
-                    error={form.errors.name}
+                    error={fieldError('name')}
                     description="一覧と詳細で表示する名前です。"
                     label="サーバー名"
                     onChange={(event) => form.setData('name', event.currentTarget.value)}
@@ -143,7 +137,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                         ? `使用するホスト名: ${normalizedHostname || '-'}`
                         : '半角英小文字・数字・ハイフンのみ使えます。'
                     }
-                    error={form.errors.hostname}
+                    error={fieldError('hostname')}
                     inputMode="url"
                     label="ホスト名"
                     maxLength={63}
@@ -156,7 +150,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   <Select
                     data={runtime_family_options}
                     description={runtimeFamilyDescription(form.data.runtime_family)}
-                    error={form.errors.runtime_family}
+                    error={fieldError('runtime_family')}
                     label="サーバーソフト"
                     onChange={(value) => form.setData('runtime_family', value || '')}
                     required
@@ -165,7 +159,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   <Select
                     data={minecraftVersionOptions}
                     description="起動する Minecraft バージョンです。"
-                    error={form.errors.minecraft_version}
+                    error={fieldError('minecraft_version')}
                     label="Minecraft バージョン"
                     onChange={(value) => form.setData('minecraft_version', value || '')}
                     required
@@ -176,7 +170,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                     <Grid.Col span={{ base: 12 }}>
                       <NumberInput
                         allowDecimal={false}
-                        error={form.errors.memory_mb}
+                        error={fieldError('memory_mb')}
                         hideControls
                         label="メモリ (MB)"
                         max={MAX_MEMORY_MB}
