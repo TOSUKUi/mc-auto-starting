@@ -640,79 +640,92 @@ export default function ServersShow({ server }) {
                   {startupSettingsLoading ? <Loader size="sm" /> : null}
                 </Group>
                 <Divider />
-                <Grid gutter="md">
-                  <Grid.Col span={{ base: 12, md: 6 }}>
-                    <Select
-                      data={[
-                        { value: 'easy', label: 'Easy' },
-                        { value: 'normal', label: 'Normal' },
-                        { value: 'hard', label: 'Hard' },
-                        { value: 'peaceful', label: 'Peaceful' },
-                      ]}
-                      disabled={!canManageStartupSettings}
-                      label="難易度"
-                      onChange={(value) => setStartupSettings((current) => ({ ...current, difficulty: value || '' }))}
-                      value={startupSettings.difficulty}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={{ base: 12, md: 6 }}>
-                    <Select
-                      data={[
-                        { value: 'survival', label: 'Survival' },
-                        { value: 'creative', label: 'Creative' },
-                        { value: 'adventure', label: 'Adventure' },
-                        { value: 'spectator', label: 'Spectator' },
-                      ]}
-                      disabled={!canManageStartupSettings}
-                      label="ゲームモード"
-                      onChange={(value) => setStartupSettings((current) => ({ ...current, gamemode: value || '' }))}
-                      value={startupSettings.gamemode}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={{ base: 12, md: 6 }}>
-                    <NumberInput
-                      allowDecimal={false}
-                      disabled={!canManageStartupSettings}
-                      hideControls
-                      label="最大プレイヤー数"
-                      max={100}
-                      min={1}
-                      onChange={(value) => setStartupSettings((current) => ({ ...current, max_players: Math.max(1, Math.min(100, Number(value) || 1)) }))}
-                      value={startupSettings.max_players}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={{ base: 12, md: 6 }}>
-                    <Select
-                      data={[
-                        { value: 'true', label: '有効' },
-                        { value: 'false', label: '無効' },
-                      ]}
-                      disabled={!canManageStartupSettings}
-                      label="PvP"
-                      onChange={(value) => setStartupSettings((current) => ({ ...current, pvp: value === 'true' }))}
-                      value={toSelectBoolean(startupSettings.pvp)}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={12}>
-                    <TextInput
-                      disabled={!canManageStartupSettings}
-                      label="MOTD"
-                      onChange={(event) => setStartupSettings((current) => ({ ...current, motd: event.currentTarget.value }))}
-                      value={startupSettings.motd}
-                    />
-                  </Grid.Col>
-                  <Grid.Col span={12}>
-                    <Switch
-                      checked={!!startupSettings.hardcore}
-                      disabled={!canManageStartupSettings}
-                      label="ハードコア"
-                      onChange={(event) => {
-                        const checked = event.currentTarget.checked
-                        setStartupSettings((current) => ({ ...current, hardcore: checked }))
-                      }}
-                    />
-                  </Grid.Col>
-                </Grid>
+                <Alert color="gray" radius="lg" title="いま反映できる設定" variant="light">
+                  現在の baseline では、ここで扱う起動設定はまだリアルタイム反映しません。保存後、次回の起動または再起動で反映します。
+                </Alert>
+                <Paper p="md" radius="lg" withBorder>
+                  <Stack gap="sm">
+                    <Stack gap={2}>
+                      <Text fw={700}>再起動で反映する設定</Text>
+                      <Text c="dimmed" size="sm">
+                        保存した内容が次回の起動または再起動で server.properties 系へ反映されます。
+                      </Text>
+                    </Stack>
+                    <Grid gutter="md">
+                      <Grid.Col span={{ base: 12, md: 6 }}>
+                        <Select
+                          data={[
+                            { value: 'easy', label: 'Easy' },
+                            { value: 'normal', label: 'Normal' },
+                            { value: 'hard', label: 'Hard' },
+                            { value: 'peaceful', label: 'Peaceful' },
+                          ]}
+                          disabled={!canManageStartupSettings}
+                          label="難易度"
+                          onChange={(value) => setStartupSettings((current) => ({ ...current, difficulty: value || '' }))}
+                          value={startupSettings.difficulty}
+                        />
+                      </Grid.Col>
+                      <Grid.Col span={{ base: 12, md: 6 }}>
+                        <Select
+                          data={[
+                            { value: 'survival', label: 'Survival' },
+                            { value: 'creative', label: 'Creative' },
+                            { value: 'adventure', label: 'Adventure' },
+                            { value: 'spectator', label: 'Spectator' },
+                          ]}
+                          disabled={!canManageStartupSettings}
+                          label="ゲームモード"
+                          onChange={(value) => setStartupSettings((current) => ({ ...current, gamemode: value || '' }))}
+                          value={startupSettings.gamemode}
+                        />
+                      </Grid.Col>
+                      <Grid.Col span={{ base: 12, md: 6 }}>
+                        <NumberInput
+                          allowDecimal={false}
+                          disabled={!canManageStartupSettings}
+                          hideControls
+                          label="最大プレイヤー数"
+                          max={100}
+                          min={1}
+                          onChange={(value) => setStartupSettings((current) => ({ ...current, max_players: Math.max(1, Math.min(100, Number(value) || 1)) }))}
+                          value={startupSettings.max_players}
+                        />
+                      </Grid.Col>
+                      <Grid.Col span={{ base: 12, md: 6 }}>
+                        <Select
+                          data={[
+                            { value: 'true', label: '有効' },
+                            { value: 'false', label: '無効' },
+                          ]}
+                          disabled={!canManageStartupSettings}
+                          label="PvP"
+                          onChange={(value) => setStartupSettings((current) => ({ ...current, pvp: value === 'true' }))}
+                          value={toSelectBoolean(startupSettings.pvp)}
+                        />
+                      </Grid.Col>
+                      <Grid.Col span={12}>
+                        <TextInput
+                          disabled={!canManageStartupSettings}
+                          label="MOTD"
+                          onChange={(event) => setStartupSettings((current) => ({ ...current, motd: event.currentTarget.value }))}
+                          value={startupSettings.motd}
+                        />
+                      </Grid.Col>
+                      <Grid.Col span={12}>
+                        <Switch
+                          checked={!!startupSettings.hardcore}
+                          disabled={!canManageStartupSettings}
+                          label="ハードコア"
+                          onChange={(event) => {
+                            const checked = event.currentTarget.checked
+                            setStartupSettings((current) => ({ ...current, hardcore: checked }))
+                          }}
+                        />
+                      </Grid.Col>
+                    </Grid>
+                  </Stack>
+                </Paper>
                 {startupSettingsError ? (
                   <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="起動設定を保存できませんでした" variant="light">
                     {startupSettingsError}

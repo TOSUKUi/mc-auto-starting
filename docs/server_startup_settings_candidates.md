@@ -122,6 +122,8 @@ bot でも扱える前提にする候補:
   - `gamemode`
   - 将来追加する列挙型 setting
 - `max_players` や `motd` のような自由入力値だけを text / number input に残す
+- detail では「リアルタイム反映できる設定」と「再起動で反映する設定」を分けて見せる
+- 初期 baseline では startup settings 全体が再起動反映なので、detail の editable surface は再起動反映セクションに寄せる
 
 ## Surface Contract Direction
 

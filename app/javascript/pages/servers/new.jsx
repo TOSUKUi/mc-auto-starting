@@ -171,104 +171,138 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                     value={form.data.minecraft_version}
                   />
                   <Divider label="起動設定" labelPosition="center" />
-                  <Grid gutter="md">
-                    <Grid.Col span={{ base: 12 }}>
-                      <NumberInput
-                        allowDecimal={false}
-                        error={fieldError('memory_mb')}
-                        hideControls
-                        label="メモリ (MB)"
-                        max={MAX_MEMORY_MB}
-                        min={MIN_MEMORY_MB}
-                        onChange={(value) => form.setData('memory_mb', clampMemory(Number(value)))}
-                        required
-                        step={512}
-                        thousandSeparator=","
-                        value={form.data.memory_mb}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Select
-                        data={[
-                          { value: 'easy', label: 'Easy' },
-                          { value: 'normal', label: 'Normal' },
-                          { value: 'hard', label: 'Hard' },
-                          { value: 'peaceful', label: 'Peaceful' },
-                        ]}
-                        description="モンスターや飢餓の強さを決めます。"
-                        error={fieldError('difficulty')}
-                        label="難易度"
-                        onChange={(value) => form.setData('difficulty', value || '')}
-                        required
-                        value={form.data.difficulty}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Select
-                        data={[
-                          { value: 'survival', label: 'Survival' },
-                          { value: 'creative', label: 'Creative' },
-                          { value: 'adventure', label: 'Adventure' },
-                          { value: 'spectator', label: 'Spectator' },
-                        ]}
-                        description="新規参加時の標準ゲームモードです。"
-                        error={fieldError('gamemode')}
-                        label="ゲームモード"
-                        onChange={(value) => form.setData('gamemode', value || '')}
-                        required
-                        value={form.data.gamemode}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <NumberInput
-                        allowDecimal={false}
-                        error={fieldError('max_players')}
-                        hideControls
-                        label="最大プレイヤー数"
-                        max={100}
-                        min={1}
-                        onChange={(value) => form.setData('max_players', Math.max(1, Math.min(100, Number(value) || 1)))}
-                        required
-                        value={form.data.max_players}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <TextInput
-                        description="サーバー一覧で見える紹介文です。"
-                        error={fieldError('motd')}
-                        label="MOTD"
-                        onChange={(event) => form.setData('motd', event.currentTarget.value)}
-                        placeholder="みんなのサバイバルへようこそ"
-                        value={form.data.motd}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Select
-                        data={[
-                          { value: 'true', label: '有効' },
-                          { value: 'false', label: '無効' },
-                        ]}
-                        description="プレイヤー同士の攻撃を許可するかどうかです。"
-                        error={fieldError('pvp')}
-                        label="PvP"
-                        onChange={(value) => form.setData('pvp', value === 'true')}
-                        required
-                        value={toSelectBoolean(form.data.pvp)}
-                      />
-                    </Grid.Col>
-                    <Grid.Col span={{ base: 12, sm: 6 }}>
-                      <Switch
-                        checked={!!form.data.hardcore}
-                        description="有効にすると死亡時に観戦者モードになります。"
-                        error={fieldError('hardcore')}
-                        label="ハードコア"
-                        onChange={(event) => {
-                          const checked = event.currentTarget.checked
-                          form.setData('hardcore', checked)
-                        }}
-                      />
-                    </Grid.Col>
-                  </Grid>
+                  <Stack gap="md">
+                    <Paper p="md" radius="lg" withBorder>
+                      <Stack gap="sm">
+                        <Stack gap={2}>
+                          <Text fw={700}>リソースと参加条件</Text>
+                          <Text c="dimmed" size="sm">
+                            まずはメモリと参加人数を決めます。
+                          </Text>
+                        </Stack>
+                        <Grid gutter="md">
+                          <Grid.Col span={{ base: 12, sm: 6 }}>
+                            <NumberInput
+                              allowDecimal={false}
+                              error={fieldError('memory_mb')}
+                              hideControls
+                              label="メモリ (MB)"
+                              max={MAX_MEMORY_MB}
+                              min={MIN_MEMORY_MB}
+                              onChange={(value) => form.setData('memory_mb', clampMemory(Number(value)))}
+                              required
+                              step={512}
+                              thousandSeparator=","
+                              value={form.data.memory_mb}
+                            />
+                          </Grid.Col>
+                          <Grid.Col span={{ base: 12, sm: 6 }}>
+                            <NumberInput
+                              allowDecimal={false}
+                              error={fieldError('max_players')}
+                              hideControls
+                              label="最大プレイヤー数"
+                              max={100}
+                              min={1}
+                              onChange={(value) => form.setData('max_players', Math.max(1, Math.min(100, Number(value) || 1)))}
+                              required
+                              value={form.data.max_players}
+                            />
+                          </Grid.Col>
+                        </Grid>
+                      </Stack>
+                    </Paper>
+
+                    <Paper p="md" radius="lg" withBorder>
+                      <Stack gap="sm">
+                        <Stack gap={2}>
+                          <Text fw={700}>ワールド設定</Text>
+                          <Text c="dimmed" size="sm">
+                            難易度やゲームモードなど、プレイ感に関わる設定です。
+                          </Text>
+                        </Stack>
+                        <Grid gutter="md">
+                          <Grid.Col span={{ base: 12, sm: 6 }}>
+                            <Select
+                              data={[
+                                { value: 'easy', label: 'Easy' },
+                                { value: 'normal', label: 'Normal' },
+                                { value: 'hard', label: 'Hard' },
+                                { value: 'peaceful', label: 'Peaceful' },
+                              ]}
+                              description="モンスターや飢餓の強さを決めます。"
+                              error={fieldError('difficulty')}
+                              label="難易度"
+                              onChange={(value) => form.setData('difficulty', value || '')}
+                              required
+                              value={form.data.difficulty}
+                            />
+                          </Grid.Col>
+                          <Grid.Col span={{ base: 12, sm: 6 }}>
+                            <Select
+                              data={[
+                                { value: 'survival', label: 'Survival' },
+                                { value: 'creative', label: 'Creative' },
+                                { value: 'adventure', label: 'Adventure' },
+                                { value: 'spectator', label: 'Spectator' },
+                              ]}
+                              description="新規参加時の標準ゲームモードです。"
+                              error={fieldError('gamemode')}
+                              label="ゲームモード"
+                              onChange={(value) => form.setData('gamemode', value || '')}
+                              required
+                              value={form.data.gamemode}
+                            />
+                          </Grid.Col>
+                          <Grid.Col span={{ base: 12, sm: 6 }}>
+                            <Select
+                              data={[
+                                { value: 'true', label: '有効' },
+                                { value: 'false', label: '無効' },
+                              ]}
+                              description="プレイヤー同士の攻撃を許可するかどうかです。"
+                              error={fieldError('pvp')}
+                              label="PvP"
+                              onChange={(value) => form.setData('pvp', value === 'true')}
+                              required
+                              value={toSelectBoolean(form.data.pvp)}
+                            />
+                          </Grid.Col>
+                          <Grid.Col span={{ base: 12, sm: 6 }}>
+                            <Switch
+                              checked={!!form.data.hardcore}
+                              description="有効にすると死亡時に観戦者モードになります。"
+                              error={fieldError('hardcore')}
+                              label="ハードコア"
+                              onChange={(event) => {
+                                const checked = event.currentTarget.checked
+                                form.setData('hardcore', checked)
+                              }}
+                            />
+                          </Grid.Col>
+                        </Grid>
+                      </Stack>
+                    </Paper>
+
+                    <Paper p="md" radius="lg" withBorder>
+                      <Stack gap="sm">
+                        <Stack gap={2}>
+                          <Text fw={700}>サーバー表示</Text>
+                          <Text c="dimmed" size="sm">
+                            サーバー一覧などで見える紹介文です。
+                          </Text>
+                        </Stack>
+                        <TextInput
+                          description="空欄でも作成できます。"
+                          error={fieldError('motd')}
+                          label="MOTD"
+                          onChange={(event) => form.setData('motd', event.currentTarget.value)}
+                          placeholder="みんなのサバイバルへようこそ"
+                          value={form.data.motd}
+                        />
+                      </Stack>
+                    </Paper>
+                  </Stack>
 
                   <Divider label="作成内容の確認" labelPosition="center" />
                   <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
