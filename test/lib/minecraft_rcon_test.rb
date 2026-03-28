@@ -4,6 +4,8 @@ class MinecraftRconTest < ActiveSupport::TestCase
   AuthenticationFailure = Class.new(StandardError)
 
   test "rcon client constant is available" do
+    require "rcon"
+
     assert defined?(::Rcon::Client)
   end
 

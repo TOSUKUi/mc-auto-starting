@@ -190,7 +190,7 @@ class ServersController < InertiaController
     whitelist_manager_for(server).enable! if whitelist_live_mutation?(server)
     respond_with_whitelist_action(server, notice: "ホワイトリストを有効化しました。")
   rescue MinecraftRcon::Error => error
-    respond_with_whitelist_error(server, error)
+    respond_with_whitelist_error(server, error, desired_state_saved: true)
   end
 
   def disable_whitelist
@@ -201,7 +201,7 @@ class ServersController < InertiaController
     whitelist_manager_for(server).disable! if whitelist_live_mutation?(server)
     respond_with_whitelist_action(server, notice: "ホワイトリストを無効化しました。")
   rescue MinecraftRcon::Error => error
-    respond_with_whitelist_error(server, error)
+    respond_with_whitelist_error(server, error, desired_state_saved: true)
   end
 
   def reload_whitelist
@@ -225,7 +225,7 @@ class ServersController < InertiaController
   rescue ActiveRecord::RecordInvalid => error
     respond_with_whitelist_error(server, MinecraftRcon::CommandError.new(error.record.errors.full_messages.to_sentence))
   rescue MinecraftRcon::Error => error
-    respond_with_whitelist_error(server, error)
+    respond_with_whitelist_error(server, error, desired_state_saved: true)
   end
 
   def remove_whitelist_player
@@ -239,7 +239,7 @@ class ServersController < InertiaController
   rescue ActiveRecord::RecordInvalid => error
     respond_with_whitelist_error(server, MinecraftRcon::CommandError.new(error.record.errors.full_messages.to_sentence))
   rescue MinecraftRcon::Error => error
-    respond_with_whitelist_error(server, error)
+    respond_with_whitelist_error(server, error, desired_state_saved: true)
   end
 
   private
@@ -459,14 +459,20 @@ class ServersController < InertiaController
       end
     end
 
-    def respond_with_whitelist_error(server, error)
+    def respond_with_whitelist_error(server, error, desired_state_saved: false)
+      message = if desired_state_saved
+        "ホワイトリスト設定は保存しましたが、実行中サーバーへの即時反映に失敗しました。次回起動時には保存済み設定が反映されます。原因: #{error.message}"
+      else
+        error.message
+      end
+
       respond_to do |format|
         format.html do
-          redirect_to server_path(server), alert: "ホワイトリスト操作に失敗しました: #{error.message}"
+          redirect_to server_path(server), alert: "ホワイトリスト操作に失敗しました: #{message}"
         end
 
         format.json do
-          render json: { error: error.message }, status: :unprocessable_entity
+          render json: { error: message, desired_state_saved: desired_state_saved }, status: :unprocessable_entity
         end
       end
     end

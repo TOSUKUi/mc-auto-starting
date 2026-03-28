@@ -106,7 +106,8 @@ class ServerWhitelistsControllerTest < ActionDispatch::IntegrationTest
     delete remove_whitelist_player_server_url(minecraft_servers(:one), format: :json), params: { player_name: "bad name" }
 
     assert_response :unprocessable_entity
-    assert_equal "invalid player name", response.parsed_body.fetch("error")
+    assert_equal "ホワイトリスト設定は保存しましたが、実行中サーバーへの即時反映に失敗しました。次回起動時には保存済み設定が反映されます。原因: invalid player name", response.parsed_body.fetch("error")
+    assert_equal true, response.parsed_body.fetch("desired_state_saved")
     assert_equal [ [ :remove, "bad name" ] ], manager.calls
   end
 
