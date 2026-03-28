@@ -91,9 +91,7 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
               </Text>
             </Group>
             <Title order={1}>Discord 招待リンク</Title>
-            <Text c="stone.3" maw={720}>
-              参加を許可する Discord ユーザーを指定して、手動で 1 回使い切りの招待リンクを発行します。
-            </Text>
+            <Text c="stone.3" maw={720}>Discord ユーザーを指定して招待リンクを発行します。</Text>
           </Stack>
         </Paper>
 
@@ -102,9 +100,6 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
             <Stack gap="sm">
               <Text fw={700}>発行した招待リンク</Text>
               <Text style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{pending_invite_url}</Text>
-              <Text c="dimmed" size="sm">
-                raw token は保存しないため、この URL を後から同じ形で再表示することはできません。
-              </Text>
               <Group justify="flex-start">
                 <CopyButton value={pending_invite_url}>
                   {({ copied, copy }) => (
@@ -131,7 +126,6 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
               <Title order={3}>新しい招待を発行</Title>
 
               <TextInput
-                description="招待したい相手の Discord ユーザー ID をそのまま入力します。"
                 error={form.errors.discord_user_id}
                 label="Discord ユーザー ID"
                 onChange={(event) => form.setData('discord_user_id', event.currentTarget.value)}
@@ -159,7 +153,6 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
               />
 
               <TextInput
-                description="用途のメモが必要なときだけ使います。"
                 error={form.errors.note}
                 label="メモ"
                 onChange={(event) => form.setData('note', event.currentTarget.value)}
@@ -172,9 +165,6 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
                   招待リンクを発行
                 </Button>
               </Group>
-              <Text c="dimmed" size="sm">
-                発行後はその場でリンクをコピーしてください。あとから確認できるのは発行履歴と状態だけです。
-              </Text>
             </Stack>
           </form>
         </Paper>
@@ -183,9 +173,9 @@ export default function DiscordInvitationsIndex({ available_user_types, expirati
           <Stack gap="md">
             <Group justify="space-between">
               <Title order={3}>発行済みの招待</Title>
-              <Text c="dimmed" size="sm">
+              <Badge color="blue" variant="light">
                 {invitations.length} 件
-              </Text>
+              </Badge>
             </Group>
 
             {invitations.length === 0 ? (
