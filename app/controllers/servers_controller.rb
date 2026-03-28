@@ -217,14 +217,10 @@ class ServersController < InertiaController
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :rcon_command?
 
-    command = if params[:command_key].present?
-      Servers::StructuredRconCommand.new(
-        command_key: params[:command_key],
-        args: structured_rcon_args,
-      ).build
-    else
-      params.fetch(:command, "").to_s
-    end
+    command = Servers::StructuredRconCommand.new(
+      command_key: params[:command_key],
+      args: structured_rcon_args,
+    ).build
 
     response_body = Servers::BoundedRconCommand.new(server: server).execute(command: command)
 

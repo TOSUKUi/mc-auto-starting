@@ -99,6 +99,22 @@ class DiscordInvitationsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.parsed_body.fetch("errors").fetch("expires_at"), "Expires at must be selected"
   end
 
+  test "invalid discord user id format returns validation errors" do
+    sign_in_as(users(:one))
+
+    post discord_invitations_url(format: :json), params: {
+      discord_invitation: {
+        discord_user_id: "not-a-discord-id",
+        invited_user_type: "reader",
+        expires_in_days: "7 days",
+        note: "",
+      },
+    }
+
+    assert_response :unprocessable_entity
+    assert_includes response.parsed_body.fetch("errors").fetch("discord_user_id"), "Discord user must be a Discord user ID"
+  end
+
   test "issuer can revoke an active invitation" do
     sign_in_as(users(:one))
 

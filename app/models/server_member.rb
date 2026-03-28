@@ -5,7 +5,7 @@ class ServerMember < ApplicationRecord
   enum :role, {
     viewer: "viewer",
     manager: "manager",
-  }, prefix: true
+  }, prefix: true, validate: true
 
   validates :role, presence: true
   validates :user_id, uniqueness: { scope: :minecraft_server_id }

@@ -308,15 +308,16 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "easy", response.parsed_body.fetch("startup_settings").fetch("difficulty")
   end
 
-  test "owner can execute bounded rcon command" do
+  test "owner can execute structured save-all command" do
     sign_in_as(users(:one))
     stub_bounded_rcon("players online")
 
-    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command: "list" }
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command_key: "save_all" }
 
     assert_response :success
     assert_equal true, response.parsed_body.fetch("ok")
-    assert_equal "list", response.parsed_body.fetch("command")
+    assert_equal "save_all", response.parsed_body.fetch("command_key")
+    assert_equal "save-all", response.parsed_body.fetch("command")
     assert_equal "players online", response.parsed_body.fetch("response_body")
   end
 
@@ -362,23 +363,22 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "structured_rcon_invalid", response.parsed_body.fetch("error_code")
   end
 
-  test "viewer cannot execute bounded rcon command" do
+  test "viewer cannot execute structured rcon command" do
     sign_in_as(users(:two))
 
-    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command: "list" }
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command_key: "save_all" }
 
     assert_response :forbidden
   end
 
-  test "owner receives forbidden error for blocked rcon command" do
+  test "owner receives validation error for raw rcon command input" do
     sign_in_as(users(:one))
-    stub_bounded_rcon_error(Servers::BoundedRconCommand::ForbiddenCommandError.new("この RCON コマンドは許可されていません。"))
 
     post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command: "stop" }
 
     assert_response :unprocessable_entity
     assert_equal false, response.parsed_body.fetch("ok")
-    assert_equal "rcon_command_forbidden", response.parsed_body.fetch("error_code")
+    assert_equal "structured_rcon_invalid", response.parsed_body.fetch("error_code")
   end
 
   test "owner receives validation error for invalid structured rcon args" do
@@ -549,6 +549,26 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.parsed_body.fetch("errors").keys, "name"
     assert_includes response.parsed_body.fetch("errors").keys, "hostname"
     assert_includes response.parsed_body.fetch("errors").keys, "memory_mb"
+  end
+
+  test "create rejects unsupported minecraft version outside the server-side option catalog" do
+    sign_in_as(users(:one))
+
+    assert_no_difference("MinecraftServer.count") do
+      post servers_url(format: :json), params: {
+        minecraft_server: {
+          name: "Unsupported Version",
+          hostname: "unsupported-version",
+          runtime_family: "paper",
+          minecraft_version: "definitely-not-a-real-version",
+          memory_mb: 1024,
+          disk_mb: 20480,
+        },
+      }
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes response.parsed_body.fetch("errors").fetch("minecraft_version"), "Minecraft version は選択肢にない値です。"
   end
 
   test "owner can delete a server" do

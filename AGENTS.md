@@ -119,8 +119,8 @@ Current baseline:
 - `T-1110` also fixes the surface direction: startup settings should be shared across create, detail, and bot flows, and enum-like values such as `difficulty` / `gamemode` should use `Select` controls by default.
 - `T-1111` through `T-1113` are complete: startup settings now persist on `minecraft_servers`, flow into the managed runtime env contract, are captured during create, and are exposed as read-only initial values on detail and bot surfaces.
 - `T-1114` is complete: startup settings are now treated as create-time defaults only, detail and bot surfaces expose them as read-only initial settings, startup-settings update endpoints are removed, and mutable live operations flow through structured allowlisted RCON actions instead.
-- `T-1115` is queued after that: all active input paths need a server-side validation audit so any controller/model/service enforcement gaps are found and blocked with tests.
-- `T-1116` through `T-1119` are queued behind `T-1114`: mutable live-setting changes should not be persisted as Rails desired state, and the next RCON surface should move to a shared `command_key + args` catalog with schema-driven forms such as `gamemode(mode, player_name)` for both detail and bot flows.
+- `T-1115` is complete: active create/invite/member/browser-RCON input paths now have matching server-side rejection for unsupported version selection, invalid membership roles, invalid Discord user IDs, and raw browser RCON command fallback, with request/model/service coverage backing the visible validation.
+- `T-1116` through `T-1119` remain the follow-up track after `T-1115`: mutable live-setting changes should not be persisted as Rails desired state, and the next RCON surface should move to a shared `command_key + args` catalog with schema-driven forms such as `gamemode(mode, player_name)` for both detail and bot flows.
 - `T-1116` is complete: the shared structured RCON catalog now lives in `docs/structured_rcon_command_catalog.md`, fixing the initial `command_key + args` schema for browser and bot surfaces, including player-target commands such as `gamemode(gamemode, player_name)`.
 - `T-1117` is complete: Rails now converts structured `command_key + args` payloads into bounded RCON commands through `Servers::StructuredRconCommand`, validates required/optional arguments server-side, and the detail controller path can execute structured commands such as `difficulty`, `gamemode`, `weather`, `time_set`, `say`, `kick`, and `save_all`.
 - `T-1118` is complete: the server detail RCON surface now uses one command select plus schema-driven argument form instead of multiple action cards or a freeform console, while still returning the shared command/result payload from Rails.
@@ -241,7 +241,9 @@ Use these as the default command set.
 - `docker compose up --build`
 - `docker compose run --rm app bin/rails db:prepare`
 - `docker compose run --rm -p 3000:3000 -p 3036:3036 app bin/dev`
-- `docker compose run --rm app bin/rails test`
+- `docker compose run --rm app env PARALLEL_WORKERS=1 bin/rails test`
+
+- Test runs must set `PARALLEL_WORKERS=1`; do not rely on Rails' default parallel test worker count in this repository.
 
 - `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, `MINECRAFT_RUNTIME_IMAGE`, and `MINECRAFT_RUNTIME_VANILLA_IMAGE` values used by Compose.
 - `.env.example` is the checked-in template for those values; keep the real `.env` local and out of Git, treat it as the single local source for Compose, Discord OAuth, bootstrap-owner, and future bot secrets, and leave only the current local/bootstrap baseline uncommented while keeping non-required variables as commented examples.
@@ -280,6 +282,7 @@ All contributors and sub-agents must use `docs/task_board.md` as the shared task
 - Each progress-step commit must include both the implementation change and the matching restart-doc updates for that step
 - Commit messages should reference the task ID first
 - Do not batch unrelated task progress into one commit when separate commits are practical
+- Treat restart flow as: restore context from the required docs, confirm the active task in `docs/task_board.md`, implement within the locked decisions, verify with the appropriate Dockerized checks, sync restart docs, then create a git commit in an appropriate change-sized unit
 - Do not leave the repository in a state where the current task status and the restart docs disagree
 
 ## Immediate Next Start Point
@@ -288,4 +291,4 @@ If no other instruction is given, start from the current critical path:
 1. `T-200` through `T-400` are complete
 2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, `T-804`, and `T-805` are complete while keeping `mc-router`
 3. `T-900`, `T-901`, `T-903`, `T-904`, and `T-905` are complete
-4. Next, continue from `T-1012` on the browser log / bounded-command track
+4. `T-1115` is complete; next, continue from `T-1119` to align the bot RCON contract with the shared structured command catalog

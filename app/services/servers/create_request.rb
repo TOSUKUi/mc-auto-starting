@@ -8,6 +8,8 @@ module Servers
     def call
       server = actor.owned_minecraft_servers.build(server_attributes)
       return server if server.errors.any?
+      validate_runtime_selection(server)
+      return server if server.errors.any?
       enforce_memory_quota(server)
       return server if server.errors.any?
       return server unless server.save
@@ -35,6 +37,18 @@ module Servers
           template_kind: runtime_family,
           status: :provisioning,
         )
+      end
+
+      def validate_runtime_selection(server)
+        runtime_family = server.template_kind
+        version = server.minecraft_version.to_s
+        return if runtime_family.blank? || version.blank?
+        return unless MinecraftRuntime.catalog.key?(runtime_family)
+
+        allowed_versions = MinecraftRuntime.version_options(runtime_family: runtime_family).map { |option| option[:value] || option["value"] }
+        return if allowed_versions.include?(version)
+
+        server.errors.add(:minecraft_version, "は選択肢にない値です。")
       end
 
       def enforce_memory_quota(server)

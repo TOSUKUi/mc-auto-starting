@@ -71,6 +71,20 @@ class ServerMembersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "manager", server_members(:one).reload.role
   end
 
+  test "owner receives validation errors for an unknown membership role" do
+    sign_in_as(users(:one))
+
+    patch server_member_url(minecraft_servers(:one), server_members(:one), format: :json), params: {
+      server_member: {
+        role: "owner",
+      },
+    }
+
+    assert_response :unprocessable_entity
+    assert_includes response.parsed_body.fetch("errors").fetch("role"), "Role is not included in the list"
+    assert_equal "viewer", server_members(:one).reload.role
+  end
+
   test "owner can remove a membership" do
     sign_in_as(users(:one))
 
