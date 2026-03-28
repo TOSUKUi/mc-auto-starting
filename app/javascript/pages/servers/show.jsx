@@ -586,7 +586,7 @@ export default function ServersShow({ server }) {
                   </Stack>
                 ) : (
                   <Text c="dimmed">
-                    {server.runtime.container_state === 'running' ? 'いまは取得できません。' : '停止中です。'}
+                    {server.runtime.container_state === 'running' ? '取得できません。' : '停止中です。'}
                   </Text>
                 )}
               </Stack>
@@ -625,7 +625,7 @@ export default function ServersShow({ server }) {
                   </ScrollArea.Autosize>
                 ) : (
                   <Text c="dimmed" size="sm">
-                    いまはログを取得できません。再読込で再確認してください。
+                    取得できません。
                   </Text>
                 )}
               </Stack>
@@ -637,7 +637,19 @@ export default function ServersShow({ server }) {
               <Stack gap="md">
                 <Group justify="space-between" align="center">
                   <Text fw={700}>起動設定</Text>
-                  {startupSettingsLoading ? <Loader size="sm" /> : null}
+                  <Group gap="xs">
+                    {startupSettingsLoading ? <Loader size="sm" /> : null}
+                    {canManageStartupSettings ? (
+                      <Button
+                        disabled={startupSettingsLoading}
+                        onClick={() => saveStartupSettings()}
+                        size="xs"
+                        type="button"
+                      >
+                        保存
+                      </Button>
+                    ) : null}
+                  </Group>
                 </Group>
                 <Divider />
                 <Paper p="md" radius="lg" withBorder>
@@ -734,21 +746,6 @@ export default function ServersShow({ server }) {
                     {startupSettingsNotice}
                   </Alert>
                 ) : null}
-                {canManageStartupSettings ? (
-                  <Group justify="flex-end">
-                    <Button
-                      disabled={startupSettingsLoading}
-                      onClick={() => saveStartupSettings()}
-                      type="button"
-                    >
-                      起動設定を保存
-                    </Button>
-                  </Group>
-                ) : (
-                  <Text c="dimmed" size="sm">
-                    変更はオーナーまたは管理者のみ可能です。
-                  </Text>
-                )}
               </Stack>
             </Paper>
           </Grid.Col>
@@ -796,9 +793,7 @@ export default function ServersShow({ server }) {
                 {rconLoading ? <Loader size="sm" /> : null}
               </Group>
               <Divider />
-              <Text c="dimmed" size="sm">
-                `say` `list` `kick` `save-all` `time set` `weather` のみ実行できます。停止や OP 変更などは禁止しています。
-              </Text>
+              <Code block>実行可能: say / list / kick / save-all / time set / weather</Code>
               {rconError ? (
                 <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="コマンドを実行できませんでした" variant="light">
                   {rconError}
@@ -845,13 +840,13 @@ export default function ServersShow({ server }) {
               <>
                 {whitelistStagedOnly ? (
                   <Alert color="blue" radius="lg" title="次回起動時に反映します" variant="light">
-                    停止中のため、いまの変更は保存だけ行います。次に起動すると現在の設定で container を作り直して反映します。
+                    停止中のため、変更は保存のみ行います。
                   </Alert>
                 ) : null}
 
                 {!whitelistEnabled ? (
                   <Alert color="yellow" radius="lg" title="現在は無効です" variant="light">
-                    この状態では登録済みプレイヤーがいても接続制限はかかりません。
+                    登録済みプレイヤーでも接続制限はかかりません。
                   </Alert>
                 ) : null}
 
@@ -915,7 +910,7 @@ export default function ServersShow({ server }) {
                   </Group>
 
                   <Stack gap="xs">
-                    <Text c="dimmed" size="sm">現在の許可プレイヤー</Text>
+                    <Text c="dimmed" size="sm">登録済みプレイヤー</Text>
                     {whitelistEntries.length === 0 ? (
                       <Text size="sm">まだ登録はありません。</Text>
                     ) : (
