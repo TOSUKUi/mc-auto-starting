@@ -120,7 +120,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
 - `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
 - `T-902` is complete: the Kamal-based release, migration, and rollback path now lives in `docs/release_runbook.md`.
-- The next implementation critical path starts at `T-1104` for the per-runtime version-source/display contract cleanup.
+- The runtime version-source/display contract cleanup through `T-1104` is complete; no remaining critical-path task depends on that contract row.
 - The earlier server-screen follow-up tasks `T-505`, `T-506`, and `T-507` are now complete; `docs/server_ui_display_review.md` remains the display-contract reference for any future server-screen cleanup.
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
@@ -145,6 +145,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-1105` through `T-1107` are complete: the create UI resolves runtime-family-specific version choices on the Rails side when the page opens, caches them briefly, falls back to the checked-in catalog, and exposes only the runtime-family-specific select choices without a freeform version field.
 - Index/detail screens now show both Minecraft version and runtime `Type`, keeping the operator-facing display aligned with the new runtime-family model.
 - The UI now shows stable Minecraft version labels instead of Docker image tags; submitted values are stable version keys, with `latest` remaining a special symbolic option.
+- `T-1104` is complete: the contract row is now aligned with the shipped behavior, fixing Mojang manifest for `vanilla`, the Paper-specific source for `paper`, and the `label` / submitted `value` / persisted `resolved_minecraft_version` split as the authoritative display model.
 - For `itzg/minecraft-server`, the official docs treat Minecraft version selection as the `TYPE` + `VERSION` container contract, not as a guarantee that image tag equals Minecraft version; keep that distinction in mind when touching `T-1102` and later runtime work.
 - `T-1102` is complete: servers now persist `resolved_minecraft_version`, so list/detail screens can show a concrete numeric Minecraft version even when the stored selection is `latest`.
 - The current live sources are Mojang's `https://piston-meta.mojang.com/mc/game/version_manifest_v2.json` for `vanilla` and `https://qing762.is-a.dev/api/papermc` for `paper`.
