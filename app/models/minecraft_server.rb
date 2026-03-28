@@ -105,7 +105,7 @@ class MinecraftServer < ApplicationRecord
   end
 
   def whitelist_entries_csv
-    whitelist_entries.join("\n")
+    whitelist_entries.join(",")
   end
 
   def whitelist_entry?(player_name)

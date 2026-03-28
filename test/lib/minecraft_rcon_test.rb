@@ -3,6 +3,10 @@ require "test_helper"
 class MinecraftRconTest < ActiveSupport::TestCase
   AuthenticationFailure = Class.new(StandardError)
 
+  test "rcon client constant is available" do
+    assert defined?(::Rcon::Client)
+  end
+
   test "password generation is stable per server" do
     server = minecraft_servers(:one)
 
@@ -16,7 +20,11 @@ class MinecraftRconTest < ActiveSupport::TestCase
   test "connection maps authentication errors" do
     server = minecraft_servers(:one)
     fake_client = Class.new do
-      def initialize(*); end
+      def initialize(host:, port:, password:)
+        @host = host
+        @port = port
+        @password = password
+      end
 
       def authenticate!(**)
         raise MinecraftRconTest::AuthenticationFailure, "bad auth"

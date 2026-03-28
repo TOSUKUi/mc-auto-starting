@@ -522,7 +522,13 @@ export default function ServersShow({ server }) {
                               method: 'DELETE',
                               body: { player_name: entry },
                             })}
-                            style={{ cursor: whitelistMutationLoading ? 'default' : 'pointer' }}
+                            style={{
+                              cursor: whitelistMutationLoading ? 'default' : 'pointer',
+                              fontFamily: 'ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace',
+                              fontSize: '0.85rem',
+                              letterSpacing: '0.04em',
+                              textTransform: 'none',
+                            }}
                             variant="light"
                           >
                             {entry} ×

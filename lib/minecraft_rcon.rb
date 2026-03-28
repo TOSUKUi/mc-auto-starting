@@ -1,3 +1,4 @@
+require "rcon"
 require "openssl"
 require "timeout"
 
@@ -87,16 +88,16 @@ module MinecraftRcon
 
       def build_client
         client_class.new(
-          MinecraftRcon.host_for(server),
-          MinecraftRcon.port,
-          MinecraftRcon.password_for(server),
+          host: MinecraftRcon.host_for(server),
+          port: MinecraftRcon.port,
+          password: MinecraftRcon.password_for(server),
         )
       rescue ArgumentError
         client_class.new(MinecraftRcon.host_for(server), MinecraftRcon.port, MinecraftRcon.password_for(server))
       end
 
       def authenticate!(client)
-        client.authenticate!(ignore_first_packet: false)
+        client.authenticate!(ignore_first_packet: true)
       end
 
       def map_error(error, command:)
