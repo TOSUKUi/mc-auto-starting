@@ -6,6 +6,7 @@ module Servers
       /\Alist\z/i,
       /\Asay\s+.+\z/i,
       /\Adifficulty\s+(peaceful|easy|normal|hard)\z/i,
+      /\Agamemode\s+(survival|creative|adventure|spectator)(?:\s+[A-Za-z0-9_]{3,16})?\z/i,
       /\Akick\s+[A-Za-z0-9_]{3,16}(?:\s+.+)?\z/i,
       /\Asave-all\z/i,
       /\Atime\s+set\s+.+\z/i,
