@@ -37,6 +37,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for the direct-Docker lifecycle, sync, and delete contract before implementing `T-401` through `T-403`.
 - `docs/discord_auth_and_bot_strategy.md`
   Use for the authoritative Discord OAuth, manual invite URL, and Discord Bot to Rails to RCON strategy fixed by `T-1000`.
+- `docs/discord_bot_api_contract.md`
+  Use for the concrete bot credential, acting-user, endpoint, command-scope, whitelist-scope, and response-envelope contract fixed by `T-1005`.
 - `docs/project_execution_plan.md`
   Use for the active phase ordering, dependency flow, milestones, and critical path.
 - `docs/task_board.md`
@@ -116,7 +118,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
 - `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
 - `T-902` is complete: the Kamal-based release, migration, and rollback path now lives in `docs/release_runbook.md`.
-- The next implementation critical path starts at `T-1005` for the remaining Discord bot/RCON work; after that, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
+- The next implementation critical path starts at `T-1007` for the remaining Discord bot/RCON work; after that, operator-facing player-count and browser-console tasks continue at `T-1010` through `T-1012`.
 - The earlier server-screen follow-up tasks `T-505`, `T-506`, and `T-507` are now complete; `docs/server_ui_display_review.md` remains the display-contract reference for any future server-screen cleanup.
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
@@ -147,6 +149,7 @@ This file tells any contributor or agent where to find authoritative information
 - The selected future auth direction is Discord OAuth-only login plus manually issued invite URLs, not distributed local passwords.
 - The selected future bot direction is Discord Bot -> Rails API -> lifecycle/RCON execution, not direct bot access to Docker or containers.
 - `docs/discord_auth_and_bot_strategy.md` is the strategy-level source of truth for the future Discord auth and bot track.
+- `T-1005` is complete: `docs/discord_bot_api_contract.md` now fixes the bot credential model, acting Discord-user resolution, allowed lifecycle/read/whitelist commands, request/response envelopes, and audit expectations before endpoint implementation.
 - `T-1001` is complete: `users` now store Discord identity fields, OmniAuth Discord is wired into the app, and linked users can complete the Discord OAuth callback into a normal Rails session.
 - `T-1002` is complete: `discord_invitations` now stores digest-backed manual invite records, authenticated users can issue/revoke invites from `/discord-invitations`, and raw invite URLs are shown only at issuance time.
 - `T-1003` is complete: `/login` is now a Discord-only entry page for existing users, `/discord/login` guards the OAuth handoff so misconfigured Discord env returns safely to `/login`, local password and password-reset routes are no longer part of the active path, and bootstrap-owner startup logs can surface the first `/login` link when Discord OAuth and bootstrap env are configured.

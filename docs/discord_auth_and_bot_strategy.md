@@ -4,7 +4,8 @@
 
 This document fixes the strategy for Discord-based authentication, manual invite issuance, and Discord Bot mediated server operations before implementation starts.
 
-`T-1000` uses this file as the authoritative contract for the Discord auth and bot track.
+`T-1000` uses this file as the authoritative strategy contract for the Discord auth and bot track.
+Detailed bot request/response and trust-boundary rules live in `docs/discord_bot_api_contract.md`.
 
 ## Goals
 
