@@ -190,10 +190,40 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
       payload = response.parsed_body.fetch("server")
       assert_match "公開設定の反映を確認できませんでした", payload.fetch("route_issue_message")
+      assert_equal true, payload.fetch("can_repair_publication")
       assert_equal "failed", server.router_route.reload.last_apply_status
     end
   ensure
     Router.instance_variable_set(:@config, Router.config.with_overrides(routes_config_path: original_path)) if original_path
+  end
+
+  test "manager can repair publication" do
+    server = minecraft_servers(:one)
+    sign_in_as(users(:three))
+
+    original_call = Router::RepairPublication.instance_method(:call)
+    called = false
+    Router::RepairPublication.define_method(:call) do
+      called = true
+      server
+    end
+
+    post repair_publication_server_url(server, format: :json)
+
+    assert_response :success
+    assert_equal true, called
+  ensure
+    Router::RepairPublication.define_method(:call, original_call)
+  end
+
+  test "viewer cannot repair publication" do
+    server = minecraft_servers(:one)
+    server.server_members.find_by!(user: users(:three)).update!(role: :viewer)
+    sign_in_as(users(:three))
+
+    post repair_publication_server_url(server, format: :json)
+
+    assert_response :forbidden
   end
 
   test "show exposes only sync for degraded servers" do

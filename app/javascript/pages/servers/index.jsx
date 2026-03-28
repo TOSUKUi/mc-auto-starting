@@ -273,14 +273,6 @@ export default function ServersIndex({ servers, summary }) {
                     <Paper p="md" radius="lg" withBorder>
                       <Stack gap={2}>
                         <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                          公開状態
-                        </Text>
-                        <Text fw={700}>{server.route.enabled ? '公開中' : '非公開'}</Text>
-                      </Stack>
-                    </Paper>
-                    <Paper p="md" radius="lg" withBorder>
-                      <Stack gap={2}>
-                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
                           オーナー
                         </Text>
                         <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.owner_display_name}</Text>

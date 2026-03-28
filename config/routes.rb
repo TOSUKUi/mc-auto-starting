@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       post :stop
       post :restart
       post :sync
+      post :repair_publication
     end
 
     resources :members, controller: "server_members", only: %i[index create update destroy]

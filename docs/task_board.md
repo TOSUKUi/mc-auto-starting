@@ -57,6 +57,7 @@
 | T-508 | P4 | Remove duplicated route metadata and rebalance server layouts | T-503,T-505,T-506,T-507 | done | Server index/detail no longer surface `応答状態`, `最終反映`, or `最終ヘルスチェック`, repeated facts such as status/connection/runtime labels are shown only once per screen, and the primary detail layout clearly separates connection, action, ownership, and lower-priority technical metadata |
 | T-509 | P4 | Surface route publication failures only when abnormal | T-303,T-505,T-508 | done | Normal server screens hide router metadata, but route apply/audit failures surface explicit warning UI and keep `attention_needed` meaningful |
 | T-510 | P4 | Make transition-state polling converge via backend sync | T-402,T-507 | done | Detail-page polling now triggers backend reconciliation while `starting`, `stopping`, or `restarting`, so the visible status can move to a stable state without manual sync |
+| T-511 | P4 | Provide a direct recovery action for publication failures | T-509 | done | Route failure warnings now tell operators the next step and expose a `公開設定を再適用` action for authorized users, while unauthorized users are told to contact an owner/admin |
 | T-600 | P5 | Build authenticated layout shell | T-004,T-100 | done | Shared layout works for signed-in pages |
 | T-601 | P5 | Build login page | T-100,T-004 | done | UI login works |
 | T-700 | P6 | Remove provider coupling from app services | T-400,T-401,T-402 | done | Direct-Docker implementation no longer depends on execution-provider services |
@@ -167,6 +168,7 @@ The current critical path is:
 - `T-508`: index/detail no longer show `応答状態` or router timestamp noise, and the detail page now separates primary connection/action cues from ownership/version information and lower-priority technical metadata without repeating the same facts in multiple sections.
 - `T-509`: route publication failures are now audited against the rendered routes file and shown only when abnormal, with explicit warning UI instead of always-visible router metadata.
 - `T-510`: transition-state polling now sends a dedicated poll header so the server detail endpoint performs `SyncServerState` during polling and the displayed status can converge without manual sync.
+- `T-511`: route failure warnings now include the next user action, and authorized users can reapply publication directly from the detail page without leaving the current flow.
 - Local env handling now treats `.env.example` as the checked-in template while `.env` stays untracked for machine-specific values.
 - `T-205`: legacy provider dependency inventory now lives in `docs/provider_cleanup_inventory.md`.
 - `T-700` / `T-702`: provider service classes, initializer, and dedicated provider tests are removed from the active code path.

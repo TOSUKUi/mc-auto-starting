@@ -1,13 +1,11 @@
 import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core'
 import { Head, Link, router } from '@inertiajs/react'
 import {
-  IconActivityHeartbeat,
   IconAlertCircle,
   IconArrowBackUp,
   IconPlayerPause,
   IconPlayerPlay,
   IconRefresh,
-  IconRoute2,
   IconSparkles,
   IconTrash,
   IconUsers,
@@ -199,9 +197,6 @@ export default function ServersShow({ server }) {
                   >
                     {labelize(server.status)}
                   </Badge>
-                  <Badge color={ROUTE_COLORS[server.route.last_apply_status] ?? 'gray'} variant="light">
-                    {server.route.enabled ? '公開中' : '非公開'}
-                  </Badge>
                 </Group>
               </Stack>
 
@@ -244,7 +239,7 @@ export default function ServersShow({ server }) {
               </Group>
             </Group>
 
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+            <SimpleGrid cols={{ base: 1, md: 1 }} spacing="md">
               <Paper p="lg" radius="lg" withBorder>
                 <Stack gap={4}>
                   <Group gap="xs">
@@ -256,25 +251,32 @@ export default function ServersShow({ server }) {
                   <Code block style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>{server.connection_target}</Code>
                 </Stack>
               </Paper>
-
-              <Paper p="lg" radius="lg" withBorder>
-                <Stack gap={4}>
-                  <Group gap="xs">
-                    <ThemeIcon color="orange" radius="xl" size={28} variant="light">
-                      <IconRoute2 size={15} />
-                    </ThemeIcon>
-                    <Text fw={700}>公開状態</Text>
-                  </Group>
-                  <Text fw={600}>{server.route.enabled ? 'プレイヤーから接続できます' : '現在は公開されていません'}</Text>
-                </Stack>
-              </Paper>
             </SimpleGrid>
           </Stack>
         </Paper>
 
         {routeIssueMessage ? (
           <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="公開反映エラー" variant="light">
-            {routeIssueMessage}
+            <Stack gap="sm">
+              <Text>{routeIssueMessage}</Text>
+              <Text c="dimmed" size="sm">
+                {server.can_repair_publication ? "まず公開設定を再適用してください。" : "この問題は管理者または運用担当に対応を依頼してください。"}
+              </Text>
+              {server.can_repair_publication ? (
+                <Group justify="flex-start">
+                  <Button
+                    color="red"
+                    leftSection={<IconRefresh size={16} />}
+                    onClick={() => router.post(`/servers/${server.id}/repair_publication`)}
+                    size="xs"
+                    type="button"
+                    variant="light"
+                  >
+                    公開設定を再適用
+                  </Button>
+                </Group>
+              ) : null}
+            </Stack>
           </Alert>
         ) : null}
 

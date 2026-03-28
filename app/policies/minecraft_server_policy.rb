@@ -39,6 +39,10 @@ class MinecraftServerPolicy < ApplicationPolicy
     lifecycle_access?
   end
 
+  def repair_publication?
+    admin_user? || owner? || manager_membership?
+  end
+
   class Scope < Scope
     def resolve
       return scope.none unless user

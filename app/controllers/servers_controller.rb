@@ -155,6 +155,16 @@ class ServersController < InertiaController
     respond_with_server_error(server, error)
   end
 
+  def repair_publication
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :repair_publication?
+
+    Router::RepairPublication.new(server: server).call
+    respond_with_server_action(server, notice: "公開設定を再適用しました。")
+  rescue Router::ApplyError => error
+    respond_with_server_error(server, error)
+  end
+
   private
     def new_server_page_props(form_values: {})
       hostname = normalized_hostname(form_values[:hostname])
@@ -247,6 +257,7 @@ class ServersController < InertiaController
           backend: server.backend,
         ),
         route_issue_message: route_issue_message,
+        can_repair_publication: policy(server).repair_publication?,
         can_manage_members: policy(server).manage_members?,
         can_destroy: policy(server).destroy?,
         can_start: visible_actions[:start],

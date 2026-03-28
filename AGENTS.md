@@ -57,6 +57,7 @@ Current baseline:
 - `T-508` is complete: index/detail no longer show `応答状態` or router timestamp noise, and the detail layout now separates primary connection/action cues from ownership/version information and lower-priority technical metadata without repeating the same facts.
 - `T-509` is complete: route publication failures are now audited against the rendered routes file and shown only when abnormal, instead of keeping router internals visible all the time.
 - `T-510` is complete: transition-state polling now triggers backend reconciliation during detail-page polling, so `starting` / `stopping` / `restarting` can converge without manual sync.
+- `T-511` is complete: publication-failure warnings now tell the user the next step, and authorized users can reapply publication directly from the server detail page.
 - `T-205`, `T-700`, `T-702`, and `T-703` are complete: provider dependency inventory exists, provider services/initializer/tests are removed, and controller create flow now treats `template_kind` as internal schema debt instead of an exposed input.
 - `T-701` is complete: legacy provider design docs remain only as historical references and are no longer part of the active restart workflow.
 - `T-803` is complete: automated acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync paths against the direct-Docker baseline with router publication checks.
