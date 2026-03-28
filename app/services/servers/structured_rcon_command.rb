@@ -39,12 +39,12 @@ module Servers
         build: ->(_args) { "save-all" },
       },
       "gamemode" => {
-        required: %w[gamemode],
-        optional: %w[player_name],
+        required: %w[gamemode player_name],
+        optional: [],
         build: lambda { |args|
           gamemode = enum!(args.fetch("gamemode"), %w[survival creative adventure spectator])
-          player_name = optional_player_name(args["player_name"])
-          [ "gamemode", gamemode, player_name.presence ].compact.join(" ")
+          player_name = player_name!(args.fetch("player_name"))
+          [ "gamemode", gamemode, player_name ].join(" ")
         },
       },
     }.freeze
@@ -101,19 +101,11 @@ module Servers
           normalized
         end
 
-        def optional_player_name(value)
-          normalized = value.to_s.strip
-          return "" if normalized.blank?
-          raise InvalidCommandError, "player_name is invalid" unless PLAYER_NAME_PATTERN.match?(normalized)
-
-          normalized
-        end
       end
 
       def enum!(value, allowed) = self.class.enum!(value, allowed)
       def string!(value, field:, max_length:) = self.class.string!(value, field:, max_length:)
       def optional_string(value, max_length:) = self.class.optional_string(value, max_length:)
       def player_name!(value) = self.class.player_name!(value)
-      def optional_player_name(value) = self.class.optional_player_name(value)
   end
 end

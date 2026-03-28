@@ -11,7 +11,7 @@
 - browser と bot で同じ `command_key + args` contract を使う
 - freeform command input ではなく schema-driven form を前提にする
 - Rails 側で server-side validation と command build を一元化する
-- `gamemode(mode, player_name?)` のような optional target を扱えるようにする
+- `gamemode(mode, player_name)` のような player-target command を扱えるようにする
 
 ## Non-Goals
 
@@ -147,15 +147,13 @@ Args:
   - values: `survival | creative | adventure | spectator`
 - `player_name`
   - type: minecraft_player_name
-  - required: false
+  - required: true
 
 Build:
-- `gamemode <gamemode>`
 - `gamemode <gamemode> <player_name>`
 
 Notes:
-- `player_name` がなければ server/global 対象の command として扱う。
-- `player_name` があればそのプレイヤーを対象にする。
+- `gamemode` は対象プレイヤー名を必須とする。
 
 ## Shared Argument Types
 

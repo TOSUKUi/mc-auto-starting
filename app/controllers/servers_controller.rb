@@ -204,42 +204,11 @@ class ServersController < InertiaController
       format.json do
         render json: {
           startup_settings: startup_settings_payload_for(server),
-          editable: policy(server).manage_startup_settings?,
         }
       end
 
       format.html do
         redirect_to server_path(server)
-      end
-    end
-  end
-
-  def update_startup_settings
-    server = policy_scope(MinecraftServer).find(params[:id])
-    authorize server, :manage_startup_settings?
-    server.update!(startup_settings_params)
-
-    respond_to do |format|
-      format.json do
-        render json: {
-          startup_settings: startup_settings_payload_for(server),
-          desired_state_saved: true,
-          restart_required: true,
-        }
-      end
-
-      format.html do
-        redirect_to server_path(server), notice: "起動設定を保存しました。次回の起動または再起動で反映されます。"
-      end
-    end
-  rescue ActiveRecord::RecordInvalid => error
-    respond_to do |format|
-      format.json do
-        render json: { error: error.record.errors.full_messages.to_sentence, errors: error.record.errors.to_hash(true) }, status: :unprocessable_entity
-      end
-
-      format.html do
-        redirect_to server_path(server), alert: error.record.errors.full_messages.to_sentence
       end
     end
   end
@@ -461,6 +430,10 @@ class ServersController < InertiaController
           container_state: server.container_state,
           volume_name: server.volume_name,
         },
+        whitelist: {
+          enabled: server.whitelist_enabled?,
+          entry_count: server.whitelist_entries.size,
+        },
         player_presence: player_presence_payload_for(server),
       }
     end
@@ -486,7 +459,6 @@ class ServersController < InertiaController
         can_manage_members: policy(server).manage_members?,
         can_manage_whitelist: policy(server).manage_whitelist?,
         can_run_rcon_command: policy(server).rcon_command?,
-        can_manage_startup_settings: policy(server).manage_startup_settings?,
         can_destroy: policy(server).destroy?,
         can_start: visible_actions[:start],
         can_stop: visible_actions[:stop],
@@ -594,16 +566,6 @@ class ServersController < InertiaController
 
     def whitelist_manager_for(server)
       Servers::WhitelistManager.new(server: server)
-    end
-
-    def startup_settings_params
-      params.expect(minecraft_server: [ :hardcore, :difficulty, :gamemode, :max_players, :motd, :pvp ]).to_h.transform_values do |value|
-        case value
-        when "true", "TRUE", true then true
-        when "false", "FALSE", false then false
-        else value
-        end
-      end
     end
 
     def whitelist_player_name

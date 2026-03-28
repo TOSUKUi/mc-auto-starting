@@ -99,6 +99,8 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "container-001", visible_server.fetch("runtime").fetch("container_id")
     assert_equal "running", visible_server.fetch("runtime").fetch("container_state")
     assert_equal "mc-data-main-survival", visible_server.fetch("runtime").fetch("volume_name")
+    assert_equal true, visible_server.fetch("whitelist").fetch("enabled")
+    assert_equal 0, visible_server.fetch("whitelist").fetch("entry_count")
     assert_not visible_server.fetch("runtime").key?("backend")
   end
 
@@ -139,7 +141,6 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 20, server.fetch("startup_settings").fetch("max_players")
     assert_equal false, server.fetch("can_manage_whitelist")
     assert_equal false, server.fetch("can_run_rcon_command")
-    assert_equal false, server.fetch("can_manage_startup_settings")
     assert_equal true, server.fetch("can_stop")
     assert_equal true, server.fetch("can_restart")
     assert_equal true, server.fetch("can_sync")
@@ -304,61 +305,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     get startup_settings_server_url(minecraft_servers(:one), format: :json)
 
     assert_response :success
-    assert_equal false, response.parsed_body.fetch("editable")
     assert_equal "easy", response.parsed_body.fetch("startup_settings").fetch("difficulty")
-  end
-
-  test "owner can update startup settings" do
-    sign_in_as(users(:one))
-    server = minecraft_servers(:one)
-
-    patch update_startup_settings_server_url(server, format: :json), params: {
-      minecraft_server: {
-        hardcore: true,
-        difficulty: "hard",
-        gamemode: "creative",
-        max_players: 12,
-        motd: "夜更かし建築",
-        pvp: false,
-      },
-    }
-
-    assert_response :success
-    assert_equal true, response.parsed_body.fetch("desired_state_saved")
-    assert_equal true, response.parsed_body.fetch("restart_required")
-
-    server.reload
-    assert_equal true, server.hardcore?
-    assert_equal "hard", server.difficulty
-    assert_equal "creative", server.gamemode
-    assert_equal 12, server.max_players
-    assert_equal "夜更かし建築", server.motd
-    assert_equal false, server.pvp?
-  end
-
-  test "manager cannot update startup settings" do
-    sign_in_as(users(:three))
-
-    patch update_startup_settings_server_url(minecraft_servers(:one), format: :json), params: {
-      minecraft_server: { difficulty: "hard" },
-    }
-
-    assert_response :forbidden
-  end
-
-  test "startup settings update returns validation errors" do
-    sign_in_as(users(:one))
-
-    patch update_startup_settings_server_url(minecraft_servers(:one), format: :json), params: {
-      minecraft_server: {
-        difficulty: "nightmare",
-        max_players: 0,
-      },
-    }
-
-    assert_response :unprocessable_entity
-    assert_match "Difficulty is not included in the list", response.parsed_body.fetch("error")
-    assert_includes response.parsed_body.fetch("errors").fetch("max_players"), "Max players must be greater than or equal to 1"
   end
 
   test "owner can execute bounded rcon command" do
@@ -388,7 +335,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Difficulty set to hard", response.parsed_body.fetch("response_body")
   end
 
-  test "owner can execute structured gamemode command with optional player" do
+  test "owner can execute structured gamemode command with player" do
     sign_in_as(users(:one))
     stub_bounded_rcon("Changed game mode")
 
@@ -400,6 +347,19 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "gamemode", response.parsed_body.fetch("command_key")
     assert_equal "gamemode creative TOSUKUi2", response.parsed_body.fetch("command")
+  end
+
+  test "owner receives validation error for gamemode command without player" do
+    sign_in_as(users(:one))
+
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: {
+      command_key: "gamemode",
+      args: { gamemode: "creative" },
+    }
+
+    assert_response :unprocessable_entity
+    assert_equal false, response.parsed_body.fetch("ok")
+    assert_equal "structured_rcon_invalid", response.parsed_body.fetch("error_code")
   end
 
   test "viewer cannot execute bounded rcon command" do
@@ -477,17 +437,17 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
               name: "Creative Build",
               hostname: "Creative-Build",
               runtime_family: "paper",
-          minecraft_version: "1.21.4",
-          memory_mb: 4096,
-          disk_mb: 40960,
-          hardcore: true,
-          difficulty: "normal",
-          gamemode: "creative",
-          max_players: 16,
-          motd: "Creative Build",
-          pvp: false,
-        },
-      }
+              minecraft_version: "1.21.4",
+              memory_mb: 4096,
+              disk_mb: 40960,
+              hardcore: true,
+              difficulty: "normal",
+              gamemode: "creative",
+              max_players: 16,
+              motd: "Creative Build",
+              pvp: false,
+            },
+          }
         end
       end
     end

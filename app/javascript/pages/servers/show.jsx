@@ -233,6 +233,21 @@ export default function ServersShow({ server }) {
   const routeIssueMessage = server.route_issue_message || (server.route.last_apply_status === 'failed' ? '公開設定の反映に失敗しています。' : null)
   const whitelistDisabledWarning = !whitelistEnabled
   const whitelistEmptyEnabledWarning = whitelistEnabled && whitelistEntries.length === 0
+  const whitelistAttentionBanner = whitelistEmptyEnabledWarning
+    ? {
+        color: 'orange',
+        title: '接続を許可するプレイヤーが未登録です',
+        body: 'ホワイトリストは有効ですが、まだ誰も入れません。',
+        actionLabel: 'プレイヤーを追加',
+        onAction: focusWhitelistPlayerInput,
+      }
+    : whitelistDisabledWarning
+      ? {
+          color: 'yellow',
+          title: 'ホワイトリストが無効です',
+          body: 'この状態では、知っている人なら誰でも接続できます。',
+        }
+      : null
   const pollServer = useEffectEvent(() => {
     if (reloadInFlight.current) return
 
@@ -480,6 +495,8 @@ export default function ServersShow({ server }) {
         return rconArgs.message.trim().length > 0
       case 'kick':
         return rconArgs.player_name.trim().length > 0
+      case 'gamemode':
+        return rconArgs.player_name.trim().length > 0
       default:
         return true
     }
@@ -544,6 +561,52 @@ export default function ServersShow({ server }) {
       <Head title={server.name} />
 
       <Stack gap="xl">
+        {canManageWhitelist && whitelistAttentionBanner ? (
+          <Alert color={whitelistAttentionBanner.color} icon={<IconAlertCircle size={18} />} radius="lg" title={whitelistAttentionBanner.title} variant="light">
+            <Stack gap="sm">
+              <Text>{whitelistAttentionBanner.body}</Text>
+              {whitelistAttentionBanner.actionLabel ? (
+                <Group justify="flex-start">
+                  <Button onClick={whitelistAttentionBanner.onAction} size="xs" type="button" variant="light">
+                    {whitelistAttentionBanner.actionLabel}
+                  </Button>
+                </Group>
+              ) : null}
+            </Stack>
+          </Alert>
+        ) : null}
+
+        {routeIssueMessage ? (
+          <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="公開反映エラー" variant="light">
+            <Stack gap="sm">
+              <Text>{routeIssueMessage}</Text>
+              <Text c="dimmed" size="sm">
+                {server.can_repair_publication ? "まず公開設定を再適用してください。" : "この問題は管理者または運用担当に対応を依頼してください。"}
+              </Text>
+              {server.can_repair_publication ? (
+                <Group justify="flex-start">
+                  <Button
+                    color="red"
+                    leftSection={<IconRefresh size={16} />}
+                    onClick={() => router.post(`/servers/${server.id}/repair_publication`)}
+                    size="xs"
+                    type="button"
+                    variant="light"
+                  >
+                    公開設定を再適用
+                  </Button>
+                </Group>
+              ) : null}
+            </Stack>
+          </Alert>
+        ) : null}
+
+        {server.last_error_message ? (
+          <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="直近の失敗" variant="light">
+            {server.last_error_message}
+          </Alert>
+        ) : null}
+
         <Paper
           p="xl"
           radius="xl"
@@ -582,6 +645,13 @@ export default function ServersShow({ server }) {
                     {labelize(server.status)}
                   </Badge>
                 </Group>
+                <Text c="stone.4" size="sm">
+                  {playerPresence?.available
+                    ? `プレイヤー ${playerCountLabel(playerPresence)}`
+                    : server.runtime.container_state === 'running'
+                      ? 'プレイヤー数を取得できません。'
+                      : 'プレイヤー 停止中'}
+                </Text>
               </Stack>
 
               <Group gap="xs" justify="flex-end">
@@ -639,155 +709,6 @@ export default function ServersShow({ server }) {
           </Stack>
         </Paper>
 
-        {routeIssueMessage ? (
-          <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="公開反映エラー" variant="light">
-            <Stack gap="sm">
-              <Text>{routeIssueMessage}</Text>
-              <Text c="dimmed" size="sm">
-                {server.can_repair_publication ? "まず公開設定を再適用してください。" : "この問題は管理者または運用担当に対応を依頼してください。"}
-              </Text>
-              {server.can_repair_publication ? (
-                <Group justify="flex-start">
-                  <Button
-                    color="red"
-                    leftSection={<IconRefresh size={16} />}
-                    onClick={() => router.post(`/servers/${server.id}/repair_publication`)}
-                    size="xs"
-                    type="button"
-                    variant="light"
-                  >
-                    公開設定を再適用
-                  </Button>
-                </Group>
-              ) : null}
-            </Stack>
-          </Alert>
-        ) : null}
-
-        {server.last_error_message ? (
-          <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="直近の失敗" variant="light">
-            {server.last_error_message}
-          </Alert>
-        ) : null}
-
-        <Grid gutter="md">
-          <Grid.Col span={12}>
-            <Paper p="lg" radius="lg" shadow="sm" withBorder>
-              <Stack gap="md">
-                <Group justify="space-between" align="center">
-                  <Text fw={700}>プレイヤー</Text>
-                  {playerPresenceLoading ? <Loader size="sm" /> : null}
-                </Group>
-                <Divider />
-                {playerPresence?.available ? (
-                  <Stack gap="xs">
-                    <Text fw={700} size="lg">{playerCountLabel(playerPresence)}</Text>
-                    <Text c="dimmed" size="sm">
-                      {playerPresence.online_players?.length > 0
-                        ? playerPresence.online_players.join(', ')
-                        : '現在オンラインのプレイヤーはいません。'}
-                    </Text>
-                  </Stack>
-                ) : (
-                  <Text c="dimmed">
-                    {server.runtime.container_state === 'running' ? '取得できません。' : '停止中です。'}
-                  </Text>
-                )}
-              </Stack>
-            </Paper>
-          </Grid.Col>
-
-          <Grid.Col span={12}>
-            <Paper p="lg" radius="lg" shadow="sm" withBorder>
-              <Stack gap="md">
-                <Group justify="space-between" align="center">
-                  <Text fw={700}>最近のログ</Text>
-                  <Group gap="xs">
-                    {recentLogsLoading ? <Loader size="sm" /> : null}
-                    <Button
-                      leftSection={<IconRefresh size={14} />}
-                      onClick={() => loadRecentLogs()}
-                      size="xs"
-                      type="button"
-                      variant="default"
-                    >
-                      再読込
-                    </Button>
-                  </Group>
-                </Group>
-                <Divider />
-                {recentLogsError ? (
-                  <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="ログを取得できませんでした" variant="light">
-                    {recentLogsError}
-                  </Alert>
-                ) : null}
-                {recentLogs?.available ? (
-                  <ScrollArea.Autosize mah={280} offsetScrollbars>
-                    <Code block style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                      {recentLogs.lines.join('\n')}
-                    </Code>
-                  </ScrollArea.Autosize>
-                ) : (
-                  <Text c="dimmed" size="sm">
-                    取得できません。
-                  </Text>
-                )}
-              </Stack>
-            </Paper>
-          </Grid.Col>
-
-          <Grid.Col span={12}>
-            <Paper p="lg" radius="lg" shadow="sm" withBorder>
-              <Stack gap="md">
-                <Text fw={700}>初期設定</Text>
-                <Divider />
-                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                  <DetailLine label="難易度" value={startupValueLabel('difficulty', server.startup_settings.difficulty)} />
-                  <DetailLine label="ゲームモード" value={startupValueLabel('gamemode', server.startup_settings.gamemode)} />
-                  <DetailLine label="最大プレイヤー数" value={server.startup_settings.max_players} />
-                  <DetailLine label="PvP" value={startupValueLabel('pvp', server.startup_settings.pvp)} />
-                  <DetailLine label="ハードコア" value={startupValueLabel('hardcore', server.startup_settings.hardcore)} />
-                  <DetailLine label="MOTD" value={server.startup_settings.motd ? server.startup_settings.motd : '-'} />
-                </SimpleGrid>
-              </Stack>
-            </Paper>
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
-              <Stack gap="md">
-                <Text fw={700}>運用情報</Text>
-                <Divider />
-                <DetailLine label="種類" value={<Badge color="grape" variant="light">{runtimeFamilyLabel(server.runtime_family)}</Badge>} />
-                <DetailLine
-                  label="Minecraft バージョン"
-                  value={
-                    <Stack gap={4}>
-                      <Code>{server.minecraft_version_display}</Code>
-                      {selectedVersionNote(server) ? <Text c="dimmed" size="sm">{selectedVersionNote(server)}</Text> : null}
-                    </Stack>
-                  }
-                />
-                <DetailLine label="オーナー" value={server.owner_display_name} />
-                <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{labelize(server.access_role)}</Badge>} />
-              </Stack>
-            </Paper>
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, md: 6 }}>
-            <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
-              <Stack gap="md">
-                <Text fw={700}>補助情報</Text>
-                <Divider />
-                <DetailLine label="ホスト名" value={<Code>{server.hostname}</Code>} />
-                <DetailLine label="FQDN" value={<Code>{server.fqdn}</Code>} />
-                <DetailLine label="最終起動" value={formatTimestamp(server.last_started_at)} />
-                <DetailLine label="連続稼働時間" value={formatUptime(server.uptime_seconds)} />
-              </Stack>
-            </Paper>
-          </Grid.Col>
-        </Grid>
-
         {canManageWhitelist ? (
           <Paper p="lg" radius="lg" shadow="sm" withBorder>
             <Stack gap="md">
@@ -816,27 +737,6 @@ export default function ServersShow({ server }) {
                 {whitelistStagedOnly ? (
                   <Alert color="blue" radius="lg" title="次回起動時に反映します" variant="light">
                     停止中のため、変更は保存のみ行います。
-                  </Alert>
-                ) : null}
-
-                {whitelistDisabledWarning ? (
-                  <Alert color="yellow" radius="lg" title="ホワイトリストが無効です" variant="light">
-                    <Stack gap="xs">
-                      <Text size="sm">誰でも接続できます。</Text>
-                    </Stack>
-                  </Alert>
-                ) : null}
-
-                {whitelistEmptyEnabledWarning ? (
-                  <Alert color="orange" radius="lg" title="プレイヤーが登録されていません" variant="light">
-                    <Stack gap="xs">
-                      <Text size="sm">ホワイトリストは有効ですが、許可プレイヤーがいません。</Text>
-                      <Group justify="flex-start">
-                        <Button onClick={focusWhitelistPlayerInput} size="xs" type="button" variant="subtle">
-                          プレイヤーを追加
-                        </Button>
-                      </Group>
-                    </Stack>
                   </Alert>
                 ) : null}
 
@@ -916,6 +816,60 @@ export default function ServersShow({ server }) {
           </Paper>
         ) : null}
 
+        <Grid gutter="md">
+
+          <Grid.Col span={12}>
+            <Paper p="lg" radius="lg" shadow="sm" withBorder>
+              <Stack gap="md">
+                <Text fw={700}>初期設定</Text>
+                <Divider />
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                  <DetailLine label="難易度" value={startupValueLabel('difficulty', server.startup_settings.difficulty)} />
+                  <DetailLine label="ゲームモード" value={startupValueLabel('gamemode', server.startup_settings.gamemode)} />
+                  <DetailLine label="最大プレイヤー数" value={server.startup_settings.max_players} />
+                  <DetailLine label="PvP" value={startupValueLabel('pvp', server.startup_settings.pvp)} />
+                  <DetailLine label="ハードコア" value={startupValueLabel('hardcore', server.startup_settings.hardcore)} />
+                  <DetailLine label="MOTD" value={server.startup_settings.motd ? server.startup_settings.motd : '-'} />
+                </SimpleGrid>
+              </Stack>
+            </Paper>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
+              <Stack gap="md">
+                <Text fw={700}>運用情報</Text>
+                <Divider />
+                <DetailLine label="種類" value={<Badge color="grape" variant="light">{runtimeFamilyLabel(server.runtime_family)}</Badge>} />
+                <DetailLine
+                  label="Minecraft バージョン"
+                  value={
+                    <Stack gap={4}>
+                      <Code>{server.minecraft_version_display}</Code>
+                      {selectedVersionNote(server) ? <Text c="dimmed" size="sm">{selectedVersionNote(server)}</Text> : null}
+                    </Stack>
+                  }
+                />
+                <DetailLine label="オーナー" value={server.owner_display_name} />
+                <DetailLine label="アクセス権" value={<Badge color="blue" variant="light">{labelize(server.access_role)}</Badge>} />
+              </Stack>
+            </Paper>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Paper p="lg" radius="lg" shadow="sm" withBorder h="100%">
+              <Stack gap="md">
+                <Text fw={700}>補助情報</Text>
+                <Divider />
+                <DetailLine label="ホスト名" value={<Code>{server.hostname}</Code>} />
+                <DetailLine label="FQDN" value={<Code>{server.fqdn}</Code>} />
+                <DetailLine label="最終起動" value={formatTimestamp(server.last_started_at)} />
+                <DetailLine label="連続稼働時間" value={formatUptime(server.uptime_seconds)} />
+              </Stack>
+            </Paper>
+          </Grid.Col>
+        </Grid>
+
         {canRunRconCommand ? (
           <Paper p="lg" radius="lg" shadow="sm" withBorder>
             <Stack gap="md">
@@ -971,7 +925,7 @@ export default function ServersShow({ server }) {
                       <TextInput
                         label="プレイヤー名"
                         onChange={(event) => updateRconArg('player_name', event.currentTarget.value)}
-                        placeholder="未入力で全体"
+                        placeholder="対象プレイヤー名を入力"
                         value={rconArgs.player_name}
                       />
                     </>
@@ -1034,6 +988,43 @@ export default function ServersShow({ server }) {
             </Stack>
           </Paper>
         ) : null}
+
+        <Paper p="lg" radius="lg" shadow="sm" withBorder>
+          <Stack gap="md">
+            <Group justify="space-between" align="center">
+              <Text fw={700}>最近のログ</Text>
+              <Group gap="xs">
+                {recentLogsLoading ? <Loader size="sm" /> : null}
+                <Button
+                  leftSection={<IconRefresh size={14} />}
+                  onClick={() => loadRecentLogs()}
+                  size="xs"
+                  type="button"
+                  variant="default"
+                >
+                  再読込
+                </Button>
+              </Group>
+            </Group>
+            <Divider />
+            {recentLogsError ? (
+              <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="ログを取得できませんでした" variant="light">
+                {recentLogsError}
+              </Alert>
+            ) : null}
+            {recentLogs?.available ? (
+              <ScrollArea.Autosize mah={280} offsetScrollbars>
+                <Code block style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                  {recentLogs.lines.join('\n')}
+                </Code>
+              </ScrollArea.Autosize>
+            ) : (
+              <Text c="dimmed" size="sm">
+                取得できません。
+              </Text>
+            )}
+          </Stack>
+        </Paper>
       </Stack>
     </>
   )

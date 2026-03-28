@@ -8,12 +8,6 @@ module Servers
       assert_equal "difficulty hard", command
     end
 
-    test "builds gamemode command without player" do
-      command = StructuredRconCommand.new(command_key: "gamemode", args: { gamemode: "creative" }).build
-
-      assert_equal "gamemode creative", command
-    end
-
     test "builds gamemode command with player" do
       command = StructuredRconCommand.new(
         command_key: "gamemode",
@@ -21,6 +15,17 @@ module Servers
       ).build
 
       assert_equal "gamemode creative TOSUKUi2", command
+    end
+
+    test "rejects gamemode command without player" do
+      error = assert_raises(StructuredRconCommand::InvalidCommandError) do
+        StructuredRconCommand.new(
+          command_key: "gamemode",
+          args: { gamemode: "creative" },
+        ).build
+      end
+
+      assert_equal "player_name is required", error.message
     end
 
     test "rejects invalid player name" do

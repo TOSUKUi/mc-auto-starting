@@ -13,8 +13,8 @@ class Api::Discord::Bot::ServersControllerTest < ActionDispatch::IntegrationTest
   teardown do
     Rails.application.config.x.discord_bot.api_token = @original_token
     Rails.application.config.x.discord_bot.allowed_cidrs = @original_cidrs
-    Servers::WhitelistManager.define_singleton_method(:new, @original_whitelist_new)
-    Servers::BoundedRconCommand.define_method(:execute, @original_rcon_execute)
+    Servers::WhitelistManager.define_singleton_method(:new, @original_whitelist_new) if @original_whitelist_new
+    Servers::BoundedRconCommand.define_method(:execute, @original_rcon_execute) if @original_rcon_execute
   end
 
   test "rejects missing bot token" do
@@ -70,56 +70,6 @@ class Api::Discord::Bot::ServersControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "startup_settings_show", response.parsed_body.fetch("action")
     assert_equal "easy", response.parsed_body.fetch("result").fetch("difficulty")
-  end
-
-  test "owner can update startup settings through bot api" do
-    server = minecraft_servers(:one)
-
-    post startup_settings_update_api_discord_bot_server_url(server),
-      headers: bot_headers(discord_user_id: users(:one).discord_user_id),
-      env: bot_env,
-      params: {
-        startup_settings: {
-          hardcore: true,
-          difficulty: "hard",
-          gamemode: "creative",
-          max_players: 16,
-          motd: "bot update",
-          pvp: false,
-        },
-      }
-
-    assert_response :success
-    assert_equal "startup_settings_update", response.parsed_body.fetch("action")
-    assert_equal true, server.reload.hardcore?
-    assert_equal "hard", server.difficulty
-    assert_equal "creative", server.gamemode
-    assert_equal 16, server.max_players
-    assert_equal "bot update", server.motd
-    assert_equal false, server.pvp?
-  end
-
-  test "manager cannot update startup settings through bot api" do
-    post startup_settings_update_api_discord_bot_server_url(minecraft_servers(:one)),
-      headers: bot_headers(discord_user_id: users(:three).discord_user_id),
-      env: bot_env,
-      params: {
-        startup_settings: { difficulty: "hard" },
-      }
-
-    assert_response :forbidden
-  end
-
-  test "startup settings update returns validation failure through bot api" do
-    post startup_settings_update_api_discord_bot_server_url(minecraft_servers(:one)),
-      headers: bot_headers(discord_user_id: users(:one).discord_user_id),
-      env: bot_env,
-      params: {
-        startup_settings: { difficulty: "nightmare" },
-      }
-
-    assert_response :unprocessable_entity
-    assert_equal "startup_settings_invalid", response.parsed_body.fetch("error_code")
   end
 
   test "manager can restart through bot api" do

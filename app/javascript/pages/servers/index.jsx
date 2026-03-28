@@ -1,4 +1,5 @@
 import {
+  Alert,
   Badge,
   Box,
   Button,
@@ -93,6 +94,26 @@ function needsAttention(server) {
   return server.status !== 'ready' || server.route.last_apply_status === 'failed'
 }
 
+function whitelistAttention(server) {
+  if (!server.whitelist?.enabled) {
+    return {
+      color: 'yellow',
+      title: 'ホワイトリストが無効です',
+      body: 'この状態では、知っている人なら誰でも接続できます。',
+    }
+  }
+
+  if (server.whitelist.entry_count === 0) {
+    return {
+      color: 'orange',
+      title: '接続を許可するプレイヤーが未登録です',
+      body: 'ホワイトリストは有効ですが、まだ誰も入れません。',
+    }
+  }
+
+  return null
+}
+
 function StatCard({ label, value, tone = 'gray' }) {
   return (
     <Card padding="lg" radius="xl" withBorder>
@@ -111,6 +132,7 @@ function StatCard({ label, value, tone = 'gray' }) {
 
 export default function ServersIndex({ servers, summary }) {
   const [query, setQuery] = useState('')
+  const [activeCardId, setActiveCardId] = useState(null)
   const normalizedQuery = query.trim().toLowerCase()
   const filteredServers = normalizedQuery
     ? servers.filter((server) =>
@@ -187,111 +209,138 @@ export default function ServersIndex({ servers, summary }) {
           </Group>
         </Paper>
 
-            {filteredServers.length === 0 ? (
-              <Paper p="xl" radius="lg" withBorder>
-                <Stack align="center" gap="sm" py="xl">
-                  <ThemeIcon color="gray" radius="xl" size={48} variant="light">
-                    <IconServer2 size={24} />
-                  </ThemeIcon>
-                  <Title order={3}>{servers.length === 0 ? '表示できるサーバーがありません' : '条件に一致するサーバーがありません'}</Title>
-                </Stack>
-              </Paper>
-            ) : (
+        {filteredServers.length === 0 ? (
+          <Paper p="xl" radius="lg" withBorder>
+            <Stack align="center" gap="sm" py="xl">
+              <ThemeIcon color="gray" radius="xl" size={48} variant="light">
+                <IconServer2 size={24} />
+              </ThemeIcon>
+              <Title order={3}>{servers.length === 0 ? '表示できるサーバーがありません' : '条件に一致するサーバーがありません'}</Title>
+            </Stack>
+          </Paper>
+        ) : (
           <Stack gap="md">
-            {filteredServers.map((server) => (
-              <Paper key={server.id} p="lg" radius="lg" shadow="sm" withBorder>
-                <Stack gap="md">
-                  <Group align="flex-start" justify="space-between">
-                    <Stack gap={4}>
-                      <Group gap="sm">
-                        <Text fw={700} size="lg" style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                          {server.name}
-                        </Text>
-                        <Badge color="blue" variant="light">
-                          {labelize(server.access_role)}
-                        </Badge>
-                        <Badge color="grape" variant="light">
-                          種類 {runtimeFamilyLabel(server.runtime_family)}
-                        </Badge>
-                        <Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">
-                          {labelize(server.status)}
-                        </Badge>
-                      </Group>
-                      <Text c="dimmed" size="sm">
-                        共有アドレス
-                      </Text>
-                      <Text fw={700} size="lg" style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
-                        {server.connection_target}
-                      </Text>
-                    </Stack>
+            {filteredServers.map((server) => {
+              const whitelistWarning = whitelistAttention(server)
+              const cardIsActive = activeCardId === server.id
 
-                    {needsAttention(server) ? (
-                      <Group gap="xs">
-                        {server.route.last_apply_status === 'failed' ? (
-                          <Badge color="red" leftSection={<IconAlertTriangle size={12} />} variant="light">
-                            公開反映エラー
-                          </Badge>
-                        ) : null}
-                        <Badge color="orange" leftSection={<IconAlertTriangle size={12} />} variant="light">
-                          要確認
-                        </Badge>
-                      </Group>
+              return (
+                <Paper
+                  key={server.id}
+                  href={`/servers/${server.id}`}
+                  p="lg"
+                  radius="lg"
+                  renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />}
+                  shadow="sm"
+                  onBlur={() => setActiveCardId((current) => (current === server.id ? null : current))}
+                  onFocus={() => setActiveCardId(server.id)}
+                  onMouseEnter={() => setActiveCardId(server.id)}
+                  onMouseLeave={() => setActiveCardId((current) => (current === server.id ? null : current))}
+                  style={{
+                    borderColor: cardIsActive ? '#8a7f6a' : undefined,
+                    boxShadow: cardIsActive ? '0 18px 34px rgba(0, 0, 0, 0.24)' : undefined,
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    textDecoration: 'none',
+                    transform: cardIsActive ? 'translateY(-2px)' : 'translateY(0)',
+                    transition: 'transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease',
+                  }}
+                  withBorder
+                >
+                  <Stack gap="md">
+                    {whitelistWarning ? (
+                      <Alert color={whitelistWarning.color} icon={<IconAlertTriangle size={18} />} radius="lg" title={whitelistWarning.title} variant="light">
+                        {whitelistWarning.body}
+                      </Alert>
                     ) : null}
-                  </Group>
 
-                  <Group justify="flex-end">
-                    <Button
-                      href={`/servers/${server.id}`}
-                      renderRoot={(props) => <Link {...props} href={`/servers/${server.id}`} />}
-                      size="xs"
-                      variant="light"
-                    >
-                      詳細を見る
-                    </Button>
-                  </Group>
+                    <Group align="flex-start" justify="space-between">
+                      <Stack gap={4}>
+                        <Group gap="sm">
+                          <Text fw={700} size="lg" style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                            {server.name}
+                          </Text>
+                          <Badge color="blue" variant="light">
+                            {labelize(server.access_role)}
+                          </Badge>
+                          <Badge color="grape" variant="light">
+                            種類 {runtimeFamilyLabel(server.runtime_family)}
+                          </Badge>
+                          <Badge color={STATUS_COLORS[server.status] ?? 'gray'} variant="light">
+                            {labelize(server.status)}
+                          </Badge>
+                        </Group>
+                        <Text c="dimmed" size="sm">
+                          共有アドレス
+                        </Text>
+                        <Text fw={700} size="lg" style={{ maxWidth: '100%', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
+                          {server.connection_target}
+                        </Text>
+                      </Stack>
 
-                  <SimpleGrid cols={{ base: 1, sm: 4 }} spacing="sm">
-                    <Paper p="md" radius="lg" withBorder>
-                      <Stack gap={2}>
-                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                          種類
-                        </Text>
-                        <Text fw={700}>{runtimeFamilyLabel(server.runtime_family)}</Text>
-                      </Stack>
-                    </Paper>
-                    <Paper p="md" radius="lg" withBorder>
-                      <Stack gap={2}>
-                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                          Minecraft バージョン
-                        </Text>
-                        <Text fw={700}>{server.minecraft_version_display}</Text>
-                        {selectedVersionNote(server) ? (
-                          <Text c="dimmed" size="sm">{selectedVersionNote(server)}</Text>
-                        ) : null}
-                      </Stack>
-                    </Paper>
-                    <Paper p="md" radius="lg" withBorder>
-                      <Stack gap={2}>
-                        <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                          オーナー
-                        </Text>
-                        <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.owner_display_name}</Text>
-                      </Stack>
-                    </Paper>
-                    {server.player_presence?.available ? (
+                      {needsAttention(server) ? (
+                        <Group gap="xs">
+                          {server.route.last_apply_status === 'failed' ? (
+                            <Badge color="red" leftSection={<IconAlertTriangle size={12} />} variant="light">
+                              公開反映エラー
+                            </Badge>
+                          ) : null}
+                          <Badge color="orange" leftSection={<IconAlertTriangle size={12} />} variant="light">
+                            要確認
+                          </Badge>
+                        </Group>
+                      ) : null}
+                    </Group>
+
+                    <SimpleGrid cols={{ base: 1, sm: 4 }} spacing="sm">
                       <Paper p="md" radius="lg" withBorder>
                         <Stack gap={2}>
                           <Text c="dimmed" fw={700} size="xs" tt="uppercase">
-                            プレイヤー
+                            種類
                           </Text>
-                          <Text fw={700}>{playerCountLabel(server.player_presence)}</Text>
+                          <Text fw={700}>{runtimeFamilyLabel(server.runtime_family)}</Text>
                         </Stack>
                       </Paper>
-                    ) : null}
-                  </SimpleGrid>
-                </Stack>
-              </Paper>
-            ))}
+                      <Paper p="md" radius="lg" withBorder>
+                        <Stack gap={2}>
+                          <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                            Minecraft バージョン
+                          </Text>
+                          <Text fw={700}>{server.minecraft_version_display}</Text>
+                          {selectedVersionNote(server) ? (
+                            <Text c="dimmed" size="sm">{selectedVersionNote(server)}</Text>
+                          ) : null}
+                        </Stack>
+                      </Paper>
+                      <Paper p="md" radius="lg" withBorder>
+                        <Stack gap={2}>
+                          <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                            オーナー
+                          </Text>
+                          <Text fw={700} style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}>{server.owner_display_name}</Text>
+                        </Stack>
+                      </Paper>
+                      {server.player_presence?.available ? (
+                        <Paper p="md" radius="lg" withBorder>
+                          <Stack gap={2}>
+                            <Text c="dimmed" fw={700} size="xs" tt="uppercase">
+                              プレイヤー
+                            </Text>
+                            <Text fw={700}>{playerCountLabel(server.player_presence)}</Text>
+                          </Stack>
+                        </Paper>
+                      ) : null}
+                    </SimpleGrid>
+
+                    <Group justify="flex-end">
+                      <Text c={cardIsActive ? 'teal.2' : 'dimmed'} fw={700} size="sm">
+                        詳細を見る
+                      </Text>
+                    </Group>
+                  </Stack>
+                </Paper>
+              )
+            })}
           </Stack>
         )}
       </Stack>

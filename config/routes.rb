@@ -21,7 +21,6 @@ Rails.application.routes.draw do
       get :recent_logs
       post :rcon_command
       get :startup_settings
-      patch :update_startup_settings
       get :whitelist
       post :enable_whitelist
       post :disable_whitelist
@@ -45,7 +44,6 @@ Rails.application.routes.draw do
               post :restart
               post :sync
               post "startup-settings/show", action: :startup_settings_show
-              post "startup-settings/update", action: :startup_settings_update
               post "whitelist/list", action: :whitelist_list
               post "whitelist/add", action: :whitelist_add
               post "whitelist/remove", action: :whitelist_remove
