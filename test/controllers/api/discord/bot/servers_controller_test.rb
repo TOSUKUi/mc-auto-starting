@@ -151,35 +151,57 @@ class Api::Discord::Bot::ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal [ "Steve" ], response.parsed_body.fetch("result").fetch("entries")
   end
 
-  test "owner can run bounded rcon command through bot api" do
+  test "owner can run structured rcon command through bot api" do
     Servers::BoundedRconCommand.define_method(:execute) { |command:| "Executed: #{command}" }
 
     post rcon_command_api_discord_bot_server_url(minecraft_servers(:one)),
       headers: bot_headers(discord_user_id: users(:one).discord_user_id),
       env: bot_env,
-      params: { command: "say hello" }
+      params: {
+        command_key: "say",
+        args: { message: "hello" },
+      }
 
     assert_response :success
-    assert_equal "Executed: say hello", response.parsed_body.fetch("result").fetch("response_body")
+    result = response.parsed_body.fetch("result")
+    assert_equal "say", result.fetch("command_key")
+    assert_equal "say hello", result.fetch("command")
+    assert_equal "Executed: say hello", result.fetch("response_body")
   end
 
-  test "manager cannot run bounded rcon command through bot api" do
+  test "manager cannot run structured rcon command through bot api" do
     post rcon_command_api_discord_bot_server_url(minecraft_servers(:one)),
       headers: bot_headers(discord_user_id: users(:three).discord_user_id),
       env: bot_env,
-      params: { command: "say hello" }
+      params: {
+        command_key: "say",
+        args: { message: "hello" },
+      }
 
     assert_response :forbidden
   end
 
-  test "forbidden bounded rcon command returns validation error" do
+  test "raw bot rcon command input is rejected" do
     post rcon_command_api_discord_bot_server_url(minecraft_servers(:one)),
       headers: bot_headers(discord_user_id: users(:one).discord_user_id),
       env: bot_env,
       params: { command: "stop" }
 
     assert_response :unprocessable_entity
-    assert_equal "rcon_command_forbidden", response.parsed_body.fetch("error_code")
+    assert_equal "structured_rcon_invalid", response.parsed_body.fetch("error_code")
+  end
+
+  test "invalid structured bot rcon args return validation error" do
+    post rcon_command_api_discord_bot_server_url(minecraft_servers(:one)),
+      headers: bot_headers(discord_user_id: users(:one).discord_user_id),
+      env: bot_env,
+      params: {
+        command_key: "gamemode",
+        args: { gamemode: "creative" },
+      }
+
+    assert_response :unprocessable_entity
+    assert_equal "structured_rcon_invalid", response.parsed_body.fetch("error_code")
   end
 
   private

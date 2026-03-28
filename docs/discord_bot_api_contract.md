@@ -295,19 +295,20 @@ Bounded-RCON success:
   "action": "rcon_command",
   "message": "コマンドを実行しました。",
   "result": {
+    "command_key": "say",
     "command": "say サーバーメンテナンスを開始します",
     "response_body": ""
   }
 }
 ```
 
-Bounded-RCON forbidden command:
+Bounded-RCON validation failure:
 
 ```json
 {
   "ok": false,
-  "error": "この RCON コマンドは許可されていません。",
-  "error_code": "rcon_command_forbidden"
+  "error": "player_name is required",
+  "error_code": "structured_rcon_invalid"
 }
 ```
 

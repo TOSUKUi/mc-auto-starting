@@ -124,6 +124,7 @@ Current baseline:
 - `T-1116` is complete: the shared structured RCON catalog now lives in `docs/structured_rcon_command_catalog.md`, fixing the initial `command_key + args` schema for browser and bot surfaces, including player-target commands such as `gamemode(gamemode, player_name)`.
 - `T-1117` is complete: Rails now converts structured `command_key + args` payloads into bounded RCON commands through `Servers::StructuredRconCommand`, validates required/optional arguments server-side, and the detail controller path can execute structured commands such as `difficulty`, `gamemode`, `weather`, `time_set`, `say`, `kick`, and `save_all`.
 - `T-1118` is complete: the server detail RCON surface now uses one command select plus schema-driven argument form instead of multiple action cards or a freeform console, while still returning the shared command/result payload from Rails.
+- `T-1119` is complete: the Discord bot RCON surface now uses the same structured `command_key + args` catalog as the browser detail path, rejects raw command fallback server-side, and returns `command_key` plus the built command through the shared validation boundary.
 - `T-1120` is complete: the whitelist card now sits above generic server operations, uses a toggle-style mode control, warns strongly when enabled with zero entries, keeps a persistent warning while disabled, and guides the user toward the existing add-player section instead of embedding another form into the warning.
 - `T-1121` is complete: the server index now treats each card itself as the primary path to detail, with `詳細を見る` reduced to a supporting cue instead of the earlier small right-edge button or a heavy full-width CTA.
 - Startup-settings detail UI now explicitly separates create-time initial values from real-time operations at the presentation layer; mutable live changes should flow through the structured RCON surface instead of saving new desired state from detail.
@@ -291,4 +292,4 @@ If no other instruction is given, start from the current critical path:
 1. `T-200` through `T-400` are complete
 2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, `T-804`, and `T-805` are complete while keeping `mc-router`
 3. `T-900`, `T-901`, `T-903`, `T-904`, and `T-905` are complete
-4. `T-1115` is complete; next, continue from `T-1119` to align the bot RCON contract with the shared structured command catalog
+4. `T-1115` and `T-1119` are complete; confirm whether a new task should be opened before continuing beyond the current board

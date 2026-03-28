@@ -121,18 +121,23 @@ module Api
         def rcon_command
           authorize @server, :rcon_command?
 
-          response_body = Servers::BoundedRconCommand.new(server: @server).execute(command: params.fetch(:command, "").to_s)
+          command = Servers::StructuredRconCommand.new(
+            command_key: params[:command_key],
+            args: structured_rcon_args,
+          ).build
+          response_body = Servers::BoundedRconCommand.new(server: @server).execute(command: command)
           render_success(
             server: @server,
             action: "rcon_command",
             message: "コマンドを実行しました。",
             result: {
-              command: params.fetch(:command, "").to_s,
+              command_key: params[:command_key].presence,
+              command: command,
               response_body: response_body,
             },
           )
-        rescue Servers::BoundedRconCommand::ForbiddenCommandError => error
-          render_failure(error: error.message, error_code: "rcon_command_forbidden", status: :unprocessable_entity)
+        rescue Servers::StructuredRconCommand::InvalidCommandError => error
+          render_failure(error: error.message, error_code: "structured_rcon_invalid", status: :unprocessable_entity)
         rescue MinecraftRcon::Error => error
           render_failure(error: error.message, error_code: "rcon_command_failed", status: :unprocessable_entity)
         end
@@ -177,6 +182,14 @@ module Api
 
           def whitelist_player_name
             params.fetch(:player_name, "").to_s
+          end
+
+          def structured_rcon_args
+            args = params[:args]
+            return {} unless args.present?
+            return args.to_unsafe_h if args.respond_to?(:to_unsafe_h)
+
+            args.to_h
           end
 
           def uptime_seconds_for(server)
