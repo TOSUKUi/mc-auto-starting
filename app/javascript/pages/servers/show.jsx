@@ -126,13 +126,15 @@ function csrfToken() {
 export default function ServersShow({ server }) {
   const reloadInFlight = useRef(false)
   const [ whitelistEntries, setWhitelistEntries ] = useState([])
+  const [ whitelistEnabled, setWhitelistEnabled ] = useState(true)
+  const [ whitelistStagedOnly, setWhitelistStagedOnly ] = useState(false)
   const [ whitelistLoading, setWhitelistLoading ] = useState(false)
   const [ whitelistError, setWhitelistError ] = useState(null)
   const [ whitelistMutationLoading, setWhitelistMutationLoading ] = useState(false)
   const [ playerName, setPlayerName ] = useState('')
   const transitionState = isTransitioning(server.status)
   const canManageWhitelist = server.can_manage_whitelist
-  const whitelistAvailable = canManageWhitelist && server.runtime.container_state === 'running'
+  const whitelistLiveMode = canManageWhitelist && server.runtime.container_state === 'running'
   const routeIssueMessage = server.route_issue_message || (server.route.last_apply_status === 'failed' ? '公開設定の反映に失敗しています。' : null)
   const pollServer = useEffectEvent(() => {
     if (reloadInFlight.current) return
@@ -168,8 +170,10 @@ export default function ServersShow({ server }) {
   }, [pollServer, transitionState])
 
   const loadWhitelist = useEffectEvent(async () => {
-    if (!canManageWhitelist || !whitelistAvailable) {
+    if (!canManageWhitelist) {
       setWhitelistEntries([])
+      setWhitelistEnabled(true)
+      setWhitelistStagedOnly(false)
       setWhitelistError(null)
       return
     }
@@ -191,6 +195,8 @@ export default function ServersShow({ server }) {
       }
 
       setWhitelistEntries(body.whitelist.entries || [])
+      setWhitelistEnabled(body.whitelist.enabled !== false)
+      setWhitelistStagedOnly(body.whitelist.staged_only === true)
     } catch (error) {
       setWhitelistError(error.message)
     } finally {
@@ -201,12 +207,14 @@ export default function ServersShow({ server }) {
   useEffect(() => {
     setPlayerName('')
     setWhitelistEntries([])
+    setWhitelistEnabled(true)
+    setWhitelistStagedOnly(false)
     setWhitelistError(null)
   }, [server.id])
 
   useEffect(() => {
     loadWhitelist()
-  }, [loadWhitelist, canManageWhitelist, whitelistAvailable, server.id])
+  }, [loadWhitelist, canManageWhitelist, server.id])
 
   async function mutateWhitelist(url, { method = 'POST', body } = {}) {
     setWhitelistMutationLoading(true)
@@ -230,6 +238,8 @@ export default function ServersShow({ server }) {
       }
 
       setWhitelistEntries(payload.whitelist.entries || [])
+      setWhitelistEnabled(payload.whitelist.enabled !== false)
+      setWhitelistStagedOnly(payload.whitelist.staged_only === true)
     } catch (error) {
       setWhitelistError(error.message)
     } finally {
@@ -413,12 +423,19 @@ export default function ServersShow({ server }) {
               </Group>
               <Divider />
 
-              {!whitelistAvailable ? (
-                <Alert color="blue" radius="lg" title="起動中のみ操作できます" variant="light">
-                  サーバーを起動すると、ホワイトリストの確認と変更ができます。
-                </Alert>
-              ) : (
-                <>
+              <>
+                {whitelistStagedOnly ? (
+                  <Alert color="blue" radius="lg" title="次回起動時に反映します" variant="light">
+                    停止中のため、いまの変更は保存だけ行います。次に起動すると現在の設定で container を作り直して反映します。
+                  </Alert>
+                ) : null}
+
+                {!whitelistEnabled ? (
+                  <Alert color="yellow" radius="lg" title="現在は無効です" variant="light">
+                    この状態では登録済みプレイヤーがいても接続制限はかかりません。
+                  </Alert>
+                ) : null}
+
                   {whitelistError ? (
                     <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="ホワイトリスト操作に失敗しました" variant="light">
                       {whitelistError}
@@ -501,8 +518,7 @@ export default function ServersShow({ server }) {
                       </Group>
                     )}
                   </Stack>
-                </>
-              )}
+              </>
             </Stack>
           </Paper>
         ) : null}

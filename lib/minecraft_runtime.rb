@@ -95,7 +95,9 @@ module MinecraftRuntime
         "VERSION" => normalize_version_tag(server.minecraft_version),
         "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
         "ENABLE_RCON" => "TRUE",
-        "ENABLE_WHITELIST" => "TRUE",
+        "ENABLE_WHITELIST" => server.whitelist_enabled? ? "TRUE" : "FALSE",
+        "WHITELIST" => server.whitelist_entries_csv,
+        "EXISTING_WHITELIST_FILE" => "SYNCHRONIZE",
         "RCON_PORT" => MinecraftRcon.port.to_s,
         "RCON_PASSWORD" => MinecraftRcon.password_for(server),
       }
@@ -106,7 +108,9 @@ module MinecraftRuntime
         "VERSION" => normalize_version_tag(server.minecraft_version),
         "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
         "ENABLE_RCON" => "TRUE",
-        "ENABLE_WHITELIST" => "TRUE",
+        "ENABLE_WHITELIST" => server.whitelist_enabled? ? "TRUE" : "FALSE",
+        "WHITELIST" => server.whitelist_entries_csv,
+        "EXISTING_WHITELIST_FILE" => "SYNCHRONIZE",
         "RCON_PORT" => MinecraftRcon.port.to_s,
         "RCON_PASSWORD" => MinecraftRcon.password_for(server),
       }

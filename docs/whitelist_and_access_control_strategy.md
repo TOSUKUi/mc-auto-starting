@@ -40,9 +40,10 @@ Out of scope in this phase:
   - `whitelist remove <player>`
   - `whitelist reload`
 - Whitelist operations should target running servers only.
-- When a server is stopped, the UI should not offer whitelist mutations and should instead explain that the server must be running first.
+- When a server is running, whitelist mutations should be applied immediately through RCON and also persisted as the desired whitelist state.
+- When a server is stopped, whitelist mutations should still be accepted as desired state and saved for the next start.
 - Because server data lives under the managed `/data` volume, successful whitelist mutations should survive ordinary start/stop/restart cycles.
-- Changing this default affects newly provisioned containers; existing containers created before the change still need an explicit `whitelist on` once.
+- Start should recreate the managed container with the current desired env so stopped-state whitelist changes are applied on the next boot.
 
 ### 2. Whitelist authority is stronger than lifecycle authority
 
@@ -67,13 +68,16 @@ Rationale:
 ### Server detail
 
 - Add a whitelist card only when the server is running.
-- Show current whitelist mode and current entries.
+- Add a whitelist card on server detail for owner/admin users.
+- Show current whitelist mode and current desired entries.
 - Offer explicit actions:
   - `ホワイトリストを有効化`
   - `ホワイトリストを無効化`
   - `プレイヤーを追加`
   - `プレイヤーを削除`
   - `再読込`
+- Running servers should mutate live state through RCON.
+- Stopped servers should show a staged-mode note and allow the same edits, but explain that they apply on the next start.
 - If the acting user lacks whitelist authority, show nothing or read-only state depending on the finalized UI contract.
 
 ### Error handling

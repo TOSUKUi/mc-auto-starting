@@ -1,7 +1,28 @@
 require "test_helper"
 
 class Servers::LifecycleOperationTest < ActiveSupport::TestCase
-  FakeDockerClient = Struct.new(:calls, :inspect_result, :error, keyword_init: true) do
+  FakeDockerClient = Struct.new(:calls, :inspect_result, :created_container_id, :error, keyword_init: true) do
+    def remove_container(**kwargs)
+      calls << [ :remove_container, kwargs ]
+      raise error if error
+
+      true
+    end
+
+    def create_container(**kwargs)
+      calls << [ :create_container, kwargs ]
+      raise error if error
+
+      { "Id" => created_container_id || inspect_result.fetch("Id") }
+    end
+
+    def pull_image(**kwargs)
+      calls << [ :pull_image, kwargs ]
+      raise error if error
+
+      true
+    end
+
     def start_container(**kwargs)
       calls << [ :start_container, kwargs ]
       raise error if error
@@ -36,8 +57,9 @@ class Servers::LifecycleOperationTest < ActiveSupport::TestCase
     server.update_columns(status: "stopped", container_state: "exited")
     docker_client = FakeDockerClient.new(
       calls: [],
+      created_container_id: "container-002",
       inspect_result: {
-        "Id" => "container-001",
+        "Id" => "container-002",
         "State" => { "Status" => "running" },
       },
     )
@@ -45,10 +67,13 @@ class Servers::LifecycleOperationTest < ActiveSupport::TestCase
     result = Servers::StartServer.new(server: server, docker_client: docker_client).call
 
     assert_equal server, result
-    assert_equal [ :start_container, { id: "container-001" } ], docker_client.calls.fetch(0)
-    assert_equal [ :inspect_container, { id_or_name: "container-001" } ], docker_client.calls.fetch(1)
+    assert_equal [ :remove_container, { id: "container-001", force: false } ], docker_client.calls.fetch(0)
+    assert_equal :create_container, docker_client.calls.fetch(1).fetch(0)
+    assert_equal [ :start_container, { id: "container-002" } ], docker_client.calls.fetch(2)
+    assert_equal [ :inspect_container, { id_or_name: "container-002" } ], docker_client.calls.fetch(3)
     assert_equal "starting", server.reload.status
     assert_equal "running", server.container_state
+    assert_equal "container-002", server.container_id
     assert_not_nil server.last_started_at
     assert_nil server.last_error_message
   end

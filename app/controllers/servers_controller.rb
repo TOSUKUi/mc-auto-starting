@@ -186,7 +186,8 @@ class ServersController < InertiaController
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :manage_whitelist?
 
-    whitelist_manager_for(server).enable!
+    server.update!(whitelist_enabled: true)
+    whitelist_manager_for(server).enable! if whitelist_live_mutation?(server)
     respond_with_whitelist_action(server, notice: "ホワイトリストを有効化しました。")
   rescue MinecraftRcon::Error => error
     respond_with_whitelist_error(server, error)
@@ -196,7 +197,8 @@ class ServersController < InertiaController
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :manage_whitelist?
 
-    whitelist_manager_for(server).disable!
+    server.update!(whitelist_enabled: false)
+    whitelist_manager_for(server).disable! if whitelist_live_mutation?(server)
     respond_with_whitelist_action(server, notice: "ホワイトリストを無効化しました。")
   rescue MinecraftRcon::Error => error
     respond_with_whitelist_error(server, error)
@@ -206,7 +208,7 @@ class ServersController < InertiaController
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :manage_whitelist?
 
-    whitelist_manager_for(server).reload!
+    whitelist_manager_for(server).reload! if whitelist_live_mutation?(server)
     respond_with_whitelist_action(server, notice: "ホワイトリストを再読込しました。")
   rescue MinecraftRcon::Error => error
     respond_with_whitelist_error(server, error)
@@ -216,8 +218,12 @@ class ServersController < InertiaController
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :manage_whitelist?
 
-    whitelist_manager_for(server).add_player!(whitelist_player_name)
+    player_name = whitelist_player_name
+    server.update!(whitelist_entries: (server.whitelist_entries + [ player_name ]).uniq.sort)
+    whitelist_manager_for(server).add_player!(player_name) if whitelist_live_mutation?(server)
     respond_with_whitelist_action(server, notice: "プレイヤーを追加しました。")
+  rescue ActiveRecord::RecordInvalid => error
+    respond_with_whitelist_error(server, MinecraftRcon::CommandError.new(error.record.errors.full_messages.to_sentence))
   rescue MinecraftRcon::Error => error
     respond_with_whitelist_error(server, error)
   end
@@ -226,8 +232,12 @@ class ServersController < InertiaController
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :manage_whitelist?
 
-    whitelist_manager_for(server).remove_player!(whitelist_player_name)
+    player_name = whitelist_player_name
+    server.update!(whitelist_entries: server.whitelist_entries.reject { |entry| entry == player_name })
+    whitelist_manager_for(server).remove_player!(player_name) if whitelist_live_mutation?(server)
     respond_with_whitelist_action(server, notice: "プレイヤーを削除しました。")
+  rescue ActiveRecord::RecordInvalid => error
+    respond_with_whitelist_error(server, MinecraftRcon::CommandError.new(error.record.errors.full_messages.to_sentence))
   rescue MinecraftRcon::Error => error
     respond_with_whitelist_error(server, error)
   end
@@ -404,7 +414,9 @@ class ServersController < InertiaController
 
     def whitelist_payload(server)
       {
-        entries: whitelist_manager_for(server).list_entries,
+        enabled: server.whitelist_enabled?,
+        entries: server.whitelist_entries,
+        staged_only: !whitelist_live_mutation?(server),
       }
     end
 
@@ -414,6 +426,10 @@ class ServersController < InertiaController
 
     def whitelist_player_name
       params.fetch(:player_name, "").to_s
+    end
+
+    def whitelist_live_mutation?(server)
+      server.container_state == "running"
     end
 
     def sync_server_for_transition_poll!(server)

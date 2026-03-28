@@ -44,6 +44,7 @@ class ServerWhitelistsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "owner can fetch whitelist entries" do
+    minecraft_servers(:one).update!(whitelist_entries: [ "Alex", "Steve" ], whitelist_enabled: true)
     manager = stub_whitelist_manager(entries: [ "Alex", "Steve" ])
     sign_in_as(users(:one))
 
@@ -51,7 +52,9 @@ class ServerWhitelistsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal [ "Alex", "Steve" ], response.parsed_body.fetch("whitelist").fetch("entries")
-    assert_equal [ [ :list_entries ] ], manager.calls
+    assert_equal true, response.parsed_body.fetch("whitelist").fetch("enabled")
+    assert_equal false, response.parsed_body.fetch("whitelist").fetch("staged_only")
+    assert_empty manager.calls
   end
 
   test "admin can manage whitelist for a non-owned visible server" do
@@ -63,7 +66,8 @@ class ServerWhitelistsControllerTest < ActionDispatch::IntegrationTest
     post add_whitelist_player_server_url(server, format: :json), params: { player_name: "Alex" }
 
     assert_response :success
-    assert_equal [ [ :add, "Alex" ], [ :list_entries ] ], manager.calls
+    assert_equal [ [ :add, "Alex" ] ], manager.calls
+    assert_equal [ "Alex" ], server.reload.whitelist_entries
   end
 
   test "manager membership cannot fetch whitelist entries" do
@@ -82,16 +86,17 @@ class ServerWhitelistsControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "stopped server whitelist action returns unprocessable entity" do
-    minecraft_servers(:one).update_columns(container_state: "exited")
-    manager = stub_whitelist_manager(error: MinecraftRcon::UnavailableError.new("whitelist operations require a running server"))
+  test "stopped server whitelist action is staged for next start" do
+    minecraft_servers(:one).update_columns(container_state: "exited", status: "stopped")
+    manager = stub_whitelist_manager(entries: [])
     sign_in_as(users(:one))
 
-    post enable_whitelist_server_url(minecraft_servers(:one), format: :json)
+    post add_whitelist_player_server_url(minecraft_servers(:one), format: :json), params: { player_name: "Steve" }
 
-    assert_response :unprocessable_entity
-    assert_equal "whitelist operations require a running server", response.parsed_body.fetch("error")
-    assert_equal [ [ :enable ] ], manager.calls
+    assert_response :success
+    assert_equal [ "Steve" ], response.parsed_body.fetch("whitelist").fetch("entries")
+    assert_equal true, response.parsed_body.fetch("whitelist").fetch("staged_only")
+    assert_empty manager.calls
   end
 
   test "rcon command failure returns unprocessable entity" do

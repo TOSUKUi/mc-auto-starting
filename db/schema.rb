@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_035000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_080000) do
   create_table "discord_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "discord_user_id", null: false
@@ -51,6 +51,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_035000) do
     t.string "template_kind", null: false
     t.datetime "updated_at", null: false
     t.string "volume_name", null: false
+    t.boolean "whitelist_enabled", default: true, null: false
+    t.text "whitelist_entries", null: false
     t.index ["container_id"], name: "index_minecraft_servers_on_container_id"
     t.index ["container_name"], name: "index_minecraft_servers_on_container_name", unique: true
     t.index ["container_state"], name: "index_minecraft_servers_on_container_state"

@@ -4,6 +4,7 @@ class MinecraftServer < ApplicationRecord
   MANAGED_CONTAINER_PORT = 25_565
   MIN_MEMORY_MB = 512
   MAX_MEMORY_MB = 4096
+  PLAYER_NAME_PATTERN = /\A[A-Za-z0-9_]{3,16}\z/
 
   STATUS_TRANSITIONS = MinecraftServerStatus::TRANSITIONS
 
@@ -17,6 +18,7 @@ class MinecraftServer < ApplicationRecord
   before_validation :normalize_hostname
   before_validation :assign_legacy_template_kind
   before_validation :assign_managed_resource_names
+  before_validation :normalize_whitelist_entries
 
   validates :name, :hostname, :status, :minecraft_version, :template_kind, :container_name, :volume_name, presence: true
   validates :template_kind, inclusion: { in: RUNTIME_FAMILIES }
@@ -29,6 +31,7 @@ class MinecraftServer < ApplicationRecord
     less_than_or_equal_to: MAX_MEMORY_MB,
   }
   validates :disk_mb, numericality: { only_integer: true, greater_than: 0 }
+  validate :whitelist_entries_are_valid
   validate :status_transition_is_allowed, if: :will_save_change_to_status?
 
   def self.normalize_hostname(value)
@@ -81,6 +84,34 @@ class MinecraftServer < ApplicationRecord
     MinecraftRcon.password_for(self)
   end
 
+  def whitelist_entries
+    raw_entries = self[:whitelist_entries]
+    return [] if raw_entries.blank?
+    return raw_entries if raw_entries.is_a?(Array)
+
+    JSON.parse(raw_entries)
+  rescue JSON::ParserError
+    []
+  end
+
+  def whitelist_entries=(value)
+    normalized_entries = Array(value)
+      .map { |entry| entry.to_s.strip }
+      .reject(&:blank?)
+      .uniq
+      .sort
+
+    self[:whitelist_entries] = JSON.generate(normalized_entries)
+  end
+
+  def whitelist_entries_csv
+    whitelist_entries.join("\n")
+  end
+
+  def whitelist_entry?(player_name)
+    whitelist_entries.include?(player_name.to_s.strip)
+  end
+
   def lifecycle_ready?
     container_id.present?
   end
@@ -114,6 +145,22 @@ class MinecraftServer < ApplicationRecord
 
       self.container_name = MinecraftServerHostname.container_name_for(hostname)
       self.volume_name = MinecraftServerHostname.volume_name_for(hostname)
+    end
+
+    def normalize_whitelist_entries
+      self.whitelist_entries = Array(whitelist_entries)
+        .map { |entry| entry.to_s.strip }
+        .reject(&:blank?)
+        .uniq
+        .sort
+    end
+
+    def whitelist_entries_are_valid
+      whitelist_entries.each do |entry|
+        next if entry.match?(PLAYER_NAME_PATTERN)
+
+        errors.add(:whitelist_entries, "contains an invalid player name: #{entry}")
+      end
     end
 
     def status_transition_is_allowed
