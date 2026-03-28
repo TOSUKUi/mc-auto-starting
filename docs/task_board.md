@@ -116,6 +116,8 @@
 | T-1111 | P10 | Persist baseline startup settings alongside server desired state | T-1110,T-400 | done | `minecraft_servers` now persists baseline startup settings such as `hardcore`, `difficulty`, `max_players`, `motd`, `pvp`, and `gamemode`, and `MinecraftRuntime` includes them in the managed-container env contract used on create/start/restart |
 | T-1112 | P10 | Add startup settings UI to create/detail flows | T-1110,T-1111,T-500,T-501 | done | Create flow now accepts the baseline startup settings, server detail shows them for visible users, and owner/admin users can update the desired state from detail with enum-like values rendered as `Select` controls plus explicit `hardcore` handling |
 | T-1113 | P10 | Expose startup settings through the bot surface | T-1110,T-1111,T-1007 | done | Discord bot can now read and update the same startup-settings desired state through the internal Rails-owned bot API surface |
+| T-1114 | P10 | Reframe startup settings as create-time defaults and move detail changes to structured RCON actions | T-1110,T-1111,T-1112,T-1012 | todo | Startup settings remain part of create-time/default runtime config, detail no longer treats Rails desired state as the live source of truth for mutable server properties, and owner/admin detail actions move toward structured allowlisted RCON forms instead of a freeform console |
+| T-1115 | P10 | Audit all input validation paths and block any server-side gaps | T-500,T-1002,T-1012,T-1114 | todo | Browser-visible validation matches controller/model/service enforcement across active create/invite/member/whitelist/RCON flows, and any missing server-side rejection paths are added with test coverage |
 
 ## Critical Path Tasks
 
