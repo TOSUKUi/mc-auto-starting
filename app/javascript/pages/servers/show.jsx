@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, NumberInput, Paper, ScrollArea, Select, SimpleGrid, Stack, Switch, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
+import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, ScrollArea, Select, SimpleGrid, Stack, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
 import { Head, Link, router } from '@inertiajs/react'
 import {
   IconAlertCircle,
@@ -119,6 +119,43 @@ function toSelectBoolean(value) {
   return value ? 'true' : 'false'
 }
 
+const DIFFICULTY_OPTIONS = [
+  { value: 'peaceful', label: 'Peaceful' },
+  { value: 'easy', label: 'Easy' },
+  { value: 'normal', label: 'Normal' },
+  { value: 'hard', label: 'Hard' },
+]
+
+const WEATHER_OPTIONS = [
+  { value: 'clear', label: '晴れ' },
+  { value: 'rain', label: '雨' },
+  { value: 'thunder', label: '雷雨' },
+]
+
+const TIME_OPTIONS = [
+  { value: 'day', label: '朝' },
+  { value: 'noon', label: '昼' },
+  { value: 'night', label: '夜' },
+  { value: 'midnight', label: '深夜' },
+]
+
+function startupValueLabel(setting, value) {
+  if (setting === 'difficulty') return DIFFICULTY_OPTIONS.find((option) => option.value === value)?.label || value
+  if (setting === 'pvp') return toSelectBoolean(value) === 'true' ? '有効' : '無効'
+  if (setting === 'hardcore') return value ? '有効' : '無効'
+  if (setting === 'gamemode') {
+    switch (value) {
+      case 'survival': return 'Survival'
+      case 'creative': return 'Creative'
+      case 'adventure': return 'Adventure'
+      case 'spectator': return 'Spectator'
+      default: return value
+    }
+  }
+
+  return value
+}
+
 function DetailLine({ label, value }) {
   return (
     <Stack gap={2}>
@@ -158,18 +195,18 @@ export default function ServersShow({ server }) {
   const [ recentLogs, setRecentLogs ] = useState({ available: false, lines: [], error_code: null })
   const [ recentLogsLoading, setRecentLogsLoading ] = useState(false)
   const [ recentLogsError, setRecentLogsError ] = useState(null)
-  const [ startupSettings, setStartupSettings ] = useState(server.startup_settings)
-  const [ startupSettingsLoading, setStartupSettingsLoading ] = useState(false)
-  const [ startupSettingsError, setStartupSettingsError ] = useState(null)
-  const [ startupSettingsNotice, setStartupSettingsNotice ] = useState(null)
-  const [ rconCommand, setRconCommand ] = useState('')
   const [ rconLoading, setRconLoading ] = useState(false)
   const [ rconResult, setRconResult ] = useState(null)
   const [ rconError, setRconError ] = useState(null)
+  const [ sayMessage, setSayMessage ] = useState('')
+  const [ kickPlayerName, setKickPlayerName ] = useState('')
+  const [ kickReason, setKickReason ] = useState('')
+  const [ selectedDifficulty, setSelectedDifficulty ] = useState(server.startup_settings.difficulty)
+  const [ selectedWeather, setSelectedWeather ] = useState('clear')
+  const [ selectedTime, setSelectedTime ] = useState('day')
   const transitionState = isTransitioning(server.status)
   const canManageWhitelist = server.can_manage_whitelist
   const canRunRconCommand = server.can_run_rcon_command
-  const canManageStartupSettings = server.can_manage_startup_settings
   const whitelistLiveMode = canManageWhitelist && server.runtime.container_state === 'running'
   const routeIssueMessage = server.route_issue_message || (server.route.last_apply_status === 'failed' ? '公開設定の反映に失敗しています。' : null)
   const pollServer = useEffectEvent(() => {
@@ -196,12 +233,6 @@ export default function ServersShow({ server }) {
   useEffect(() => {
     setPlayerPresence(server.player_presence)
   }, [server.id, server.player_presence])
-
-  useEffect(() => {
-    setStartupSettings(server.startup_settings)
-    setStartupSettingsError(null)
-    setStartupSettingsNotice(null)
-  }, [server.id, server.startup_settings])
 
   useEffect(() => {
     if (!transitionState) return undefined
@@ -303,9 +334,14 @@ export default function ServersShow({ server }) {
     setWhitelistError(null)
     setRecentLogs({ available: false, lines: [], error_code: null })
     setRecentLogsError(null)
-    setRconCommand('')
     setRconResult(null)
     setRconError(null)
+    setSayMessage('')
+    setKickPlayerName('')
+    setKickReason('')
+    setSelectedDifficulty(server.startup_settings.difficulty)
+    setSelectedWeather('clear')
+    setSelectedTime('day')
   }, [server.id])
 
   useEffect(() => {
@@ -342,7 +378,7 @@ export default function ServersShow({ server }) {
     loadRecentLogs()
   }, [server.id])
 
-  async function submitRconCommand() {
+  async function executeRconCommand(command, { onSuccess } = {}) {
     setRconLoading(true)
     setRconError(null)
     setRconResult(null)
@@ -356,7 +392,7 @@ export default function ServersShow({ server }) {
           'Content-Type': 'application/json',
           'X-CSRF-Token': csrfToken(),
         },
-        body: JSON.stringify({ command: rconCommand }),
+        body: JSON.stringify({ command }),
       })
       const body = await readJsonResponse(response, 'RCON コマンドの応答が不正です。')
 
@@ -365,6 +401,7 @@ export default function ServersShow({ server }) {
       }
 
       setRconResult(body)
+      onSuccess?.()
     } catch (error) {
       setRconError(error.message)
     } finally {
@@ -401,37 +438,6 @@ export default function ServersShow({ server }) {
         setWhitelistError(fallbackError.message)
       }
       setWhitelistMutationLoading(false)
-    }
-  }
-
-  async function saveStartupSettings() {
-    setStartupSettingsLoading(true)
-    setStartupSettingsError(null)
-    setStartupSettingsNotice(null)
-
-    try {
-      const response = await fetch(`/servers/${server.id}/update_startup_settings.json`, {
-        method: 'PATCH',
-        credentials: 'same-origin',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': csrfToken(),
-        },
-        body: JSON.stringify({ minecraft_server: startupSettings }),
-      })
-      const body = await readJsonResponse(response, '起動設定の応答が不正です。')
-
-      if (!response.ok) {
-        throw new Error(body.error || '起動設定を保存できませんでした。')
-      }
-
-      setStartupSettings(body.startup_settings)
-      setStartupSettingsNotice('起動設定を保存しました。次回の起動または再起動で反映されます。')
-    } catch (error) {
-      setStartupSettingsError(error.message)
-    } finally {
-      setStartupSettingsLoading(false)
     }
   }
 
@@ -635,117 +641,16 @@ export default function ServersShow({ server }) {
           <Grid.Col span={12}>
             <Paper p="lg" radius="lg" shadow="sm" withBorder>
               <Stack gap="md">
-                <Group justify="space-between" align="center">
-                  <Text fw={700}>起動設定</Text>
-                  <Group gap="xs">
-                    {startupSettingsLoading ? <Loader size="sm" /> : null}
-                    {canManageStartupSettings ? (
-                      <Button
-                        disabled={startupSettingsLoading}
-                        onClick={() => saveStartupSettings()}
-                        size="xs"
-                        type="button"
-                      >
-                        保存
-                      </Button>
-                    ) : null}
-                  </Group>
-                </Group>
+                <Text fw={700}>初期設定</Text>
                 <Divider />
-                <Paper p="md" radius="lg" withBorder>
-                  <Stack gap="sm">
-                    <Text fw={700}>再起動で反映する設定</Text>
-                    <Grid gutter="md">
-                      <Grid.Col span={{ base: 12, md: 6 }}>
-                        <Select
-                          data={[
-                            { value: 'easy', label: 'Easy' },
-                            { value: 'normal', label: 'Normal' },
-                            { value: 'hard', label: 'Hard' },
-                            { value: 'peaceful', label: 'Peaceful' },
-                          ]}
-                          disabled={!canManageStartupSettings}
-                          label="難易度"
-                          onChange={(value) => setStartupSettings((current) => ({ ...current, difficulty: value || '' }))}
-                          value={startupSettings.difficulty}
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={{ base: 12, md: 6 }}>
-                        <Select
-                          data={[
-                            { value: 'survival', label: 'Survival' },
-                            { value: 'creative', label: 'Creative' },
-                            { value: 'adventure', label: 'Adventure' },
-                            { value: 'spectator', label: 'Spectator' },
-                          ]}
-                          disabled={!canManageStartupSettings}
-                          label="ゲームモード"
-                          onChange={(value) => setStartupSettings((current) => ({ ...current, gamemode: value || '' }))}
-                          value={startupSettings.gamemode}
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={{ base: 12, md: 6 }}>
-                        <NumberInput
-                          allowDecimal={false}
-                          disabled={!canManageStartupSettings}
-                          hideControls
-                          label="最大プレイヤー数"
-                          max={100}
-                          min={1}
-                          onChange={(value) => setStartupSettings((current) => ({ ...current, max_players: Math.max(1, Math.min(100, Number(value) || 1)) }))}
-                          value={startupSettings.max_players}
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={{ base: 12, md: 6 }}>
-                        <Select
-                          data={[
-                            { value: 'true', label: '有効' },
-                            { value: 'false', label: '無効' },
-                          ]}
-                          disabled={!canManageStartupSettings}
-                          label="PvP"
-                          onChange={(value) => setStartupSettings((current) => ({ ...current, pvp: value === 'true' }))}
-                          value={toSelectBoolean(startupSettings.pvp)}
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={12}>
-                        <TextInput
-                          description="サーバー一覧などで見える説明文です。"
-                          disabled={!canManageStartupSettings}
-                          label="MOTD"
-                          onChange={(event) => setStartupSettings((current) => ({ ...current, motd: event.currentTarget.value }))}
-                          value={startupSettings.motd}
-                        />
-                      </Grid.Col>
-                      <Grid.Col span={12}>
-                        <Paper p="sm" radius="md" withBorder>
-                          <Stack gap={8}>
-                            <Text fw={500} size="sm">ハードコア</Text>
-                            <Switch
-                              checked={!!startupSettings.hardcore}
-                              disabled={!canManageStartupSettings}
-                              label={startupSettings.hardcore ? '有効' : '無効'}
-                              onChange={(event) => {
-                                const checked = event.currentTarget.checked
-                                setStartupSettings((current) => ({ ...current, hardcore: checked }))
-                              }}
-                            />
-                          </Stack>
-                        </Paper>
-                      </Grid.Col>
-                    </Grid>
-                  </Stack>
-                </Paper>
-                {startupSettingsError ? (
-                  <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="起動設定を保存できませんでした" variant="light">
-                    {startupSettingsError}
-                  </Alert>
-                ) : null}
-                {startupSettingsNotice ? (
-                  <Alert color="teal" radius="lg" title="保存しました" variant="light">
-                    {startupSettingsNotice}
-                  </Alert>
-                ) : null}
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                  <DetailLine label="難易度" value={startupValueLabel('difficulty', server.startup_settings.difficulty)} />
+                  <DetailLine label="ゲームモード" value={startupValueLabel('gamemode', server.startup_settings.gamemode)} />
+                  <DetailLine label="最大プレイヤー数" value={server.startup_settings.max_players} />
+                  <DetailLine label="PvP" value={startupValueLabel('pvp', server.startup_settings.pvp)} />
+                  <DetailLine label="ハードコア" value={startupValueLabel('hardcore', server.startup_settings.hardcore)} />
+                  <DetailLine label="MOTD" value={server.startup_settings.motd ? server.startup_settings.motd : '-'} />
+                </SimpleGrid>
               </Stack>
             </Paper>
           </Grid.Col>
@@ -789,13 +694,107 @@ export default function ServersShow({ server }) {
           <Paper p="lg" radius="lg" shadow="sm" withBorder>
             <Stack gap="md">
               <Group justify="space-between" align="center">
-                <Text fw={700}>コマンド入力</Text>
+                <Text fw={700}>サーバー操作</Text>
                 {rconLoading ? <Loader size="sm" /> : null}
               </Group>
               <Divider />
-              <Code block>実行可能: say / list / kick / save-all / time set / weather</Code>
+              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                <Paper p="md" radius="lg" withBorder>
+                  <Stack gap="sm">
+                    <Text fw={700}>難易度</Text>
+                    <Group align="flex-end" grow>
+                      <Select data={DIFFICULTY_OPTIONS} onChange={(value) => setSelectedDifficulty(value || 'easy')} value={selectedDifficulty} />
+                      <Button onClick={() => executeRconCommand(`difficulty ${selectedDifficulty}`)} type="button">
+                        変更
+                      </Button>
+                    </Group>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" withBorder>
+                  <Stack gap="sm">
+                    <Text fw={700}>天気</Text>
+                    <Group align="flex-end" grow>
+                      <Select data={WEATHER_OPTIONS} onChange={(value) => setSelectedWeather(value || 'clear')} value={selectedWeather} />
+                      <Button onClick={() => executeRconCommand(`weather ${selectedWeather}`)} type="button">
+                        変更
+                      </Button>
+                    </Group>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" withBorder>
+                  <Stack gap="sm">
+                    <Text fw={700}>時刻</Text>
+                    <Group align="flex-end" grow>
+                      <Select data={TIME_OPTIONS} onChange={(value) => setSelectedTime(value || 'day')} value={selectedTime} />
+                      <Button onClick={() => executeRconCommand(`time set ${selectedTime}`)} type="button">
+                        変更
+                      </Button>
+                    </Group>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" withBorder>
+                  <Stack gap="sm">
+                    <Text fw={700}>保存</Text>
+                    <Button onClick={() => executeRconCommand('save-all')} type="button" variant="light">
+                      save-all
+                    </Button>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" withBorder>
+                  <Stack gap="sm">
+                    <Text fw={700}>お知らせ</Text>
+                    <Group align="flex-end" grow>
+                      <TextInput
+                        onChange={(event) => setSayMessage(event.currentTarget.value)}
+                        placeholder="再起動を開始します"
+                        value={sayMessage}
+                      />
+                      <Button
+                        disabled={sayMessage.trim().length === 0}
+                        onClick={() => executeRconCommand(`say ${sayMessage}`, { onSuccess: () => setSayMessage('') })}
+                        type="button"
+                      >
+                        送信
+                      </Button>
+                    </Group>
+                  </Stack>
+                </Paper>
+                <Paper p="md" radius="lg" withBorder>
+                  <Stack gap="sm">
+                    <Text fw={700}>キック</Text>
+                    <TextInput
+                      label="プレイヤー名"
+                      onChange={(event) => setKickPlayerName(event.currentTarget.value)}
+                      placeholder="Steve"
+                      value={kickPlayerName}
+                    />
+                    <TextInput
+                      label="理由"
+                      onChange={(event) => setKickReason(event.currentTarget.value)}
+                      placeholder="メンテナンス中です"
+                      value={kickReason}
+                    />
+                    <Group justify="flex-end">
+                      <Button
+                        color="red"
+                        disabled={kickPlayerName.trim().length === 0}
+                        onClick={() => executeRconCommand(`kick ${kickPlayerName}${kickReason.trim().length > 0 ? ` ${kickReason}` : ''}`, {
+                          onSuccess: () => {
+                            setKickPlayerName('')
+                            setKickReason('')
+                          },
+                        })}
+                        type="button"
+                        variant="light"
+                      >
+                        実行
+                      </Button>
+                    </Group>
+                  </Stack>
+                </Paper>
+              </SimpleGrid>
               {rconError ? (
-                <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="コマンドを実行できませんでした" variant="light">
+                <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="操作を実行できませんでした" variant="light">
                   {rconError}
                 </Alert>
               ) : null}
@@ -809,21 +808,6 @@ export default function ServersShow({ server }) {
                   </Stack>
                 </Alert>
               ) : null}
-              <Group align="flex-end" grow>
-                <TextInput
-                  label="RCON コマンド"
-                  value={rconCommand}
-                  onChange={(event) => setRconCommand(event.currentTarget.value)}
-                  placeholder="say サーバーメンテナンスを開始します"
-                />
-                <Button
-                  onClick={() => submitRconCommand()}
-                  type="button"
-                  disabled={rconLoading || rconCommand.trim().length === 0}
-                >
-                  実行
-                </Button>
-              </Group>
             </Stack>
           </Paper>
         ) : null}

@@ -373,6 +373,17 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal "players online", response.parsed_body.fetch("response_body")
   end
 
+  test "owner can execute structured difficulty command" do
+    sign_in_as(users(:one))
+    stub_bounded_rcon("Difficulty set to hard")
+
+    post rcon_command_server_url(minecraft_servers(:one), format: :json), params: { command: "difficulty hard" }
+
+    assert_response :success
+    assert_equal "difficulty hard", response.parsed_body.fetch("command")
+    assert_equal "Difficulty set to hard", response.parsed_body.fetch("response_body")
+  end
+
   test "viewer cannot execute bounded rcon command" do
     sign_in_as(users(:two))
 

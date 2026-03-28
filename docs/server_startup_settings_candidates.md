@@ -2,14 +2,14 @@
 
 ## Purpose
 
-サーバー作成時または詳細画面から扱いたい「起動設定」の候補を整理する。
+サーバー作成時に扱う「初期設定」の候補を整理する。
 
 このメモは、起動設定 contract の正本として使う。
 
 ## Goal
 
 - create 時に触らせるべき設定
-- create 後に詳細画面から変更したい設定
+- create 後に詳細画面で見せるべき設定
 - Discord bot からも扱える設定
 - 初手では scope 外に置く設定
 
@@ -78,19 +78,18 @@
 
 ### Detail Screen
 
-作成後に変更しやすい候補:
+作成後は「初期設定」として read-only 表示する。
 
 - `difficulty`
 - `gamemode`
 - `max_players`
 - `motd`
 - `pvp`
-- `view_distance`
-- `simulation_distance`
+- `hardcore`
 
 ### Discord Bot
 
-bot でも扱える前提にする候補:
+bot でも read-only で扱える前提にする候補:
 
 - `hardcore`
 - `difficulty`
@@ -99,22 +98,21 @@ bot でも扱える前提にする候補:
 - `motd`
 - `pvp`
 
-初手では browser/detail と同じ bounded setting surface を使い、bot 専用の別契約を増やしすぎない。
+mutable な live 設定変更は startup-settings desired state ではなく、structured RCON action surface に寄せる。
 
 ## Runtime Contract Direction
 
-- Rails は startup settings を desired state として `minecraft_servers` に保存する
-- create 時はその desired state をそのまま保存する
-- detail と bot からの update も同じ desired state を更新する
-- managed container の env は `create` / `start` / `restart` 時に current desired state から組み立てる
-- 初期 baseline の startup settings は live apply を行わず、次回の起動または再起動で反映する
+- Rails は startup settings を create-time defaults として `minecraft_servers` に保存する
+- create 時はその defaults をそのまま保存する
+- managed container の env は `create` / `start` / `restart` 時に saved defaults から組み立てる
+- live server の mutable properties を Rails の desired state として追い続けることはしない
+- 運用中の変更は structured RCON actions に寄せる
 
 ## UI Direction
 
 - 初手の create form では 3 から 5 項目までに抑える
 - それ以上は「詳細設定」に分ける
 - whitelist や lifecycle は既存の専用 UI を維持する
-- 変更結果は `server.properties` 系の desired state として Rails 側で保持し、次回の起動または再起動で反映する
 - 列挙型の設定は freeform input ではなく `Select` を使う
 - 想定対象:
   - `hardcore`
@@ -122,19 +120,19 @@ bot でも扱える前提にする候補:
   - `gamemode`
   - 将来追加する列挙型 setting
 - `max_players` や `motd` のような自由入力値だけを text / number input に残す
-- detail では「リアルタイム反映できる設定」と「再起動で反映する設定」を分けて見せる
-- 初期 baseline では startup settings 全体が再起動反映なので、detail の editable surface は再起動反映セクションに寄せる
+- detail では startup settings を read-only の「初期設定」として見せる
+- live 変更は自由入力ではなく、structured RCON actions として別 card に分ける
 
 ## Surface Contract Direction
 
 - create form
-  - 初期 desired state を決める
+  - 初期 defaults を決める
 - server detail
-  - 保存済み desired state を編集する
+  - 保存済み defaults を read-only で表示する
 - Discord bot
-  - 同じ desired state を read / mutate できる
+  - 同じ defaults を read できる
 
-つまり source of truth は Rails 側の startup settings desired state で共通化する。
+つまり source of truth は Rails 側の create-time defaults であり、live mutable state の正本ではない。
 
 ## Suggested Order
 

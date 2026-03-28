@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document fixes the contract for player count, recent logs, and the browser-side bounded command console before the UI work in `T-1011` and `T-1012`.
+This document fixes the contract for player count, recent logs, and the browser-side structured bounded RCON actions before the UI work in `T-1011` and `T-1012`.
 
 `T-1010` uses this file as the authoritative contract.
 
@@ -12,7 +12,7 @@ In scope:
 
 - player count and online-player read surface
 - recent Minecraft server log read surface
-- browser-side bounded RCON command console
+- browser-side structured bounded RCON actions
 - authorization, refresh behavior, and payload shape for those surfaces
 
 Out of scope in this phase:
@@ -38,13 +38,14 @@ Out of scope in this phase:
 - Log viewing stays read-only.
 - The initial log surface is a short tail view for current troubleshooting, not a persistent audit store.
 
-### 3. Browser command input reuses the same bounded RCON policy as the bot
+### 3. Browser-side RCON actions reuse the same bounded policy as the bot
 
-- The browser command console must use the same Rails-owned bounded RCON boundary as the bot surface.
+- The browser-side RCON surface must use the same Rails-owned bounded RCON boundary as the bot surface.
 - Allowed commands stay aligned with `Servers::BoundedRconCommand`.
 - Forbidden commands such as `stop`, `start`, `restart`, `reload`, `op`, `deop`, `ban`, `pardon`, and `whitelist ...` remain blocked.
 - Lifecycle operations continue to live behind the dedicated lifecycle buttons.
 - Whitelist operations continue to live behind the dedicated whitelist card.
+- The first browser surface should prefer structured forms such as `difficulty`, `weather`, `time`, `say`, `kick`, and `save-all` instead of a freeform command textarea.
 
 ## Authorization Contract
 
@@ -68,14 +69,14 @@ Allowed for the same visibility set as server detail:
 
 The initial log view is read-only for visible members.
 
-### Browser bounded RCON command console
+### Browser structured bounded RCON actions
 
 Allowed only when the acting user is:
 
 - global `admin`
 - server owner
 
-Server-local `manager` is not enough for direct browser command input in the first pass.
+Server-local `manager` is not enough for direct browser-side RCON actions in the first pass.
 
 ## Refresh Strategy
 
@@ -93,11 +94,12 @@ Server-local `manager` is not enough for direct browser command input in the fir
 - The initial browser log viewer should use manual refresh rather than aggressive streaming.
 - Future streaming is allowed but not part of this contract.
 
-### Browser command console
+### Browser structured RCON actions
 
 - Commands execute only on explicit submit.
 - The UI should show the command result returned by Rails.
 - The UI should not retry commands automatically.
+- The initial browser surface should be preset forms rather than arbitrary text input.
 
 ## Payload Contract
 
@@ -181,8 +183,8 @@ Forbidden command:
 - Show player count ahead of lower-priority metadata.
 - Allow a visible member to see online-player names when available.
 - Show recent logs in a dedicated read-only panel.
-- Show the bounded command console only for owner/admin.
-- Keep lifecycle buttons, whitelist controls, and bounded command input visually separate.
+- Show structured RCON actions only for owner/admin.
+- Keep lifecycle buttons, whitelist controls, and structured RCON actions visually separate.
 
 ### Error behavior
 
@@ -193,7 +195,7 @@ Forbidden command:
 ## Follow-Up Tasks
 
 - `T-1011`: surface player counts in index and detail
-- `T-1012`: add browser log viewer and bounded command console UI
+- `T-1012`: add browser log viewer and structured bounded RCON UI
 
 ## Related Existing Contracts
 
