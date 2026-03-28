@@ -47,6 +47,10 @@ class MinecraftServerPolicy < ApplicationPolicy
     (admin_user? || owner?) && record.lifecycle_ready?
   end
 
+  def rcon_command?
+    (admin_user? || owner?) && record.lifecycle_ready?
+  end
+
   class Scope < Scope
     def resolve
       return scope.none unless user

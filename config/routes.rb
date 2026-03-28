@@ -27,6 +27,31 @@ Rails.application.routes.draw do
 
     resources :members, controller: "server_members", only: %i[index create update destroy]
   end
+
+  constraints DiscordBotNetworkConstraint.new do
+    namespace :api do
+      namespace :discord do
+        namespace :bot do
+          resources :servers, only: [] do
+            member do
+              post :status
+              post :start
+              post :stop
+              post :restart
+              post :sync
+              post "whitelist/list", action: :whitelist_list
+              post "whitelist/add", action: :whitelist_add
+              post "whitelist/remove", action: :whitelist_remove
+              post "whitelist/enable", action: :whitelist_enable
+              post "whitelist/disable", action: :whitelist_disable
+              post "whitelist/reload", action: :whitelist_reload
+              post "rcon/command", action: :rcon_command
+            end
+          end
+        end
+      end
+    end
+  end
   root "servers#index"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
