@@ -84,6 +84,7 @@ Current baseline:
 - `T-1018` is complete: server authorization now combines global type and server-local membership so `admin` has full visibility/management, `manager` membership grants lifecycle access, `viewer` grants read-only visibility, and destroy/member-management remain owner-or-admin only.
 - `T-1020` is complete: whitelist planning now treats server whitelist changes as Rails-owned RCON operations, with the resulting contract fixed in `docs/whitelist_and_access_control_strategy.md`.
 - `T-1006` is complete: Rails now has an app-owned RCON connection layer, managed containers enable RCON by default, and per-server RCON passwords are derived from a stable secret plus server identity instead of being stored as plain DB fields.
+- Managed runtime env now also defaults `ENABLE_WHITELIST=TRUE`, so newly provisioned servers enforce whitelist mode from first boot.
 - `T-1021` is complete: Rails now has a bounded whitelist service over RCON for list/add/remove/on/off/reload operations against running managed servers.
 - `T-1022` is complete: whitelist endpoints are now controller/policy-gated to admins and owners, and request/service coverage includes unauthorized access plus stopped-server and RCON-failure handling.
 - `T-1023` is complete: server detail now includes an owner/admin whitelist card that loads entries from the Rails-owned whitelist endpoints, exposes add/remove/on/off/reload actions while running, and falls back to a non-interactive explanation when the server is stopped.

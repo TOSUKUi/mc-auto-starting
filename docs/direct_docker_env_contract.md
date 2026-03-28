@@ -121,7 +121,7 @@ This document fixes the initial environment and configuration contract for the d
 - `MinecraftPublicEndpoint` is the single source of truth for public FQDN and connection-target formatting.
 - `MinecraftRuntime` is the single source of truth for the baseline runtime image, shared bridge network name, live version-source URLs, and per-family container env payload.
 - `MinecraftRuntime` resolves both `paper` and `vanilla` against the `itzg/minecraft-server` image family, switching only the `TYPE` env value.
-- `MinecraftRuntime` also enables RCON for managed servers and injects the per-server `RCON_PASSWORD` derived by `MinecraftRcon`.
+- `MinecraftRuntime` also enables RCON and `ENABLE_WHITELIST=TRUE` for managed servers, and injects the per-server `RCON_PASSWORD` derived by `MinecraftRcon`.
 - The create form now separates `runtime_family` from `minecraft_version`; `minecraft_version` is runtime-version input passed through the container `VERSION` contract rather than a Docker image tag.
 - `MEMORY` is derived from the selected container memory with reserved JVM headroom; it is not equal to the Docker memory limit.
 - `DockerEngine` reads only Docker transport settings.

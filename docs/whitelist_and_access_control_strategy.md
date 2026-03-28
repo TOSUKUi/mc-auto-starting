@@ -31,6 +31,7 @@ Out of scope in this phase:
 
 - The app should treat whitelist mutation as a bounded RCON feature.
 - Managed containers should start with RCON enabled, using a per-server password derived by Rails from a stable app secret plus the local server identity.
+- Managed containers should also start with whitelist enforcement enabled by default, so a server with no listed players behaves as closed until an operator explicitly adds entries or disables whitelist mode.
 - Initial command surface:
   - `whitelist on`
   - `whitelist off`
@@ -41,6 +42,7 @@ Out of scope in this phase:
 - Whitelist operations should target running servers only.
 - When a server is stopped, the UI should not offer whitelist mutations and should instead explain that the server must be running first.
 - Because server data lives under the managed `/data` volume, successful whitelist mutations should survive ordinary start/stop/restart cycles.
+- Changing this default affects newly provisioned containers; existing containers created before the change still need an explicit `whitelist on` once.
 
 ### 2. Whitelist authority is stronger than lifecycle authority
 

@@ -95,6 +95,7 @@ module MinecraftRuntime
         "VERSION" => normalize_version_tag(server.minecraft_version),
         "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
         "ENABLE_RCON" => "TRUE",
+        "ENABLE_WHITELIST" => "TRUE",
         "RCON_PORT" => MinecraftRcon.port.to_s,
         "RCON_PASSWORD" => MinecraftRcon.password_for(server),
       }
@@ -105,6 +106,7 @@ module MinecraftRuntime
         "VERSION" => normalize_version_tag(server.minecraft_version),
         "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
         "ENABLE_RCON" => "TRUE",
+        "ENABLE_WHITELIST" => "TRUE",
         "RCON_PORT" => MinecraftRcon.port.to_s,
         "RCON_PASSWORD" => MinecraftRcon.password_for(server),
       }

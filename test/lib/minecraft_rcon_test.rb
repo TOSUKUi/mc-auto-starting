@@ -35,6 +35,7 @@ class MinecraftRconTest < ActiveSupport::TestCase
     env = MinecraftRuntime.container_env(server: server)
 
     assert_equal "TRUE", env.fetch("ENABLE_RCON")
+    assert_equal "TRUE", env.fetch("ENABLE_WHITELIST")
     assert_equal MinecraftRcon.port.to_s, env.fetch("RCON_PORT")
     assert_equal MinecraftRcon.password_for(server), env.fetch("RCON_PASSWORD")
   end
