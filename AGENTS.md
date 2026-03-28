@@ -215,6 +215,7 @@ Follow these rules unless the user overrides them.
 - Router config writes should treat explicit `SIGHUP` reload of the compose-managed `mc-router` container as the default baseline; do not rely on bind-mounted file-watch pickup.
 - Do not add monitoring dashboards or audit-log screens unless the user explicitly reintroduces them.
 - UI copy should default to Japanese, while remaining compatible with English via shared locale handling.
+- In React/Inertia UI work, treat `useEffect` as a last resort. Prefer solving state updates through server-provided props, direct event handlers, derived render-time values, or explicit local `useState` transitions before introducing effect-driven synchronization.
 
 ## Build and Bootstrap Commands
 Use these as the default command set.
