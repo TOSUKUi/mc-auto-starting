@@ -97,7 +97,7 @@ module MinecraftRcon
       end
 
       def authenticate!(client)
-        client.authenticate!(ignore_first_packet: true)
+        client.authenticate!(ignore_first_packet: false)
       end
 
       def map_error(error, command:)

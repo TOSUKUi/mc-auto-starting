@@ -36,7 +36,8 @@ module Servers
 
       def execute!(command, segmented: false)
         ensure_running!
-        connection.execute(command, segmented: segmented).to_s.strip
+        response = connection.execute(command, segmented: segmented)
+        response.body.to_s.strip
       end
 
       def ensure_running!
@@ -53,7 +54,11 @@ module Servers
       end
 
       def parse_entries(response)
-        entries = response.split(":", 2).last.to_s.split(",").map(&:strip).reject(&:blank?)
+        normalized_response = response.to_s.strip
+        return [] if normalized_response.blank?
+        return [] if normalized_response.match?(/\AThere are no whitelisted players\z/i)
+
+        entries = normalized_response.split(":", 2).last.to_s.split(",").map(&:strip).reject(&:blank?)
         entries.sort
       end
   end

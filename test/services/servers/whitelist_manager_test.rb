@@ -1,6 +1,7 @@
 require "test_helper"
 
 class Servers::WhitelistManagerTest < ActiveSupport::TestCase
+  FakeResponse = Struct.new(:body, keyword_init: true)
   FakeConnection = Struct.new(:calls, :responses, keyword_init: true) do
     def execute(command, segmented: false)
       calls << [ command, segmented ]
@@ -13,7 +14,7 @@ class Servers::WhitelistManagerTest < ActiveSupport::TestCase
     connection = FakeConnection.new(
       calls: [],
       responses: {
-        "whitelist list" => "There are 2 whitelisted player(s): Steve, Alex",
+        "whitelist list" => FakeResponse.new(body: "There are 2 whitelisted player(s): Steve, Alex"),
       },
     )
 
@@ -23,14 +24,29 @@ class Servers::WhitelistManagerTest < ActiveSupport::TestCase
     assert_equal [ [ "whitelist list", true ] ], connection.calls
   end
 
+  test "list entries returns an empty array when no players are whitelisted" do
+    server = minecraft_servers(:one)
+    connection = FakeConnection.new(
+      calls: [],
+      responses: {
+        "whitelist list" => FakeResponse.new(body: "There are no whitelisted players"),
+      },
+    )
+
+    entries = Servers::WhitelistManager.new(server: server, connection: connection).list_entries
+
+    assert_equal [], entries
+    assert_equal [ [ "whitelist list", true ] ], connection.calls
+  end
+
   test "enable disable and reload issue the expected commands" do
     server = minecraft_servers(:one)
     connection = FakeConnection.new(
       calls: [],
       responses: {
-        "whitelist on" => "Whitelist is now enabled",
-        "whitelist off" => "Whitelist is now disabled",
-        "whitelist reload" => "Reloaded the whitelist",
+        "whitelist on" => FakeResponse.new(body: "Whitelist is now enabled"),
+        "whitelist off" => FakeResponse.new(body: "Whitelist is now disabled"),
+        "whitelist reload" => FakeResponse.new(body: "Reloaded the whitelist"),
       },
     )
     manager = Servers::WhitelistManager.new(server: server, connection: connection)
@@ -54,8 +70,8 @@ class Servers::WhitelistManagerTest < ActiveSupport::TestCase
     connection = FakeConnection.new(
       calls: [],
       responses: {
-        "whitelist add Steve_123" => "Added Steve_123",
-        "whitelist remove Steve_123" => "Removed Steve_123",
+        "whitelist add Steve_123" => FakeResponse.new(body: "Added Steve_123"),
+        "whitelist remove Steve_123" => FakeResponse.new(body: "Removed Steve_123"),
       },
     )
     manager = Servers::WhitelistManager.new(server: server, connection: connection)

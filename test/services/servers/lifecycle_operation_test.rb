@@ -96,22 +96,28 @@ class Servers::LifecycleOperationTest < ActiveSupport::TestCase
     assert_equal "exited", server.container_state
   end
 
-  test "restart uses the managed container reference and marks the server restarting" do
+  test "restart recreates the container with the managed reference and marks the server restarting" do
     server = minecraft_servers(:one)
+    server.update_columns(status: "ready", container_state: "running")
     docker_client = FakeDockerClient.new(
       calls: [],
+      created_container_id: "container-003",
       inspect_result: {
-        "Id" => "container-001",
+        "Id" => "container-003",
         "State" => { "Status" => "running" },
       },
     )
 
     Servers::RestartServer.new(server: server, docker_client: docker_client).call
 
-    assert_equal [ :restart_container, { id: "container-001", timeout_seconds: 30 } ], docker_client.calls.fetch(0)
-    assert_equal [ :inspect_container, { id_or_name: "container-001" } ], docker_client.calls.fetch(1)
+    assert_equal [ :stop_container, { id: "container-001", timeout_seconds: 30 } ], docker_client.calls.fetch(0)
+    assert_equal [ :remove_container, { id: "container-001", force: false } ], docker_client.calls.fetch(1)
+    assert_equal :create_container, docker_client.calls.fetch(2).fetch(0)
+    assert_equal [ :start_container, { id: "container-003" } ], docker_client.calls.fetch(3)
+    assert_equal [ :inspect_container, { id_or_name: "container-003" } ], docker_client.calls.fetch(4)
     assert_equal "restarting", server.reload.status
     assert_equal "running", server.container_state
+    assert_equal "container-003", server.container_id
     assert_not_nil server.last_started_at
   end
 
