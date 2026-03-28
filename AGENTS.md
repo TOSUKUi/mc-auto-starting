@@ -72,6 +72,7 @@ Current baseline:
 - `T-905` is complete: the repository now includes `config/deploy.yml`, `config/deploy.production.yml`, `.kamal` secret templates and hooks, plus the `mc-router` deployment helper needed for the first Kamal-based single-host rollout.
 - `T-902` is complete: `docs/release_runbook.md` now documents the Kamal-based release, migration, and rollback procedure for the current single-host deployment baseline.
 - `T-1005` is complete: `docs/discord_bot_api_contract.md` now fixes the bot credential model, acting Discord-user resolution, allowed lifecycle/read/whitelist commands, request/response envelopes, and audit expectations before bot endpoint implementation.
+- `T-1024` is complete: the bot contract now keeps whitelist mutations owner/admin-only, treats `whitelist_list` as a read-class surface, and separates bounded RCON input from lifecycle/server-operation commands so forbidden commands such as `stop` are never accepted through the RCON path.
 - Follow-up UI tasks for the server screens have been partially closed: `T-505`, `T-506`, and `T-507` are complete, and `docs/server_ui_display_review.md` remains the display-contract reference for future adjustments.
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
 - `T-506` is complete: server detail responses now gate lifecycle actions by current server status so `ready` only shows stop/restart, `stopped` shows start, and transitional/degraded states converge on sync-only controls.
@@ -260,4 +261,4 @@ If no other instruction is given, start from the current critical path:
 1. `T-200` through `T-400` are complete
 2. `T-205`, `T-700`, `T-702`, `T-703`, `T-803`, `T-804`, and `T-805` are complete while keeping `mc-router`
 3. `T-900`, `T-901`, `T-903`, `T-904`, and `T-905` are complete
-4. Next, continue from `T-1007` on the Discord bot/RCON track, unless a higher-priority task is explicitly chosen
+4. Next, continue from `T-1007` on the Discord bot/RCON track, with server operations and bounded RCON commands implemented as separate endpoint categories

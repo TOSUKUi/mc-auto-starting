@@ -18,6 +18,8 @@
 
 プレイヤー数は重要だが、`RCON` 周りの後続実装で扱う。現時点の UI 契約には含めない。
 
+将来の詳細画面では、owner/admin 限定で bounded RCON command 入力欄を持てる。ただし lifecycle 系コマンドと whitelist 系コマンドは専用 UI に分離し、`stop` などの forbidden command は自由入力経路から受け付けない。
+
 ## Server Index
 一覧画面では「今つながるか」「誰のサーバーか」「自分がどこまで触れるか」を短時間で判断できることを優先する。
 

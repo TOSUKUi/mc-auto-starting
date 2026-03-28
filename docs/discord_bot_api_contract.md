@@ -11,7 +11,7 @@ This document fixes the Rails-side trust boundary and command contract for Disco
 - Keep the Discord Bot as a relay, not an authority.
 - Make every bot request attributable to one acting Discord user.
 - Reuse the existing Rails authorization model instead of creating bot-only permissions.
-- Split read-class, lifecycle, and whitelist command surfaces clearly.
+- Split read-class, server-operation, whitelist, and bounded-RCON-command surfaces clearly.
 
 ## Non-Goals
 
@@ -76,7 +76,7 @@ Initial read-class bot commands:
 - future `recent_logs`
 - `whitelist_list`
 
-### Lifecycle Operations
+### Server Operations
 
 Allowed when the acting user is any of:
 
@@ -84,7 +84,7 @@ Allowed when the acting user is any of:
 - server owner
 - server membership `manager`
 
-Initial lifecycle commands:
+Initial server-operation commands:
 
 - `start`
 - `stop`
@@ -102,11 +102,46 @@ Server membership `manager` is not enough for whitelist mutation in the initial 
 
 Initial whitelist commands:
 
+- `whitelist_list`
 - `whitelist_add`
 - `whitelist_remove`
 - `whitelist_enable`
 - `whitelist_disable`
 - `whitelist_reload`
+
+### Bounded RCON Commands
+
+Allowed when the acting user is any of:
+
+- global `admin`
+- server owner
+
+Server membership `manager` is not enough for direct RCON command input in the initial contract.
+
+Initial bounded-RCON commands:
+
+- `say`
+- `list`
+- `kick <player>`
+- `save-all`
+- `time set ...`
+- `weather ...`
+
+These commands are intentionally separate from server operations. For example, `stop` remains a server-operation capability and is not exposed through the RCON command surface.
+
+### Forbidden Through Bounded RCON
+
+These commands must be rejected even when the acting user is `owner` or `admin`:
+
+- `stop`
+- `start`
+- `restart`
+- `reload`
+- `op`
+- `deop`
+- `ban`
+- `pardon`
+- `whitelist ...`
 
 ### Forbidden Through Bot
 
@@ -116,7 +151,7 @@ These stay out of the bot surface in the initial contract:
 - server destroy
 - membership management
 - invite issuance / revocation
-- arbitrary RCON command execution
+- arbitrary RCON command execution outside the bounded allowlist
 
 ## Endpoint Contract
 
@@ -137,6 +172,7 @@ Initial endpoints:
 - `POST /api/discord/bot/servers/:id/whitelist/enable`
 - `POST /api/discord/bot/servers/:id/whitelist/disable`
 - `POST /api/discord/bot/servers/:id/whitelist/reload`
+- `POST /api/discord/bot/servers/:id/rcon/command`
 
 `POST` is used consistently so the bot can send one authenticated request shape regardless of whether the command is read or write.
 
@@ -157,6 +193,14 @@ Whitelist mutation payloads add:
 ```json
 {
   "player_name": "TOSUKUi2"
+}
+```
+
+Bounded-RCON payload:
+
+```json
+{
+  "command": "say サーバーメンテナンスを開始します"
 }
 ```
 
@@ -227,6 +271,30 @@ Mutation failure after DB save but before live RCON apply:
 }
 ```
 
+Bounded-RCON success:
+
+```json
+{
+  "ok": true,
+  "action": "rcon_command",
+  "message": "コマンドを実行しました。",
+  "result": {
+    "command": "say サーバーメンテナンスを開始します",
+    "response_body": ""
+  }
+}
+```
+
+Bounded-RCON forbidden command:
+
+```json
+{
+  "ok": false,
+  "error": "この RCON コマンドは許可されていません。",
+  "error_code": "rcon_command_forbidden"
+}
+```
+
 ## Audit Expectations
 
 Rails should log at least:
@@ -246,3 +314,4 @@ The bot does not own the audit log; Rails does.
 - Bot controller code should call the same service objects used by the web surface.
 - Bot-specific code should translate request/response envelopes, not re-implement business logic.
 - Whitelist bot actions should call the existing Rails-owned whitelist services and inherit the same desired-state plus live-apply behavior.
+- Bot-side RCON input should use an explicit allowlist validator owned by Rails; it must not pass arbitrary text through to the Minecraft server.

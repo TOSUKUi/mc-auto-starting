@@ -65,7 +65,7 @@ Detailed bot request/response and trust-boundary rules live in `docs/discord_bot
 - In-game command execution will use RCON from Rails to the managed Minecraft server.
 - RCON connection details are app-managed server configuration and not a Discord Bot concern.
 - Rails must apply command allowlisting or equivalent policy controls before exposing command execution to the bot.
-- Lifecycle actions and RCON actions are separate capabilities and should be authorized independently.
+- Lifecycle/server-operation actions and bounded RCON actions are separate capabilities and should be authorized independently.
 
 ## Recommended Architecture
 
