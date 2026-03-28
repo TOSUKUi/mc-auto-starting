@@ -279,6 +279,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                       <Stack gap="sm">
                         <Text fw={700}>サーバー表示</Text>
                         <TextInput
+                          description="サーバー一覧などで見える説明文です。"
                           error={fieldError('motd')}
                           label="MOTD"
                           onChange={(event) => form.setData('motd', event.currentTarget.value)}

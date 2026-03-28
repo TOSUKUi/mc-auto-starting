@@ -698,6 +698,7 @@ export default function ServersShow({ server }) {
                       </Grid.Col>
                       <Grid.Col span={12}>
                         <TextInput
+                          description="サーバー一覧などで見える説明文です。"
                           disabled={!canManageStartupSettings}
                           label="MOTD"
                           onChange={(event) => setStartupSettings((current) => ({ ...current, motd: event.currentTarget.value }))}
