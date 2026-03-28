@@ -1,4 +1,4 @@
-import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, ScrollArea, SimpleGrid, Stack, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
+import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, NumberInput, Paper, ScrollArea, Select, SimpleGrid, Stack, Switch, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
 import { Head, Link, router } from '@inertiajs/react'
 import {
   IconAlertCircle,
@@ -115,6 +115,10 @@ function isTransitioning(status) {
   return TRANSITION_STATUSES.includes(status)
 }
 
+function toSelectBoolean(value) {
+  return value ? 'true' : 'false'
+}
+
 function DetailLine({ label, value }) {
   return (
     <Stack gap={2}>
@@ -154,6 +158,10 @@ export default function ServersShow({ server }) {
   const [ recentLogs, setRecentLogs ] = useState({ available: false, lines: [], error_code: null })
   const [ recentLogsLoading, setRecentLogsLoading ] = useState(false)
   const [ recentLogsError, setRecentLogsError ] = useState(null)
+  const [ startupSettings, setStartupSettings ] = useState(server.startup_settings)
+  const [ startupSettingsLoading, setStartupSettingsLoading ] = useState(false)
+  const [ startupSettingsError, setStartupSettingsError ] = useState(null)
+  const [ startupSettingsNotice, setStartupSettingsNotice ] = useState(null)
   const [ rconCommand, setRconCommand ] = useState('')
   const [ rconLoading, setRconLoading ] = useState(false)
   const [ rconResult, setRconResult ] = useState(null)
@@ -161,6 +169,7 @@ export default function ServersShow({ server }) {
   const transitionState = isTransitioning(server.status)
   const canManageWhitelist = server.can_manage_whitelist
   const canRunRconCommand = server.can_run_rcon_command
+  const canManageStartupSettings = server.can_manage_startup_settings
   const whitelistLiveMode = canManageWhitelist && server.runtime.container_state === 'running'
   const routeIssueMessage = server.route_issue_message || (server.route.last_apply_status === 'failed' ? '公開設定の反映に失敗しています。' : null)
   const pollServer = useEffectEvent(() => {
@@ -187,6 +196,12 @@ export default function ServersShow({ server }) {
   useEffect(() => {
     setPlayerPresence(server.player_presence)
   }, [server.id, server.player_presence])
+
+  useEffect(() => {
+    setStartupSettings(server.startup_settings)
+    setStartupSettingsError(null)
+    setStartupSettingsNotice(null)
+  }, [server.id, server.startup_settings])
 
   useEffect(() => {
     if (!transitionState) return undefined
@@ -389,6 +404,37 @@ export default function ServersShow({ server }) {
     }
   }
 
+  async function saveStartupSettings() {
+    setStartupSettingsLoading(true)
+    setStartupSettingsError(null)
+    setStartupSettingsNotice(null)
+
+    try {
+      const response = await fetch(`/servers/${server.id}/update_startup_settings.json`, {
+        method: 'PATCH',
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken(),
+        },
+        body: JSON.stringify({ minecraft_server: startupSettings }),
+      })
+      const body = await readJsonResponse(response, '起動設定の応答が不正です。')
+
+      if (!response.ok) {
+        throw new Error(body.error || '起動設定を保存できませんでした。')
+      }
+
+      setStartupSettings(body.startup_settings)
+      setStartupSettingsNotice('起動設定を保存しました。次回の起動または再起動で反映されます。')
+    } catch (error) {
+      setStartupSettingsError(error.message)
+    } finally {
+      setStartupSettingsLoading(false)
+    }
+  }
+
   return (
     <>
       <Head title={server.name} />
@@ -580,6 +626,116 @@ export default function ServersShow({ server }) {
                 ) : (
                   <Text c="dimmed" size="sm">
                     いまはログを取得できません。再読込で再確認してください。
+                  </Text>
+                )}
+              </Stack>
+            </Paper>
+          </Grid.Col>
+
+          <Grid.Col span={12}>
+            <Paper p="lg" radius="lg" shadow="sm" withBorder>
+              <Stack gap="md">
+                <Group justify="space-between" align="center">
+                  <Text fw={700}>起動設定</Text>
+                  {startupSettingsLoading ? <Loader size="sm" /> : null}
+                </Group>
+                <Divider />
+                <Grid gutter="md">
+                  <Grid.Col span={{ base: 12, md: 6 }}>
+                    <Select
+                      data={[
+                        { value: 'easy', label: 'Easy' },
+                        { value: 'normal', label: 'Normal' },
+                        { value: 'hard', label: 'Hard' },
+                        { value: 'peaceful', label: 'Peaceful' },
+                      ]}
+                      disabled={!canManageStartupSettings}
+                      label="難易度"
+                      onChange={(value) => setStartupSettings((current) => ({ ...current, difficulty: value || '' }))}
+                      value={startupSettings.difficulty}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={{ base: 12, md: 6 }}>
+                    <Select
+                      data={[
+                        { value: 'survival', label: 'Survival' },
+                        { value: 'creative', label: 'Creative' },
+                        { value: 'adventure', label: 'Adventure' },
+                        { value: 'spectator', label: 'Spectator' },
+                      ]}
+                      disabled={!canManageStartupSettings}
+                      label="ゲームモード"
+                      onChange={(value) => setStartupSettings((current) => ({ ...current, gamemode: value || '' }))}
+                      value={startupSettings.gamemode}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={{ base: 12, md: 6 }}>
+                    <NumberInput
+                      allowDecimal={false}
+                      disabled={!canManageStartupSettings}
+                      hideControls
+                      label="最大プレイヤー数"
+                      max={100}
+                      min={1}
+                      onChange={(value) => setStartupSettings((current) => ({ ...current, max_players: Math.max(1, Math.min(100, Number(value) || 1)) }))}
+                      value={startupSettings.max_players}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={{ base: 12, md: 6 }}>
+                    <Select
+                      data={[
+                        { value: 'true', label: '有効' },
+                        { value: 'false', label: '無効' },
+                      ]}
+                      disabled={!canManageStartupSettings}
+                      label="PvP"
+                      onChange={(value) => setStartupSettings((current) => ({ ...current, pvp: value === 'true' }))}
+                      value={toSelectBoolean(startupSettings.pvp)}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={12}>
+                    <TextInput
+                      disabled={!canManageStartupSettings}
+                      label="MOTD"
+                      onChange={(event) => setStartupSettings((current) => ({ ...current, motd: event.currentTarget.value }))}
+                      value={startupSettings.motd}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={12}>
+                    <Switch
+                      checked={!!startupSettings.hardcore}
+                      disabled={!canManageStartupSettings}
+                      label="ハードコア"
+                      onChange={(event) => {
+                        const checked = event.currentTarget.checked
+                        setStartupSettings((current) => ({ ...current, hardcore: checked }))
+                      }}
+                    />
+                  </Grid.Col>
+                </Grid>
+                {startupSettingsError ? (
+                  <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="起動設定を保存できませんでした" variant="light">
+                    {startupSettingsError}
+                  </Alert>
+                ) : null}
+                {startupSettingsNotice ? (
+                  <Alert color="teal" radius="lg" title="保存しました" variant="light">
+                    {startupSettingsNotice}
+                  </Alert>
+                ) : null}
+                {canManageStartupSettings ? (
+                  <Group justify="flex-end">
+                    <Button
+                      disabled={startupSettingsLoading}
+                      onClick={() => saveStartupSettings()}
+                      type="button"
+                    >
+                      起動設定を保存
+                    </Button>
+                  </Group>
+                ) : (
+                  <Text c="dimmed" size="sm">
+                    ここで内容は確認できますが、変更はオーナーまたは管理者のみ可能です。
                   </Text>
                 )}
               </Stack>

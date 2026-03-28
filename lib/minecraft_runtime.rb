@@ -87,33 +87,30 @@ module MinecraftRuntime
   end
 
   def container_env(server:)
+    base_env = startup_settings_env(server).merge(
+      "ENABLE_RCON" => "TRUE",
+      "ENABLE_WHITELIST" => server.whitelist_enabled? ? "TRUE" : "FALSE",
+      "WHITELIST" => server.whitelist_entries_csv,
+      "EXISTING_WHITELIST_FILE" => "SYNCHRONIZE",
+      "RCON_PORT" => MinecraftRcon.port.to_s,
+      "RCON_PASSWORD" => MinecraftRcon.password_for(server),
+    )
+
     case normalize_runtime_family(server.runtime_family)
     when "vanilla"
-      {
+      base_env.merge(
         "EULA" => "TRUE",
         "TYPE" => "VANILLA",
         "VERSION" => normalize_version_tag(server.minecraft_version),
         "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
-        "ENABLE_RCON" => "TRUE",
-        "ENABLE_WHITELIST" => server.whitelist_enabled? ? "TRUE" : "FALSE",
-        "WHITELIST" => server.whitelist_entries_csv,
-        "EXISTING_WHITELIST_FILE" => "SYNCHRONIZE",
-        "RCON_PORT" => MinecraftRcon.port.to_s,
-        "RCON_PASSWORD" => MinecraftRcon.password_for(server),
-      }
+      )
     else
-      {
+      base_env.merge(
         "EULA" => "TRUE",
         "TYPE" => "PAPER",
         "VERSION" => normalize_version_tag(server.minecraft_version),
         "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
-        "ENABLE_RCON" => "TRUE",
-        "ENABLE_WHITELIST" => server.whitelist_enabled? ? "TRUE" : "FALSE",
-        "WHITELIST" => server.whitelist_entries_csv,
-        "EXISTING_WHITELIST_FILE" => "SYNCHRONIZE",
-        "RCON_PORT" => MinecraftRcon.port.to_s,
-        "RCON_PASSWORD" => MinecraftRcon.password_for(server),
-      }
+      )
     end
   end
 
@@ -133,6 +130,18 @@ module MinecraftRuntime
   def jvm_memory_mb(container_memory_mb)
     memory_mb = Integer(container_memory_mb)
     [ memory_mb - JVM_HEADROOM_MB, MIN_JVM_MEMORY_MB ].max
+  end
+
+  def startup_settings_env(server)
+    {
+      "HARDCORE" => server.hardcore? ? "TRUE" : "FALSE",
+      "DIFFICULTY" => server.difficulty,
+      "MODE" => server.gamemode,
+      "MAX_PLAYERS" => server.max_players.to_s,
+      "PVP" => server.pvp? ? "TRUE" : "FALSE",
+    }.tap do |env|
+      env["MOTD"] = server.motd if server.motd.present?
+    end
   end
 
   def catalog

@@ -12,6 +12,7 @@ This document fixes the Rails-side trust boundary and command contract for Disco
 - Make every bot request attributable to one acting Discord user.
 - Reuse the existing Rails authorization model instead of creating bot-only permissions.
 - Split read-class, server-operation, whitelist, and bounded-RCON-command surfaces clearly.
+- Keep startup-settings desired-state updates on their own surface, separate from lifecycle and bounded RCON.
 
 ## Non-Goals
 
@@ -79,6 +80,7 @@ Initial read-class bot commands:
 
 - `status`
 - `show_connection_target`
+- `startup_settings_show`
 - future `player_count`
 - future `recent_logs`
 - `whitelist_list`
@@ -160,6 +162,20 @@ These stay out of the bot surface in the initial contract:
 - invite issuance / revocation
 - arbitrary RCON command execution outside the bounded allowlist
 
+### Startup Settings
+
+Allowed when the acting user is any of:
+
+- global `admin`
+- server owner
+
+Server membership `manager` is not enough for startup-settings mutation in the initial contract.
+
+Initial startup-settings commands:
+
+- `startup_settings_show`
+- `startup_settings_update`
+
 ## Endpoint Contract
 
 Base path:
@@ -169,6 +185,8 @@ Base path:
 Initial endpoints:
 
 - `POST /api/discord/bot/servers/:id/status`
+- `POST /api/discord/bot/servers/:id/startup-settings/show`
+- `POST /api/discord/bot/servers/:id/startup-settings/update`
 - `POST /api/discord/bot/servers/:id/start`
 - `POST /api/discord/bot/servers/:id/stop`
 - `POST /api/discord/bot/servers/:id/restart`
@@ -208,6 +226,21 @@ Bounded-RCON payload:
 ```json
 {
   "command": "say サーバーメンテナンスを開始します"
+}
+```
+
+Startup-settings update payload:
+
+```json
+{
+  "startup_settings": {
+    "hardcore": true,
+    "difficulty": "hard",
+    "gamemode": "creative",
+    "max_players": 16,
+    "motd": "bot update",
+    "pvp": false
+  }
 }
 ```
 

@@ -51,6 +51,10 @@ class MinecraftServerPolicy < ApplicationPolicy
     (admin_user? || owner?) && record.lifecycle_ready?
   end
 
+  def manage_startup_settings?
+    admin_user? || owner?
+  end
+
   class Scope < Scope
     def resolve
       return scope.none unless user

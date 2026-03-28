@@ -51,6 +51,31 @@ module Api
           render_failure(error: error.message, error_code: "server_operation_failed", status: :unprocessable_entity)
         end
 
+        def startup_settings_show
+          authorize @server, :show?
+
+          render_success(
+            server: @server,
+            action: "startup_settings_show",
+            message: "起動設定を取得しました。",
+            result: startup_settings_payload(@server),
+          )
+        end
+
+        def startup_settings_update
+          authorize @server, :manage_startup_settings?
+          @server.update!(startup_settings_params)
+
+          render_success(
+            server: @server.reload,
+            action: "startup_settings_update",
+            message: "起動設定を保存しました。次回の起動または再起動で反映されます。",
+            result: startup_settings_payload(@server),
+          )
+        rescue ActiveRecord::RecordInvalid => error
+          render_failure(error: error.record.errors.full_messages.to_sentence, error_code: "startup_settings_invalid", status: :unprocessable_entity)
+        end
+
         def whitelist_list
           authorize @server, :show?
 
@@ -140,7 +165,12 @@ module Api
               owner_display_name: server.owner.operator_display_name,
               last_started_at: server.last_started_at&.iso8601,
               uptime_seconds: uptime_seconds_for(server),
+              startup_settings: startup_settings_payload(server),
             }
+          end
+
+          def startup_settings_payload(server)
+            server.startup_settings
           end
 
           def whitelist_payload(server)
@@ -157,6 +187,16 @@ module Api
 
           def whitelist_live_mutation?(server)
             server.container_state == "running"
+          end
+
+          def startup_settings_params
+            params.fetch(:startup_settings, {}).permit(:hardcore, :difficulty, :gamemode, :max_players, :motd, :pvp).to_h.transform_values do |value|
+              case value
+              when "true", "TRUE", true then true
+              when "false", "FALSE", false then false
+              else value
+              end
+            end
           end
 
           def whitelist_player_name

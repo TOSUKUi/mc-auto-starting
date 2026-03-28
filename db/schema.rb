@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_28_080000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_162354) do
   create_table "discord_invitations", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "discord_user_id", null: false
@@ -35,17 +35,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_28_080000) do
     t.string "container_name", null: false
     t.string "container_state"
     t.datetime "created_at", null: false
+    t.string "difficulty", default: "easy", null: false
     t.integer "disk_mb", null: false
+    t.string "gamemode", default: "survival", null: false
+    t.boolean "hardcore", default: false, null: false
     t.string "hostname", null: false
     t.string "last_error_message"
     t.datetime "last_started_at"
+    t.integer "max_players", default: 20, null: false
     t.integer "memory_mb", null: false
     t.string "minecraft_version", null: false
+    t.string "motd"
     t.string "name", null: false
     t.bigint "owner_id", null: false
     t.string "provider_name"
     t.string "provider_server_id"
     t.string "provider_server_identifier"
+    t.boolean "pvp", default: true, null: false
     t.string "resolved_minecraft_version"
     t.string "status", default: "provisioning", null: false
     t.string "template_kind", null: false

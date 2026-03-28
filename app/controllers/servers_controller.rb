@@ -196,6 +196,54 @@ class ServersController < InertiaController
     end
   end
 
+  def startup_settings
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :show?
+
+    respond_to do |format|
+      format.json do
+        render json: {
+          startup_settings: startup_settings_payload_for(server),
+          editable: policy(server).manage_startup_settings?,
+        }
+      end
+
+      format.html do
+        redirect_to server_path(server)
+      end
+    end
+  end
+
+  def update_startup_settings
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :manage_startup_settings?
+    server.update!(startup_settings_params)
+
+    respond_to do |format|
+      format.json do
+        render json: {
+          startup_settings: startup_settings_payload_for(server),
+          desired_state_saved: true,
+          restart_required: true,
+        }
+      end
+
+      format.html do
+        redirect_to server_path(server), notice: "起動設定を保存しました。次回の起動または再起動で反映されます。"
+      end
+    end
+  rescue ActiveRecord::RecordInvalid => error
+    respond_to do |format|
+      format.json do
+        render json: { error: error.record.errors.full_messages.to_sentence, errors: error.record.errors.to_hash(true) }, status: :unprocessable_entity
+      end
+
+      format.html do
+        redirect_to server_path(server), alert: error.record.errors.full_messages.to_sentence
+      end
+    end
+  end
+
   def rcon_command
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :rcon_command?
@@ -300,19 +348,24 @@ class ServersController < InertiaController
 
   private
     def new_server_page_props(form_values: {}, validation_errors: {})
-      hostname = normalized_hostname(form_values[:hostname])
-      selected_runtime_family = form_values[:runtime_family] || form_values["runtime_family"] || MinecraftRuntime.default_runtime_family
+      symbolized_form_values = form_values.symbolize_keys
+      hostname = normalized_hostname(symbolized_form_values[:hostname])
+      selected_runtime_family = symbolized_form_values[:runtime_family] || MinecraftRuntime.default_runtime_family
       minecraft_version_options_by_runtime_family = MinecraftRuntime.version_options_by_runtime_family
+      normalized_runtime_family = MinecraftRuntime.normalize_runtime_family(selected_runtime_family)
+      runtime_version_options = minecraft_version_options_by_runtime_family.fetch(normalized_runtime_family, [])
+      selected_version = symbolized_form_values[:minecraft_version]
+      selected_version = runtime_version_options.first&.fetch(:value, MinecraftRuntime.default_version_tag) unless runtime_version_options.any? { |option| option[:value] == selected_version }
 
       {
-        form_defaults: default_new_server_form.merge(form_values.symbolize_keys),
+        form_defaults: default_new_server_form.merge(symbolized_form_values).merge(
+          runtime_family: normalized_runtime_family,
+          minecraft_version: selected_version,
+        ),
         validation_errors: validation_errors,
         create_quota: create_quota_payload,
         runtime_family_options: MinecraftRuntime.runtime_family_options,
-        minecraft_version_options: minecraft_version_options_by_runtime_family.fetch(
-          MinecraftRuntime.normalize_runtime_family(selected_runtime_family),
-          [],
-        ),
+        minecraft_version_options: runtime_version_options,
         minecraft_version_options_by_runtime_family: minecraft_version_options_by_runtime_family,
         public_endpoint: {
           public_domain: MinecraftPublicEndpoint.public_domain,
@@ -331,11 +384,36 @@ class ServersController < InertiaController
         minecraft_version: MinecraftRuntime.default_version_tag,
         memory_mb: MinecraftServer::MAX_MEMORY_MB,
         disk_mb: 20480,
+        hardcore: false,
+        difficulty: "easy",
+        gamemode: "survival",
+        max_players: 20,
+        motd: "",
+        pvp: true,
       }
     end
 
     def create_server_params
-      params.expect(minecraft_server: [ :name, :hostname, :runtime_family, :minecraft_version, :memory_mb, :disk_mb ]).to_h
+      params.expect(minecraft_server: [
+        :name,
+        :hostname,
+        :runtime_family,
+        :minecraft_version,
+        :memory_mb,
+        :disk_mb,
+        :hardcore,
+        :difficulty,
+        :gamemode,
+        :max_players,
+        :motd,
+        :pvp,
+      ]).to_h.transform_values do |value|
+        case value
+        when "true", "TRUE", true then true
+        when "false", "FALSE", false then false
+        else value
+        end
+      end
     end
 
     def normalized_hostname(value)
@@ -396,12 +474,14 @@ class ServersController < InertiaController
         can_manage_members: policy(server).manage_members?,
         can_manage_whitelist: policy(server).manage_whitelist?,
         can_run_rcon_command: policy(server).rcon_command?,
+        can_manage_startup_settings: policy(server).manage_startup_settings?,
         can_destroy: policy(server).destroy?,
         can_start: visible_actions[:start],
         can_stop: visible_actions[:stop],
         can_restart: visible_actions[:restart],
         can_sync: visible_actions[:sync],
         player_presence: summary.fetch(:player_presence),
+        startup_settings: startup_settings_payload_for(server),
       )
     end
 
@@ -411,6 +491,10 @@ class ServersController < InertiaController
 
     def recent_logs_payload_for(server)
       Servers::RecentLogs.new(server: server).read
+    end
+
+    def startup_settings_payload_for(server)
+      server.startup_settings
     end
 
     def access_role_for(server)
@@ -490,6 +574,16 @@ class ServersController < InertiaController
 
     def whitelist_manager_for(server)
       Servers::WhitelistManager.new(server: server)
+    end
+
+    def startup_settings_params
+      params.expect(minecraft_server: [ :hardcore, :difficulty, :gamemode, :max_players, :motd, :pvp ]).to_h.transform_values do |value|
+        case value
+        when "true", "TRUE", true then true
+        when "false", "FALSE", false then false
+        else value
+        end
+      end
     end
 
     def whitelist_player_name

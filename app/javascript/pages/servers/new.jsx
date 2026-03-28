@@ -1,6 +1,5 @@
-import { Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
+import { Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Switch, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
-import { useEffect } from 'react'
 import { IconPlugConnected, IconSparkles } from '@tabler/icons-react'
 
 const MIN_MEMORY_MB = 512
@@ -42,6 +41,10 @@ function selectedVersionLabel(value, options) {
   return options.find((option) => option.value === value)?.label || value
 }
 
+function toSelectBoolean(value) {
+  return value ? 'true' : 'false'
+}
+
 function runtimeFamilyDescription(value) {
   if (value === 'vanilla') return '公式が提供するサーバーで、最新バージョンへの対応がされています。'
 
@@ -68,13 +71,6 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
     form.transform((data) => ({ minecraft_server: data }))
     form.post('/servers')
   }
-
-  useEffect(() => {
-    if (minecraftVersionOptions.length === 0) return
-    if (minecraftVersionOptions.some((option) => option.value === form.data.minecraft_version)) return
-
-    form.setData('minecraft_version', minecraftVersionOptions[0].value)
-  }, [form, minecraftVersionOptions, form.data.minecraft_version])
 
   return (
     <>
@@ -152,7 +148,16 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                     description={runtimeFamilyDescription(form.data.runtime_family)}
                     error={fieldError('runtime_family')}
                     label="サーバーソフト"
-                    onChange={(value) => form.setData('runtime_family', value || '')}
+                    onChange={(value) => {
+                      const nextRuntimeFamily = value || ''
+                      const nextVersionOptions = minecraft_version_options_by_runtime_family[nextRuntimeFamily] || []
+
+                      form.setData({
+                        ...form.data,
+                        runtime_family: nextRuntimeFamily,
+                        minecraft_version: nextVersionOptions[0]?.value || '',
+                      })
+                    }}
                     required
                     value={form.data.runtime_family}
                   />
@@ -180,6 +185,87 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                         step={512}
                         thousandSeparator=","
                         value={form.data.memory_mb}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                      <Select
+                        data={[
+                          { value: 'easy', label: 'Easy' },
+                          { value: 'normal', label: 'Normal' },
+                          { value: 'hard', label: 'Hard' },
+                          { value: 'peaceful', label: 'Peaceful' },
+                        ]}
+                        description="モンスターや飢餓の強さを決めます。"
+                        error={fieldError('difficulty')}
+                        label="難易度"
+                        onChange={(value) => form.setData('difficulty', value || '')}
+                        required
+                        value={form.data.difficulty}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                      <Select
+                        data={[
+                          { value: 'survival', label: 'Survival' },
+                          { value: 'creative', label: 'Creative' },
+                          { value: 'adventure', label: 'Adventure' },
+                          { value: 'spectator', label: 'Spectator' },
+                        ]}
+                        description="新規参加時の標準ゲームモードです。"
+                        error={fieldError('gamemode')}
+                        label="ゲームモード"
+                        onChange={(value) => form.setData('gamemode', value || '')}
+                        required
+                        value={form.data.gamemode}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                      <NumberInput
+                        allowDecimal={false}
+                        error={fieldError('max_players')}
+                        hideControls
+                        label="最大プレイヤー数"
+                        max={100}
+                        min={1}
+                        onChange={(value) => form.setData('max_players', Math.max(1, Math.min(100, Number(value) || 1)))}
+                        required
+                        value={form.data.max_players}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                      <TextInput
+                        description="サーバー一覧で見える紹介文です。"
+                        error={fieldError('motd')}
+                        label="MOTD"
+                        onChange={(event) => form.setData('motd', event.currentTarget.value)}
+                        placeholder="みんなのサバイバルへようこそ"
+                        value={form.data.motd}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                      <Select
+                        data={[
+                          { value: 'true', label: '有効' },
+                          { value: 'false', label: '無効' },
+                        ]}
+                        description="プレイヤー同士の攻撃を許可するかどうかです。"
+                        error={fieldError('pvp')}
+                        label="PvP"
+                        onChange={(value) => form.setData('pvp', value === 'true')}
+                        required
+                        value={toSelectBoolean(form.data.pvp)}
+                      />
+                    </Grid.Col>
+                    <Grid.Col span={{ base: 12, sm: 6 }}>
+                      <Switch
+                        checked={!!form.data.hardcore}
+                        description="有効にすると死亡時に観戦者モードになります。"
+                        error={fieldError('hardcore')}
+                        label="ハードコア"
+                        onChange={(event) => {
+                          const checked = event.currentTarget.checked
+                          form.setData('hardcore', checked)
+                        }}
                       />
                     </Grid.Col>
                   </Grid>

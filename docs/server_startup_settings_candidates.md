@@ -4,7 +4,7 @@
 
 サーバー作成時または詳細画面から扱いたい「起動設定」の候補を整理する。
 
-このメモは、次の設定契約 task のたたき台として使う。
+このメモは、起動設定 contract の正本として使う。
 
 ## Goal
 
@@ -67,8 +67,9 @@
 
 ### Create Form
 
-作成時に直接触れる候補:
+作成時に直接触れる baseline:
 
+- `hardcore`
 - `difficulty`
 - `gamemode`
 - `max_players`
@@ -100,12 +101,20 @@ bot でも扱える前提にする候補:
 
 初手では browser/detail と同じ bounded setting surface を使い、bot 専用の別契約を増やしすぎない。
 
+## Runtime Contract Direction
+
+- Rails は startup settings を desired state として `minecraft_servers` に保存する
+- create 時はその desired state をそのまま保存する
+- detail と bot からの update も同じ desired state を更新する
+- managed container の env は `create` / `start` / `restart` 時に current desired state から組み立てる
+- 初期 baseline の startup settings は live apply を行わず、次回の起動または再起動で反映する
+
 ## UI Direction
 
 - 初手の create form では 3 から 5 項目までに抑える
 - それ以上は「詳細設定」に分ける
 - whitelist や lifecycle は既存の専用 UI を維持する
-- 変更結果は `server.properties` 系の desired state として Rails 側で保持し、起動中は可能なら live apply、停止中は次回起動時反映に寄せる
+- 変更結果は `server.properties` 系の desired state として Rails 側で保持し、次回の起動または再起動で反映する
 - 列挙型の設定は freeform input ではなく `Select` を使う
 - 想定対象:
   - `hardcore`

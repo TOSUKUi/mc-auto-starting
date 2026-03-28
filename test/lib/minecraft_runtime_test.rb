@@ -42,6 +42,11 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
         "TYPE" => "PAPER",
         "VERSION" => "1.21.4",
         "MEMORY" => "3584M",
+        "HARDCORE" => "FALSE",
+        "DIFFICULTY" => "easy",
+        "MODE" => "survival",
+        "MAX_PLAYERS" => "20",
+        "PVP" => "TRUE",
         "ENABLE_RCON" => "TRUE",
         "ENABLE_WHITELIST" => "TRUE",
         "WHITELIST" => "",
@@ -58,6 +63,12 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
     server.template_kind = "vanilla"
     server.minecraft_version = "latest"
     server.memory_mb = 4096
+    server.hardcore = true
+    server.difficulty = "hard"
+    server.gamemode = "creative"
+    server.max_players = 12
+    server.motd = "Vanilla World"
+    server.pvp = false
 
     assert_equal(
       {
@@ -65,6 +76,12 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
         "TYPE" => "VANILLA",
         "VERSION" => "latest",
         "MEMORY" => "3584M",
+        "HARDCORE" => "TRUE",
+        "DIFFICULTY" => "hard",
+        "MODE" => "creative",
+        "MAX_PLAYERS" => "12",
+        "MOTD" => "Vanilla World",
+        "PVP" => "FALSE",
         "ENABLE_RCON" => "TRUE",
         "ENABLE_WHITELIST" => "TRUE",
         "WHITELIST" => "",

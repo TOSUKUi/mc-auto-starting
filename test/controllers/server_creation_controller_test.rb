@@ -17,6 +17,12 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "latest", response.parsed_body.fetch("form_defaults").fetch("minecraft_version")
     assert_equal 4096, response.parsed_body.fetch("form_defaults").fetch("memory_mb")
     assert_equal 20480, response.parsed_body.fetch("form_defaults").fetch("disk_mb")
+    assert_equal false, response.parsed_body.fetch("form_defaults").fetch("hardcore")
+    assert_equal "easy", response.parsed_body.fetch("form_defaults").fetch("difficulty")
+    assert_equal "survival", response.parsed_body.fetch("form_defaults").fetch("gamemode")
+    assert_equal 20, response.parsed_body.fetch("form_defaults").fetch("max_players")
+    assert_equal "", response.parsed_body.fetch("form_defaults").fetch("motd")
+    assert_equal true, response.parsed_body.fetch("form_defaults").fetch("pvp")
     assert_equal "vanilla", response.parsed_body.fetch("runtime_family_options").first.fetch("value")
     assert_equal "Java Edition", response.parsed_body.fetch("runtime_family_options").first.fetch("label")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
@@ -47,6 +53,12 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
           minecraft_version: "1.21.11",
           memory_mb: 4096,
           disk_mb: 40960,
+          hardcore: true,
+          difficulty: "hard",
+          gamemode: "creative",
+          max_players: 12,
+          motd: "Sky Lab へようこそ",
+          pvp: false,
         },
       }
     end
@@ -62,6 +74,12 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "paper", server.fetch("runtime_family")
     assert_equal "1.21.11", server.fetch("resolved_minecraft_version")
     assert_equal "1.21.11", server.fetch("minecraft_version_display")
+    assert_equal true, server.fetch("startup_settings").fetch("hardcore")
+    assert_equal "hard", server.fetch("startup_settings").fetch("difficulty")
+    assert_equal "creative", server.fetch("startup_settings").fetch("gamemode")
+    assert_equal 12, server.fetch("startup_settings").fetch("max_players")
+    assert_equal "Sky Lab へようこそ", server.fetch("startup_settings").fetch("motd")
+    assert_equal false, server.fetch("startup_settings").fetch("pvp")
     assert_not server.key?("template_kind")
     assert_equal "mc-server-sky-lab", server.fetch("runtime").fetch("container_name")
     assert_equal "mc-data-sky-lab", server.fetch("runtime").fetch("volume_name")
@@ -80,6 +98,8 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
           minecraft_version: "1.21.11",
           memory_mb: 4608,
           disk_mb: 40960,
+          difficulty: "nightmare",
+          max_players: 0,
         },
       }
     end
@@ -87,6 +107,8 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_includes response.parsed_body.fetch("errors").fetch("hostname"), "Hostname must use lowercase letters, numbers, and internal hyphens only"
     assert_includes response.parsed_body.fetch("errors").fetch("memory_mb"), "Memory mb must be less than or equal to 4096"
+    assert_includes response.parsed_body.fetch("errors").fetch("difficulty"), "Difficulty is not included in the list"
+    assert_includes response.parsed_body.fetch("errors").fetch("max_players"), "Max players must be greater than or equal to 1"
   end
 
   test "html create failure includes validation errors for the inertia form" do

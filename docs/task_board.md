@@ -111,9 +111,9 @@
 | T-1106 | P10 | Fetch `paper` options from the Paper version list at request time | T-1104 | done | The create form can build `paper` version choices from the Paper-specific source while preserving a safe fallback when that source is unavailable |
 | T-1107 | P10 | Unify version-option presentation around label/value display rules | T-1104,T-1105,T-1106 | done | Operators see only the human-facing Minecraft version label, while the stored/submitted value remains the stable version key chosen for each runtime family |
 | T-1110 | P10 | Define server startup-settings candidate contract | T-500,T-1101 | done | Candidate server startup settings, phasing, and create-vs-detail split now live in `docs/server_startup_settings_candidates.md` |
-| T-1111 | P10 | Persist baseline startup settings alongside server desired state | T-1110,T-400 | todo | Rails can store the agreed baseline settings such as `hardcore`, `difficulty`, `max_players`, `motd`, `pvp`, and `gamemode` as desired server state shared by create, detail, and bot surfaces |
-| T-1112 | P10 | Add startup settings UI to create/detail flows | T-1110,T-1111,T-500,T-501 | todo | Operators can set the agreed baseline startup settings during create and adjust them later from server detail, with enum-like settings rendered as `Select` controls and `hardcore` exposed explicitly |
-| T-1113 | P10 | Expose startup settings through the bot surface | T-1110,T-1111,T-1007 | todo | Discord bot can read and update the agreed startup settings through the same Rails-owned desired-state contract used by the browser UI |
+| T-1111 | P10 | Persist baseline startup settings alongside server desired state | T-1110,T-400 | done | `minecraft_servers` now persists baseline startup settings such as `hardcore`, `difficulty`, `max_players`, `motd`, `pvp`, and `gamemode`, and `MinecraftRuntime` includes them in the managed-container env contract used on create/start/restart |
+| T-1112 | P10 | Add startup settings UI to create/detail flows | T-1110,T-1111,T-500,T-501 | done | Create flow now accepts the baseline startup settings, server detail shows them for visible users, and owner/admin users can update the desired state from detail with enum-like values rendered as `Select` controls plus explicit `hardcore` handling |
+| T-1113 | P10 | Expose startup settings through the bot surface | T-1110,T-1111,T-1007 | done | Discord bot can now read and update the same startup-settings desired state through the internal Rails-owned bot API surface |
 
 ## Critical Path Tasks
 

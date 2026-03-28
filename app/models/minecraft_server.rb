@@ -1,9 +1,13 @@
 class MinecraftServer < ApplicationRecord
   LEGACY_TEMPLATE_KIND = "paper"
   RUNTIME_FAMILIES = %w[paper vanilla].freeze
+  DIFFICULTIES = %w[peaceful easy normal hard].freeze
+  GAMEMODES = %w[survival creative adventure spectator].freeze
   MANAGED_CONTAINER_PORT = 25_565
   MIN_MEMORY_MB = 512
   MAX_MEMORY_MB = 4096
+  MIN_MAX_PLAYERS = 1
+  MAX_MAX_PLAYERS = 100
   PLAYER_NAME_PATTERN = /\A[A-Za-z0-9_]{3,16}\z/
 
   STATUS_TRANSITIONS = MinecraftServerStatus::TRANSITIONS
@@ -22,6 +26,8 @@ class MinecraftServer < ApplicationRecord
 
   validates :name, :hostname, :status, :minecraft_version, :template_kind, :container_name, :volume_name, presence: true
   validates :template_kind, inclusion: { in: RUNTIME_FAMILIES }
+  validates :difficulty, inclusion: { in: DIFFICULTIES }
+  validates :gamemode, inclusion: { in: GAMEMODES }
   validates :hostname, hostname_format: true, reserved_hostname: true
   validates :hostname, uniqueness: true
   validates :container_name, :volume_name, uniqueness: true
@@ -31,6 +37,13 @@ class MinecraftServer < ApplicationRecord
     less_than_or_equal_to: MAX_MEMORY_MB,
   }
   validates :disk_mb, numericality: { only_integer: true, greater_than: 0 }
+  validates :max_players, numericality: {
+    only_integer: true,
+    greater_than_or_equal_to: MIN_MAX_PLAYERS,
+    less_than_or_equal_to: MAX_MAX_PLAYERS,
+  }
+  validates :motd, length: { maximum: 255 }
+  validates :hardcore, :pvp, inclusion: { in: [ true, false ] }
   validate :whitelist_entries_are_valid
   validate :status_transition_is_allowed, if: :will_save_change_to_status?
 
@@ -48,6 +61,17 @@ class MinecraftServer < ApplicationRecord
 
   def display_minecraft_version
     resolved_minecraft_version.presence || minecraft_version
+  end
+
+  def startup_settings
+    {
+      hardcore: hardcore?,
+      difficulty: difficulty,
+      gamemode: gamemode,
+      max_players: max_players,
+      motd: motd.to_s,
+      pvp: pvp?,
+    }
   end
 
   def slug
@@ -110,6 +134,14 @@ class MinecraftServer < ApplicationRecord
 
   def whitelist_entry?(player_name)
     whitelist_entries.include?(player_name.to_s.strip)
+  end
+
+  def hardcore?
+    !!self[:hardcore]
+  end
+
+  def pvp?
+    !!self[:pvp]
   end
 
   def lifecycle_ready?
