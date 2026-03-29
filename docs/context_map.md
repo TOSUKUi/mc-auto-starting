@@ -120,7 +120,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - `T-900` is complete: the single-host bootstrap path, external network prerequisite, local `.env` handling, and Dockerized development workflow are now documented for new contributors.
-- `T-904` is complete: the single-host Kamal deployment topology, accessory strategy, secret-file split, shared router-routes mount, and local `.env` to deploy env mapping are now fixed in docs before implementation.
+- `T-904` is complete and `T-906` now refines it: the single-host Kamal deployment topology keeps external MariaDB outside Kamal accessories, retains Redis as the remaining accessory, preserves the shared router-routes mount, and keeps the local `.env` to deploy env mapping explicit in docs and config.
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
 - `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
 - `T-902` is complete: the Kamal-based release, migration, and rollback path now lives in `docs/release_runbook.md`.

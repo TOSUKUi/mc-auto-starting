@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document fixes the `T-904` deployment baseline for running the app on a single host with Kamal while preserving the current direct-Docker and `mc-router` architecture.
+This document fixes the `T-904` baseline and its external-DB follow-up for running the app on a single host with Kamal while preserving the current direct-Docker and `mc-router` architecture.
 
 `T-905` implements this document through:
 
@@ -30,7 +30,7 @@ The initial deployment target is one Linux host running:
 
 - Docker Engine
 - Kamal-managed Rails app containers
-- MariaDB
+- access to an external MariaDB instance
 - Redis
 - `mc-router`
 - Rails-managed Minecraft server containers
@@ -53,7 +53,7 @@ There is no separate worker role in the initial baseline because production queu
 
 The single-host deployment baseline is:
 
-- MariaDB: Kamal accessory
+- MariaDB: external service outside Kamal accessories
 - Redis: Kamal accessory
 - `mc-router`: host-level sibling service outside the Rails app container, kept aligned with the current compose-managed architecture
 
@@ -62,7 +62,7 @@ The single-host deployment baseline is:
 For `T-905`, that means the repository should ship:
 
 - Kamal config for the Rails app
-- Kamal-managed accessories for MariaDB and Redis
+- a Kamal-managed Redis accessory
 - a checked-in deployment helper or compose file for the long-lived `mc-router` sibling service
 
 The goal is to keep the app deployment Kamal-based without changing the architectural decision that `mc-router` is not managed by Rails.
@@ -182,12 +182,12 @@ These keys are not part of the steady-state app env. They are injected only for 
 
 | Local key | Deploy scope | Secret | Deploy value / note |
 | --- | --- | --- | --- |
-| `DB_HOST` | app | no | accessory service hostname for MariaDB |
+| `DB_HOST` | app | no | external MariaDB hostname or private IP |
 | `DB_PORT` | app | no | MariaDB port, usually `3306` |
-| `DB_USERNAME` | app + db accessory | no | shared database username |
-| `DB_PASSWORD` | db accessory | yes | accessory bootstrap password |
+| `DB_USERNAME` | app | no | database username |
+| `DB_PASSWORD` | app | yes | application database password |
 | `APP_DATABASE_PASSWORD` | app | yes | same secret value as `DB_PASSWORD`; app uses this name in production when present |
-| `DB_NAME_PRODUCTION` | app + db accessory | no | production database name |
+| `DB_NAME_PRODUCTION` | app | no | production database name |
 | `REDIS_URL` | app | no | points at the Redis accessory |
 | `DOCKER_ENGINE_SOCKET_PATH` | app | no | `/var/run/docker.sock` |
 | `DOCKER_ENGINE_API_VERSION` | app | no | unset by default unless the host daemon needs an override |
@@ -229,7 +229,7 @@ These keys are not part of the steady-state app env. They are injected only for 
 
 ## Deployment Boundaries
 
-- Kamal deploys the Rails app image and its accessories
+- Kamal deploys the Rails app image and the Redis accessory
 - Rails continues to manage only app-labeled Minecraft runtime containers and volumes
 - `mc-router` remains a long-lived sibling service and must not be folded into Rails runtime lifecycle
 - No production env rename should be required just because the app moved from local Compose to Kamal deploy
@@ -238,7 +238,7 @@ These keys are not part of the steady-state app env. They are injected only for 
 
 - add Kamal to the project toolchain
 - check in the initial Kamal config
-- wire MariaDB and Redis accessories
+- wire the external MariaDB env plus the Redis accessory
 - define the persistent shared mount for router routes
 - add the app container mount for `/var/run/docker.sock`
 - add the deployment helper or config for the long-lived `mc-router` sibling service

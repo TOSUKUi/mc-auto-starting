@@ -4,7 +4,7 @@
 
 This document is the `T-901` operator-facing runbook for the current direct-Docker architecture.
 
-It is written for the current repository state on `2026-03-28`:
+It is written for the current repository state on `2026-03-29`:
 
 - direct Docker lifecycle is implemented
 - local single-host bootstrap is documented
@@ -20,9 +20,16 @@ If you want to run the app yourself right now, use the single-host Docker Compos
 
 That is the current usable deployment and operations path in this repository.
 
-### Not Yet Checked In
+### Kamal Deployment Baseline
 
-Kamal is the planned deployment baseline, and the initial config files are now checked in under:
+Kamal is the checked-in deployment baseline, and the current repo now assumes:
+
+- Rails app containers are deployed by Kamal
+- MariaDB is provided externally, outside Kamal accessories
+- Redis remains a Kamal accessory for now
+- `mc-router` remains a long-lived sibling service outside Kamal app lifecycle
+
+The relevant files are:
 
 - [config/deploy.yml](../config/deploy.yml)
 - [config/deploy.production.yml](../config/deploy.production.yml)
@@ -30,8 +37,6 @@ Kamal is the planned deployment baseline, and the initial config files are now c
 - [bin/deploy-mc-router](../bin/deploy-mc-router)
 
 The dedicated release and rollback procedure now lives in [docs/release_runbook.md](release_runbook.md).
-
-## Kamal Deployment Baseline
 
 Use this path when you are ready to move from the current Compose-operated host to the Kamal-based single-host deployment.
 
@@ -49,7 +54,6 @@ Then fill in at least:
 - `KAMAL_REGISTRY_PASSWORD`
 - `RAILS_MASTER_KEY`
 - `DB_PASSWORD`
-- `DB_ROOT_PASSWORD`
 - `DISCORD_CLIENT_ID`
 - `DISCORD_CLIENT_SECRET`
 
@@ -61,6 +65,8 @@ export KAMAL_REGISTRY_USERNAME=your-registry-user
 export KAMAL_REGISTRY_SERVER=registry.example.com
 export DEPLOY_WEB_HOST=app.example.com
 export APP_BASE_URL=https://app.example.com
+export DB_HOST=db.example.internal
+export DB_PORT=3306
 export DB_USERNAME=app_user
 export DB_NAME_PRODUCTION=app_production
 export MINECRAFT_PUBLIC_DOMAIN=mc.example.com
@@ -91,7 +97,7 @@ From the repository checkout used for deployment:
 kamal setup -d production
 ```
 
-This should bootstrap accessories, push env, and deploy the app using the checked-in baseline.
+This should bootstrap the Redis accessory, push env, and deploy the app using the checked-in baseline.
 
 ### 5. Verify the deployed app
 
@@ -106,10 +112,9 @@ This should bootstrap accessories, push env, and deploy the app using the checke
 kamal deploy -d production
 ```
 
-If an accessory image changes, reboot that accessory explicitly:
+If the Redis accessory image changes, reboot it explicitly:
 
 ```bash
-kamal accessory reboot mariadb -d production
 kamal accessory reboot redis -d production
 ```
 
@@ -132,7 +137,6 @@ cp .env.example .env
 Review at minimum:
 
 - `DB_PASSWORD`
-- `DB_ROOT_PASSWORD`
 - `DB_NAME_PRODUCTION`
 - `MINECRAFT_PUBLIC_DOMAIN`
 - `MINECRAFT_PUBLIC_PORT`

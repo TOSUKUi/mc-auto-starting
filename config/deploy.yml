@@ -15,8 +15,8 @@ env:
   clear:
     RAILS_ENV: production
     RAILS_LOG_LEVEL: <%= ENV.fetch("RAILS_LOG_LEVEL", "info") %>
-    DB_HOST: mc-auto-starting-mariadb
-    DB_PORT: "3306"
+    DB_HOST: <%= ENV.fetch("DB_HOST") %>
+    DB_PORT: <%= ENV.fetch("DB_PORT", "3306") %>
     DB_USERNAME: <%= ENV.fetch("DB_USERNAME", "app_user") %>
     DB_NAME_PRODUCTION: <%= ENV.fetch("DB_NAME_PRODUCTION", "app_production") %>
     REDIS_URL: redis://mc-auto-starting-redis:6379/1
@@ -53,20 +53,6 @@ volumes:
   - /var/lib/mc-auto-starting/shared/storage:/rails/storage
 
 accessories:
-  mariadb:
-    service: mc-auto-starting-mariadb
-    image: mariadb:10.11.16
-    roles:
-      - web
-    env:
-      clear:
-        MARIADB_DATABASE: <%= ENV.fetch("DB_NAME_PRODUCTION", "app_production") %>
-        MARIADB_USER: <%= ENV.fetch("DB_USERNAME", "app_user") %>
-      secret:
-        - MARIADB_PASSWORD:DB_PASSWORD
-        - MARIADB_ROOT_PASSWORD:DB_ROOT_PASSWORD
-    directories:
-      - /var/lib/mc-auto-starting/accessories/mariadb:/var/lib/mysql
   redis:
     service: mc-auto-starting-redis
     image: redis:7

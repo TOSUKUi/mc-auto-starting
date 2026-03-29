@@ -7,7 +7,8 @@ This document closes `T-902`.
 It defines the operator-facing release, migration, and rollback procedure for the current single-host deployment baseline:
 
 - Kamal deploys the Rails app
-- MariaDB and Redis run as Kamal accessories
+- MariaDB is provided externally
+- Redis runs as a Kamal accessory
 - `mc-router` remains a long-lived sibling service
 - Rails continues to control Minecraft containers through `/var/run/docker.sock`
 
@@ -25,6 +26,7 @@ Before a release, confirm:
 - `.kamal/secrets-common` and `.kamal/secrets.production` are present and current
 - `bin/deploy-mc-router` has already been run on the target host
 - the shared runtime network exists
+- the external MariaDB instance is reachable from the target host using `DB_HOST`, `DB_PORT`, `DB_USERNAME`, and `DB_NAME_PRODUCTION`
 - the current production app answers `GET /up`
 - the target host still exposes `/var/run/docker.sock` to the Rails app container
 
@@ -112,10 +114,9 @@ Check at least:
 
 ## Accessory Maintenance
 
-If MariaDB or Redis images/config changed, restart them explicitly after the app deploy:
+If the Redis image/config changed, restart it explicitly after the app deploy:
 
 ```bash
-kamal accessory reboot mariadb -d production
 kamal accessory reboot redis -d production
 ```
 
@@ -128,7 +129,7 @@ kamal app details -d production
 
 ## Rollback
 
-Use rollback when the new app version is unhealthy but the underlying host and accessories remain usable.
+Use rollback when the new app version is unhealthy but the underlying host and Redis accessory remain usable.
 
 ### 1. Confirm the failure mode
 
@@ -173,7 +174,7 @@ If the migration is destructive or not safely reversible, prefer a forward fix i
 
 ## Failure Handling Notes
 
-### App deploy failed but accessories are healthy
+### App deploy failed but Redis accessory is healthy
 
 - run `kamal rollback -d production`
 - verify `/up`
