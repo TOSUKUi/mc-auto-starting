@@ -34,15 +34,8 @@ Initial owner bootstrap requires:
 Internal bot relay requires:
 
 - `DISCORD_BOT_API_TOKEN`
-- `DISCORD_BOT_ALLOWED_CIDRS`
 
-Current default for `DISCORD_BOT_ALLOWED_CIDRS` is the Docker private-network range:
-
-```text
-172.16.0.0/12
-```
-
-Keep the bot relay on the Docker private network unless the trust boundary is revised first.
+The bot API CIDR allowlist is fixed in Rails to the Docker private-network range `172.16.0.0/12`. Keep the bot relay on that private network unless the trust boundary is revised first.
 
 ## First-Time Login Setup
 
@@ -106,7 +99,7 @@ The Discord Bot is not part of this Rails process. It is an external relay that 
 Current trust boundary:
 
 - bot API is internal-only
-- route access is limited to `DISCORD_BOT_ALLOWED_CIDRS`
+- route access is limited to the fixed Docker private-network CIDR allowlist
 - every request needs `Authorization: Bearer <DISCORD_BOT_API_TOKEN>`
 - every request needs `X-Discord-User-Id`
 - Rails remains the final authorization authority

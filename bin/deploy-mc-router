@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-network_name="${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}"
-config_dir="${MC_ROUTER_HOST_CONFIG_DIR:-/var/lib/mc-auto-starting/shared/mc-router}"
+network_name="mc_router_net"
+config_dir="/var/lib/mc-auto-starting/shared/mc-router"
 
 docker network inspect "${network_name}" >/dev/null 2>&1 || docker network create "${network_name}" >/dev/null
 mkdir -p "${config_dir}"

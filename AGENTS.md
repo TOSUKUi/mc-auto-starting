@@ -77,6 +77,8 @@ Current baseline:
 - `T-901` is complete: `docs/operator_runbook.md` now gives operators a current Compose-based single-host deployment procedure, host-side verification commands, direct-Docker lifecycle guidance, and explicit Docker safety notes.
 - `T-905` is complete: the repository now includes `config/deploy.yml`, `config/deploy.production.yml`, `.kamal` secret templates and hooks, plus the `mc-router` deployment helper needed for the first Kamal-based single-host rollout.
 - `T-902` is complete: `docs/release_runbook.md` now documents the Kamal-based release, migration, and rollback procedure for the current single-host deployment baseline.
+- `T-907` is complete: obsolete env keys have been pruned after the runtime-family and Kamal decisions settled, so the supported contract now drops the dead `BOOTSTRAP_EMAIL_ADDRESS` compose pass-through and the no-longer-needed runtime-image override in favor of the shared `itzg` baseline.
+- `T-908` is complete: fixed-value env knobs for Docker transport, runtime catalog sources, `mc-router` reload wiring, network naming, and RCON transport defaults now live in code or checked-in config instead of `.env`, while Discord OAuth is treated as the current required app secret baseline and the bot-facing app secret is consistently `DISCORD_BOT_API_TOKEN`.
 - `T-1005` is complete: `docs/discord_bot_api_contract.md` now fixes the bot credential model, acting Discord-user resolution, allowed lifecycle/read/whitelist commands, request/response envelopes, and audit expectations before bot endpoint implementation.
 - `T-1024` is complete: the bot contract now keeps whitelist mutations owner/admin-only, treats `whitelist_list` as a read-class surface, and separates bounded RCON input from lifecycle/server-operation commands so forbidden commands such as `stop` are never accepted through the RCON path.
 - Bot API network policy is now fixed at the strategy layer: `/api/discord/bot/*` should be reachable only from the Docker private network, while still requiring the dedicated bot bearer token.
@@ -146,7 +148,7 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Router/container topology: `mc-router` and app-managed Minecraft containers share one bridge network
 - `mc-router` itself is managed by `compose.yaml`, not created or lifecycle-managed by Rails
 - `compose.yaml` defines a compose-managed `mc-router` service that publishes `${MINECRAFT_PUBLIC_PORT}:25565`
-- `compose.yaml` attaches `mc-router` to the external shared network `${MINECRAFT_RUNTIME_NETWORK_NAME}`
+- `compose.yaml` attaches `mc-router` to the external shared network `mc_router_net`
 - `compose.yaml` labels the `mc-router` service with `app.kubos.dev/component=mc-router` so Rails can target reload signals without relying on generated container names
 - Ruby: `3.4.9`
 - Rails: `8.1.2`
@@ -246,8 +248,8 @@ Use these as the default command set.
 
 - Test runs must set `PARALLEL_WORKERS=1`; do not rely on Rails' default parallel test worker count in this repository.
 
-- `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, `MINECRAFT_RUNTIME_IMAGE`, and `MINECRAFT_RUNTIME_VANILLA_IMAGE` values used by Compose.
-- `.env.example` is the checked-in template for those values; keep the real `.env` local and out of Git, treat it as the single local source for Compose, Discord OAuth, bootstrap-owner, and future bot secrets, and leave only the current local/bootstrap baseline uncommented while keeping non-required variables as commented examples.
+- `.env` now carries the local default `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, database, public-ingress, Discord OAuth, and bootstrap-owner values used by Compose.
+- `.env.example` is the checked-in template for those values; keep the real `.env` local and out of Git, treat it as the single local source for Compose, Discord OAuth, bootstrap-owner, and the optional internal bot API secret, and keep only the genuinely operator-settable keys there.
 - If the host user or Docker socket group differs, update `.env` before running Compose.
 Do not install Ruby gems on the host unless there is an explicit exception.
 Keep gems in `vendor/bundle` inside the workspace so the mapped app user can write them.

@@ -1,7 +1,6 @@
 module MinecraftRuntime
   DEFAULT_RUNTIME_FAMILY = "vanilla".freeze
   DEFAULT_IMAGE = "itzg/minecraft-server".freeze
-  DEFAULT_VANILLA_IMAGE = "itzg/minecraft-server".freeze
   DEFAULT_NETWORK_NAME = "mc_router_net".freeze
   DEFAULT_VERSION_TAG = "latest".freeze
   JVM_HEADROOM_MB = 512
@@ -12,12 +11,7 @@ module MinecraftRuntime
   module_function
 
   def image(runtime_family: DEFAULT_RUNTIME_FAMILY)
-    case normalize_runtime_family(runtime_family)
-    when "vanilla"
-      config.vanilla_image.to_s.presence || DEFAULT_VANILLA_IMAGE
-    else
-      config.image.to_s.presence || DEFAULT_IMAGE
-    end
+    config.image.to_s.presence || DEFAULT_IMAGE
   end
 
   def image_for(version_tag:, runtime_family: DEFAULT_RUNTIME_FAMILY)

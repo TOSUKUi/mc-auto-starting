@@ -73,7 +73,7 @@ export MINECRAFT_PUBLIC_DOMAIN=mc.example.com
 export MINECRAFT_PUBLIC_PORT=25565
 ```
 
-Optional overrides can also be exported if you need non-default Docker or runtime settings.
+The current deploy baseline intentionally fixes Docker, runtime-image, router-reload, and version-source internals in code and checked-in config. Do not add ad-hoc deploy env for those unless the contract is revised first.
 
 ### 3. Prepare the target host for `mc-router`
 
@@ -155,14 +155,11 @@ If the host UID, GID, or Docker group differ from the local defaults, also updat
 If you plan to run the Discord Bot relay on the same Docker private network, also set:
 
 - `DISCORD_BOT_API_TOKEN`
-- `DISCORD_BOT_ALLOWED_CIDRS`
-
-For the current baseline, `DISCORD_BOT_ALLOWED_CIDRS` should stay on the Docker private-network default unless the bot deployment shape is explicitly revised.
 
 ### 3. Create the shared runtime network
 
 ```bash
-docker network create "${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}"
+docker network create mc_router_net
 ```
 
 This only needs to be done once per host.
@@ -297,7 +294,7 @@ docker volume ls --filter label=app=mc-auto-starting
 ### Check the shared runtime network
 
 ```bash
-docker network inspect "${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}"
+docker network inspect mc_router_net
 ```
 
 ### Check the rendered router config
@@ -385,13 +382,13 @@ Usually this means one of:
 The first thing to check is whether the shared runtime network exists:
 
 ```bash
-docker network inspect "${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}"
+docker network inspect mc_router_net
 ```
 
 If it does not exist:
 
 ```bash
-docker network create "${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}"
+docker network create mc_router_net
 ```
 
 ## References

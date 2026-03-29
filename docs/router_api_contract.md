@@ -45,18 +45,12 @@ This document fixes the initial mc-router integration contract for Phase 4 tasks
 - The compose-managed `mc-router` container should carry a stable label such as `app.kubos.dev/component=mc-router` so Rails can resolve it without depending on a generated container name.
 
 ## Rails Configuration Contract
-- `MC_ROUTER_ROUTES_CONFIG_PATH`
-  Absolute or app-visible path to the rendered routes JSON file.
-- `MC_ROUTER_RELOAD_STRATEGY`
-  One of `watch`, `command`, `docker_signal`, `manual`.
-- `MC_ROUTER_RELOAD_COMMAND`
-  Required only when `MC_ROUTER_RELOAD_STRATEGY=command`.
-- `MC_ROUTER_RELOAD_SIGNAL`
-  Signal name sent when `MC_ROUTER_RELOAD_STRATEGY=docker_signal`. Default: `HUP`.
-- `MC_ROUTER_RELOAD_CONTAINER_LABELS`
-  Comma-separated Docker label filters that uniquely resolve the compose-managed `mc-router` container when `MC_ROUTER_RELOAD_STRATEGY=docker_signal`.
-- `MC_ROUTER_API_URL`
-  Optional future-facing base URL for router inspection or operational tooling.
+- Local development writes routes to `tmp/mc-router/routes.json` under the app root.
+- Production writes routes to `/rails/shared/mc-router/routes.json` so the Kamal-managed app and the long-lived `mc-router` sibling service share the same file.
+- The active reload strategy is fixed to `docker_signal`.
+- The active reload signal is fixed to `HUP`.
+- Rails resolves the reload target by the fixed Docker label `app.kubos.dev/component=mc-router`.
+- The REST API and command-based reload remain upstream capabilities, but they are not part of the supported app configuration contract.
 
 ## Implementation Notes
 - `T-401` builds one route definition from `RouterRoute` + `MinecraftServer`.

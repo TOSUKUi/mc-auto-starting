@@ -73,14 +73,11 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
 
   setup do
     @original_runtime_image = Rails.application.config.x.minecraft_runtime.image
-    @original_vanilla_image = Rails.application.config.x.minecraft_runtime.vanilla_image
     Rails.application.config.x.minecraft_runtime.image = "itzg/minecraft-server"
-    Rails.application.config.x.minecraft_runtime.vanilla_image = "itzg/minecraft-server"
   end
 
   teardown do
     Rails.application.config.x.minecraft_runtime.image = @original_runtime_image
-    Rails.application.config.x.minecraft_runtime.vanilla_image = @original_vanilla_image
   end
 
   test "creates Docker resources publishes the route and marks the server ready" do
@@ -120,6 +117,11 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal "itzg/minecraft-server", create_call.fetch(1).fetch(:image)
     assert_equal(
       {
+        "HARDCORE" => "FALSE",
+        "DIFFICULTY" => "easy",
+        "MODE" => "survival",
+        "MAX_PLAYERS" => "20",
+        "PVP" => "TRUE",
         "EULA" => "TRUE",
         "TYPE" => "PAPER",
         "VERSION" => "1.21.4",
@@ -239,6 +241,11 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     assert_equal "itzg/minecraft-server", create_call.fetch(1).fetch(:image)
     assert_equal(
       {
+        "HARDCORE" => "FALSE",
+        "DIFFICULTY" => "easy",
+        "MODE" => "survival",
+        "MAX_PLAYERS" => "20",
+        "PVP" => "TRUE",
         "EULA" => "TRUE",
         "TYPE" => "VANILLA",
         "VERSION" => "latest",

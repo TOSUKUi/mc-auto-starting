@@ -93,7 +93,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-304` is complete: Docker transport, public endpoint, runtime image/network, the `itzg` runtime payload, and router file/reload defaults are fixed in env-backed helpers and docs.
 - The create-form `minecraft_version` field is runtime-version input passed through the container `VERSION` contract rather than a Docker image tag.
 - `MinecraftRuntime` now derives container `MEMORY` below the Docker limit so the server keeps JVM headroom.
-- Local Compose bootstrap now includes checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, and `MINECRAFT_RUNTIME_IMAGE`.
+- Local Compose bootstrap now includes checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, database, public-ingress, Discord OAuth, and bootstrap-owner values.
 - `T-400` is complete: the create job now provisions managed Docker resources, persists runtime state, and publishes the `mc-router` mapping.
 - `T-400` now pulls the selected runtime image on demand when Docker create fails with `No such image`.
 - The direct-Docker lifecycle/delete contract is now fixed in `docs/direct_docker_lifecycle_contract.md` ahead of service replacement work.
@@ -121,6 +121,8 @@ This file tells any contributor or agent where to find authoritative information
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - `T-900` is complete: the single-host bootstrap path, external network prerequisite, local `.env` handling, and Dockerized development workflow are now documented for new contributors.
 - `T-904` is complete and `T-906` now refines it: the single-host Kamal deployment topology keeps external MariaDB outside Kamal accessories, retains Redis as the remaining accessory, preserves the shared router-routes mount, and keeps the local `.env` to deploy env mapping explicit in docs and config.
+- `T-907` is complete: obsolete env keys have been removed after the runtime-family and Kamal decisions settled, so the active contract now uses the shared `itzg` baseline and no longer carries the dead `BOOTSTRAP_EMAIL_ADDRESS` compose pass-through.
+- `T-908` is complete: fixed-value env knobs for Docker transport, runtime catalog sources, `mc-router` reload wiring, network naming, and RCON transport defaults are now code/config defaults rather than operator-facing env, while Discord OAuth is treated as a current required secret baseline and the bot-facing app secret is consistently `DISCORD_BOT_API_TOKEN`.
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
 - `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
 - `T-902` is complete: the Kamal-based release, migration, and rollback path now lives in `docs/release_runbook.md`.
@@ -184,4 +186,4 @@ This file tells any contributor or agent where to find authoritative information
 - `T-1003` is complete: `/login` is now a Discord-only entry page for existing users, `/discord/login` guards the OAuth handoff so misconfigured Discord env returns safely to `/login`, local password and password-reset routes are no longer part of the active path, and bootstrap-owner startup logs can surface the first `/login` link when Discord OAuth and bootstrap env are configured.
 - `T-1004` is complete: invite redemption now starts at `/invites/:token`, pending invite tokens are held in the Rails session, and Discord OAuth callbacks can create/link the invited user on first login.
 - Initial operator bootstrap should use `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed`, then follow the startup `/login` hint to sign in through Discord before invite-based onboarding takes over.
-- Local configuration should now be driven from `.env`, using `.env.example` as the checked-in template; required local/bootstrap keys stay active there, while non-required Discord, bot, router-command, and deploy-era examples stay commented until needed.
+- Local configuration should now be driven from `.env`, using `.env.example` as the checked-in template; it should contain only operator-settable keys, while fixed router/runtime/socket defaults live in code or checked-in Compose/Kamal config.

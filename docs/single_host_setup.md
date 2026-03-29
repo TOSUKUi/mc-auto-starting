@@ -69,12 +69,6 @@ The Compose file expects the Minecraft runtime network to already exist because 
 Create it once before the first `docker compose up`:
 
 ```bash
-docker network create "${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}"
-```
-
-If you keep the default `.env.example` values, this becomes:
-
-```bash
 docker network create mc_router_net
 ```
 
@@ -135,7 +129,7 @@ http://localhost:3000
 
 `bin/dev` also exposes Vite on port `3036`.
 
-If Discord OAuth is configured with `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, and optionally `APP_BASE_URL`, the server boot log can print a bootstrap owner sign-in hint for `/login`.
+If Discord OAuth is configured with `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, and `APP_BASE_URL`, the server boot log can print a bootstrap owner sign-in hint for `/login`.
 
 ## Normal Local Development Commands
 
@@ -188,7 +182,7 @@ Symptoms:
 Fix:
 
 ```bash
-docker network create "${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}"
+docker network create mc_router_net
 ```
 
 ### App files created with the wrong owner

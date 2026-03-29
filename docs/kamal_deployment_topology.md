@@ -89,7 +89,7 @@ No socket proxy is added in the initial deployment baseline.
 
 ### Runtime Network
 
-`MINECRAFT_RUNTIME_NETWORK_NAME` remains the shared bridge network for:
+`mc_router_net` remains the shared bridge network for:
 
 - the long-lived `mc-router` container
 - Rails-created Minecraft runtime containers
@@ -118,12 +118,6 @@ Expected mounts:
 - host path `/var/lib/mc-auto-starting/shared/mc-router`
 - inside Rails `web` container: `/rails/shared/mc-router`
 - inside `mc-router`: `/config`
-
-Expected deploy-time env:
-
-```text
-MC_ROUTER_ROUTES_CONFIG_PATH=/rails/shared/mc-router/routes.json
-```
 
 This keeps the generated routes file visible to both the Rails app and the long-lived router container.
 
@@ -189,32 +183,14 @@ These keys are not part of the steady-state app env. They are injected only for 
 | `APP_DATABASE_PASSWORD` | app | yes | same secret value as `DB_PASSWORD`; app uses this name in production when present |
 | `DB_NAME_PRODUCTION` | app | no | production database name |
 | `REDIS_URL` | app | no | points at the Redis accessory |
-| `DOCKER_ENGINE_SOCKET_PATH` | app | no | `/var/run/docker.sock` |
 | `DOCKER_ENGINE_API_VERSION` | app | no | unset by default unless the host daemon needs an override |
-| `DOCKER_ENGINE_OPEN_TIMEOUT` | app | no | carried through unchanged |
-| `DOCKER_ENGINE_READ_TIMEOUT` | app | no | carried through unchanged |
-| `DOCKER_ENGINE_WRITE_TIMEOUT` | app | no | carried through unchanged |
 | `MINECRAFT_PUBLIC_DOMAIN` | app | no | public DNS suffix shown in the UI and written to router routes |
 | `MINECRAFT_PUBLIC_PORT` | app + `mc-router` sibling service | no | shared public Minecraft port |
-| `MINECRAFT_RUNTIME_IMAGE` | app | no | primary `itzg` runtime image family |
-| `MINECRAFT_RUNTIME_VANILLA_IMAGE` | app | no | optional runtime-family override |
-| `MINECRAFT_RUNTIME_VANILLA_VERSION_MANIFEST_URL` | app | no | optional live source override |
-| `MINECRAFT_RUNTIME_PAPER_VERSION_MANIFEST_URL` | app | no | optional live source override |
-| `MINECRAFT_RUNTIME_VERSION_OPTIONS_CACHE_TTL` | app | no | carried through unchanged |
-| `MINECRAFT_RUNTIME_NETWORK_NAME` | app + `mc-router` sibling service | no | shared external bridge network name |
-| `MC_ROUTER_ROUTES_CONFIG_PATH` | app | no | use the deployed shared mount path, not the local `/app/tmp/...` path |
-| `MC_ROUTER_RELOAD_STRATEGY` | app | no | keep `docker_signal` as the default baseline |
-| `MC_ROUTER_RELOAD_SIGNAL` | app | no | keep `HUP` unless deployment proves otherwise |
-| `MC_ROUTER_RELOAD_CONTAINER_LABELS` | app | no | must still resolve the long-lived router container reliably |
-| `MC_ROUTER_RELOAD_COMMAND` | app | yes | only needed if the reload strategy changes to `command` |
-| `MC_ROUTER_API_URL` | app | no | optional future operational endpoint |
 | `DISCORD_CLIENT_ID` | app | yes | production OAuth client id |
 | `DISCORD_CLIENT_SECRET` | app | yes | production OAuth client secret |
 | `APP_BASE_URL` | app | no | public HTTPS base URL used for login hints and callback-related app behavior |
-| `DISCORD_BOT_TOKEN` | app | yes | future bot integration secret |
-| `DISCORD_BOT_PUBLIC_KEY` | app | yes | future bot integration secret |
-| `DISCORD_BOT_APPLICATION_ID` | app | yes | future bot integration value |
-| `DISCORD_BOT_SHARED_SECRET` | app | yes | future bot-to-Rails auth secret |
+| `DISCORD_BOT_API_TOKEN` | app | yes | secret bearer token for the internal bot API when the external relay is in use |
+| `MINECRAFT_RCON_PASSWORD_SECRET` | app | yes | optional explicit secret used to derive stable per-server RCON passwords |
 | `RAILS_LOG_LEVEL` | app | no | carried through unchanged |
 
 ## Production Defaults To Preserve
@@ -222,9 +198,10 @@ These keys are not part of the steady-state app env. They are injected only for 
 `T-905` should preserve these current code assumptions:
 
 - `DOCKER_ENGINE_API_VERSION` stays unset by default
-- `MC_ROUTER_RELOAD_STRATEGY` defaults to `docker_signal`
-- `MC_ROUTER_RELOAD_SIGNAL` defaults to `HUP`
-- `MC_ROUTER_RELOAD_CONTAINER_LABELS` resolves the router by stable label rather than generated container name
+- Docker socket path remains `/var/run/docker.sock`
+- Docker Engine timeouts stay fixed at open `5s`, read `30s`, write `30s`
+- `mc-router` route output path stays `/rails/shared/mc-router/routes.json` in production
+- `mc-router` reload stays fixed to Docker signal `HUP`, resolved by the stable label `app.kubos.dev/component=mc-router`
 - `paper` and `vanilla` continue to provision through `itzg/minecraft-server`
 
 ## Deployment Boundaries

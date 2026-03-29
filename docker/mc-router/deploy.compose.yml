@@ -1,6 +1,6 @@
 services:
   mc-router:
-    image: ${MC_ROUTER_IMAGE:-itzg/mc-router}
+    image: itzg/mc-router
     container_name: mc-router
     labels:
       app.kubos.dev/component: mc-router
@@ -17,5 +17,5 @@ services:
 
 networks:
   mc_router:
-    name: ${MINECRAFT_RUNTIME_NETWORK_NAME:-mc_router_net}
+    name: mc_router_net
     external: true

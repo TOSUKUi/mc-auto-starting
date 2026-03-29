@@ -78,7 +78,7 @@ docker compose run --rm -p 3000:3000 -p 3036:3036 app bin/dev
 - Keep `.env` local and untracked. `.env.example` is the checked-in template.
 - The `app` container must be able to access `/var/run/docker.sock`.
 - `mc-router` runs as a Compose-managed sibling container on the shared external bridge network.
-- To bootstrap the first owner, set `BOOTSTRAP_DISCORD_USER_ID` in `.env`, run `docker compose run --rm app bin/rails db:seed`, then complete sign-in from `/login` after Discord OAuth is configured.
+- To bootstrap the first owner, set `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `APP_BASE_URL`, and `BOOTSTRAP_DISCORD_USER_ID` in `.env`, run `docker compose run --rm app bin/rails db:seed`, then complete sign-in from `/login`.
 
 ## Detailed Setup
 
