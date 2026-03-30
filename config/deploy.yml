@@ -5,6 +5,13 @@ hooks_path: .kamal/hooks
 secrets_path: .kamal/secrets
 asset_path: /rails/public/assets
 
+ssh:
+  user: <%= ENV.fetch("SSH_USER") %>
+
+builder:
+  arch:
+    - amd64
+
 registry:
   server: <%= ENV.fetch("KAMAL_REGISTRY_SERVER", "docker.io") %>
   username: <%= ENV.fetch("KAMAL_REGISTRY_USERNAME") %>
@@ -44,3 +51,18 @@ accessories:
       - web
     directories:
       - /var/lib/mc-auto-starting/accessories/redis:/data
+  mc-router:
+    service: mc-router
+    image: itzg/mc-router
+    labels:
+      app.kubos.dev/component: mc-router
+    roles:
+      - web
+    env:
+      PORT: 25565
+      ROUTES_CONFIG: /config/routes.json
+    directories:
+      - ${MC_ROUTER_HOST_CONFIG_DIR:-/var/lib/mc-auto-starting/shared/mc-router}:/config
+    port: "${MINECRAFT_PUBLIC_PORT:-25565}:25565"
+    network: mc_router
+
