@@ -27,7 +27,8 @@ Kamal is the checked-in deployment baseline, and the current repo now assumes:
 - Rails app containers are deployed by Kamal
 - MariaDB is provided externally, outside Kamal accessories
 - Redis remains a Kamal accessory for now
-- `mc-router` remains a long-lived sibling service outside Kamal app lifecycle
+- `mc-router` remains a long-lived sibling service outside Kamal app lifecycle and outside direct Kamal accessory management
+- deployed Rails app containers must join `mc_router_net` in addition to the default Kamal app network so RCON-backed features can reach managed containers by `container_name`
 
 The relevant files are:
 
@@ -60,9 +61,6 @@ Then fill in at least:
 ### 2. Export the required non-secret deploy variables
 
 ```bash
-export KAMAL_IMAGE=registry.example.com/mc-auto-starting
-export KAMAL_REGISTRY_USERNAME=your-registry-user
-export KAMAL_REGISTRY_SERVER=registry.example.com
 export DEPLOY_WEB_HOST=app.example.com
 export APP_BASE_URL=https://app.example.com
 export DB_HOST=db.example.internal
@@ -89,6 +87,8 @@ This helper:
 - creates the shared router config directory
 - starts the long-lived `mc-router` sibling service
 
+The current deploy baseline keeps `mc-router` off the Kamal accessory list and lets the checked-in post-deploy hook perform the same host-side reconciliation automatically after app deploys.
+
 ### 4. Run the first Kamal setup
 
 From the repository checkout used for deployment:
@@ -97,7 +97,7 @@ From the repository checkout used for deployment:
 kamal setup -d production
 ```
 
-This should bootstrap the Redis accessory, push env, and deploy the app using the checked-in baseline.
+This bootstraps the Redis accessory, pushes env, deploys the app using the checked-in baseline, and then runs the checked-in post-deploy reconciliation for the shared runtime network, the long-lived `mc-router` sibling service, and the Rails app container's extra `mc_router_net` attachment.
 
 ### 5. Verify the deployed app
 
@@ -105,6 +105,7 @@ This should bootstrap the Redis accessory, push env, and deploy the app using th
 - check `${APP_BASE_URL}/up`
 - confirm `/login` works
 - confirm the `mc-router` container is still present with `app.kubos.dev/component=mc-router`
+- confirm the current Rails app container is attached to both the default Kamal app network and `mc_router_net`
 
 ### 6. Later app updates
 

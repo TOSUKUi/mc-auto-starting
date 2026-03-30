@@ -58,12 +58,14 @@ The single-host deployment baseline is:
 - `mc-router`: host-level sibling service outside the Rails app container, kept aligned with the current compose-managed architecture
 
 `mc-router` stays outside Rails lifecycle ownership. Rails may rewrite its routes file and signal reloads, but Rails must not create or destroy the router container itself.
+`mc-router` should also stay outside direct Kamal accessory ownership. The checked-in deploy helper and hooks may reconcile the sibling service on the host, but steady-state `mc-router` management should remain host-side rather than modeled as a Kamal accessory.
 
 For `T-905`, that means the repository should ship:
 
 - Kamal config for the Rails app
 - a Kamal-managed Redis accessory
 - a checked-in deployment helper or compose file for the long-lived `mc-router` sibling service
+- checked-in deploy hooks that can reconcile host-side prerequisites without turning `mc-router` into a Kamal accessory
 
 The goal is to keep the app deployment Kamal-based without changing the architectural decision that `mc-router` is not managed by Rails.
 
@@ -93,8 +95,17 @@ No socket proxy is added in the initial deployment baseline.
 
 - the long-lived `mc-router` container
 - Rails-created Minecraft runtime containers
+- Kamal-deployed Rails `web` containers after deploy-time network attachment
 
-The Rails `web` container does not need to be attached to that network for the current baseline because it talks to Docker over the Unix socket rather than by container-to-container networking.
+The Rails `web` container must also be attached to `mc_router_net` in production.
+
+Reason:
+
+- Docker lifecycle operations use `/var/run/docker.sock`
+- but Rails-owned RCON features connect to managed Minecraft containers by `container_name`
+- player presence, whitelist mutation, and bounded RCON actions therefore require container-to-container reachability on the shared runtime network
+
+Kamal's default app network remains the primary HTTP/proxy network. The additional `mc_router_net` attachment should be handled by checked-in deploy hooks or equivalent host-safe automation rather than by moving the runtime plane onto the Kamal app network.
 
 ### HTTP And Minecraft Ports
 
@@ -209,6 +220,7 @@ These keys are not part of the steady-state app env. They are injected only for 
 - Kamal deploys the Rails app image and the Redis accessory
 - Rails continues to manage only app-labeled Minecraft runtime containers and volumes
 - `mc-router` remains a long-lived sibling service and must not be folded into Rails runtime lifecycle
+- `mc-router` remains outside direct Kamal accessory ownership even when deploy hooks reconcile it on the host
 - No production env rename should be required just because the app moved from local Compose to Kamal deploy
 
 ## Follow-On Work For `T-905`

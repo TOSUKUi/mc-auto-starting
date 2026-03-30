@@ -9,8 +9,9 @@ It defines the operator-facing release, migration, and rollback procedure for th
 - Kamal deploys the Rails app
 - MariaDB is provided externally
 - Redis runs as a Kamal accessory
-- `mc-router` remains a long-lived sibling service
+- `mc-router` remains a long-lived sibling service outside direct Kamal accessory management
 - Rails continues to control Minecraft containers through `/var/run/docker.sock`
+- deployed Rails app containers must also be attached to `mc_router_net` so Rails-owned RCON features can reach managed containers by `container_name`
 
 Use this together with:
 
@@ -48,7 +49,7 @@ The tree should be clean before deploying.
 Confirm the required non-secret deploy env is exported:
 
 ```bash
-env | grep -E '^(KAMAL_IMAGE|KAMAL_REGISTRY_USERNAME|KAMAL_REGISTRY_SERVER|DEPLOY_WEB_HOST|APP_BASE_URL|DB_USERNAME|DB_NAME_PRODUCTION|MINECRAFT_PUBLIC_DOMAIN|MINECRAFT_PUBLIC_PORT)='
+env | grep -E '^(DEPLOY_WEB_HOST|APP_BASE_URL|DB_HOST|DB_PORT|DB_NAME_PRODUCTION|MINECRAFT_PUBLIC_DOMAIN|MINECRAFT_PUBLIC_PORT)='
 ```
 
 ### 3. Deploy the app
@@ -57,7 +58,7 @@ env | grep -E '^(KAMAL_IMAGE|KAMAL_REGISTRY_USERNAME|KAMAL_REGISTRY_SERVER|DEPLO
 kamal deploy -d production
 ```
 
-This is the normal release path for code-only and code-plus-migration releases.
+This is the normal release path for code-only and code-plus-migration releases. The checked-in post-deploy hook reconciles the shared runtime network, the long-lived `mc-router` sibling service, and the app container's extra `mc_router_net` attachment after the new app instance boots.
 
 ### 4. Verify the release
 
@@ -73,6 +74,7 @@ Then verify in the UI:
 - `/login` is reachable
 - `/servers` loads
 - an existing server detail page loads
+- at least one RCON-backed surface such as player count or whitelist data loads for an existing running server if one is available
 
 ### 5. Verify the router sibling service
 
@@ -83,7 +85,7 @@ docker ps --filter label=app.kubos.dev/component=mc-router
 docker logs --tail=100 $(docker ps -q --filter label=app.kubos.dev/component=mc-router)
 ```
 
-`mc-router` is not redeployed by `kamal deploy`, so this check confirms the sibling service remained healthy across the app release.
+`mc-router` is not managed as a Kamal accessory, so this check confirms the sibling service remained healthy across the app release.
 
 ## Release With Database Migration
 

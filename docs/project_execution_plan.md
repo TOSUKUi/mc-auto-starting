@@ -259,9 +259,11 @@
 - 単一ホスト前提の Kamal deploy topology を決める
 - Rails app / accessories / secret 注入方法を固定する
 - 現在の local Compose 用 env 名を可能な限りそのまま deploy 側へ持ち込む
+- follow-up: Rails app を `kamal` network だけに閉じず、RCON 用に `mc_router_net` へも参加させる hook-based 補完手順を固定する
 - 完了条件:
   - Kamal で deploy 可能な最小構成が決まる
   - local `.env` と deploy secrets の写像が追跡できる
+  - RCON / whitelist / player presence など `container_name` 到達が必要な機能が Kamal deploy 後も維持される
 
 #### P6-4 単一ホスト運用 docs
 

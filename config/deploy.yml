@@ -3,12 +3,13 @@ image: <%= ENV.fetch("KAMAL_IMAGE") %>
 require_destination: true
 hooks_path: .kamal/hooks
 secrets_path: .kamal/secrets
-asset_path: /rails/public/assets
+asset_path: /app/public/vite
 
 ssh:
   user: <%= ENV.fetch("SSH_USER") %>
 
 builder:
+  dockerfile: Dockerfile.production
   arch:
     - amd64
 
@@ -50,3 +51,4 @@ accessories:
     roles:
       - web
     directories:
+      - ~/kamal-services/mc-auto-starting/accessories/redis:/data

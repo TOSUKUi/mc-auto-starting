@@ -1,0 +1,48 @@
+FROM ruby:3.4.9 AS build
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    build-essential \
+    default-libmysqlclient-dev \
+    nodejs \
+    npm \
+    git \
+    pkg-config \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+ENV RAILS_ENV=production \
+    BUNDLE_WITHOUT=development:test
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
+
+FROM ruby:3.4.9
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    default-libmysqlclient-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+ENV RAILS_ENV=production \
+    RACK_ENV=production \
+    BUNDLE_WITHOUT=development:test
+
+COPY --from=build /usr/local/bundle /usr/local/bundle
+COPY --from=build /app /app
+
+RUN rm -rf /app/node_modules
+
+EXPOSE 3000
+
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
