@@ -16,6 +16,6 @@ services:
       - mc_router_net
 
 networks:
-  mc_router:
+  mc_router_net:
     name: mc_router_net
     external: true

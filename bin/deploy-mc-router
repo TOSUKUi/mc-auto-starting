@@ -2,7 +2,7 @@
 set -euo pipefail
 
 network_name="mc_router_net"
-config_dir="~/kamal-services/mc-server-manager/shared/mc-router"
+config_dir="${KAMAL_BASE_DIR}/mc-server-manager/shared/mc-router"
 
 docker network inspect "${network_name}" >/dev/null 2>&1 || docker network create "${network_name}" >/dev/null
 mkdir -p "${config_dir}"

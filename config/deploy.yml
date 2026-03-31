@@ -41,8 +41,8 @@ env:
 
 volumes:
   - /var/run/docker.sock:/var/run/docker.sock
-  - ~/kamal-services/mc-auto-starting/shared/mc-router:/rails/shared/mc-router
-  - ~/kamal-services/mc-auto-starting/shared/storage:/rails/storage
+  - ${KAMAL_BASE_DIR}/mc-auto-starting/shared/mc-router:/rails/shared/mc-router
+  - ${KAMAL_BASE_DIR}/mc-auto-starting/shared/storage:/rails/storage
 
 accessories:
   redis:
@@ -51,4 +51,4 @@ accessories:
     roles:
       - web
     directories:
-      - ~/kamal-services/mc-auto-starting/accessories/redis:/data
+      - ${KAMAL_BASE_DIR}/mc-auto-starting/accessories/redis:/data
