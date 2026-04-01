@@ -179,6 +179,7 @@ These are not steady-state app env and should be injected only for setup or main
 | `DISCORD_CLIENT_ID` | app | yes | production OAuth client id |
 | `DISCORD_CLIENT_SECRET` | app | yes | production OAuth client secret |
 | `APP_BASE_URL` | app | no | public base URL used for callbacks and login hints |
+| `SECRET_KEY_BASE` | app | yes | required Rails production secret for session/cookie/message verification |
 | `DISCORD_BOT_API_TOKEN` | app | yes | internal bot API bearer token |
 | `MINECRAFT_RCON_PASSWORD_SECRET` | app | yes | required production secret for stable per-server RCON password derivation |
 | `RAILS_LOG_LEVEL` | app | no | carried through unchanged when needed |

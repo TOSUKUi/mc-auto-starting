@@ -53,10 +53,14 @@ This document fixes the supported environment-variable contract for the current 
   Optional Docker Engine API version prefix used only when the host daemon needs an explicit `/v1.xx` override.
 - `DISCORD_BOT_API_TOKEN`
   Shared bearer token for the internal `/api/discord/bot/*` surface. Set it when the external bot relay is in use.
-- `MINECRAFT_RCON_PASSWORD_SECRET`
-  Required production secret used to derive stable per-server RCON passwords. The app no longer falls back to `secret_key_base`.
 - `RAILS_LOG_LEVEL`
   Rails log level. Default: `info`.
+
+## Required Production Secrets
+- `SECRET_KEY_BASE`
+  Required Rails production secret used for cookies, sessions, and message verification when the app boots without credentials.
+- `MINECRAFT_RCON_PASSWORD_SECRET`
+  Required production secret used to derive stable per-server RCON passwords. The app no longer falls back to `secret_key_base`.
 
 ## Fixed Internal Configuration
 - Docker socket path is fixed to `/var/run/docker.sock`.

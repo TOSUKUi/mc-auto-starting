@@ -66,6 +66,7 @@ At minimum, set:
 - `MINECRAFT_PUBLIC_DOMAIN`
 - `MINECRAFT_PUBLIC_PORT`
 - `APP_BASE_URL`
+- `SECRET_KEY_BASE`
 - `DISCORD_CLIENT_ID`
 - `DISCORD_CLIENT_SECRET`
 - `DISCORD_BOT_API_TOKEN` if the bot relay is in use
@@ -79,6 +80,12 @@ Optional but commonly useful:
 - `DOCKER_ENGINE_API_VERSION`
 
 Do not set `RAILS_MASTER_KEY`. Production is expected to boot without it.
+
+Generate `SECRET_KEY_BASE` once with a command such as:
+
+```bash
+openssl rand -hex 64
+```
 
 ### 3. Pull and start the production stack
 

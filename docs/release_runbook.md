@@ -26,6 +26,7 @@ Before a release, confirm:
 
 - the target host has an up-to-date `.env.production`
 - `APP_IMAGE` points at the intended image tag
+- `SECRET_KEY_BASE` is present in `.env.production` or the corresponding Komodo secret store
 - the shared runtime network exists
 - the external MariaDB instance is reachable from the target host using `DB_HOST`, `DB_PORT`, `DB_USERNAME`, and `DB_NAME_PRODUCTION`
 - the current production app answers `GET /up`
