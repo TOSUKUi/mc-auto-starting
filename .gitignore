@@ -1,5 +1,6 @@
 .local/
 .env
+.env.production
 !.env.example
 .kamal/secrets
 .kamal/secrets.*
