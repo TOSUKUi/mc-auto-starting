@@ -39,7 +39,7 @@ module MinecraftRcon
   def password_for(server)
     raise UnavailableError, "RCON password requires a persisted server" if server.id.blank?
 
-    secret = config.password_secret.presence || Rails.application.secret_key_base
+    secret = config.password_secret.presence
     raise UnavailableError, "RCON password secret is not configured" if secret.blank?
 
     OpenSSL::HMAC.hexdigest("SHA256", secret, "#{server.id}:#{server.hostname}")[0, PASSWORD_LENGTH]

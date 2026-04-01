@@ -10,14 +10,12 @@ Current important files:
 
 - `README.md`
 - `Dockerfile`
+- `Dockerfile.production`
 - `compose.yaml`
 - `docs/single_host_setup.md`
 - `docs/operator_runbook.md`
 - `docs/discord_operator_runbook.md`
 - `docs/release_runbook.md`
-- `docs/kamal_deployment_topology.md`
-- `config/deploy.yml`
-- `config/deploy.production.yml`
 - `docs/direct_docker_lifecycle_contract.md`
 - `docs/direct_docker_env_contract.md`
 - `docs/discord_auth_and_bot_strategy.md`
@@ -73,12 +71,12 @@ Current baseline:
 - `T-804` is complete: compose-managed `mc-router` now runs on the shared bridge network and a live status ping through the shared public port reached a managed Minecraft container.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after rewriting the routes file, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - `T-900` is complete: `README.md` now points at a concrete single-host bootstrap path, and `docs/single_host_setup.md` documents the local `.env` setup, external network prerequisite, Dockerized boot flow, and bootstrap-owner seed path for new contributors.
-- `T-904` is complete and `T-906` now refines it: the single-host Kamal deployment shape keeps external MariaDB outside Kamal accessories, retains Redis as the remaining accessory, keeps `mc-router` as a long-lived sibling service, and preserves deploy secrets outside Git while keeping the current env key names.
 - `T-901` is complete: `docs/operator_runbook.md` now gives operators a current Compose-based single-host deployment procedure, host-side verification commands, direct-Docker lifecycle guidance, and explicit Docker safety notes.
-- `T-905` is complete: the repository now includes `config/deploy.yml`, `config/deploy.production.yml`, `.kamal` secret templates and hooks, plus the `mc-router` deployment helper needed for the first Kamal-based single-host rollout.
-- `T-902` is complete: `docs/release_runbook.md` now documents the Kamal-based release, migration, and rollback procedure for the current single-host deployment baseline.
-- `T-907` is complete: obsolete env keys have been pruned after the runtime-family and Kamal decisions settled, so the supported contract now drops the dead `BOOTSTRAP_EMAIL_ADDRESS` compose pass-through and the no-longer-needed runtime-image override in favor of the shared `itzg` baseline.
+- The deployment direction has pivoted away from Kamal and toward a production `docker-compose.production.yml` plus Komodo flow, with registry-pushed app images pulled on the target host.
+- Production is now expected to boot without Rails credentials or `master.key`; app secrets should come from environment variables or the deploy orchestrator secret store.
+- `T-907` is complete: obsolete env keys have been pruned after the runtime-family and deploy-shape decisions settled, so the supported contract now drops the dead `BOOTSTRAP_EMAIL_ADDRESS` compose pass-through and the no-longer-needed runtime-image override in favor of the shared `itzg` baseline.
 - `T-908` is complete: fixed-value env knobs for Docker transport, runtime catalog sources, `mc-router` reload wiring, network naming, and RCON transport defaults now live in code or checked-in config instead of `.env`, while Discord OAuth is treated as the current required app secret baseline and the bot-facing app secret is consistently `DISCORD_BOT_API_TOKEN`.
+- `T-911` through `T-915` are the new deployment follow-up track: replace the abandoned Kamal baseline with a Compose + Komodo production topology, publish app images from GitHub Actions, add `docker-compose.production.yml`, update runbooks, and remove obsolete Kamal-specific files/docs.
 - `T-1005` is complete: `docs/discord_bot_api_contract.md` now fixes the bot credential model, acting Discord-user resolution, allowed lifecycle/read/whitelist commands, request/response envelopes, and audit expectations before bot endpoint implementation.
 - `T-1024` is complete: the bot contract now keeps whitelist mutations owner/admin-only, treats `whitelist_list` as a read-class surface, and separates bounded RCON input from lifecycle/server-operation commands so forbidden commands such as `stop` are never accepted through the RCON path.
 - Bot API network policy is now fixed at the strategy layer: `/api/discord/bot/*` should be reachable only from the Docker private network, while still requiring the dedicated bot bearer token.
@@ -150,6 +148,9 @@ These are already decided and should be treated as defaults unless explicitly ch
 - `compose.yaml` defines a compose-managed `mc-router` service that publishes `${MINECRAFT_PUBLIC_PORT}:25565`
 - `compose.yaml` attaches `mc-router` to the external shared network `mc_router_net`
 - `compose.yaml` labels the `mc-router` service with `app.kubos.dev/component=mc-router` so Rails can target reload signals without relying on generated container names
+- Production deployment direction: `docker-compose.production.yml` managed by Komodo, not Kamal
+- Production image distribution direction: GitHub Actions builds and pushes the app image to an external registry, and the target host pulls it
+- Rails credentials direction: production should boot without `config/master.key` or `RAILS_MASTER_KEY`; secrets are supplied directly by env/secret injection
 - Ruby: `3.4.9`
 - Rails: `8.1.2`
 - Database: MariaDB `10.11.16` (via `mysql2` adapter)
@@ -209,12 +210,9 @@ The active system has four parts.
 10. `docs/single_host_setup.md`
 11. `docs/operator_runbook.md`
 12. `docs/release_runbook.md`
-13. `docs/kamal_deployment_topology.md`
-14. `config/deploy.yml`
-15. `config/deploy.production.yml`
-16. `docs/direct_docker_env_contract.md`
-17. `docs/direct_docker_lifecycle_contract.md`
-18. `docs/discord_auth_and_bot_strategy.md`
+13. `docs/direct_docker_env_contract.md`
+14. `docs/direct_docker_lifecycle_contract.md`
+15. `docs/discord_auth_and_bot_strategy.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.

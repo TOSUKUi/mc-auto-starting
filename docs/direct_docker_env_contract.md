@@ -6,7 +6,7 @@ This document fixes the supported environment-variable contract for the current 
 ## Template Policy
 - The live `.env` file is local-only runtime data and must remain untracked.
 - `.env.example` is the checked-in template and should list only the keys operators are expected to set.
-- Fixed implementation choices belong in code or checked-in Compose/Kamal config, not in operator-editable env.
+- Fixed implementation choices belong in code or checked-in Compose config, not in operator-editable env.
 
 ## Required Local Compose Configuration
 - `LOCAL_UID`
@@ -48,13 +48,13 @@ This document fixes the supported environment-variable contract for the current 
 
 ## Optional Configuration
 - `DB_NAME_PRODUCTION`
-  Production database name used by Kamal deploy env and any production-mode maintenance commands. Default fallback: `mc_auto_starting_production`.
+  Production database name used by production Compose env and any production-mode maintenance commands. Default fallback: `mc_auto_starting_production`.
 - `DOCKER_ENGINE_API_VERSION`
   Optional Docker Engine API version prefix used only when the host daemon needs an explicit `/v1.xx` override.
 - `DISCORD_BOT_API_TOKEN`
   Shared bearer token for the internal `/api/discord/bot/*` surface. Set it when the external bot relay is in use.
 - `MINECRAFT_RCON_PASSWORD_SECRET`
-  Optional explicit secret used to derive stable per-server RCON passwords instead of falling back to `secret_key_base`.
+  Required production secret used to derive stable per-server RCON passwords. The app no longer falls back to `secret_key_base`.
 - `RAILS_LOG_LEVEL`
   Rails log level. Default: `info`.
 
@@ -86,6 +86,7 @@ This document fixes the supported environment-variable contract for the current 
 - `MinecraftRuntime` resolves both `paper` and `vanilla` against the fixed `itzg/minecraft-server` baseline, switching only the `TYPE` env value.
 - `MinecraftRuntime` also enables RCON and `ENABLE_WHITELIST=TRUE` for managed servers, and injects the per-server `RCON_PASSWORD` derived by `MinecraftRcon`.
 - `MinecraftRuntime` also projects the persisted desired whitelist state into container env through `ENABLE_WHITELIST`, `WHITELIST`, and `EXISTING_WHITELIST_FILE=SYNCHRONIZE`.
+- Production boot should not depend on Rails credentials, `config/master.key`, or `RAILS_MASTER_KEY`; all app secrets are expected to come from direct env or deploy-orchestrator secret injection.
 - The create form separates `runtime_family` from `minecraft_version`; `minecraft_version` is runtime-version input passed through the container `VERSION` contract rather than a Docker image tag.
 - `MEMORY` is derived from the selected container memory with reserved JVM headroom; it is not equal to the Docker memory limit.
 - `DockerEngine` reads only the optional API version override.

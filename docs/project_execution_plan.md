@@ -32,7 +32,7 @@
 7. 作成 / 詳細 UI を新前提へ簡素化する
 8. 受け入れ条件ベースの統合検証を追加する
 9. `.env` / `.env.example` / deploy secrets の境界を整理する
-10. Kamal 前提の単一ホスト deploy 基盤を整える
+10. production `docker-compose.production.yml` と Komodo 前提の単一ホスト deploy 基盤を整える
 11. 単一ホスト運用手順を文書化する
 12. Discord OAuth 招待制ログインと Bot 経由の RCON 操作を追加する
 13. プレイヤー人数表示とブラウザ運用コンソールを追加する
@@ -46,8 +46,8 @@
 - データモデル見直しと Docker label / naming 規則の設計は並行可能
 - Docker client wrapper 実装と UI copy 調整は並行可能
 - 運用 docs は安全境界と Docker 構成が固まってから確定する
-- `.env` の required/optional 整理は運用 docs と並行可能だが、Kamal 実装前に終えて env 名を固定する
-- Kamal 導入は `.env.example` の required/optional 区分と secret 注入方針が固まってから着手する
+- `.env` の required/optional 整理は運用 docs と並行可能だが、本番 Compose 実装前に終えて env 名を固定する
+- production Compose / Komodo 導入は `.env.example` の required/optional 区分と secret 注入方針が固まってから着手する
 - provider 実装の cleanup は direct-Docker の最小経路が通ってから進める
 - `mc-router` 連携の維持に必要な FQDN / route 設定の整合確認は並行可能
 - provider schema debt の棚卸しは `docs/provider_cleanup_inventory.md` を正本にする
@@ -254,23 +254,24 @@
   - `.env` と `.env.example` の責務が docs と task board で一致する
   - required/optional の区分が deploy 前提でも破綻しない
 
-#### P6-3 Kamal deploy 基盤
+#### P6-3 Production Compose / Komodo deploy 基盤
 
-- 単一ホスト前提の Kamal deploy topology を決める
-- Rails app / accessories / secret 注入方法を固定する
-- 現在の local Compose 用 env 名を可能な限りそのまま deploy 側へ持ち込む
-- follow-up: Rails app を `kamal` network だけに閉じず、RCON 用に `mc_router_net` へも参加させる hook-based 補完手順を固定する
+- 単一ホスト前提の `docker-compose.production.yml` topology を決める
+- Rails app / dependencies / secret 注入方法を固定する
+- 現在の local Compose 用 env 名を可能な限りそのまま production 側へ持ち込む
+- Komodo からの pull/update フローを固定する
+- GitHub Actions で app image を build/push する流れを固定する
 - 完了条件:
-  - Kamal で deploy 可能な最小構成が決まる
-  - local `.env` と deploy secrets の写像が追跡できる
-  - RCON / whitelist / player presence など `container_name` 到達が必要な機能が Kamal deploy 後も維持される
+  - target host が registry から app image を pull して起動できる
+  - local `.env` と production secrets の写像が追跡できる
+  - RCON / whitelist / player presence など `container_name` 到達が必要な機能が production deploy 後も維持される
 
 #### P6-4 単一ホスト運用 docs
 
 - docker.sock マウント注意点
 - compose 起動
 - ポート範囲設定
-- Kamal deploy / rollback
+- Compose / Komodo deploy / rollback
 - 完了条件:
   - 新規参加者が単一ホストで再現できる
 

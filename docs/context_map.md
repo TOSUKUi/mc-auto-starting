@@ -12,13 +12,7 @@ This file tells any contributor or agent where to find authoritative information
 - `docs/operator_runbook.md`
   Use for the current operator-facing deploy procedure, host-side verification commands, direct-Docker safety notes, and day-2 operations fixed by `T-901`.
 - `docs/release_runbook.md`
-  Use for the Kamal-based release, migration, and rollback procedure fixed by `T-902`.
-- `docs/kamal_deployment_topology.md`
-  Use for the single-host Kamal deployment shape, accessory strategy, secret injection path, and `.env` to deploy-time env mapping fixed by `T-904`.
-- `config/deploy.yml`
-  Use for the checked-in Kamal base configuration added in `T-905`.
-- `config/deploy.production.yml`
-  Use for the single-host production destination, proxy host, and web host mapping added in `T-905`.
+  Use for the checked-in production release procedure; Kamal references are now historical until the Compose + Komodo rewrite lands.
 - `docs/implementation_breakdown.md`
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
 - `docs/access_policy_and_quota_contract.md`
@@ -55,6 +49,12 @@ This file tells any contributor or agent where to find authoritative information
   Historical reference from the abandoned external-provider approach. Not current architecture.
 - `docs/router_api_contract.md`
   Active reference for the retained `mc-router` ingress contract.
+- `docs/kamal_deployment_topology.md`
+  Historical reference from the abandoned Kamal deployment attempt. Do not treat it as current deployment guidance.
+- `config/deploy.yml`
+  Historical Kamal config left in the repository until the Compose + Komodo cleanup tasks remove it.
+- `config/deploy.production.yml`
+  Historical Kamal destination config left in the repository until the Compose + Komodo cleanup tasks remove it.
 
 ## Disposable Session Context
 - `.local/session_context.md`
@@ -120,12 +120,11 @@ This file tells any contributor or agent where to find authoritative information
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - `T-900` is complete: the single-host bootstrap path, external network prerequisite, local `.env` handling, and Dockerized development workflow are now documented for new contributors.
-- `T-904` is complete and `T-906` now refines it: the single-host Kamal deployment topology keeps external MariaDB outside Kamal accessories, retains Redis as the remaining accessory, preserves the shared router-routes mount, and keeps the local `.env` to deploy env mapping explicit in docs and config.
-- `T-907` is complete: obsolete env keys have been removed after the runtime-family and Kamal decisions settled, so the active contract now uses the shared `itzg` baseline and no longer carries the dead `BOOTSTRAP_EMAIL_ADDRESS` compose pass-through.
+- The deployment direction has pivoted away from Kamal and toward production Compose plus Komodo orchestration, with the concrete implementation tracked under `T-911` through `T-915`.
+- Production boot no longer depends on Rails credentials or `master.key`; env/secret injection is now the intended secret path.
+- `T-907` is complete: obsolete env keys have been removed after the runtime-family and deploy-shape decisions settled, so the active contract now uses the shared `itzg` baseline and no longer carries the dead `BOOTSTRAP_EMAIL_ADDRESS` compose pass-through.
 - `T-908` is complete: fixed-value env knobs for Docker transport, runtime catalog sources, `mc-router` reload wiring, network naming, and RCON transport defaults are now code/config defaults rather than operator-facing env, while Discord OAuth is treated as a current required secret baseline and the bot-facing app secret is consistently `DISCORD_BOT_API_TOKEN`.
 - `T-901` is complete: the current operator runbook now covers the usable Compose-based single-host deployment path, UI-driven lifecycle operations, host-side verification commands, and direct-Docker safety boundaries.
-- `T-905` is complete: the repository now includes an initial Kamal base config, a production destination config, `.kamal` secret templates and hooks, and an `mc-router` deploy helper for the long-lived sibling service.
-- `T-902` is complete: the Kamal-based release, migration, and rollback path now lives in `docs/release_runbook.md`.
 - The runtime version-source/display contract cleanup through `T-1104` is complete; no remaining critical-path task depends on that contract row.
 - The earlier server-screen follow-up tasks `T-505`, `T-506`, and `T-507` are now complete; `docs/server_ui_display_review.md` remains the display-contract reference for any future server-screen cleanup.
 - `T-504` is complete: the server index now prefers the owner's Discord display identity over `email_address`, using `discord_global_name`, then `discord_username`, then a fixed fallback label.
@@ -186,4 +185,4 @@ This file tells any contributor or agent where to find authoritative information
 - `T-1003` is complete: `/login` is now a Discord-only entry page for existing users, `/discord/login` guards the OAuth handoff so misconfigured Discord env returns safely to `/login`, local password and password-reset routes are no longer part of the active path, and bootstrap-owner startup logs can surface the first `/login` link when Discord OAuth and bootstrap env are configured.
 - `T-1004` is complete: invite redemption now starts at `/invites/:token`, pending invite tokens are held in the Rails session, and Discord OAuth callbacks can create/link the invited user on first login.
 - Initial operator bootstrap should use `BOOTSTRAP_DISCORD_USER_ID=... bin/rails db:seed`, then follow the startup `/login` hint to sign in through Discord before invite-based onboarding takes over.
-- Local configuration should now be driven from `.env`, using `.env.example` as the checked-in template; it should contain only operator-settable keys, while fixed router/runtime/socket defaults live in code or checked-in Compose/Kamal config.
+- Local configuration should now be driven from `.env`, using `.env.example` as the checked-in template; it should contain only operator-settable keys, while fixed router/runtime/socket defaults live in code or checked-in Compose config.

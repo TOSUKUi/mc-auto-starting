@@ -1,6 +1,26 @@
 .git
-log
-tmp
+.local/
+.env
+!.env.example
+.kamal/
+log/
+tmp/
+node_modules/
+vendor/bundle/
+storage/
+
+# Ignore key files for decrypting credentials and more.
+/config/*.key
+
+
+/app/assets/builds/*
+!/app/assets/builds/.keep
+
+/node_modules
+
+# Vite Ruby
+/public/vite*
 node_modules
-vendor/bundle
-storage
+# Vite uses dotenv and suggests to ignore local-only env files. See
+# https://vitejs.dev/guide/env-and-mode.html#env-files
+*.local
