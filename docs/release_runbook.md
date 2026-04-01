@@ -2,30 +2,30 @@
 
 ## Purpose
 
-This document closes `T-902`.
+This document closes `T-902` and `T-914`.
 
-It defines the operator-facing release, migration, and rollback procedure for the current single-host deployment baseline:
+It defines the operator-facing release, migration, and rollback procedure for the current single-host production baseline:
 
-- Kamal deploys the Rails app
-- MariaDB is provided externally
-- Redis runs as a Kamal accessory
-- `mc-router` remains a long-lived sibling service outside direct Kamal accessory management
+- Komodo or an operator runs `docker compose pull` and `docker compose up -d`
+- the Rails app image is published by GitHub Actions
+- MariaDB is external
+- Redis runs in the production Compose stack
+- `mc-router` remains a long-lived sibling service in the production Compose stack
 - Rails continues to control Minecraft containers through `/var/run/docker.sock`
-- deployed Rails app containers must also be attached to `mc_router_net` so Rails-owned RCON features can reach managed containers by `container_name`
+- the Rails app, `mc-router`, and managed runtime containers continue to share `mc_router_net`
 
 Use this together with:
 
 - [docs/operator_runbook.md](operator_runbook.md)
-- [docs/kamal_deployment_topology.md](kamal_deployment_topology.md)
-- [config/deploy.yml](../config/deploy.yml)
-- [config/deploy.production.yml](../config/deploy.production.yml)
+- [docs/compose_komodo_deployment_topology.md](compose_komodo_deployment_topology.md)
+- [docker-compose.production.yml](../docker-compose.production.yml)
 
 ## Preconditions
 
 Before a release, confirm:
 
-- `.kamal/secrets-common` and `.kamal/secrets.production` are present and current
-- `bin/deploy-mc-router` has already been run on the target host
+- the target host has an up-to-date `.env.production`
+- `APP_IMAGE` points at the intended image tag
 - the shared runtime network exists
 - the external MariaDB instance is reachable from the target host using `DB_HOST`, `DB_PORT`, `DB_USERNAME`, and `DB_NAME_PRODUCTION`
 - the current production app answers `GET /up`
@@ -35,37 +35,44 @@ Before a release, confirm:
 
 ### 1. Review the deploy diff
 
-Run locally from the deploy checkout:
+Run locally from the release checkout:
 
 ```bash
 git log --oneline --decorate -n 10
 git status --short
 ```
 
-The tree should be clean before deploying.
+The tree should be clean before tagging or merging the release commit.
 
-### 2. Verify Kamal env locally
+### 2. Confirm the image to deploy
 
-Confirm the required non-secret deploy env is exported:
+Check the image tag that production will pull.
+
+Examples:
+
+- `ghcr.io/OWNER/REPO:latest`
+- `ghcr.io/OWNER/REPO:sha-...`
+- `ghcr.io/OWNER/REPO:v1.2.3`
+
+Prefer an immutable tag for controlled releases.
+
+### 3. Pull and start the release
+
+On the target host or through Komodo:
 
 ```bash
-env | grep -E '^(DEPLOY_WEB_HOST|APP_BASE_URL|DB_HOST|DB_PORT|DB_NAME_PRODUCTION|MINECRAFT_PUBLIC_DOMAIN|MINECRAFT_PUBLIC_PORT)='
+docker compose --env-file .env.production -f docker-compose.production.yml pull
+docker compose --env-file .env.production -f docker-compose.production.yml up -d
 ```
 
-### 3. Deploy the app
-
-```bash
-kamal deploy -d production
-```
-
-This is the normal release path for code-only and code-plus-migration releases. The checked-in post-deploy hook reconciles the shared runtime network, the long-lived `mc-router` sibling service, and the app container's extra `mc_router_net` attachment after the new app instance boots.
+This is the normal release path for code-only releases.
 
 ### 4. Verify the release
 
 Check:
 
 ```bash
-kamal app details -d production
+docker compose --env-file .env.production -f docker-compose.production.yml ps
 curl -f "${APP_BASE_URL}/up"
 ```
 
@@ -85,25 +92,26 @@ docker ps --filter label=app.kubos.dev/component=mc-router
 docker logs --tail=100 $(docker ps -q --filter label=app.kubos.dev/component=mc-router)
 ```
 
-`mc-router` is not managed as a Kamal accessory, so this check confirms the sibling service remained healthy across the app release.
+This confirms the sibling router service remained healthy across the app release.
 
 ## Release With Database Migration
 
-The current baseline uses the same `kamal deploy -d production` entrypoint, then an explicit migration check.
+Use this path when a release needs schema changes.
 
-### 1. Deploy first
-
-```bash
-kamal deploy -d production
-```
-
-### 2. Run the migration step if needed
+### 1. Pull and start the new app image
 
 ```bash
-kamal app exec -d production -- bin/rails db:migrate
+docker compose --env-file .env.production -f docker-compose.production.yml pull
+docker compose --env-file .env.production -f docker-compose.production.yml up -d
 ```
 
-If the deploy already ran migrations through hooks for that release, this command should be a no-op.
+### 2. Run the migration step
+
+```bash
+docker compose --env-file .env.production -f docker-compose.production.yml run --rm app bin/rails db:prepare
+```
+
+Use `db:prepare` as the default because it is safe across first boot and normal migration runs.
 
 ### 3. Validate schema-dependent pages
 
@@ -114,24 +122,24 @@ Check at least:
 - one create-related flow
 - one lifecycle action against a non-critical test server if available
 
-## Accessory Maintenance
+## Service Maintenance
 
-If the Redis image/config changed, restart it explicitly after the app deploy:
+If Redis was changed and needs a clean restart:
 
 ```bash
-kamal accessory reboot redis -d production
+docker compose --env-file .env.production -f docker-compose.production.yml up -d redis
 ```
 
 Then re-run:
 
 ```bash
 curl -f "${APP_BASE_URL}/up"
-kamal app details -d production
+docker compose --env-file .env.production -f docker-compose.production.yml ps
 ```
 
 ## Rollback
 
-Use rollback when the new app version is unhealthy but the underlying host and Redis accessory remain usable.
+Use rollback when the new app version is unhealthy but the underlying host, Redis, and `mc-router` remain usable.
 
 ### 1. Confirm the failure mode
 
@@ -141,22 +149,27 @@ Examples:
 - `/login` or `/servers` returns a server error
 - a critical controller path fails after a code release
 
-### 2. Roll back the app
+### 2. Point `APP_IMAGE` back to the previous known-good tag
+
+Edit `.env.production` or the corresponding Komodo env/secret setting so `APP_IMAGE` references the previous release.
+
+### 3. Pull and restart using the previous image
 
 ```bash
-kamal rollback -d production
+docker compose --env-file .env.production -f docker-compose.production.yml pull
+docker compose --env-file .env.production -f docker-compose.production.yml up -d
 ```
 
-### 3. Verify the previous release
+### 4. Verify the previous release
 
 ```bash
-kamal app details -d production
+docker compose --env-file .env.production -f docker-compose.production.yml ps
 curl -f "${APP_BASE_URL}/up"
 ```
 
 Then confirm `/login` and `/servers` again in the browser.
 
-### 4. Roll back the database only if required
+### 5. Roll back the database only if required
 
 Do not automatically roll back the database on every app rollback.
 
@@ -169,16 +182,17 @@ Use a DB rollback only when:
 Command:
 
 ```bash
-kamal app exec -d production -- bin/rails db:rollback
+docker compose --env-file .env.production -f docker-compose.production.yml run --rm app bin/rails db:rollback
 ```
 
 If the migration is destructive or not safely reversible, prefer a forward fix instead of forcing schema rollback.
 
 ## Failure Handling Notes
 
-### App deploy failed but Redis accessory is healthy
+### App deploy failed but Redis and `mc-router` are healthy
 
-- run `kamal rollback -d production`
+- point `APP_IMAGE` back to the previous known-good tag
+- run the rollback steps above
 - verify `/up`
 - leave `mc-router` running as-is
 
@@ -187,19 +201,19 @@ If the migration is destructive or not safely reversible, prefer a forward fix i
 On the target host:
 
 ```bash
-bin/deploy-mc-router
+docker compose --env-file .env.production -f docker-compose.production.yml up -d mc-router
 docker ps --filter label=app.kubos.dev/component=mc-router
 ```
 
-Do not use Rails or Kamal app commands to recreate `mc-router`.
+Do not use Rails operations to recreate `mc-router`.
 
 ### Migration failed midway
 
 - stop at the migration failure
 - inspect the exact migration error
 - verify whether the current app release can still boot
-- prefer a forward fix migration when data safety is unclear
-- use `kamal rollback -d production` only if the previous app release is known-good against the current schema state
+- prefer a forward-fix migration when data safety is unclear
+- roll back the app image only if the previous release is known-good against the current schema state
 
 ## Post-Release Checklist
 
@@ -208,4 +222,4 @@ Do not use Rails or Kamal app commands to recreate `mc-router`.
 - `/servers` works
 - at least one existing server detail page works
 - `mc-router` container is still running
-- no unexpected app boot loop appears in Kamal app details
+- `docker compose ... ps` shows a healthy `app` container

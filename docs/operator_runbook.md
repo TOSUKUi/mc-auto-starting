@@ -2,141 +2,65 @@
 
 ## Purpose
 
-This document is the `T-901` operator-facing runbook for the current direct-Docker architecture.
+This document is the `T-901` and `T-914` operator-facing runbook for the current direct-Docker architecture.
 
-It is written for the current repository state on `2026-03-29`:
+It is written for the current repository state on `2026-04-02`:
 
 - direct Docker lifecycle is implemented
 - local single-host bootstrap is documented
-- Kamal topology is defined
-- the initial Kamal deployment baseline is checked into the repository
-- the dedicated release and rollback runbook is now checked in
+- production deployment has pivoted to `docker-compose.production.yml` plus Komodo
+- the app image is expected to be built by GitHub Actions and pulled on the target host
+- production boot no longer depends on Rails credentials or `master.key`
 
 ## Which Deployment Path To Use Today
 
-### Usable Today
+### Local Development
 
-If you want to run the app yourself right now, use the single-host Docker Compose path described in [docs/single_host_setup.md](single_host_setup.md).
+If you want to run the app yourself right now on a development machine, use the single-host Docker Compose path described in [docs/single_host_setup.md](single_host_setup.md).
 
-That is the current usable deployment and operations path in this repository.
+### Production Deployment
 
-### Kamal Deployment Baseline
+For the production-like single-host deployment path, use:
 
-Kamal is the checked-in deployment baseline, and the current repo now assumes:
+- [docker-compose.production.yml](../docker-compose.production.yml)
+- [docs/compose_komodo_deployment_topology.md](compose_komodo_deployment_topology.md)
+- [docs/release_runbook.md](release_runbook.md)
 
-- Rails app containers are deployed by Kamal
-- MariaDB is provided externally, outside Kamal accessories
-- Redis remains a Kamal accessory for now
-- `mc-router` remains a long-lived sibling service outside Kamal app lifecycle and outside direct Kamal accessory management
-- deployed Rails app containers must join `mc_router_net` in addition to the default Kamal app network so RCON-backed features can reach managed containers by `container_name`
+The production baseline now assumes:
 
-The relevant files are:
+- Komodo drives `docker compose pull` and `docker compose up -d`
+- the Rails app uses a prebuilt registry image
+- MariaDB is external
+- Redis remains containerized on the same host
+- `mc-router` remains a long-lived sibling service in the same production Compose stack
+- the Rails app, `mc-router`, and managed Minecraft containers share `mc_router_net`
+- app secrets are injected directly by env or secret management, not by Rails credentials
 
-- [config/deploy.yml](../config/deploy.yml)
-- [config/deploy.production.yml](../config/deploy.production.yml)
-- [docker/mc-router/deploy.compose.yml](../docker/mc-router/deploy.compose.yml)
-- [bin/deploy-mc-router](../bin/deploy-mc-router)
-
-The dedicated release and rollback procedure now lives in [docs/release_runbook.md](release_runbook.md).
-
-Use this path when you are ready to move from the current Compose-operated host to the Kamal-based single-host deployment.
-
-### 1. Prepare local deploy secrets
-
-Copy the example files:
-
-```bash
-cp .kamal/secrets-common.example .kamal/secrets-common
-cp .kamal/secrets.production.example .kamal/secrets.production
-```
-
-Then fill in at least:
-
-- `KAMAL_REGISTRY_PASSWORD`
-- `RAILS_MASTER_KEY`
-- `DB_PASSWORD`
-- `DISCORD_CLIENT_ID`
-- `DISCORD_CLIENT_SECRET`
-
-### 2. Export the required non-secret deploy variables
-
-```bash
-export DEPLOY_WEB_HOST=app.example.com
-export APP_BASE_URL=https://app.example.com
-export DB_HOST=db.example.internal
-export DB_PORT=3306
-export DB_USERNAME=app_user
-export DB_NAME_PRODUCTION=app_production
-export MINECRAFT_PUBLIC_DOMAIN=mc.example.com
-export MINECRAFT_PUBLIC_PORT=25565
-```
-
-The current deploy baseline intentionally fixes Docker, runtime-image, router-reload, and version-source internals in code and checked-in config. Do not add ad-hoc deploy env for those unless the contract is revised first.
-
-### 3. Prepare the target host for `mc-router`
-
-SSH to the target host and run:
-
-```bash
-bin/deploy-mc-router
-```
-
-This helper:
-
-- creates the shared runtime network if it is missing
-- creates the shared router config directory
-- starts the long-lived `mc-router` sibling service
-
-The current deploy baseline keeps `mc-router` off the Kamal accessory list and lets the checked-in post-deploy hook perform the same host-side reconciliation automatically after app deploys.
-
-### 4. Run the first Kamal setup
-
-From the repository checkout used for deployment:
-
-```bash
-kamal setup -d production
-```
-
-This bootstraps the Redis accessory, pushes env, deploys the app using the checked-in baseline, and then runs the checked-in post-deploy reconciliation for the shared runtime network, the long-lived `mc-router` sibling service, and the Rails app container's extra `mc_router_net` attachment.
-
-### 5. Verify the deployed app
-
-- open `${APP_BASE_URL}`
-- check `${APP_BASE_URL}/up`
-- confirm `/login` works
-- confirm the `mc-router` container is still present with `app.kubos.dev/component=mc-router`
-- confirm the current Rails app container is attached to both the default Kamal app network and `mc_router_net`
-
-### 6. Later app updates
-
-```bash
-kamal deploy -d production
-```
-
-If the Redis accessory image changes, reboot it explicitly:
-
-```bash
-kamal accessory reboot redis -d production
-```
-
-## Current Single-Host Deployment Procedure
+## Current Single-Host Production Procedure
 
 Use this when deploying the app to one Docker host with the current repository state.
 
 ### 1. Prepare the host
 
 - install Docker Engine with Compose support
+- install and configure Komodo if you want UI-driven rollout
 - ensure the operator can access `/var/run/docker.sock`
-- clone the repository on the target host
-
-### 2. Create the env file
+- create or confirm the shared runtime network
 
 ```bash
-cp .env.example .env
+docker network create mc_router_net || true
 ```
 
-Review at minimum:
+### 2. Prepare the production env file
 
+Create a host-local env file such as `.env.production`.
+
+At minimum, set:
+
+- `APP_IMAGE`
+- `DB_HOST`
+- `DB_PORT`
+- `DB_USERNAME`
 - `DB_PASSWORD`
 - `DB_NAME_PRODUCTION`
 - `MINECRAFT_PUBLIC_DOMAIN`
@@ -144,64 +68,66 @@ Review at minimum:
 - `APP_BASE_URL`
 - `DISCORD_CLIENT_ID`
 - `DISCORD_CLIENT_SECRET`
+- `DISCORD_BOT_API_TOKEN` if the bot relay is in use
+- `MINECRAFT_RCON_PASSWORD_SECRET`
+
+Optional but commonly useful:
+
+- `APP_HTTP_PORT`
+- `RAILS_LOG_LEVEL`
+- `REDIS_URL`
+- `DOCKER_ENGINE_API_VERSION`
+
+Do not set `RAILS_MASTER_KEY`. Production is expected to boot without it.
+
+### 3. Pull and start the production stack
+
+```bash
+docker compose --env-file .env.production -f docker-compose.production.yml pull
+docker compose --env-file .env.production -f docker-compose.production.yml up -d
+```
+
+This should start:
+
+- `app`
+- `redis`
+- `mc-router`
+
+It should not create a local MariaDB container.
+
+### 4. Prepare the database
+
+For first boot or schema updates:
+
+```bash
+docker compose --env-file .env.production -f docker-compose.production.yml run --rm app bin/rails db:prepare
+```
+
+### 5. Bootstrap the first owner if needed
+
+Inject these only for the seed run:
+
 - `BOOTSTRAP_DISCORD_USER_ID`
 - `BOOTSTRAP_DISCORD_USERNAME`
 
-If the host UID, GID, or Docker group differ from the local defaults, also update:
-
-- `LOCAL_UID`
-- `LOCAL_GID`
-- `DOCKER_GID`
-
-If you plan to run the Discord Bot relay on the same Docker private network, also set:
-
-- `DISCORD_BOT_API_TOKEN`
-
-### 3. Create the shared runtime network
+Then run:
 
 ```bash
-docker network create mc_router_net
+docker compose --env-file .env.production -f docker-compose.production.yml run --rm app bin/rails db:seed
 ```
 
-This only needs to be done once per host.
-
-### 4. Build and start the stack
+### 6. Verify the app
 
 ```bash
-docker compose build app
-docker compose up -d --build
+curl -f "${APP_BASE_URL}/up"
 ```
 
-### 5. Prepare the database
+Then confirm:
 
-```bash
-docker compose run --rm app bin/rails db:prepare
-```
-
-### 6. Bootstrap the first owner if needed
-
-```bash
-docker compose run --rm app bin/rails db:seed
-```
-
-This seed path uses:
-
-- `BOOTSTRAP_DISCORD_USER_ID`
-- `BOOTSTRAP_DISCORD_USERNAME`
-
-### 7. Verify the app
-
-```bash
-curl -f http://localhost:3000/up
-```
-
-Then open:
-
-```text
-http://localhost:3000/login
-```
-
-If Discord OAuth is configured correctly, the initial owner can sign in there and start issuing invite URLs from `/discord-invitations`.
+- `/login` is reachable
+- `/servers` loads after sign-in
+- the `mc-router` container is present with `app.kubos.dev/component=mc-router`
+- the app container is attached to `mc_router_net`
 
 ## Day-2 Operations
 
@@ -266,18 +192,18 @@ The supported direct-Docker lifecycle contract is documented in [docs/direct_doc
 
 These host-side commands are safe for inspection and troubleshooting.
 
-### Check the app stack
+### Check the production stack
 
 ```bash
-docker compose ps
-docker compose logs app --tail=200
-docker compose logs mc-router --tail=200
+docker compose --env-file .env.production -f docker-compose.production.yml ps
+docker compose --env-file .env.production -f docker-compose.production.yml logs app --tail=200
+docker compose --env-file .env.production -f docker-compose.production.yml logs mc-router --tail=200
 ```
 
 ### Check Rails health
 
 ```bash
-curl -f http://localhost:3000/up
+curl -f "${APP_BASE_URL}/up"
 ```
 
 ### Check app-managed Minecraft containers
@@ -300,13 +226,11 @@ docker network inspect mc_router_net
 
 ### Check the rendered router config
 
-For the current Compose deployment path:
+Use a temporary shell in the app container:
 
 ```bash
-cat tmp/mc-router/routes.json
+docker compose --env-file .env.production -f docker-compose.production.yml exec app cat /rails/shared/mc-router/routes.json
 ```
-
-For the planned Kamal deployment shape, the routes file moves to the shared host path described in [docs/kamal_deployment_topology.md](kamal_deployment_topology.md).
 
 ## Docker Safety Rules
 
@@ -332,7 +256,7 @@ These labels are the ownership boundary for managed Minecraft containers and vol
 - do not use `docker system prune`
 - do not use `docker volume prune`
 - do not remove the shared runtime network while the app is in service
-- do not stop or recreate `mc-router` without preserving its label and route-file mount contract
+- do not stop or recreate `mc-router` without preserving its label and route-sharing contract
 
 ### Be careful with direct Docker intervention
 
@@ -361,7 +285,7 @@ docker ps -a --filter label=app=mc-auto-starting
 Check the rendered routes file:
 
 ```bash
-cat tmp/mc-router/routes.json
+docker compose --env-file .env.production -f docker-compose.production.yml exec app cat /rails/shared/mc-router/routes.json
 ```
 
 Then confirm the `mc-router` container is up and still labeled correctly:
@@ -375,10 +299,10 @@ docker ps --filter label=app.kubos.dev/component=mc-router
 Usually this means one of:
 
 - `/var/run/docker.sock` is not mounted into the app container
-- the effective container user cannot access the socket
-- `DOCKER_GID` is wrong for the host
+- the app container cannot access the socket
+- the host Docker daemon is unavailable
 
-### The compose stack will not start
+### The production stack will not start
 
 The first thing to check is whether the shared runtime network exists:
 
@@ -395,9 +319,8 @@ docker network create mc_router_net
 ## References
 
 - [docs/single_host_setup.md](single_host_setup.md)
-- [docs/kamal_deployment_topology.md](kamal_deployment_topology.md)
-- [config/deploy.yml](../config/deploy.yml)
-- [config/deploy.production.yml](../config/deploy.production.yml)
+- [docs/compose_komodo_deployment_topology.md](compose_komodo_deployment_topology.md)
+- [docker-compose.production.yml](../docker-compose.production.yml)
 - [docs/direct_docker_env_contract.md](direct_docker_env_contract.md)
 - [docs/direct_docker_lifecycle_contract.md](direct_docker_lifecycle_contract.md)
 - [docs/docker_engine_contract.md](docker_engine_contract.md)

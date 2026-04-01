@@ -81,7 +81,8 @@ Current baseline:
 - `T-911` is complete: the production Compose + Komodo topology and secret contract now live in `docs/compose_komodo_deployment_topology.md`.
 - `T-912` is complete: the repository now includes a GHCR-oriented GitHub Actions workflow that builds `Dockerfile.production` and publishes production app images without relying on host-local image builds.
 - `T-913` is complete: the repository now includes `docker-compose.production.yml` for pull-based single-host deploys with external MariaDB, shared `mc_router_net`, and persistent Docker volumes for router routes and app storage.
-- `T-914` and `T-915` are the remaining deployment follow-up track: update runbooks and remove obsolete Kamal-specific files/docs.
+- `T-914` is complete: the operator and release runbooks now describe the Compose + Komodo production flow, including pull-based rollout, migration, rollback, and verification.
+- `T-915` is the remaining deployment follow-up task: remove obsolete Kamal-specific files/docs from the active restart path.
 - `T-1005` is complete: `docs/discord_bot_api_contract.md` now fixes the bot credential model, acting Discord-user resolution, allowed lifecycle/read/whitelist commands, request/response envelopes, and audit expectations before bot endpoint implementation.
 - `T-1024` is complete: the bot contract now keeps whitelist mutations owner/admin-only, treats `whitelist_list` as a read-class surface, and separates bounded RCON input from lifecycle/server-operation commands so forbidden commands such as `stop` are never accepted through the RCON path.
 - Bot API network policy is now fixed at the strategy layer: `/api/discord/bot/*` should be reachable only from the Docker private network, while still requiring the dedicated bot bearer token.
