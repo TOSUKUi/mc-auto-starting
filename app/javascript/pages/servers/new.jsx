@@ -1,6 +1,7 @@
 import { Button, Code, Divider, Grid, Group, NumberInput, Paper, Select, SimpleGrid, Stack, Switch, Text, TextInput, Title, ThemeIcon } from '@mantine/core'
 import { Head, Link, useForm } from '@inertiajs/react'
 import { IconPlugConnected, IconSparkles } from '@tabler/icons-react'
+import { useState } from 'react'
 
 const MIN_MEMORY_MB = 512
 const MAX_MEMORY_MB = 4096
@@ -21,6 +22,13 @@ function clampMemory(value) {
   if (!Number.isFinite(value)) return 0
 
   return Math.min(MAX_MEMORY_MB, Math.max(MIN_MEMORY_MB, value))
+}
+
+function commitMemoryValue(value, fallbackValue) {
+  const parsedValue = Number.parseInt(String(value), 10)
+  if (!Number.isFinite(parsedValue)) return clampMemory(fallbackValue)
+
+  return clampMemory(parsedValue)
 }
 
 function endpointPreview(hostname, publicEndpoint) {
@@ -53,6 +61,7 @@ function runtimeFamilyDescription(value) {
 
 export default function ServersNew({ create_quota, form_defaults, runtime_family_options, minecraft_version_options_by_runtime_family, public_endpoint, validation_errors = {} }) {
   const form = useForm(form_defaults)
+  const [memoryInput, setMemoryInput] = useState(String(form_defaults.memory_mb))
   const normalizedHostname = normalizeHostname(form.data.hostname)
   const preview = endpointPreview(form.data.hostname, public_endpoint)
   const hasTouchedHostname = form.data.hostname.trim().length > 0
@@ -68,7 +77,11 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
 
   const submit = (event) => {
     event?.preventDefault()
-    form.transform((data) => ({ minecraft_server: data }))
+    const nextMemoryMb = commitMemoryValue(memoryInput, form.data.memory_mb)
+
+    setMemoryInput(String(nextMemoryMb))
+    form.setData('memory_mb', nextMemoryMb)
+    form.transform((data) => ({ minecraft_server: { ...data, memory_mb: nextMemoryMb } }))
     form.post('/servers')
   }
 
@@ -180,11 +193,17 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                               label="メモリ (MB)"
                               max={MAX_MEMORY_MB}
                               min={MIN_MEMORY_MB}
-                              onChange={(value) => form.setData('memory_mb', clampMemory(Number(value)))}
+                              onBlur={() => {
+                                const nextMemoryMb = commitMemoryValue(memoryInput, form.data.memory_mb)
+
+                                setMemoryInput(String(nextMemoryMb))
+                                form.setData('memory_mb', nextMemoryMb)
+                              }}
+                              onChange={(value) => setMemoryInput(value === null ? '' : String(value))}
                               required
                               step={512}
                               thousandSeparator=","
-                              value={form.data.memory_mb}
+                              value={memoryInput}
                             />
                           </Grid.Col>
                           <Grid.Col span={{ base: 12, sm: 6 }}>
