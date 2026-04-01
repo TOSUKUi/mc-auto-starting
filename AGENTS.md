@@ -12,6 +12,7 @@ Current important files:
 - `Dockerfile`
 - `Dockerfile.production`
 - `compose.yaml`
+- `docs/compose_komodo_deployment_topology.md`
 - `docs/single_host_setup.md`
 - `docs/operator_runbook.md`
 - `docs/discord_operator_runbook.md`
@@ -76,7 +77,9 @@ Current baseline:
 - Production is now expected to boot without Rails credentials or `master.key`; app secrets should come from environment variables or the deploy orchestrator secret store.
 - `T-907` is complete: obsolete env keys have been pruned after the runtime-family and deploy-shape decisions settled, so the supported contract now drops the dead `BOOTSTRAP_EMAIL_ADDRESS` compose pass-through and the no-longer-needed runtime-image override in favor of the shared `itzg` baseline.
 - `T-908` is complete: fixed-value env knobs for Docker transport, runtime catalog sources, `mc-router` reload wiring, network naming, and RCON transport defaults now live in code or checked-in config instead of `.env`, while Discord OAuth is treated as the current required app secret baseline and the bot-facing app secret is consistently `DISCORD_BOT_API_TOKEN`.
-- `T-911` through `T-915` are the new deployment follow-up track: replace the abandoned Kamal baseline with a Compose + Komodo production topology, publish app images from GitHub Actions, add `docker-compose.production.yml`, update runbooks, and remove obsolete Kamal-specific files/docs.
+- `T-911` is complete: the production Compose + Komodo topology and secret contract now live in `docs/compose_komodo_deployment_topology.md`.
+- `T-912` is complete: the repository now includes a GHCR-oriented GitHub Actions workflow that builds `Dockerfile.production` and publishes production app images without relying on host-local image builds.
+- `T-913` through `T-915` are the remaining deployment follow-up track: add `docker-compose.production.yml`, update runbooks, and remove obsolete Kamal-specific files/docs.
 - `T-1005` is complete: `docs/discord_bot_api_contract.md` now fixes the bot credential model, acting Discord-user resolution, allowed lifecycle/read/whitelist commands, request/response envelopes, and audit expectations before bot endpoint implementation.
 - `T-1024` is complete: the bot contract now keeps whitelist mutations owner/admin-only, treats `whitelist_list` as a read-class surface, and separates bounded RCON input from lifecycle/server-operation commands so forbidden commands such as `stop` are never accepted through the RCON path.
 - Bot API network policy is now fixed at the strategy layer: `/api/discord/bot/*` should be reachable only from the Docker private network, while still requiring the dedicated bot bearer token.
@@ -210,9 +213,10 @@ The active system has four parts.
 10. `docs/single_host_setup.md`
 11. `docs/operator_runbook.md`
 12. `docs/release_runbook.md`
-13. `docs/direct_docker_env_contract.md`
-14. `docs/direct_docker_lifecycle_contract.md`
-15. `docs/discord_auth_and_bot_strategy.md`
+13. `docs/compose_komodo_deployment_topology.md`
+14. `docs/direct_docker_env_contract.md`
+15. `docs/direct_docker_lifecycle_contract.md`
+16. `docs/discord_auth_and_bot_strategy.md`
 
 ## Execution Rules
 Follow these rules unless the user overrides them.

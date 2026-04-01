@@ -13,6 +13,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for the current operator-facing deploy procedure, host-side verification commands, direct-Docker safety notes, and day-2 operations fixed by `T-901`.
 - `docs/release_runbook.md`
   Use for the checked-in production release procedure; Kamal references are now historical until the Compose + Komodo rewrite lands.
+- `docs/compose_komodo_deployment_topology.md`
+  Use for the active production Compose + Komodo topology, image-pull deploy direction, secret contract, and `mc_router_net` expectations fixed by `T-911`.
 - `docs/implementation_breakdown.md`
   Use for the active `Rails + docker.sock` single-host architecture, screen list, data model, and service decomposition.
 - `docs/access_policy_and_quota_contract.md`
@@ -120,7 +122,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-804` is complete: a live status ping through the shared public port reached a managed Minecraft server after `mc-router` loaded the generated routes.
 - `T-805` is complete: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, so live ingress updates no longer depend on bind-mounted file-watch behavior.
 - `T-900` is complete: the single-host bootstrap path, external network prerequisite, local `.env` handling, and Dockerized development workflow are now documented for new contributors.
-- The deployment direction has pivoted away from Kamal and toward production Compose plus Komodo orchestration, with the concrete implementation tracked under `T-911` through `T-915`.
+- `T-911` is complete: the production Compose + Komodo topology, image-pull deploy direction, and secret contract now live in `docs/compose_komodo_deployment_topology.md`.
 - Production boot no longer depends on Rails credentials or `master.key`; env/secret injection is now the intended secret path.
 - `T-907` is complete: obsolete env keys have been removed after the runtime-family and deploy-shape decisions settled, so the active contract now uses the shared `itzg` baseline and no longer carries the dead `BOOTSTRAP_EMAIL_ADDRESS` compose pass-through.
 - `T-908` is complete: fixed-value env knobs for Docker transport, runtime catalog sources, `mc-router` reload wiring, network naming, and RCON transport defaults are now code/config defaults rather than operator-facing env, while Discord OAuth is treated as a current required secret baseline and the bot-facing app secret is consistently `DISCORD_BOT_API_TOKEN`.
