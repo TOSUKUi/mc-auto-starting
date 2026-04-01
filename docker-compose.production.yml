@@ -1,0 +1,71 @@
+# Use with:
+#   docker compose --env-file .env.production -f docker-compose.production.yml pull
+#   docker compose --env-file .env.production -f docker-compose.production.yml up -d
+
+services:
+  app:
+    image: ${APP_IMAGE:?APP_IMAGE is required}
+    env_file:
+      - .env.production
+    environment:
+      RAILS_ENV: production
+      RACK_ENV: production
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/1}
+      RAILS_LOG_LEVEL: ${RAILS_LOG_LEVEL:-info}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - mc_router_config:/rails/shared/mc-router
+      - app_storage:/app/storage
+    ports:
+      - "${APP_HTTP_PORT:-3000}:3000"
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "ruby -rnet/http -e 'exit(Net::HTTP.get_response(URI(\"http://127.0.0.1:3000/up\")).is_a?(Net::HTTPSuccess) ? 0 : 1)'"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - default
+      - mc_router
+
+  mc-router:
+    image: itzg/mc-router
+    labels:
+      app.kubos.dev/component: mc-router
+    environment:
+      PORT: 25565
+      ROUTES_CONFIG: /config/routes.json
+    volumes:
+      - mc_router_config:/config
+    ports:
+      - "${MINECRAFT_PUBLIC_PORT:?MINECRAFT_PUBLIC_PORT is required}:25565"
+    restart: unless-stopped
+    networks:
+      - mc_router
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  app_storage:
+  mc_router_config:
+  redis_data:
+
+networks:
+  mc_router:
+    name: mc_router_net
+    external: true

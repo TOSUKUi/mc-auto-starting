@@ -121,23 +121,21 @@ This is required because Rails-owned RCON features talk to managed containers by
 
 The single shared Minecraft ingress port model does not change.
 
-## Shared Host Paths
+## Shared Volumes
 
 Production must not rely on the development bind mount at `./tmp/mc-router`.
 
-The production baseline should use a persistent host path such as:
+The production baseline should prefer persistent Docker named volumes over bind-mounted host directories.
 
-```text
-/var/lib/mc-auto-starting/shared/mc-router
-```
+Expected shared volumes:
 
-Expected mounts:
+- `mc_router_config`
+  - inside Rails app container: `/rails/shared/mc-router`
+  - inside `mc-router`: `/config`
+- `app_storage`
+  - inside Rails app container: `/app/storage`
 
-- host path `/var/lib/mc-auto-starting/shared/mc-router`
-- inside Rails app container: `/rails/shared/mc-router`
-- inside `mc-router`: `/config`
-
-This keeps the generated routes file visible to both the Rails app and the long-lived router container.
+This keeps the generated routes file visible to both the Rails app and the long-lived router container while avoiding host-path coupling in the checked-in Compose file.
 
 ## Secret And Env Contract
 
@@ -200,7 +198,7 @@ The planned `docker-compose.production.yml` should:
 - use `image:` for the Rails app instead of `build:`
 - pull the prebuilt app image from the external registry
 - mount `/var/run/docker.sock`
-- mount the persistent shared `mc-router` routes directory
+- mount persistent Docker volumes for the shared `mc-router` routes and Rails storage paths
 - attach the Rails app, `mc-router`, and Redis to the required networks
 - keep MariaDB external rather than declaring a local DB service
 - avoid bind-mounting the full repository source tree

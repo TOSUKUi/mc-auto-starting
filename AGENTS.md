@@ -12,6 +12,7 @@ Current important files:
 - `Dockerfile`
 - `Dockerfile.production`
 - `compose.yaml`
+- `docker-compose.production.yml`
 - `docs/compose_komodo_deployment_topology.md`
 - `docs/single_host_setup.md`
 - `docs/operator_runbook.md`
@@ -79,7 +80,8 @@ Current baseline:
 - `T-908` is complete: fixed-value env knobs for Docker transport, runtime catalog sources, `mc-router` reload wiring, network naming, and RCON transport defaults now live in code or checked-in config instead of `.env`, while Discord OAuth is treated as the current required app secret baseline and the bot-facing app secret is consistently `DISCORD_BOT_API_TOKEN`.
 - `T-911` is complete: the production Compose + Komodo topology and secret contract now live in `docs/compose_komodo_deployment_topology.md`.
 - `T-912` is complete: the repository now includes a GHCR-oriented GitHub Actions workflow that builds `Dockerfile.production` and publishes production app images without relying on host-local image builds.
-- `T-913` through `T-915` are the remaining deployment follow-up track: add `docker-compose.production.yml`, update runbooks, and remove obsolete Kamal-specific files/docs.
+- `T-913` is complete: the repository now includes `docker-compose.production.yml` for pull-based single-host deploys with external MariaDB, shared `mc_router_net`, and persistent Docker volumes for router routes and app storage.
+- `T-914` and `T-915` are the remaining deployment follow-up track: update runbooks and remove obsolete Kamal-specific files/docs.
 - `T-1005` is complete: `docs/discord_bot_api_contract.md` now fixes the bot credential model, acting Discord-user resolution, allowed lifecycle/read/whitelist commands, request/response envelopes, and audit expectations before bot endpoint implementation.
 - `T-1024` is complete: the bot contract now keeps whitelist mutations owner/admin-only, treats `whitelist_list` as a read-class surface, and separates bounded RCON input from lifecycle/server-operation commands so forbidden commands such as `stop` are never accepted through the RCON path.
 - Bot API network policy is now fixed at the strategy layer: `/api/discord/bot/*` should be reachable only from the Docker private network, while still requiring the dedicated bot bearer token.
@@ -154,6 +156,7 @@ These are already decided and should be treated as defaults unless explicitly ch
 - Production deployment direction: `docker-compose.production.yml` managed by Komodo, not Kamal
 - Production image distribution direction: GitHub Actions builds and pushes the app image to an external registry, and the target host pulls it
 - Rails credentials direction: production should boot without `config/master.key` or `RAILS_MASTER_KEY`; secrets are supplied directly by env/secret injection
+- Production Compose direction: `docker-compose.production.yml` uses a prebuilt app image, an external MariaDB, a local Redis container, the long-lived `mc-router` sibling service, and persistent Docker volumes for shared runtime data
 - Ruby: `3.4.9`
 - Rails: `8.1.2`
 - Database: MariaDB `10.11.16` (via `mysql2` adapter)
