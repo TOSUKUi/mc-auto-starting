@@ -16,7 +16,7 @@ This document fixes the initial mc-router integration contract for Phase 4 tasks
 {
   "default-server": null,
   "mappings": {
-    "alpha.mc.tosukui.xyz": "10.0.0.10:25565"
+    "alpha.mc.hogehoge.fuga": "10.0.0.10:25565"
   }
 }
 ```
