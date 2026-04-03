@@ -37,7 +37,8 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
         "EULA" => "TRUE",
         "TYPE" => "PAPER",
         "VERSION" => "1.21.4",
-        "MEMORY" => "3584M",
+        "INIT_MEMORY" => "4096M",
+        "MAX_MEMORY" => "4096M",
         "HARDCORE" => "FALSE",
         "DIFFICULTY" => "easy",
         "MODE" => "survival",
@@ -71,7 +72,8 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
         "EULA" => "TRUE",
         "TYPE" => "VANILLA",
         "VERSION" => "latest",
-        "MEMORY" => "3584M",
+        "INIT_MEMORY" => "4096M",
+        "MAX_MEMORY" => "4096M",
         "HARDCORE" => "TRUE",
         "DIFFICULTY" => "hard",
         "MODE" => "creative",
@@ -89,10 +91,16 @@ class MinecraftRuntimeTest < ActiveSupport::TestCase
     )
   end
 
-  test "keeps JVM heap below the container memory limit" do
-    assert_equal 3584, MinecraftRuntime.jvm_memory_mb(4096)
-    assert_equal 1536, MinecraftRuntime.jvm_memory_mb(2048)
+  test "uses the selected memory for both initial and max JVM heap" do
+    assert_equal 4096, MinecraftRuntime.jvm_memory_mb(4096)
+    assert_equal 2048, MinecraftRuntime.jvm_memory_mb(2048)
     assert_equal 512, MinecraftRuntime.jvm_memory_mb(512)
+  end
+
+  test "derives container memory so JVM heap uses seventy percent of the limit" do
+    assert_equal 5852, MinecraftRuntime.container_memory_mb(4096)
+    assert_equal 2926, MinecraftRuntime.container_memory_mb(2048)
+    assert_equal 732, MinecraftRuntime.container_memory_mb(512)
   end
 
   test "builds a tagged image reference from the selected version" do

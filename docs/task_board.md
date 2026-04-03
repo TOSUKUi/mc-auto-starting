@@ -166,7 +166,7 @@ The current critical path is:
 - Local Compose now reads checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, database, public-ingress, Discord OAuth, and bootstrap-owner values.
 - `T-400`: `Servers::ProvisionServer` now creates a managed volume/container through `DockerEngine`, starts it, persists runtime state, and then publishes the route.
 - `T-400`: create retries once with `DockerEngine#pull_image` when the selected runtime image is missing locally.
-- `T-400`: container `MEMORY` now reserves JVM headroom below the Docker memory limit to avoid immediate OOM kill on boot.
+- `T-400`: managed runtime memory now treats `memory_mb` as the Minecraft JVM heap and derives the Docker memory limit so the heap uses 70% of container memory.
 - `T-803`: acceptance coverage now verifies the main create/detail/delete/start/stop/restart/sync flows against the direct-Docker baseline.
 - `T-804`: compose-managed `mc-router` ingress is verified end-to-end on the shared public port after loading the generated routes.
 - `T-805`: Rails now reloads the compose-managed `mc-router` explicitly with `SIGHUP` after route rewrites, avoiding unreliable bind-mounted file-watch behavior.

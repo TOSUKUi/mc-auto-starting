@@ -224,7 +224,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_includes FakeDockerClient.calls, [ :remove_volume, { name: "mc-data-main-survival" } ]
 
     mappings = JSON.parse(File.read(File.join(@tmpdir, "routes.json"))).fetch("mappings")
-    assert_not mappings.key?("main-survival.mc.tosukui.xyz")
+    assert_not mappings.key?(minecraft_servers(:one).fqdn)
   end
 
   test "manager membership can start a visible server and sync it back to ready" do
@@ -310,7 +310,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
           mounts: [ { Type: "volume", Source: server.volume_name, Target: "/data" } ],
           labels: :labels,
           network_name: "mc_router_net",
-          memory_mb: server.memory_mb,
+          memory_mb: MinecraftRuntime.container_memory_mb(server.memory_mb),
         },
       ]
     end

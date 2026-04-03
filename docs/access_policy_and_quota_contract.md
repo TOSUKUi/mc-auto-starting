@@ -45,6 +45,7 @@ This document fixes the global user-type model, server-membership role model, se
 ### `operator`
 
 - 自分が所有するサーバーの合計 `memory_mb` が `5120 MB` までサーバー作成可能
+  ここでの `memory_mb` は Docker 上限ではなく Minecraft JVM `Xms` / `Xmx` 入力値を指す
 - 招待は `reader` のみ可能
 - owner のサーバーは閲覧 / lifecycle 操作 / 削除 / membership 管理が可能
 - 他人のサーバーでも membership があれば、その membership に従って閲覧 / 操作が可能
@@ -80,6 +81,7 @@ This document fixes the global user-type model, server-membership role model, se
 ### Fixed Limit
 
 - `operator` は、自分が所有する Minecraft サーバーの合計 `memory_mb` が `5120 MB` を超えない範囲でのみ作成できる。
+  判定対象は Docker container memory ではなく Minecraft JVM メモリ入力値
 - `admin` にはこの quota を適用しない。
 - `reader` は作成不可のため quota 対象外である。
 

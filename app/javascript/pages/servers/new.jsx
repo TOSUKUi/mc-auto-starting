@@ -69,7 +69,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
   const resourceHints = [
     { label: 'サーバーソフト', value: selectedRuntimeLabel(form.data.runtime_family, runtime_family_options) },
     { label: 'バージョン', value: selectedVersionLabel(form.data.minecraft_version, minecraftVersionOptions) },
-    { label: 'メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
+    { label: 'Minecraft メモリ', value: `${form.data.memory_mb.toLocaleString()} MB` },
     { label: '接続先', value: preview?.connectionTarget ?? 'hostname.mc.tosukui.xyz:42434' },
   ]
   const projectedMemoryTotal = (create_quota?.used_mb || 0) + form.data.memory_mb
@@ -188,9 +188,10 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                           <Grid.Col span={{ base: 12, sm: 6 }}>
                             <NumberInput
                               allowDecimal={false}
+                              description="Minecraft の Xms / Xmx に設定されます。Docker 上限は自動計算されます。"
                               error={fieldError('memory_mb')}
                               hideControls
-                              label="メモリ (MB)"
+                              label="Minecraft メモリ (MB)"
                               max={MAX_MEMORY_MB}
                               min={MIN_MEMORY_MB}
                               onBlur={() => {
@@ -382,7 +383,7 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                   <Stack gap="md">
                     <Title order={3}>作成上限</Title>
                     <Text c="dimmed" size="sm">
-                      運用者は所有サーバーの合計メモリを {create_quota.limit_mb.toLocaleString()} MB まで使えます。
+                      運用者は所有サーバーの合計 Minecraft メモリを {create_quota.limit_mb.toLocaleString()} MB まで使えます。
                     </Text>
                     <Stack gap={6}>
                       <Text size="sm">

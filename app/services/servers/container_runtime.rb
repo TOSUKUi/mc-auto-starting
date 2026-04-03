@@ -20,7 +20,7 @@ module Servers
         mounts: [ data_volume_mount ],
         labels: managed_labels,
         network_name: MinecraftRuntime.network_name,
-        memory_mb: server.memory_mb,
+        memory_mb: MinecraftRuntime.container_memory_mb(server.memory_mb),
       )
 
       response.fetch("Id")

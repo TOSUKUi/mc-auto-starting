@@ -50,7 +50,7 @@ class RouterRouteTest < ActiveSupport::TestCase
   test "derives publication fields from the related server" do
     route = router_routes(:one)
 
-    assert_equal "main-survival.mc.tosukui.xyz", route.server_address
+    assert_equal minecraft_servers(:one).fqdn, route.server_address
     assert_equal "mc-server-main-survival:25565", route.backend
     assert_equal true, route.desired_enabled?
     assert_equal true, route.publishable?

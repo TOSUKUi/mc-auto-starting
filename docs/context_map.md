@@ -94,7 +94,7 @@ This file tells any contributor or agent where to find authoritative information
 - `T-303` is complete: route publication apply/rollback is centralized and reused by the existing create/delete-era services.
 - `T-304` is complete: Docker transport, public endpoint, runtime image/network, the `itzg` runtime payload, and router file/reload defaults are fixed in env-backed helpers and docs.
 - The create-form `minecraft_version` field is runtime-version input passed through the container `VERSION` contract rather than a Docker image tag.
-- `MinecraftRuntime` now derives container `MEMORY` below the Docker limit so the server keeps JVM headroom.
+- `MinecraftRuntime` now treats `memory_mb` as the Minecraft JVM heap (`Xms` / `Xmx`) and derives the Docker memory limit so that heap uses 70% of the container limit.
 - Local Compose bootstrap now includes checked-in `.env` defaults for `LOCAL_UID`, `LOCAL_GID`, `DOCKER_GID`, database, public-ingress, Discord OAuth, and bootstrap-owner values.
 - `T-400` is complete: the create job now provisions managed Docker resources, persists runtime state, and publishes the `mc-router` mapping.
 - `T-400` now pulls the selected runtime image on demand when Docker create fails with `No such image`.

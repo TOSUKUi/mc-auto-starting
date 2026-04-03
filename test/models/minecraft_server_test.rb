@@ -75,13 +75,13 @@ class MinecraftServerTest < ActiveSupport::TestCase
   test "builds fqdn from hostname and shared public domain" do
     server = minecraft_servers(:one)
 
-    assert_equal "main-survival.mc.tosukui.xyz", server.fqdn
+    assert_equal MinecraftPublicEndpoint.fqdn_for("main-survival"), server.fqdn
   end
 
   test "builds connection target from fqdn and shared public port" do
     server = minecraft_servers(:one)
 
-    assert_equal "main-survival.mc.tosukui.xyz:42434", server.connection_target
+    assert_equal MinecraftPublicEndpoint.connection_target_for("main-survival"), server.connection_target
   end
 
   test "derives managed Docker resource names from hostname" do

@@ -13,7 +13,7 @@ class Router::ConfigApplierTest < ActiveSupport::TestCase
       assert_equal config_path, result.path
       assert_equal "watch", result.reload_strategy
       assert_equal true, result.reloaded
-      assert_equal({ "main-survival.mc.tosukui.xyz" => "mc-server-main-survival:25565" }, payload.fetch("mappings"))
+      assert_equal({ minecraft_servers(:one).fqdn => "mc-server-main-survival:25565" }, payload.fetch("mappings"))
     end
   end
 
@@ -47,7 +47,7 @@ class Router::ConfigApplierTest < ActiveSupport::TestCase
       payload = JSON.parse(File.read(config_path))
 
       assert_equal original_inode, File.stat(config_path).ino
-      assert_equal({ "main-survival.mc.tosukui.xyz" => "mc-server-main-survival:25565" }, payload.fetch("mappings"))
+      assert_equal({ minecraft_servers(:one).fqdn => "mc-server-main-survival:25565" }, payload.fetch("mappings"))
     end
   end
 

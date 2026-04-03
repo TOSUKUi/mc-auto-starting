@@ -3,8 +3,7 @@ module MinecraftRuntime
   DEFAULT_IMAGE = "itzg/minecraft-server".freeze
   DEFAULT_NETWORK_NAME = "mc_router_net".freeze
   DEFAULT_VERSION_TAG = "latest".freeze
-  JVM_HEADROOM_MB = 512
-  MIN_JVM_MEMORY_MB = 512
+  JVM_MEMORY_SHARE_OF_CONTAINER = 0.7
   CATALOG_PATH = Rails.root.join("config/minecraft_runtime_catalog.yml")
   STABLE_VERSION_PATTERN = /\A\d+(?:\.\d+)+\z/
 
@@ -96,14 +95,16 @@ module MinecraftRuntime
         "EULA" => "TRUE",
         "TYPE" => "VANILLA",
         "VERSION" => normalize_version_tag(server.minecraft_version),
-        "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
+        "INIT_MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
+        "MAX_MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
       )
     else
       base_env.merge(
         "EULA" => "TRUE",
         "TYPE" => "PAPER",
         "VERSION" => normalize_version_tag(server.minecraft_version),
-        "MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
+        "INIT_MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
+        "MAX_MEMORY" => "#{jvm_memory_mb(server.memory_mb)}M",
       )
     end
   end
@@ -121,9 +122,12 @@ module MinecraftRuntime
     catalog.key?(runtime_family) ? runtime_family : DEFAULT_RUNTIME_FAMILY
   end
 
-  def jvm_memory_mb(container_memory_mb)
-    memory_mb = Integer(container_memory_mb)
-    [ memory_mb - JVM_HEADROOM_MB, MIN_JVM_MEMORY_MB ].max
+  def jvm_memory_mb(selected_memory_mb)
+    Integer(selected_memory_mb)
+  end
+
+  def container_memory_mb(selected_memory_mb)
+    (jvm_memory_mb(selected_memory_mb) / JVM_MEMORY_SHARE_OF_CONTAINER).ceil
   end
 
   def startup_settings_env(server)

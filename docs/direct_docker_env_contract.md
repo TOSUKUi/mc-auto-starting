@@ -92,7 +92,8 @@ This document fixes the supported environment-variable contract for the current 
 - `MinecraftRuntime` also projects the persisted desired whitelist state into container env through `ENABLE_WHITELIST`, `WHITELIST`, and `EXISTING_WHITELIST_FILE=SYNCHRONIZE`.
 - Production boot should not depend on Rails credentials, `config/master.key`, or `RAILS_MASTER_KEY`; all app secrets are expected to come from direct env or deploy-orchestrator secret injection.
 - The create form separates `runtime_family` from `minecraft_version`; `minecraft_version` is runtime-version input passed through the container `VERSION` contract rather than a Docker image tag.
-- `MEMORY` is derived from the selected container memory with reserved JVM headroom; it is not equal to the Docker memory limit.
+- `INIT_MEMORY` and `MAX_MEMORY` are both set from the selected `memory_mb`, so the form value becomes the Minecraft JVM `Xms`/`Xmx`.
+- Docker container memory is derived from the selected JVM heap so `memory_mb` uses 70% of the Docker limit rather than matching it one-to-one.
 - `DockerEngine` reads only the optional API version override.
 - `Router` reads only the fixed route file and fixed reload wiring.
 - `MinecraftRcon` is the single source of truth for RCON host/port/password derivation.

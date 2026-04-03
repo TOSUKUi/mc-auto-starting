@@ -28,16 +28,16 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").first.fetch("value")
     assert_equal "latest", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").first.fetch("value")
-    assert_equal "26.1", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").second.fetch("value")
-    assert_equal "26.1", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").second.fetch("label")
+    assert_equal MinecraftRuntime.version_options_by_runtime_family.fetch("vanilla").second.fetch(:value), response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").second.fetch("value")
+    assert_equal MinecraftRuntime.version_options_by_runtime_family.fetch("vanilla").second.fetch(:label), response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("vanilla").second.fetch("label")
     assert_equal "1.21.11", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").second.fetch("label")
     assert_equal "1.21.10", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").third.fetch("label")
     assert_equal "1.21.10", response.parsed_body.fetch("minecraft_version_options_by_runtime_family").fetch("paper").third.fetch("value")
     assert_not response.parsed_body.fetch("form_defaults").key?("template_kind")
     assert_not response.parsed_body.key?("template_kind")
     assert_not response.parsed_body.key?("runtime_image")
-    assert_equal "mc.tosukui.xyz", response.parsed_body.fetch("public_endpoint").fetch("public_domain")
-    assert_equal 42434, response.parsed_body.fetch("public_endpoint").fetch("public_port")
+    assert_equal MinecraftPublicEndpoint.public_domain, response.parsed_body.fetch("public_endpoint").fetch("public_domain")
+    assert_equal MinecraftPublicEndpoint.public_port, response.parsed_body.fetch("public_endpoint").fetch("public_port")
     assert_nil response.parsed_body.fetch("public_endpoint").fetch("fqdn")
   end
 
@@ -68,8 +68,8 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal "Sky Lab", server.fetch("name")
     assert_equal "sky-lab", server.fetch("hostname")
-    assert_equal "sky-lab.mc.tosukui.xyz", server.fetch("fqdn")
-    assert_equal "sky-lab.mc.tosukui.xyz:42434", server.fetch("connection_target")
+    assert_equal MinecraftPublicEndpoint.fqdn_for("sky-lab"), server.fetch("fqdn")
+    assert_equal MinecraftPublicEndpoint.connection_target_for("sky-lab"), server.fetch("connection_target")
     assert_equal "provisioning", server.fetch("status")
     assert_equal "paper", server.fetch("runtime_family")
     assert_equal "1.21.11", server.fetch("resolved_minecraft_version")
@@ -150,7 +150,7 @@ class ServerCreationControllerTest < ActionDispatch::IntegrationTest
 
     server = MinecraftServer.order(:id).last
     assert_equal "vanilla", server.template_kind
-    assert_equal "26.1", server.resolved_minecraft_version
+    assert_equal MinecraftRuntime.resolve_version(runtime_family: "vanilla", version: "latest"), server.resolved_minecraft_version
     assert_equal "vanilla", response.parsed_body.fetch("server").fetch("runtime_family")
   end
 

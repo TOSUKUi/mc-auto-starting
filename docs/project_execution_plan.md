@@ -59,6 +59,7 @@
 - global user type は `admin` / `operator` / `reader` を正本とし、server membership role は `viewer` / `manager` を正本とする
 - 招待権限は `admin -> unrestricted`, `operator -> reader only` に制限する
 - サーバー作成は `admin unrestricted`, `operator quota-limited`, `reader denied` とし、operator の所有サーバー合計 `memory_mb` は `5120 MB` 上限で扱う
+  この `memory_mb` は Minecraft JVM `Xms` / `Xmx` 入力値として扱う
 - サーバー閲覧 / lifecycle 操作は ownership と membership を併用し、`manager` は global `reader` / `operator` のどちらにも付与可能とする
 - サーバー削除と membership 管理は owner または global `admin` に限定する
 - プレイヤー人数表示とブラウザ console UI は RCON/command trust boundary を先に固めてから進める

@@ -125,7 +125,8 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
         "EULA" => "TRUE",
         "TYPE" => "PAPER",
         "VERSION" => "1.21.4",
-        "MEMORY" => "3584M",
+        "INIT_MEMORY" => "4096M",
+        "MAX_MEMORY" => "4096M",
         "ENABLE_RCON" => "TRUE",
         "ENABLE_WHITELIST" => "TRUE",
         "WHITELIST" => "",
@@ -137,7 +138,7 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
     )
     assert_equal [ { Type: "volume", Source: "mc-data-event-server", Target: "/data" } ], create_call.fetch(1).fetch(:mounts)
     assert_equal MinecraftRuntime.network_name, create_call.fetch(1).fetch(:network_name)
-    assert_equal 4096, create_call.fetch(1).fetch(:memory_mb)
+    assert_equal 5852, create_call.fetch(1).fetch(:memory_mb)
     assert_equal 1, router_applier.calls.size
   end
 
@@ -249,7 +250,8 @@ class Servers::ProvisionServerTest < ActiveSupport::TestCase
         "EULA" => "TRUE",
         "TYPE" => "VANILLA",
         "VERSION" => "latest",
-        "MEMORY" => "1536M",
+        "INIT_MEMORY" => "2048M",
+        "MAX_MEMORY" => "2048M",
         "ENABLE_RCON" => "TRUE",
         "ENABLE_WHITELIST" => "TRUE",
         "WHITELIST" => "",

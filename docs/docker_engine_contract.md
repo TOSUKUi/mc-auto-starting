@@ -37,6 +37,7 @@ The Docker wrapper only exposes operations needed by the current app responsibil
 - `create_volume(name:, labels:)`
 - `remove_volume(name:)`
 - `create_container(name:, image:, env:, mounts:, labels:, network_name:, memory_mb:)`
+  `memory_mb` は Docker `HostConfig.Memory` に渡す container memory limit を表す
 - `start_container(id:)`
 - `stop_container(id:, timeout_seconds:)`
 - `restart_container(id:, timeout_seconds:)`
