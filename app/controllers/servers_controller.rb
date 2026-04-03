@@ -72,6 +72,7 @@ class ServersController < InertiaController
   def show
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :show?
+    sync_server_for_detail!(server)
     sync_server_for_transition_poll!(server)
     route_issue = audit_route!(server)
     server.reload
@@ -511,6 +512,15 @@ class ServersController < InertiaController
         restart: policy(server).restart? && status == :ready,
         sync: policy(server).sync? && %i[ready stopped starting stopping restarting degraded failed].include?(status),
       }
+    end
+
+    def sync_server_for_detail!(server)
+      return unless server.container_id.present? || server.container_name.present?
+      return if server.status.in?(%w[provisioning unpublished failed deleting])
+
+      Servers::SyncServerState.new(server: server).call
+    rescue DockerEngine::Error => error
+      Rails.logger.warn("Detail sync failed for server=#{server.id}: #{error.class}: #{error.message}")
     end
 
     def respond_with_server_action(server, notice:)

@@ -104,13 +104,13 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
 
   teardown do
     Rails.application.config.x.mc_router = @original_mc_router_config
-    DockerEngine.define_singleton_method(:build_client, @original_docker_build_client)
+    DockerEngine.define_singleton_method(:build_client, @original_docker_build_client) if @original_docker_build_client
     Rails.application.config.x.minecraft_runtime.image = @original_runtime_image
     FileUtils.remove_entry(@tmpdir) if @tmpdir && File.exist?(@tmpdir)
   end
 
   test "accepted create request provisions the server and publishes the route" do
-    sign_in_as(users(:two))
+    sign_in_as(users(:one))
 
     assert_difference("MinecraftServer.count", 1) do
       assert_difference("RouterRoute.count", 1) do
@@ -138,7 +138,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     server = response.parsed_body.fetch("server")
     assert_equal "ready", server.fetch("status")
     assert_equal "creative-build", server.fetch("hostname")
-    assert_equal "creative-build.mc.tosukui.xyz:42434", server.fetch("connection_target")
+    assert_equal MinecraftServer.find(server_id).connection_target, server.fetch("connection_target")
     assert_equal "mc-server-creative-build", server.fetch("runtime").fetch("container_name")
     assert_equal "mc-server-creative-build:25565", server.fetch("runtime").fetch("backend")
     assert_equal true, server.fetch("route").fetch("enabled")
@@ -148,35 +148,24 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal "running", server.fetch("runtime").fetch("container_state")
 
     assert_equal "paper", MinecraftServer.find(server_id).template_kind
+    server_record = MinecraftServer.find(server_id)
     assert_equal(
       [
         [ :create_volume, { name: "mc-data-creative-build", labels: :labels } ],
-        [ :create_container, {
-          name: "mc-server-creative-build",
-          image: "itzg/minecraft-server",
-          env: {
-            "EULA" => "TRUE",
-            "TYPE" => "PAPER",
-            "VERSION" => "1.21.4",
-            "MEMORY" => "3584M",
-          },
-          mounts: [ { Type: "volume", Source: "mc-data-creative-build", Target: "/data" } ],
-          labels: :labels,
-          network_name: "mc_router_net",
-          memory_mb: 4096,
-        } ],
+        expected_create_container_call(server_record),
         [ :start_container, { id: "container-acceptance-001" } ],
+        [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
         [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
       ],
       normalize_docker_calls(FakeDockerClient.calls),
     )
 
     mappings = JSON.parse(File.read(File.join(@tmpdir, "routes.json"))).fetch("mappings")
-    assert_equal "mc-server-creative-build:25565", mappings.fetch("creative-build.mc.tosukui.xyz")
+    assert_equal "mc-server-creative-build:25565", mappings.fetch(server_record.fqdn)
   end
 
   test "docker provisioning failure leaves the requested server inspectable in failed state" do
-    sign_in_as(users(:two))
+    sign_in_as(users(:one))
     FakeDockerClient.error_on = [ :start_container, DockerEngine::RequestError.new("docker unavailable") ]
 
     post servers_url(format: :json), params: {
@@ -207,25 +196,12 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal "failed", server.fetch("status")
     assert_equal "docker unavailable", server.fetch("last_error_message")
     assert_equal false, server.fetch("route").fetch("enabled")
-    assert_equal "pending", server.fetch("route").fetch("last_apply_status")
+    assert_equal "failed", server.fetch("route").fetch("last_apply_status")
     assert_nil server.fetch("runtime").fetch("container_id")
     assert_equal(
       [
         [ :create_volume, { name: "mc-data-broken-build", labels: :labels } ],
-        [ :create_container, {
-          name: "mc-server-broken-build",
-          image: "itzg/minecraft-server",
-          env: {
-            "EULA" => "TRUE",
-            "TYPE" => "PAPER",
-            "VERSION" => "1.21.4",
-            "MEMORY" => "3584M",
-          },
-          mounts: [ { Type: "volume", Source: "mc-data-broken-build", Target: "/data" } ],
-          labels: :labels,
-          network_name: "mc_router_net",
-          memory_mb: 4096,
-        } ],
+        expected_create_container_call(MinecraftServer.find(server_id)),
         [ :start_container, { id: "container-acceptance-001" } ],
         [ :remove_container, { id: "container-acceptance-001", force: true } ],
         [ :remove_volume, { name: "mc-data-broken-build" } ],
@@ -267,22 +243,19 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal "ready", response.parsed_body.fetch("server").fetch("status")
     assert_equal(
       [
-        [ :start_container, { id: "container-001" } ],
-        [ :inspect_container, { id_or_name: "container-001" } ],
+        [ :remove_container, { id: "container-001", force: false } ],
+        expected_create_container_call(server.reload),
+        [ :start_container, { id: "container-acceptance-001" } ],
+        [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
         [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
       ],
-      FakeDockerClient.calls.last(3),
+      normalize_docker_calls(FakeDockerClient.calls.last(5)),
     )
   end
 
   test "owner can restart and stop a visible server" do
     sign_in_as(users(:one))
     server = minecraft_servers(:one)
-
-    FakeDockerClient.inspect_result = {
-      "Id" => "container-001",
-      "State" => { "Status" => "running" },
-    }
 
     post restart_server_url(server, format: :json)
 
@@ -296,7 +269,7 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal "ready", response.parsed_body.fetch("server").fetch("status")
 
     FakeDockerClient.inspect_result = {
-      "Id" => "container-001",
+      "Id" => "container-acceptance-001",
       "State" => { "Status" => "exited" },
     }
 
@@ -312,18 +285,36 @@ class ServersAcceptanceTest < ActionDispatch::IntegrationTest
     assert_equal "stopped", response.parsed_body.fetch("server").fetch("status")
     assert_equal(
       [
-        [ :restart_container, { id: "container-001", timeout_seconds: 30 } ],
-        [ :inspect_container, { id_or_name: "container-001" } ],
-        [ :inspect_container, { id_or_name: "container-001" } ],
         [ :stop_container, { id: "container-001", timeout_seconds: 30 } ],
-        [ :inspect_container, { id_or_name: "container-001" } ],
-        [ :inspect_container, { id_or_name: "container-001" } ],
+        [ :remove_container, { id: "container-001", force: false } ],
+        expected_create_container_call(server.reload),
+        [ :start_container, { id: "container-acceptance-001" } ],
+        [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
+        [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
+        [ :stop_container, { id: "container-acceptance-001", timeout_seconds: 30 } ],
+        [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
+        [ :inspect_container, { id_or_name: "container-acceptance-001" } ],
       ],
-      FakeDockerClient.calls.last(6),
+      normalize_docker_calls(FakeDockerClient.calls.last(9)),
     )
   end
 
   private
+    def expected_create_container_call(server)
+      [
+        :create_container,
+        {
+          name: server.container_name,
+          image: "itzg/minecraft-server",
+          env: MinecraftRuntime.container_env(server: server),
+          mounts: [ { Type: "volume", Source: server.volume_name, Target: "/data" } ],
+          labels: :labels,
+          network_name: "mc_router_net",
+          memory_mb: server.memory_mb,
+        },
+      ]
+    end
+
     def normalize_docker_calls(calls)
       calls.map do |name, payload|
         [

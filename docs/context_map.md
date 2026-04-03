@@ -100,6 +100,8 @@ This file tells any contributor or agent where to find authoritative information
 - `T-400` now pulls the selected runtime image on demand when Docker create fails with `No such image`.
 - The direct-Docker lifecycle/delete contract is now fixed in `docs/direct_docker_lifecycle_contract.md` ahead of service replacement work.
 - `T-401` and `T-402` are complete: delete/start/stop/restart/sync now use Docker Engine instead of the legacy provider path.
+- The detail endpoint now performs a best-effort runtime sync before rendering lifecycle actions, so stale persisted state does not keep showing running-only controls after the managed container has already stopped.
+- Managed container create payloads now include Docker restart policy `unless-stopped` in the direct-Docker baseline.
 - `T-403` is complete: manual sync now also reconciles `last_started_at` from Docker inspect so runtime timestamps and error state stay aligned.
 - `T-404` is complete: operator create requests are now quota-limited by owned `memory_mb` total `<= 5120`, the server-side create flow rejects over-quota requests, and the create UI shows current usage plus remaining quota.
 - `T-500` is complete: create UI now exposes only the direct-Docker baseline inputs and the public connection preview contract.

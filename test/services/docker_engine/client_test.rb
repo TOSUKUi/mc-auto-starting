@@ -66,7 +66,7 @@ class DockerEngine::ClientTest < ActiveSupport::TestCase
     assert_equal "main-survival", payload.fetch(:Labels).fetch("minecraft_server_hostname")
   end
 
-  test "creates containers with env mounts labels network and memory" do
+  test "creates containers with env mounts labels network memory and restart policy" do
     connection = FakeConnection.new(
       responses: [ DockerEngine::Response.new(status: 201, headers: {}, body: { "Id" => "container-001" }) ],
       requests: [],
@@ -89,6 +89,7 @@ class DockerEngine::ClientTest < ActiveSupport::TestCase
     assert_equal "itzg/minecraft-server:java21", payload.fetch(:Image)
     assert_equal [ "EULA=TRUE", "VERSION=1.21.4" ], payload.fetch(:Env)
     assert_equal 4_294_967_296, payload.dig(:HostConfig, :Memory)
+    assert_equal "unless-stopped", payload.dig(:HostConfig, :RestartPolicy, :Name)
     assert_equal "mc_router_net", payload.dig(:NetworkingConfig, :EndpointsConfig).keys.first
     assert_equal "mc-auto-starting", payload.fetch(:Labels).fetch("app")
     assert_equal "1", payload.fetch(:Labels).fetch("minecraft_server_id")

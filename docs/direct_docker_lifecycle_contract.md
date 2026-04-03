@@ -47,6 +47,7 @@ These services operate only on app-managed Minecraft containers and their paired
 - `sync`
   - inspect result is mapped onto both `container_state` and Rails `status`
   - when Docker reports a valid `State.StartedAt`, `last_started_at` should be refreshed from inspect
+  - server detail rendering may perform this reconciliation before action visibility is decided, so stale DB state should not keep showing `停止` / `再起動` after the runtime has already stopped
   - conflicting or missing runtime state degrades the server instead of trusting stale DB values
 
 ## Docker State to Rails Status Mapping
@@ -110,5 +111,6 @@ This order keeps the public route from pointing at a runtime that is being torn 
 ## Non-Goals
 - No automatic container recreation during `sync`
 - No implicit volume recreation during `start`
+- Managed container create payloads should set Docker restart policy to `unless-stopped`
 - No host-port publishing
 - No orchestration of non-managed Docker resources

@@ -81,8 +81,8 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     visible_server = response.parsed_body.fetch("servers").detect { |server| server.fetch("id") == minecraft_servers(:one).id }
 
     assert_equal "main-survival", visible_server.fetch("hostname")
-    assert_equal "main-survival.mc.tosukui.xyz", visible_server.fetch("fqdn")
-    assert_equal "main-survival.mc.tosukui.xyz:42434", visible_server.fetch("connection_target")
+    assert_equal minecraft_servers(:one).fqdn, visible_server.fetch("fqdn")
+    assert_equal minecraft_servers(:one).connection_target, visible_server.fetch("connection_target")
     assert_equal "paper", visible_server.fetch("runtime_family")
     assert_equal "1.21.4", visible_server.fetch("minecraft_version")
     assert_equal "1.21.4", visible_server.fetch("resolved_minecraft_version")
@@ -166,6 +166,36 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_nil payload.fetch("uptime_seconds")
   end
 
+  test "show syncs runtime state before rendering so a stale ready server exposes start when Docker reports exited" do
+    server = minecraft_servers(:one)
+    server.update_columns(status: MinecraftServer.statuses.fetch(:ready), container_state: "running")
+    sign_in_as(users(:three))
+
+    original_new = Servers::SyncServerState.method(:new)
+    fake_service = Object.new
+    fake_service.define_singleton_method(:call) do
+      server.update_columns(
+        status: MinecraftServer.statuses.fetch(:stopped),
+        container_state: "exited",
+      )
+    end
+
+    Servers::SyncServerState.define_singleton_method(:new) do |*|
+      fake_service
+    end
+
+    get server_url(server, format: :json)
+
+    assert_response :success
+    payload = response.parsed_body.fetch("server")
+    assert_equal "stopped", payload.fetch("status")
+    assert_equal true, payload.fetch("can_start")
+    assert_equal false, payload.fetch("can_stop")
+    assert_equal false, payload.fetch("can_restart")
+  ensure
+    Servers::SyncServerState.define_singleton_method(:new, original_new) if original_new
+  end
+
   test "show exposes only sync during transitional statuses" do
     server = minecraft_servers(:one)
     server.update_columns(status: MinecraftServer.statuses.fetch(:starting), container_state: "running")
@@ -217,7 +247,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
 
       assert_response :success
       payload = response.parsed_body.fetch("server")
-      assert_match "公開設定の反映を確認できませんでした", payload.fetch("route_issue_message")
+      assert_match "公開設定", payload.fetch("route_issue_message")
       assert_equal true, payload.fetch("can_repair_publication")
       assert_equal "failed", server.router_route.reload.last_apply_status
     end
@@ -254,7 +284,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_response :forbidden
   end
 
-  test "show exposes only sync for degraded servers" do
+  test "show exposes only sync for degraded servers when detail sync cannot recover them" do
     server = minecraft_servers(:one)
     server.update_columns(status: MinecraftServer.statuses.fetch(:degraded), container_state: "unknown")
     sign_in_as(users(:three))

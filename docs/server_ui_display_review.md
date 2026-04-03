@@ -117,6 +117,7 @@
 - `stopping`: `同期` のみ
 - `restarting`: `同期` のみ
 - `degraded`: `同期` を主操作にし、起動/停止の扱いは実装時に現在の runtime 状態と整合させる
+- 詳細画面は action 表示前に runtime 実状態へ寄せる。たとえば stale な `ready` が実際には停止済みなら、画面上は `stopped` 相当として `起動` を見せる
 - `failed`: `同期` を主操作にする
 - `deleting`: 操作なし
 

@@ -150,6 +150,9 @@ module DockerEngine
           HostConfig: {
             Mounts: mounts,
             Memory: Integer(memory_mb) * 1024 * 1024,
+            RestartPolicy: {
+              Name: "unless-stopped",
+            },
           },
         }
 

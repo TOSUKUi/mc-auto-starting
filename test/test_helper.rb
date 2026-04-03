@@ -1,4 +1,5 @@
 ENV["RAILS_ENV"] ||= "test"
+ENV["MINECRAFT_RCON_PASSWORD_SECRET"] ||= "test-rcon-password-secret"
 require_relative "../config/environment"
 require "rails/test_help"
 require_relative "test_helpers/session_test_helper"

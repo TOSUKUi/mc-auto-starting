@@ -197,6 +197,8 @@ The current critical path is:
 - `T-401` / `T-402`: direct-Docker lifecycle/delete behavior is fixed in `docs/direct_docker_lifecycle_contract.md` before service replacement, including Docker-state mapping and tolerated `NotFound` cleanup.
 - `T-401`: `Servers::DestroyServer` now unpublishes the route first, tolerates missing managed container/volume cleanup, and only destroys the DB record after Docker cleanup succeeds.
 - `T-402`: `Servers::StartServer`, `StopServer`, `RestartServer`, and `SyncServerState` now use Docker Engine operations plus `inspect_container`-based reconciliation instead of `ExecutionProvider`.
+- `T-402`: server detail rendering now performs a best-effort `SyncServerState` before lifecycle action visibility is computed, so stale persisted `ready` state does not keep showing `停止` / `再起動` after Docker already reports the container as stopped.
+- `T-402`: managed container create payloads now set Docker restart policy to `unless-stopped` as part of the direct-Docker runtime baseline.
 - `T-500`: create page props are reduced to the direct-Docker baseline form fields and connection preview metadata, dropping fixed runtime/template display props from the controller contract.
 - `T-501`: detail page now centers public connection target, router publication state, Docker runtime identifiers, and lifecycle actions without fixed template/provider framing.
 - `T-502`: index page now summarizes public connection targets plus container/router state, and no longer depends on backend-oriented runtime labels from the listing payload.
