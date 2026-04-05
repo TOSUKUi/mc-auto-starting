@@ -37,6 +37,9 @@
 12. Discord OAuth 招待制ログインと Bot 経由の RCON 操作を追加する
 13. プレイヤー人数表示とブラウザ運用コンソールを追加する
 14. Java サーバー runtime の選択肢とバージョン解決を改善する
+15. create UI の残る微細なレイアウト崩れを解消する
+16. managed world の download / upload を Rails 管理フローとして追加する
+17. Discord bot を別プロセスとして同一リポジトリ内で運用するための runtime 仕様を固める
 
 この順序を崩すと、DB 項目、UI、Docker label、ポート管理の手戻りが大きい。
 
@@ -56,6 +59,7 @@
 - Discord OAuth / invite / bot relay docs are now checked in, and the `T-1010` to `T-1012` player-count / browser-console track is complete
 - The runtime-catalog track is now contract-complete through `T-1104`, so any remaining follow-up should be treated as incremental UX/runtime work rather than a missing contract baseline
 - Current near-term UI polish remains under `T-503`, including Japanese-first runtime labels and keeping `Java Edition` as the default create-flow choice
+- Current near-term UI follow-up also includes the create-form memory-field alignment cleanup so quota/help annotations do not disturb the field row layout
 - global user type は `admin` / `operator` / `reader` を正本とし、server membership role は `viewer` / `manager` を正本とする
 - 招待権限は `admin -> unrestricted`, `operator -> reader only` に制限する
 - サーバー作成は `admin unrestricted`, `operator quota-limited`, `reader denied` とし、operator の所有サーバー合計 `memory_mb` は `5120 MB` 上限で扱う
@@ -64,6 +68,8 @@
 - サーバー削除と membership 管理は owner または global `admin` に限定する
 - プレイヤー人数表示とブラウザ console UI は RCON/command trust boundary を先に固めてから進める
 - Java runtime family の選択自体は先に進め、`latest` 解決と version catalog はその後に固める
+- world download / upload は managed Docker volume に対する export / import 操作なので、実装前に停止要件、archive format、容量制限、一時ファイル cleanup、権限境界を契約として固定する
+- Discord bot を別プロセスで持つ場合でも、bot は Docker や RCON を直接触らず Rails 内部 API の client に留める
 
 ## 5. 詳細タスクリスト
 
@@ -258,6 +264,37 @@
 #### P6-3 Production Compose / Komodo deploy 基盤
 
 - 単一ホスト前提の `docker-compose.production.yml` topology を決める
+
+### Phase 11: 追加 UX / world transfer / bot runtime
+
+#### P11-1 create UI 微調整
+
+- メモリ入力欄まわりの注釈で縦位置が崩れる問題を解消する
+- validation error や quota 表示が出ても入力行のリズムが崩れないようにする
+- 完了条件:
+  - メモリ input, 単位表示, 注釈, error が安定した縦揃えで表示される
+
+#### P11-2 managed world download / upload 契約
+
+- world export / import を Rails-owned な運用機能として定義する
+- stopped-server requirement, archive format, size limit, temp-file cleanup, and Docker volume 操作順序を固定する
+- 完了条件:
+  - world transfer の安全境界と UI/API 前提が文書で固定される
+
+#### P11-3 managed world download / upload 実装
+
+- world archive の download
+- replacement world archive の upload
+- server 停止確認と import/export の service 化
+- 完了条件:
+  - authorized user が world を安全に export / import できる
+
+#### P11-4 repository-local Discord bot runtime 仕様
+
+- bot をこの repo 内の別プロセスとして起動する方式を定義する
+- local / production の起動形態、必要 secrets、private network 到達性、logging / restart strategy を固定する
+- 完了条件:
+  - bot 実装前に runtime 契約と運用境界が文書で固定される
 - Rails app / dependencies / secret 注入方法を固定する
 - 現在の local Compose 用 env 名を可能な限りそのまま production 側へ持ち込む
 - Komodo からの pull/update フローを固定する
