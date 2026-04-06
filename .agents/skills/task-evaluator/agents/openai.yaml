@@ -1,0 +1,7 @@
+interface:
+  display_name: "Task Evaluator"
+  short_description: "Review scope, risk, and doc consistency."
+  default_prompt: "Use $task-evaluator to review this implementation against its done definition and identify any code or documentation drift."
+
+policy:
+  allow_implicit_invocation: true

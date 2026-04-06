@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "skills": {
+    "bootstrap-project-state": {
+      "source": "git@github.com:TOSUKUi/myskills.git",
+      "sourceType": "git",
+      "computedHash": "b480d2ac83f692069486cff93f5a24a975ddacc8652ec8f3bf86de406104e6c7"
+    },
+    "swarm-meeting": {
+      "source": "git@github.com:TOSUKUi/myskills.git",
+      "sourceType": "git",
+      "computedHash": "c8386d3c807b727076339bab4b98f4b1cd03c96dc3d6252133cb0f649badcb1a"
+    },
+    "swarm-research-pack": {
+      "source": "git@github.com:TOSUKUi/myskills.git",
+      "sourceType": "git",
+      "computedHash": "5855ac60536b55fc0253e026d94419881df12135019192d836f0a83af885c0d3"
+    },
+    "task-evaluator": {
+      "source": "git@github.com:TOSUKUi/myskills.git",
+      "sourceType": "git",
+      "computedHash": "f65ca1c7f68274af26f01ee6cc261edbcc58788b8b93cc42817763bda7c29eb9"
+    },
+    "task-implementer": {
+      "source": "git@github.com:TOSUKUi/myskills.git",
+      "sourceType": "git",
+      "computedHash": "93f52d2351071979016a03531cffd92ec955d5dd1d0c21d5c836917c34a329e7"
+    },
+    "task-supervisor-loop": {
+      "source": "git@github.com:TOSUKUi/myskills.git",
+      "sourceType": "git",
+      "computedHash": "2286d4f463ded823e8b3dc306c0ed18b443d5d3192ac0e6a2419a2df70d5b958"
+    },
+    "task-writeback": {
+      "source": "git@github.com:TOSUKUi/myskills.git",
+      "sourceType": "git",
+      "computedHash": "a38b40900ec79e0cb22bbb6e0dd744553518cd5d5f288d8f41984d04557f2c84"
+    }
+  }
+}

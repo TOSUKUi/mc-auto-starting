@@ -1,0 +1,7 @@
+interface:
+  display_name: "Task Write-Back"
+  short_description: "Write restart notes and minimal plan deltas."
+  default_prompt: "Use $task-writeback to update the restart artifacts for this accepted task result without expanding AGENTS.md."
+
+policy:
+  allow_implicit_invocation: true

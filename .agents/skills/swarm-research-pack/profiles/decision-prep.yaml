@@ -1,0 +1,24 @@
+{
+  "summary": "Prepare a decision brief with stronger emphasis on docs, constraints, and unknowns.",
+  "pack_style": "decision_prep",
+  "artifact_order": [
+    "docs",
+    "code",
+    "tests",
+    "config",
+    "notes"
+  ],
+  "sections": [
+    "Topic",
+    "Decision Questions",
+    "Constraints",
+    "Known Facts",
+    "Relevant Artifacts",
+    "Preview Snippets",
+    "Unknowns",
+    "Decision Gaps",
+    "Suggested Next Reads"
+  ],
+  "max_paths": 10,
+  "preview_lines": 10
+}

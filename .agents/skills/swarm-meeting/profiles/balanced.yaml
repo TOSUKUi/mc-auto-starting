@@ -1,0 +1,32 @@
+{
+  "summary": "Default meeting for practical implementation and architecture tradeoffs.",
+  "meeting_style": "design_review",
+  "diversity_mode": "medium",
+  "max_agents": 5,
+  "required_roles": [
+    "moderator",
+    "skeptic",
+    "pragmatist",
+    "retrieval-architect",
+    "granary-workflow-lead"
+  ],
+  "optional_roles": [
+    "minimalist",
+    "context-economist",
+    "workflow-conservative"
+  ],
+  "debate_rounds": 2,
+  "require_objection_round": true,
+  "require_recommendation": true,
+  "output_style": "markdown",
+  "timebox": "medium",
+  "biases": {
+    "prioritize_mvp": true,
+    "prioritize_operational_simplicity": true,
+    "prioritize_context_efficiency": true
+  },
+  "memo_constraints": {
+    "max_points_per_role": 5,
+    "prefer_short_paragraphs": true
+  }
+}

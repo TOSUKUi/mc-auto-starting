@@ -1,0 +1,7 @@
+interface:
+  display_name: "Task Implementer"
+  short_description: "Implement from a narrow task-scoped brief."
+  default_prompt: "Use $task-implementer to make the requested change from this implementation brief without reopening the whole project."
+
+policy:
+  allow_implicit_invocation: true

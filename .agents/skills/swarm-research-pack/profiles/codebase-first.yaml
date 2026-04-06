@@ -1,0 +1,22 @@
+{
+  "summary": "Inspect local code, tests, config, and nearby docs before deeper reasoning.",
+  "pack_style": "codebase_first",
+  "artifact_order": [
+    "code",
+    "tests",
+    "config",
+    "docs",
+    "notes"
+  ],
+  "sections": [
+    "Topic",
+    "Questions",
+    "Known Facts",
+    "Relevant Artifacts",
+    "Preview Snippets",
+    "Unknowns",
+    "Suggested Next Reads"
+  ],
+  "max_paths": 8,
+  "preview_lines": 12
+}

@@ -1,0 +1,35 @@
+{
+  "summary": "Use for high-stakes decisions that benefit from intentionally conflicting evaluation axes.",
+  "meeting_style": "design_review",
+  "diversity_mode": "high",
+  "max_agents": 6,
+  "required_roles": [
+    "moderator",
+    "skeptic",
+    "pragmatist",
+    "minimalist",
+    "maximalist"
+  ],
+  "optional_roles": [
+    "retrieval-architect",
+    "granary-workflow-lead",
+    "semantic-purist",
+    "lightweight-contrarian",
+    "context-economist",
+    "workflow-conservative"
+  ],
+  "debate_rounds": 2,
+  "require_objection_round": true,
+  "require_recommendation": true,
+  "output_style": "markdown",
+  "timebox": "medium",
+  "biases": {
+    "prioritize_mvp": false,
+    "prioritize_operational_simplicity": true,
+    "prioritize_context_efficiency": true
+  },
+  "memo_constraints": {
+    "max_points_per_role": 5,
+    "prefer_short_paragraphs": true
+  }
+}

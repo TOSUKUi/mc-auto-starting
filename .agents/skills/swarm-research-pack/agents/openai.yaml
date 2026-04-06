@@ -1,0 +1,7 @@
+interface:
+  display_name: "Swarm Research Pack"
+  short_description: "Compress local artifacts into a brief."
+  default_prompt: "Use $swarm-research-pack to prepare a compact evidence pack for this topic from the local repo."
+
+policy:
+  allow_implicit_invocation: true

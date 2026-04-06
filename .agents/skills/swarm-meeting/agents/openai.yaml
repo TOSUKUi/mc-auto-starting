@@ -1,0 +1,7 @@
+interface:
+  display_name: "Swarm Meeting"
+  short_description: "Run structured design-review debates."
+  default_prompt: "Use $swarm-meeting to compare architecture options and recommend an MVP path for this topic."
+
+policy:
+  allow_implicit_invocation: true

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Bootstrap Project State"
+  short_description: "Fill AGENTS and project-state docs from evidence."
+  default_prompt: "Use $bootstrap-project-state to fill AGENTS.md, current_state.md, and critical_path.md from the checked-in repository evidence."
+
+policy:
+  allow_implicit_invocation: true

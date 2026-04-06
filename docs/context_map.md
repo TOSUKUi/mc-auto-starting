@@ -5,8 +5,14 @@ This file tells any contributor or agent where to find authoritative information
 
 ## Read First
 - `AGENTS.md`
+- `docs/project/current_state.md`
+- `docs/project/critical_path.md`
 
 ## Architecture and Implementation Design
+- `docs/project/current_state.md`
+  Use for the compressed accepted project snapshot, open work, recent accepted changes, and current risks.
+- `docs/project/critical_path.md`
+  Use for the current goal, active dependency chain, blockers, and immediate next checks.
 - `docs/single_host_setup.md`
   Use for the single-host bootstrap path, local Docker/Compose setup, and the day-1 development workflow fixed by `T-900`.
 - `docs/operator_runbook.md`

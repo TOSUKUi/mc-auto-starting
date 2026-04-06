@@ -1,0 +1,7 @@
+interface:
+  display_name: "Task Supervisor Loop"
+  short_description: "Coordinate task phases with compact handoffs."
+  default_prompt: "Use $task-supervisor-loop to run this task through research, implementation, evaluation, and write-back with minimal shared context."
+
+policy:
+  allow_implicit_invocation: true
