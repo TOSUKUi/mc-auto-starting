@@ -9,6 +9,8 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     @original_player_presence_new = Servers::PlayerPresence.method(:new)
     @original_recent_logs_new = Servers::RecentLogs.method(:new)
     @original_bounded_rcon_new = Servers::BoundedRconCommand.method(:new)
+    @original_export_world_new = Servers::ExportWorld.method(:new)
+    @original_import_world_new = Servers::ImportWorld.method(:new)
   end
 
   teardown do
@@ -16,6 +18,8 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     Servers::PlayerPresence.define_singleton_method(:new, @original_player_presence_new) if @original_player_presence_new
     Servers::RecentLogs.define_singleton_method(:new, @original_recent_logs_new) if @original_recent_logs_new
     Servers::BoundedRconCommand.define_singleton_method(:new, @original_bounded_rcon_new) if @original_bounded_rcon_new
+    Servers::ExportWorld.define_singleton_method(:new, @original_export_world_new) if @original_export_world_new
+    Servers::ImportWorld.define_singleton_method(:new, @original_import_world_new) if @original_import_world_new
   end
 
   test "redirects unauthenticated users to login for index" do
@@ -141,6 +145,8 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal 20, server.fetch("startup_settings").fetch("max_players")
     assert_equal false, server.fetch("can_manage_whitelist")
     assert_equal false, server.fetch("can_run_rcon_command")
+    assert_equal false, server.fetch("can_export_world")
+    assert_equal false, server.fetch("can_import_world")
     assert_equal true, server.fetch("can_stop")
     assert_equal true, server.fetch("can_restart")
     assert_equal true, server.fetch("can_sync")
@@ -164,6 +170,20 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     assert_equal true, payload.fetch("can_sync")
     assert_equal false, payload.fetch("can_manage_whitelist")
     assert_nil payload.fetch("uptime_seconds")
+  end
+
+  test "show exposes world transfer controls for owner on stopped server" do
+    server = minecraft_servers(:one)
+    server.update_columns(status: MinecraftServer.statuses.fetch(:stopped), container_state: "exited")
+    sign_in_as(users(:one))
+
+    get server_url(server, format: :json)
+
+    assert_response :success
+    payload = response.parsed_body.fetch("server")
+
+    assert_equal true, payload.fetch("can_export_world")
+    assert_equal true, payload.fetch("can_import_world")
   end
 
   test "show syncs runtime state before rendering so a stale ready server exposes start when Docker reports exited" do
@@ -712,6 +732,50 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     Servers::SyncServerState.define_singleton_method(:new, original_new)
   end
 
+  test "owner can download world archive" do
+    sign_in_as(users(:one))
+    server = minecraft_servers(:one)
+    stub_export_world(
+      data: "archive-body",
+      filename: "main-survival-world-20260407.tar.gz",
+      warning: nil,
+    )
+
+    get download_world_server_url(server)
+
+    assert_response :success
+    assert_equal "archive-body", response.body
+    assert_includes response.headers["Content-Disposition"], "main-survival-world-20260407.tar.gz"
+  end
+
+  test "manager cannot download world archive" do
+    sign_in_as(users(:three))
+
+    get download_world_server_url(minecraft_servers(:one))
+
+    assert_response :forbidden
+  end
+
+  test "owner can upload replacement world archive" do
+    sign_in_as(users(:one))
+    server = minecraft_servers(:one)
+    stub_import_world(warning: nil)
+
+    post upload_world_server_url(server, format: :json), params: { world_archive: fixture_world_archive_upload }
+
+    assert_response :success
+    assert_equal true, response.parsed_body.fetch("ok")
+    assert_equal server.id, response.parsed_body.fetch("server").fetch("id")
+  end
+
+  test "viewer cannot upload replacement world archive" do
+    sign_in_as(users(:two))
+
+    post upload_world_server_url(minecraft_servers(:one), format: :json), params: { world_archive: fixture_world_archive_upload }
+
+    assert_response :forbidden
+  end
+
   def stub_player_presence(payloads)
     Servers::PlayerPresence.define_singleton_method(:new) do |server:, **|
       Struct.new(:payload) do
@@ -750,6 +814,41 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
         end
       end.new(error)
     end
+  end
+
+  def stub_export_world(data:, filename:, warning:)
+    Servers::ExportWorld.define_singleton_method(:new) do |**|
+      Struct.new(:result) do
+        def call
+          result
+        end
+      end.new(
+        Servers::ExportWorld::Result.new(
+          content_type: "application/gzip",
+          data: data,
+          filename: filename,
+          warning: warning,
+        ),
+      )
+    end
+  end
+
+  def stub_import_world(warning:)
+    Servers::ImportWorld.define_singleton_method(:new) do |**|
+      Struct.new(:result) do
+        def call
+          result
+        end
+      end.new(Servers::ImportWorld::Result.new(warning: warning))
+    end
+  end
+
+  def fixture_world_archive_upload
+    file = Tempfile.new([ "world-archive", ".tar.gz" ])
+    file.binmode
+    file.write("dummy archive")
+    file.rewind
+    Rack::Test::UploadedFile.new(file.path, "application/gzip", original_filename: "world.tar.gz")
   end
 
   def inertia_headers

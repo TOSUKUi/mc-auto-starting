@@ -27,6 +27,8 @@ This file tells any contributor or agent where to find authoritative information
   Use for the active global user types, server-local `viewer` / `manager` roles, invitation authority, ownership-vs-membership authorization rules, and the operator-scoped `5120 MB` server-create quota fixed by `T-1014`.
 - `docs/whitelist_and_access_control_strategy.md`
   Use for the whitelist-over-RCON plan and whitelist authority boundary fixed by `T-1020`.
+- `docs/managed_world_transfer_contract.md`
+  Use for the managed world download/upload authority boundary, archive format, temp staging path, and Docker volume import/export sequence fixed by `T-1200`.
 - `docs/server_ui_display_review.md`
   Use for the agreed display contract for the server index/detail screens, including owner-name display, lifecycle-action visibility, transition-state polling expectations from `T-505`, and the next de-dup/layout cleanup plan captured in `T-508`.
 - `docs/player_observability_and_browser_console_contract.md`

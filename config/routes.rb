@@ -17,6 +17,8 @@ Rails.application.routes.draw do
       post :restart
       post :sync
       post :repair_publication
+      get :download_world
+      post :upload_world
       get :player_presence
       get :recent_logs
       post :rcon_command

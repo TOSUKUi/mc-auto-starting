@@ -167,6 +167,42 @@ class ServersController < InertiaController
     respond_with_server_error(server, error)
   end
 
+  def download_world
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :export_world?
+
+    archive = Servers::ExportWorld.new(server: server).call
+    response.headers["X-World-Transfer-Warning"] = archive.warning if archive.warning.present?
+    send_data archive.data, filename: archive.filename, type: archive.content_type, disposition: "attachment"
+  rescue Servers::WorldTransferOperation::Error, DockerEngine::Error => error
+    respond_with_world_transfer_error(server, error, fallback_notice: "ワールド書き出しに失敗しました")
+  end
+
+  def upload_world
+    server = policy_scope(MinecraftServer).find(params[:id])
+    authorize server, :import_world?
+
+    result = Servers::ImportWorld.new(server: server, uploaded_file: params[:world_archive]).call
+
+    respond_to do |format|
+      format.html do
+        notice = "ワールドを置き換えました。サーバーは停止したままです。"
+        notice = "#{notice} #{result.warning}" if result.warning.present?
+        redirect_to server_path(server), notice: notice
+      end
+
+      format.json do
+        render json: {
+          ok: true,
+          warning: result.warning,
+          server: server_detail(server.reload),
+        }
+      end
+    end
+  rescue Servers::WorldTransferOperation::Error, DockerEngine::Error => error
+    respond_with_world_transfer_error(server, error, fallback_notice: "ワールド取り込みに失敗しました")
+  end
+
   def player_presence
     server = policy_scope(MinecraftServer).find(params[:id])
     authorize server, :show?
@@ -454,6 +490,8 @@ class ServersController < InertiaController
         route_issue_message: route_issue_message,
         can_repair_publication: policy(server).repair_publication?,
         can_manage_members: policy(server).manage_members?,
+        can_export_world: policy(server).export_world?,
+        can_import_world: policy(server).import_world?,
         can_manage_whitelist: policy(server).manage_whitelist?,
         can_run_rcon_command: policy(server).rcon_command?,
         can_destroy: policy(server).destroy?,
@@ -623,6 +661,28 @@ class ServersController < InertiaController
 
         format.json do
           render json: { error: message, desired_state_saved: desired_state_saved }, status: :unprocessable_entity
+        end
+      end
+    end
+
+    def respond_with_world_transfer_error(server, error, fallback_notice:)
+      message = "#{fallback_notice}: #{error.message}"
+
+      respond_to do |format|
+        format.html do
+          redirect_to server_path(server), alert: message
+        end
+
+        format.json do
+          render json: { error: error.message }, status: :unprocessable_entity
+        end
+
+        format.any do
+          if request.headers["Accept"].to_s.include?("application/json")
+            render json: { error: error.message }, status: :unprocessable_entity
+          else
+            redirect_to server_path(server), alert: message
+          end
         end
       end
     end

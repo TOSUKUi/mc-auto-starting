@@ -141,10 +141,17 @@ docker compose run --rm app bin/rails test
 docker compose run --rm app bin/rails db:migrate
 ```
 
+If `bin/rails test` hits parallel-worker or DB coordination issues in this repo, retry with `PARALLEL_WORKERS=1`:
+
+```bash
+PARALLEL_WORKERS=1 docker compose run --rm app bin/rails test
+```
+
 If you want a foreground development process outside `docker compose up`, use:
 
 ```bash
-docker compose run --rm -p 3000:3000 -p 3036:3036 app bin/dev
+APP_PORT=3001 VITE_PORT=3037 docker compose up --build
+docker compose run --rm -p 3001:3000 -p 3037:3036 app bin/dev
 ```
 
 `bin/dev` prefers `overmind`, then `hivemind`, then `foreman`, and finally falls back to running Rails and Vite directly in the same container.

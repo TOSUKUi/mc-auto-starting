@@ -74,7 +74,18 @@ module DockerEngine
       connection.request(method: :delete, path: "/volumes/#{escape_path(name)}").status == 204
     end
 
-    def create_container(name:, image:, env:, mounts:, labels:, network_name:, memory_mb:)
+    def create_container(
+      name:,
+      image:,
+      env: {},
+      mounts: [],
+      labels: {},
+      network_name: nil,
+      memory_mb: nil,
+      command: nil,
+      entrypoint: nil,
+      restart_policy_name: "unless-stopped"
+    )
       connection.request(
         method: :post,
         path: "/containers/create",
@@ -86,6 +97,9 @@ module DockerEngine
           labels: labels,
           network_name: network_name,
           memory_mb: memory_mb,
+          command: command,
+          entrypoint: entrypoint,
+          restart_policy_name: restart_policy_name,
         ),
       ).body
     end
@@ -139,23 +153,31 @@ module DockerEngine
       ).status == 204
     end
 
+    def wait_container(id:)
+      connection.request(
+        method: :post,
+        path: "/containers/#{escape_path(id)}/wait",
+        body: nil,
+      ).body
+    end
+
     private
       attr_reader :configuration, :connection
 
-      def container_payload(image:, env:, mounts:, labels:, network_name:, memory_mb:)
+      def container_payload(image:, env:, mounts:, labels:, network_name:, memory_mb:, command:, entrypoint:, restart_policy_name:)
         payload = {
           Image: image,
           Env: normalize_env(env),
           Labels: ManagedLabels.merge(labels),
           HostConfig: {
             Mounts: mounts,
-            Memory: Integer(memory_mb) * 1024 * 1024,
-            RestartPolicy: {
-              Name: "unless-stopped",
-            },
           },
         }
 
+        payload[:Cmd] = Array(command) if command.present?
+        payload[:Entrypoint] = Array(entrypoint) if entrypoint.present?
+        payload[:HostConfig][:Memory] = Integer(memory_mb) * 1024 * 1024 if memory_mb.present?
+        payload[:HostConfig][:RestartPolicy] = { Name: restart_policy_name } if restart_policy_name.present?
         payload[:NetworkingConfig] = {
           EndpointsConfig: {
             network_name => {},

@@ -43,6 +43,14 @@ class MinecraftServerPolicy < ApplicationPolicy
     admin_user? || owner? || manager_membership?
   end
 
+  def export_world?
+    transfer_world_access?
+  end
+
+  def import_world?
+    transfer_world_access?
+  end
+
   def manage_whitelist?
     (admin_user? || owner?) && record.lifecycle_ready?
   end
@@ -88,5 +96,9 @@ class MinecraftServerPolicy < ApplicationPolicy
 
     def lifecycle_access?
       (admin_user? || owner? || manager_membership?) && record.lifecycle_ready?
+    end
+
+    def transfer_world_access?
+      (admin_user? || owner?) && record.lifecycle_ready? && record.volume_name.present?
     end
 end

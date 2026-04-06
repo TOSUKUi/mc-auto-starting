@@ -14,6 +14,8 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert policy.update?
     assert policy.destroy?
     assert policy.manage_members?
+    assert policy.export_world?
+    assert policy.import_world?
     assert policy.manage_whitelist?
     assert policy.start?
     assert policy.stop?
@@ -43,6 +45,8 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert_not policy.update?
     assert_not policy.destroy?
     assert_not policy.manage_members?
+    assert_not policy.export_world?
+    assert_not policy.import_world?
     assert_not policy.manage_whitelist?
   end
 
@@ -54,6 +58,8 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert_not policy.update?
     assert_not policy.destroy?
     assert_not policy.manage_members?
+    assert_not policy.export_world?
+    assert_not policy.import_world?
     assert_not policy.manage_whitelist?
   end
 
@@ -90,6 +96,8 @@ class MinecraftServerPolicyTest < ActiveSupport::TestCase
     assert_not policy.stop?
     assert_not policy.restart?
     assert_not policy.sync?
+    assert_not policy.export_world?
+    assert_not policy.import_world?
     assert_not policy.manage_whitelist?
   end
 end

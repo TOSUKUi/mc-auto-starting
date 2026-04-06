@@ -130,6 +130,43 @@ class DockerEngine::ClientTest < ActiveSupport::TestCase
     assert_equal({ force: 1 }, connection.requests.fetch(2).fetch(:query))
   end
 
+  test "creates helper containers with command and no restart policy" do
+    connection = FakeConnection.new(
+      responses: [ DockerEngine::Response.new(status: 201, headers: {}, body: { "Id" => "helper-001" }) ],
+      requests: [],
+    )
+
+    DockerEngine::Client.new(configuration: @configuration, connection: connection).create_container(
+      name: "mc-world-transfer-helper",
+      image: "alpine:3.21",
+      mounts: [ { Type: "bind", Source: "/tmp/world", Target: "/staging" } ],
+      labels: { "component" => "world-transfer" },
+      memory_mb: 256,
+      command: [ "sh", "-lc", "echo ok" ],
+      restart_policy_name: "no",
+    )
+
+    payload = connection.requests.fetch(0).fetch(:body)
+
+    assert_equal [ "sh", "-lc", "echo ok" ], payload.fetch(:Cmd)
+    assert_equal "no", payload.dig(:HostConfig, :RestartPolicy, :Name)
+    assert_equal 268_435_456, payload.dig(:HostConfig, :Memory)
+  end
+
+  test "waits for containers through the engine" do
+    connection = FakeConnection.new(
+      responses: [ DockerEngine::Response.new(status: 200, headers: {}, body: { "StatusCode" => 0 }) ],
+      requests: [],
+    )
+
+    result = DockerEngine::Client.new(configuration: @configuration, connection: connection).wait_container(
+      id: "helper-001",
+    )
+
+    assert_equal({ "StatusCode" => 0 }, result)
+    assert_equal "/containers/helper-001/wait", connection.requests.fetch(0).fetch(:path)
+  end
+
   test "sends signals to containers through the engine" do
     connection = FakeConnection.new(
       responses: [ DockerEngine::Response.new(status: 204, headers: {}, body: nil) ],

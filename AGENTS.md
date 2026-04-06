@@ -32,6 +32,8 @@ This repository is a single-host Minecraft server manager built with Rails 8, Do
   Global roles, membership rules, and create quota policy.
 - `docs/whitelist_and_access_control_strategy.md`
   Whitelist authority and Rails-owned RCON boundary.
+- `docs/managed_world_transfer_contract.md`
+  Managed world download/upload authority, archive, staging, and volume-sequencing contract.
 - `docs/server_ui_display_review.md`
   Active server index/detail display contract.
 - `docs/operator_runbook.md`

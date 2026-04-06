@@ -29,8 +29,6 @@ The repository is past the architecture-pivot phase and already ships the direct
 The task board currently shows no tasks marked `in_progress`.
 
 Open todo work evidenced in `docs/task_board.md`:
-- `T-1200`: define the managed world download/upload contract.
-- `T-1201`: implement the managed world download/upload flow after `T-1200`.
 - `T-1202`: define the repository-local Discord bot runtime contract.
 
 ## Recent Accepted Changes
@@ -39,16 +37,17 @@ Open todo work evidenced in `docs/task_board.md`:
 - Discord OAuth invites, internal bot API, Rails-owned RCON boundary, whitelist management, player observability, and browser structured-command flows are complete through the `T-1000` to `T-1121` tracks.
 - Runtime family selection, runtime-version resolution, and operator-facing runtime/version display are complete through the `T-1100` to `T-1107` work.
 - `T-1122` is complete: the create-form memory field now keeps the input row, `MB` unit label, and helper/quota/error annotations in a stable vertical stack so note changes do not disturb the row alignment.
+- `T-1200` is complete: the managed world transfer contract now fixes the owner/admin-only authority boundary, stopped-server requirement, `.tar.gz` archive shape, `tmp/world_transfers` staging path, and helper-container volume import/export order ahead of implementation.
+- `T-1201` is complete: owner/admin users can now export and replace a managed server world through the server detail flow, with stopped-server enforcement, `.tar.gz` validation, helper-container volume transfer, and request/service coverage exercised under `PARALLEL_WORKERS=1`.
 - The latest planning write-back added the next Phase 11 tasks for world transfer and repository-local bot runtime (`6cae399`).
 
 ## Open Risks
-- World transfer is still contract-only debt: there is no accepted archive/import safety boundary yet for managed server data.
 - The repository-local Discord bot runtime is not yet specified, so the bot remains an API contract without a checked-in process topology.
 - The task board still carries `T-910` as a blocked historical task; contributors should treat it as inactive context, not as active delivery work.
 
 ## Unknowns And Assumptions
 - No checked-in source marks any task as actively assigned or currently being implemented; this file therefore treats the remaining `todo` tasks as open follow-up work rather than active in-flight work.
-- The ordering between `T-1200` and `T-1202` is not fixed by a single linear dependency chain; only explicit task dependencies are treated as authoritative.
+- `T-1202` is now the only remaining Phase 11 task on the active board; any follow-up on world transfer should be treated as post-acceptance refinement unless a new task is added.
 
 ## Write-Back Targets
 - `AGENTS.md`: slim constitution and restart map only.

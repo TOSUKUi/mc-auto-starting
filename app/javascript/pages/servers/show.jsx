@@ -1,13 +1,15 @@
-import { Alert, Badge, Button, Code, Divider, Grid, Group, Loader, Paper, ScrollArea, Select, SimpleGrid, Stack, Switch, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
+import { Alert, Badge, Button, Code, Divider, FileInput, Grid, Group, Loader, Paper, ScrollArea, Select, SimpleGrid, Stack, Switch, Text, TextInput, ThemeIcon, Title } from '@mantine/core'
 import { Head, Link, router } from '@inertiajs/react'
 import {
   IconAlertCircle,
   IconArrowBackUp,
+  IconDownload,
   IconPlayerPause,
   IconPlayerPlay,
   IconRefresh,
   IconSparkles,
   IconTrash,
+  IconUpload,
   IconUsers,
   IconUserPlus,
   IconWorldWww,
@@ -198,6 +200,18 @@ async function readJsonResponse(response, fallbackMessage) {
   return response.json()
 }
 
+function filenameFromDisposition(disposition, fallback) {
+  if (!disposition) return fallback
+
+  const utf8Match = disposition.match(/filename\*=UTF-8''([^;]+)/i)
+  if (utf8Match) return decodeURIComponent(utf8Match[1])
+
+  const basicMatch = disposition.match(/filename="?([^";]+)"?/i)
+  if (basicMatch) return basicMatch[1]
+
+  return fallback
+}
+
 export default function ServersShow({ server }) {
   const reloadInFlight = useRef(false)
   const [ whitelistEntries, setWhitelistEntries ] = useState([])
@@ -215,6 +229,10 @@ export default function ServersShow({ server }) {
   const [ rconLoading, setRconLoading ] = useState(false)
   const [ rconResult, setRconResult ] = useState(null)
   const [ rconError, setRconError ] = useState(null)
+  const [ worldArchiveFile, setWorldArchiveFile ] = useState(null)
+  const [ worldTransferLoading, setWorldTransferLoading ] = useState(false)
+  const [ worldTransferError, setWorldTransferError ] = useState(null)
+  const [ worldTransferNotice, setWorldTransferNotice ] = useState(null)
   const [ selectedRconCommand, setSelectedRconCommand ] = useState('difficulty')
   const [ rconArgs, setRconArgs ] = useState({
     difficulty: server.startup_settings.difficulty,
@@ -226,8 +244,12 @@ export default function ServersShow({ server }) {
     reason: '',
   })
   const transitionState = isTransitioning(server.status)
+  const canExportWorld = server.can_export_world
+  const canImportWorld = server.can_import_world
+  const canTransferWorld = canExportWorld || canImportWorld
   const canManageWhitelist = server.can_manage_whitelist
   const canRunRconCommand = server.can_run_rcon_command
+  const worldTransferRequiresStop = server.status !== 'stopped'
   const whitelistLiveMode = canManageWhitelist && server.runtime.container_state === 'running'
   const whitelistPlayerInputId = `whitelist-player-input-${server.id}`
   const routeIssueMessage = server.route_issue_message || (server.route.last_apply_status === 'failed' ? '公開設定の反映に失敗しています。' : null)
@@ -375,6 +397,9 @@ export default function ServersShow({ server }) {
     setRecentLogsError(null)
     setRconResult(null)
     setRconError(null)
+    setWorldArchiveFile(null)
+    setWorldTransferError(null)
+    setWorldTransferNotice(null)
     setSelectedRconCommand('difficulty')
     setRconArgs({
       difficulty: server.startup_settings.difficulty,
@@ -556,6 +581,86 @@ export default function ServersShow({ server }) {
     element.focus()
   }
 
+  async function downloadWorldArchive() {
+    setWorldTransferLoading(true)
+    setWorldTransferError(null)
+    setWorldTransferNotice(null)
+
+    try {
+      const response = await fetch(`/servers/${server.id}/download_world`, {
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/octet-stream, application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const body = await readJsonResponse(response, 'ワールド書き出しの応答が不正です。')
+        throw new Error(body.error || 'ワールドを書き出せませんでした。')
+      }
+
+      const blob = await response.blob()
+      const filename = filenameFromDisposition(
+        response.headers.get('content-disposition'),
+        `${server.hostname}-world.tar.gz`,
+      )
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+      setWorldTransferNotice('ワールドアーカイブのダウンロードを開始しました。')
+    } catch (error) {
+      setWorldTransferError(error.message)
+    } finally {
+      setWorldTransferLoading(false)
+    }
+  }
+
+  async function uploadWorldArchive() {
+    if (!worldArchiveFile) return
+
+    setWorldTransferLoading(true)
+    setWorldTransferError(null)
+    setWorldTransferNotice(null)
+
+    try {
+      const formData = new FormData()
+      formData.append('world_archive', worldArchiveFile)
+
+      const response = await fetch(`/servers/${server.id}/upload_world.json`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          Accept: 'application/json',
+          'X-CSRF-Token': csrfToken(),
+        },
+        body: formData,
+      })
+      const body = await readJsonResponse(response, 'ワールド取り込みの応答が不正です。')
+
+      if (!response.ok) {
+        throw new Error(body.error || 'ワールドを取り込めませんでした。')
+      }
+
+      setWorldArchiveFile(null)
+      setWorldTransferNotice(body.warning || 'ワールドを置き換えました。サーバーは停止したままです。')
+      router.reload({
+        only: [ 'server' ],
+        preserveScroll: true,
+        preserveState: true,
+      })
+    } catch (error) {
+      setWorldTransferError(error.message)
+    } finally {
+      setWorldTransferLoading(false)
+    }
+  }
+
   return (
     <>
       <Head title={server.name} />
@@ -708,6 +813,76 @@ export default function ServersShow({ server }) {
             </SimpleGrid>
           </Stack>
         </Paper>
+
+        {canTransferWorld ? (
+          <Paper p="lg" radius="lg" shadow="sm" withBorder>
+            <Stack gap="md">
+              <Group justify="space-between" align="center">
+                <Text fw={700}>ワールド転送</Text>
+                {worldTransferLoading ? <Loader size="sm" /> : null}
+              </Group>
+              <Divider />
+              <Stack gap="sm">
+                <Text c="dimmed" size="sm">
+                  `.tar.gz` 形式で `/data` ボリューム全体をダウンロードまたは置き換えます。取り込みは破壊的で、完了後も自動起動しません。
+                </Text>
+                {worldTransferRequiresStop ? (
+                  <Alert color="yellow" radius="lg" title="停止中のみ実行できます" variant="light">
+                    ワールド転送の前にサーバーを停止し、必要なら「同期」で停止状態を反映してください。
+                  </Alert>
+                ) : null}
+                {worldTransferError ? (
+                  <Alert color="red" icon={<IconAlertCircle size={18} />} radius="lg" title="ワールド転送に失敗しました" variant="light">
+                    {worldTransferError}
+                  </Alert>
+                ) : null}
+                {worldTransferNotice ? (
+                  <Alert color="teal" radius="lg" title="ワールド転送" variant="light">
+                    {worldTransferNotice}
+                  </Alert>
+                ) : null}
+
+                <Group align="flex-end" grow>
+                  {canExportWorld ? (
+                    <Button
+                      leftSection={<IconDownload size={16} />}
+                      onClick={downloadWorldArchive}
+                      type="button"
+                      variant="light"
+                      disabled={worldTransferLoading || worldTransferRequiresStop}
+                    >
+                      ワールドを書き出す
+                    </Button>
+                  ) : null}
+
+                  {canImportWorld ? (
+                    <>
+                      <FileInput
+                        accept=".tar.gz"
+                        clearable
+                        description="5 GiB までの `.tar.gz` を受け付けます。"
+                        label="置き換えアーカイブ"
+                        placeholder="world-backup.tar.gz"
+                        value={worldArchiveFile}
+                        onChange={setWorldArchiveFile}
+                      />
+                      <Button
+                        color="red"
+                        leftSection={<IconUpload size={16} />}
+                        onClick={uploadWorldArchive}
+                        type="button"
+                        variant="light"
+                        disabled={worldTransferLoading || worldTransferRequiresStop || !worldArchiveFile}
+                      >
+                        ワールドを置き換える
+                      </Button>
+                    </>
+                  ) : null}
+                </Group>
+              </Stack>
+            </Stack>
+          </Paper>
+        ) : null}
 
         {canManageWhitelist ? (
           <Paper p="lg" radius="lg" shadow="sm" withBorder>

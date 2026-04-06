@@ -1,0 +1,92 @@
+require "fileutils"
+require "pathname"
+require "rubygems/package"
+require "zlib"
+
+module Servers
+  class WorldArchiveValidator
+    MAX_COMPRESSED_BYTES = 5.gigabytes
+    MAX_EXPANDED_BYTES = 10.gigabytes
+
+    Result = Data.define(:expanded_bytes, :file_count)
+
+    def initialize(archive_path:, extraction_root:)
+      @archive_path = Pathname.new(archive_path)
+      @extraction_root = Pathname.new(extraction_root)
+    end
+
+    def call
+      validate_compressed_size!
+      FileUtils.mkdir_p(extraction_root)
+
+      expanded_bytes = 0
+      file_count = 0
+
+      Zlib::GzipReader.open(archive_path.to_s) do |gzip|
+        Gem::Package::TarReader.new(gzip) do |tar|
+          tar.each do |entry|
+            next if pax_header?(entry)
+
+            relative_path = normalize_entry_path(entry.full_name)
+            next if relative_path.nil?
+
+            destination = extraction_root.join(relative_path)
+
+            if entry.directory?
+              FileUtils.mkdir_p(destination)
+              next
+            end
+
+            unless entry.file?
+              raise WorldTransferOperation::InvalidArchiveError, "安全でないアーカイブ項目が含まれています: #{entry.full_name}"
+            end
+
+            expanded_bytes += entry.header.size.to_i
+            if expanded_bytes > MAX_EXPANDED_BYTES
+              raise WorldTransferOperation::InvalidArchiveError, "展開後サイズが上限 10 GiB を超えています。"
+            end
+
+            FileUtils.mkdir_p(destination.dirname)
+            File.open(destination, "wb") do |file|
+              IO.copy_stream(entry, file)
+            end
+            file_count += 1
+          end
+        end
+      end
+
+      if file_count.zero?
+        raise WorldTransferOperation::InvalidArchiveError, "空のアーカイブはアップロードできません。"
+      end
+
+      Result.new(expanded_bytes: expanded_bytes, file_count: file_count)
+    rescue Zlib::GzipFile::Error, Gem::Package::TarInvalidError, EOFError => error
+      raise WorldTransferOperation::InvalidArchiveError, "アーカイブを安全に解析できませんでした: #{error.message}"
+    end
+
+    private
+      attr_reader :archive_path, :extraction_root
+
+      def validate_compressed_size!
+        if archive_path.size > MAX_COMPRESSED_BYTES
+          raise WorldTransferOperation::InvalidArchiveError, "アップロードサイズが上限 5 GiB を超えています。"
+        end
+      end
+
+      def normalize_entry_path(raw_path)
+        path = raw_path.to_s.delete_prefix("./")
+        return nil if path.blank? || path == "."
+
+        pathname = Pathname.new(path)
+        if pathname.absolute? || pathname.each_filename.any? { |segment| segment.blank? || segment == ".." }
+          raise WorldTransferOperation::InvalidArchiveError, "相対パスではない項目が含まれています: #{raw_path}"
+        end
+
+        pathname.to_s
+      end
+
+      def pax_header?(entry)
+        entry.header.typeflag.to_s.in?([ "x", "g" ])
+      end
+  end
+end

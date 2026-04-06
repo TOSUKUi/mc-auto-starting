@@ -13,9 +13,6 @@ Advance the remaining post-baseline follow-up work without reintroducing stale d
 ## Active Dependency Chain
 The currently evidenced open work is branch-shaped rather than one long serial chain.
 
-- World-transfer track:
-  - `T-1200` define managed world download/upload contract
-  - `T-1201` implement managed world download/upload flow
 - Repository-local bot runtime track:
   - `T-1202` define repository-local Discord bot runtime contract
 
@@ -27,10 +24,11 @@ The currently evidenced open work is branch-shaped rather than one long serial c
 - The deploy path has already pivoted to production Compose + Komodo, and `T-911` through `T-914` completed the checked-in topology, image-publish path, production Compose, and rewritten runbooks.
 - The direct-Docker, Discord auth/bot API, structured RCON, whitelist, player observability, runtime catalog, and current UI baselines are complete through `T-1121`.
 - `T-1122` completed the remaining create-form memory-field alignment cleanup, so the active path is now only the world-transfer and repository-local bot-runtime branches.
+- `T-1200` fixed the managed world transfer contract, so the world-transfer branch now advances through `T-1201` implementation instead of remaining blocked on archive/staging authority decisions.
+- `T-1201` completed the managed world export/import flow, so the active dependency chain now only carries the repository-local bot-runtime track.
 - Commit `6cae399` added the next open tasks for the remaining UI cleanup, world transfer, and repository-local bot runtime specification.
 
 ## Immediate Next Checks
-- Treat `T-1200` as the main prerequisite for any world export/import implementation work.
 - Treat `T-1202` as the prerequisite for any separate-process bot implementation or deployment work.
 
 ## Unknowns And Assumptions
