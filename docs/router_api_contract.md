@@ -46,7 +46,7 @@ This document fixes the initial mc-router integration contract for Phase 4 tasks
 
 ## Rails Configuration Contract
 - Local development writes routes to `tmp/mc-router/routes.json` under the app root.
-- Production writes routes to `/rails/shared/mc-router/routes.json` so the Kamal-managed app and the long-lived `mc-router` sibling service share the same file.
+- Production writes routes to `/rails/shared/mc-router/routes.json` so the Compose-managed Rails app and the long-lived `mc-router` sibling service share the same file.
 - The active reload strategy is fixed to `docker_signal`.
 - The active reload signal is fixed to `HUP`.
 - Rails resolves the reload target by the fixed Docker label `app.kubos.dev/component=mc-router`.

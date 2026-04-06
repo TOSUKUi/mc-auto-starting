@@ -2,10 +2,6 @@
 .env
 .env.production
 !.env.example
-.kamal/secrets
-.kamal/secrets.*
-!.kamal/secrets-common.example
-!.kamal/secrets.production.example
 log/
 tmp/
 node_modules/

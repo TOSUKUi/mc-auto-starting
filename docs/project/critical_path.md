@@ -8,13 +8,11 @@
   - `6cae399` Define next UI, world transfer, and bot planning tasks
 
 ## Current Goal
-Keep the restart path aligned with the actual production direction, then advance the remaining Phase 11 follow-up work without reintroducing stale deployment assumptions.
+Advance the remaining post-baseline follow-up work without reintroducing stale deployment assumptions or reopening the retired Kamal path.
 
 ## Active Dependency Chain
 The currently evidenced open work is branch-shaped rather than one long serial chain.
 
-- Restart-path cleanup:
-  - `T-915` remove obsolete Kamal config/docs from the active restart path
 - Small UI follow-up:
   - `T-1122` fix create-form memory-field alignment
 - World-transfer track:
@@ -33,14 +31,12 @@ The currently evidenced open work is branch-shaped rather than one long serial c
 - Commit `6cae399` added the next open tasks for the remaining UI cleanup, world transfer, and repository-local bot runtime specification.
 
 ## Immediate Next Checks
-- Finish `T-915` so restart guidance no longer competes with obsolete Kamal artifacts.
 - Treat `T-1200` as the main prerequisite for any world export/import implementation work.
 - Treat `T-1202` as the prerequisite for any separate-process bot implementation or deployment work.
 - Keep `T-1122` scoped as a small UI correction, not a reopen of the broader `T-503` UI baseline.
 
 ## Unknowns And Assumptions
 - The board does not declare a single active owner or in-progress task, so the ordering above is based on explicit dependencies plus restart-path safety, not on inferred staffing.
-- `T-915` is presented here as the first cleanup target because it directly affects restart reliability, even though it is not a dependency for the Phase 11 tasks.
 
 ## Write-Back Targets
 - Update this file when the current goal, open dependency chain, or blockers change.

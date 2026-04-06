@@ -2,7 +2,6 @@
 .local/
 .env
 !.env.example
-.kamal/
 log/
 tmp/
 node_modules/

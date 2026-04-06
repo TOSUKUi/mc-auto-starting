@@ -18,7 +18,7 @@ This file tells any contributor or agent where to find authoritative information
 - `docs/operator_runbook.md`
   Use for the current operator-facing deploy procedure, host-side verification commands, direct-Docker safety notes, and day-2 operations fixed by `T-901`.
 - `docs/release_runbook.md`
-  Use for the checked-in production release procedure; Kamal references are now historical until the Compose + Komodo rewrite lands.
+  Use for the checked-in production release, migration, and rollback procedure for the active Compose + Komodo deploy path.
 - `docs/compose_komodo_deployment_topology.md`
   Use for the active production Compose + Komodo topology, image-pull deploy direction, secret contract, and `mc_router_net` expectations fixed by `T-911`.
 - `docs/implementation_breakdown.md`
@@ -57,12 +57,6 @@ This file tells any contributor or agent where to find authoritative information
   Historical reference from the abandoned external-provider approach. Not current architecture.
 - `docs/router_api_contract.md`
   Active reference for the retained `mc-router` ingress contract.
-- `docs/kamal_deployment_topology.md`
-  Historical reference from the abandoned Kamal deployment attempt. Do not treat it as current deployment guidance.
-- `config/deploy.yml`
-  Historical Kamal config left in the repository until the Compose + Komodo cleanup tasks remove it.
-- `config/deploy.production.yml`
-  Historical Kamal destination config left in the repository until the Compose + Komodo cleanup tasks remove it.
 
 ## Disposable Session Context
 - `.local/session_context.md`
