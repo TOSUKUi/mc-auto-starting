@@ -186,26 +186,44 @@ export default function ServersNew({ create_quota, form_defaults, runtime_family
                         <Text fw={700}>リソースと参加条件</Text>
                         <Grid gutter="md">
                           <Grid.Col span={{ base: 12, sm: 6 }}>
-                            <NumberInput
-                              allowDecimal={false}
-                              description="Minecraft の Xms / Xmx に設定されます。Docker 上限は自動計算されます。"
-                              error={fieldError('memory_mb')}
-                              hideControls
-                              label="Minecraft メモリ (MB)"
-                              max={MAX_MEMORY_MB}
-                              min={MIN_MEMORY_MB}
-                              onBlur={() => {
-                                const nextMemoryMb = commitMemoryValue(memoryInput, form.data.memory_mb)
+                            <Stack gap={6}>
+                              <Text fw={500} size="sm">Minecraft メモリ</Text>
+                              <Group align="flex-end" gap="xs" wrap="nowrap">
+                                <div style={{ flex: 1 }}>
+                                  <NumberInput
+                                    allowDecimal={false}
+                                    hideControls
+                                    max={MAX_MEMORY_MB}
+                                    min={MIN_MEMORY_MB}
+                                    onBlur={() => {
+                                      const nextMemoryMb = commitMemoryValue(memoryInput, form.data.memory_mb)
 
-                                setMemoryInput(String(nextMemoryMb))
-                                form.setData('memory_mb', nextMemoryMb)
-                              }}
-                              onChange={(value) => setMemoryInput(value === null ? '' : String(value))}
-                              required
-                              step={512}
-                              thousandSeparator=","
-                              value={memoryInput}
-                            />
+                                      setMemoryInput(String(nextMemoryMb))
+                                      form.setData('memory_mb', nextMemoryMb)
+                                    }}
+                                    onChange={(value) => setMemoryInput(value === null ? '' : String(value))}
+                                    required
+                                    step={512}
+                                    thousandSeparator=","
+                                    value={memoryInput}
+                                  />
+                                </div>
+                                <Text c="dimmed" fw={700} size="sm">MB</Text>
+                              </Group>
+                              <Stack gap={4}>
+                                <Text c="dimmed" size="xs">
+                                  Minecraft の Xms / Xmx に設定されます。Docker 上限は自動計算されます。
+                                </Text>
+                                {create_quota?.applies ? (
+                                  <Text c="dimmed" size="xs">
+                                    今回作成後の見込み {projectedMemoryTotal.toLocaleString()} / {create_quota.limit_mb.toLocaleString()} MB
+                                  </Text>
+                                ) : null}
+                                {fieldError('memory_mb') ? (
+                                  <Text c="red" size="xs">{fieldError('memory_mb')}</Text>
+                                ) : null}
+                              </Stack>
+                            </Stack>
                           </Grid.Col>
                           <Grid.Col span={{ base: 12, sm: 6 }}>
                             <NumberInput

@@ -29,7 +29,6 @@ The repository is past the architecture-pivot phase and already ships the direct
 The task board currently shows no tasks marked `in_progress`.
 
 Open todo work evidenced in `docs/task_board.md`:
-- `T-1122`: fix the create-form memory-field alignment issue.
 - `T-1200`: define the managed world download/upload contract.
 - `T-1201`: implement the managed world download/upload flow after `T-1200`.
 - `T-1202`: define the repository-local Discord bot runtime contract.
@@ -39,7 +38,7 @@ Open todo work evidenced in `docs/task_board.md`:
 - `T-915` is complete: obsolete Kamal deployment files and the superseded Kamal topology doc have been removed, and the restart/context map now points only at the active Compose + Komodo path.
 - Discord OAuth invites, internal bot API, Rails-owned RCON boundary, whitelist management, player observability, and browser structured-command flows are complete through the `T-1000` to `T-1121` tracks.
 - Runtime family selection, runtime-version resolution, and operator-facing runtime/version display are complete through the `T-1100` to `T-1107` work.
-- The current UI baseline is Japanese-first and the active server index/detail/create flows already follow the direct-Docker contract; the remaining visible UI follow-up is the smaller `T-1122` form-alignment task.
+- `T-1122` is complete: the create-form memory field now keeps the input row, `MB` unit label, and helper/quota/error annotations in a stable vertical stack so note changes do not disturb the row alignment.
 - The latest planning write-back added the next Phase 11 tasks for world transfer and repository-local bot runtime (`6cae399`).
 
 ## Open Risks
@@ -49,7 +48,7 @@ Open todo work evidenced in `docs/task_board.md`:
 
 ## Unknowns And Assumptions
 - No checked-in source marks any task as actively assigned or currently being implemented; this file therefore treats the remaining `todo` tasks as open follow-up work rather than active in-flight work.
-- The ordering between `T-1122`, `T-1200`, and `T-1202` is not fixed by a single linear dependency chain; only explicit task dependencies are treated as authoritative.
+- The ordering between `T-1200` and `T-1202` is not fixed by a single linear dependency chain; only explicit task dependencies are treated as authoritative.
 
 ## Write-Back Targets
 - `AGENTS.md`: slim constitution and restart map only.
