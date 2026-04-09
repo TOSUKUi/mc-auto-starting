@@ -40,7 +40,7 @@ module Servers
       attr_reader :uploaded_file
 
       def staged_archive_path
-        staging_directory.join("upload.tar.gz")
+        staging_directory.join("upload.zip")
       end
 
       def validated_directory
@@ -49,13 +49,13 @@ module Servers
 
       def validate_uploaded_file!
         if uploaded_file.blank?
-          raise InvalidArchiveError, "アップロードする `.tar.gz` を選択してください。"
+          raise InvalidArchiveError, "アップロードする `.zip` を選択してください。"
         end
 
         filename = uploaded_file.original_filename.to_s
-        return if filename.end_with?(".tar.gz")
+        return if filename.end_with?(".zip")
 
-        raise InvalidArchiveError, "アップロードできるのは `.tar.gz` 形式だけです。"
+        raise InvalidArchiveError, "アップロードできるのは `.zip` 形式だけです。"
       end
 
       def persist_uploaded_archive!

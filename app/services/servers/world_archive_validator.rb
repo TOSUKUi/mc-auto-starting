@@ -1,7 +1,6 @@
 require "fileutils"
 require "pathname"
-require "rubygems/package"
-require "zlib"
+require "zip"
 
 module Servers
   class WorldArchiveValidator
@@ -22,36 +21,34 @@ module Servers
       expanded_bytes = 0
       file_count = 0
 
-      Zlib::GzipReader.open(archive_path.to_s) do |gzip|
-        Gem::Package::TarReader.new(gzip) do |tar|
-          tar.each do |entry|
-            next if pax_header?(entry)
+      Zip::File.open(archive_path.to_s) do |zip_file|
+        zip_file.each do |entry|
+          relative_path = normalize_entry_path(entry.name)
+          next if relative_path.nil?
 
-            relative_path = normalize_entry_path(entry.full_name)
-            next if relative_path.nil?
+          destination = extraction_root.join(relative_path)
 
-            destination = extraction_root.join(relative_path)
-
-            if entry.directory?
-              FileUtils.mkdir_p(destination)
-              next
-            end
-
-            unless entry.file?
-              raise WorldTransferOperation::InvalidArchiveError, "安全でないアーカイブ項目が含まれています: #{entry.full_name}"
-            end
-
-            expanded_bytes += entry.header.size.to_i
-            if expanded_bytes > MAX_EXPANDED_BYTES
-              raise WorldTransferOperation::InvalidArchiveError, "展開後サイズが上限 10 GiB を超えています。"
-            end
-
-            FileUtils.mkdir_p(destination.dirname)
-            File.open(destination, "wb") do |file|
-              IO.copy_stream(entry, file)
-            end
-            file_count += 1
+          if entry.directory?
+            FileUtils.mkdir_p(destination)
+            next
           end
+
+          unless entry.file?
+            raise WorldTransferOperation::InvalidArchiveError, "安全でないアーカイブ項目が含まれています: #{entry.name}"
+          end
+
+          expanded_bytes += entry.size.to_i
+          if expanded_bytes > MAX_EXPANDED_BYTES
+            raise WorldTransferOperation::InvalidArchiveError, "展開後サイズが上限 10 GiB を超えています。"
+          end
+
+          FileUtils.mkdir_p(destination.dirname)
+          entry.get_input_stream do |input_stream|
+            File.open(destination, "wb") do |file|
+              IO.copy_stream(input_stream, file)
+            end
+          end
+          file_count += 1
         end
       end
 
@@ -60,7 +57,7 @@ module Servers
       end
 
       Result.new(expanded_bytes: expanded_bytes, file_count: file_count)
-    rescue Zlib::GzipFile::Error, Gem::Package::TarInvalidError, EOFError => error
+    rescue Zip::Error, EOFError => error
       raise WorldTransferOperation::InvalidArchiveError, "アーカイブを安全に解析できませんでした: #{error.message}"
     end
 
@@ -83,10 +80,6 @@ module Servers
         end
 
         pathname.to_s
-      end
-
-      def pax_header?(entry)
-        entry.header.typeflag.to_s.in?([ "x", "g" ])
       end
   end
 end

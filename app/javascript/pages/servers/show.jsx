@@ -602,7 +602,7 @@ export default function ServersShow({ server }) {
       const blob = await response.blob()
       const filename = filenameFromDisposition(
         response.headers.get('content-disposition'),
-        `${server.hostname}-world.tar.gz`,
+        `${server.hostname}-world.zip`,
       )
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -824,7 +824,7 @@ export default function ServersShow({ server }) {
               <Divider />
               <Stack gap="sm">
                 <Text c="dimmed" size="sm">
-                  `.tar.gz` 形式で `/data` ボリューム全体をダウンロードまたは置き換えます。取り込みは破壊的で、完了後も自動起動しません。
+                  `.zip` 形式で `/data` ボリューム全体をダウンロードまたは置き換えます。取り込みは破壊的で、完了後も自動起動しません。
                 </Text>
                 {worldTransferRequiresStop ? (
                   <Alert color="yellow" radius="lg" title="停止中のみ実行できます" variant="light">
@@ -858,11 +858,11 @@ export default function ServersShow({ server }) {
                   {canImportWorld ? (
                     <>
                       <FileInput
-                        accept=".tar.gz"
+                        accept=".zip,application/zip"
                         clearable
-                        description="5 GiB までの `.tar.gz` を受け付けます。"
+                        description="5 GiB までの `.zip` を受け付けます。"
                         label="置き換えアーカイブ"
-                        placeholder="world-backup.tar.gz"
+                        placeholder="world-backup.zip"
                         value={worldArchiveFile}
                         onChange={setWorldArchiveFile}
                       />

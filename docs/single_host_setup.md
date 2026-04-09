@@ -147,6 +147,12 @@ If `bin/rails test` hits parallel-worker or DB coordination issues in this repo,
 PARALLEL_WORKERS=1 docker compose run --rm app bin/rails test
 ```
 
+If you are reusing a running app container with `docker compose exec`, pass the parallel-worker setting as an environment flag instead:
+
+```bash
+docker compose exec -e PARALLEL_WORKERS=1 app bin/rails test
+```
+
 If you want a foreground development process outside `docker compose up`, use:
 
 ```bash

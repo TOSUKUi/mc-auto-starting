@@ -11,6 +11,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     @original_bounded_rcon_new = Servers::BoundedRconCommand.method(:new)
     @original_export_world_new = Servers::ExportWorld.method(:new)
     @original_import_world_new = Servers::ImportWorld.method(:new)
+    @original_sync_server_state_new = Servers::SyncServerState.method(:new)
   end
 
   teardown do
@@ -20,6 +21,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     Servers::BoundedRconCommand.define_singleton_method(:new, @original_bounded_rcon_new) if @original_bounded_rcon_new
     Servers::ExportWorld.define_singleton_method(:new, @original_export_world_new) if @original_export_world_new
     Servers::ImportWorld.define_singleton_method(:new, @original_import_world_new) if @original_import_world_new
+    Servers::SyncServerState.define_singleton_method(:new, @original_sync_server_state_new) if @original_sync_server_state_new
   end
 
   test "redirects unauthenticated users to login for index" do
@@ -125,6 +127,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   test "show allows visible server for member" do
     stub_player_presence(minecraft_servers(:one).id => { available: true, online_count: 1, max_players: 20, online_players: %w[Steve] })
     minecraft_servers(:one).update!(last_error_message: "runtime unavailable")
+    stub_show_detail_sync_noop
     sign_in_as(users(:three))
 
     get server_url(minecraft_servers(:one), format: :json)
@@ -157,6 +160,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   test "show exposes start and sync for stopped servers" do
     server = minecraft_servers(:one)
     server.update_columns(status: MinecraftServer.statuses.fetch(:stopped), container_state: "exited")
+    stub_show_detail_sync_noop
     sign_in_as(users(:three))
 
     get server_url(server, format: :json)
@@ -175,6 +179,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   test "show exposes world transfer controls for owner on stopped server" do
     server = minecraft_servers(:one)
     server.update_columns(status: MinecraftServer.statuses.fetch(:stopped), container_state: "exited")
+    stub_show_detail_sync_noop
     sign_in_as(users(:one))
 
     get server_url(server, format: :json)
@@ -219,6 +224,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   test "show exposes only sync during transitional statuses" do
     server = minecraft_servers(:one)
     server.update_columns(status: MinecraftServer.statuses.fetch(:starting), container_state: "running")
+    stub_show_detail_sync_noop
     sign_in_as(users(:three))
 
     get server_url(server, format: :json)
@@ -307,6 +313,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
   test "show exposes only sync for degraded servers when detail sync cannot recover them" do
     server = minecraft_servers(:one)
     server.update_columns(status: MinecraftServer.statuses.fetch(:degraded), container_state: "unknown")
+    stub_show_detail_sync_noop
     sign_in_as(users(:three))
 
     get server_url(server, format: :json)
@@ -737,7 +744,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     server = minecraft_servers(:one)
     stub_export_world(
       data: "archive-body",
-      filename: "main-survival-world-20260407.tar.gz",
+      filename: "main-survival-world-20260407.zip",
       warning: nil,
     )
 
@@ -745,7 +752,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal "archive-body", response.body
-    assert_includes response.headers["Content-Disposition"], "main-survival-world-20260407.tar.gz"
+    assert_includes response.headers["Content-Disposition"], "main-survival-world-20260407.zip"
   end
 
   test "manager cannot download world archive" do
@@ -824,7 +831,7 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
         end
       end.new(
         Servers::ExportWorld::Result.new(
-          content_type: "application/gzip",
+          content_type: "application/zip",
           data: data,
           filename: filename,
           warning: warning,
@@ -843,12 +850,23 @@ class ServersControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  def stub_show_detail_sync_noop
+    fake_service = Object.new
+    fake_service.define_singleton_method(:call) do
+      nil
+    end
+
+    Servers::SyncServerState.define_singleton_method(:new) do |*|
+      fake_service
+    end
+  end
+
   def fixture_world_archive_upload
-    file = Tempfile.new([ "world-archive", ".tar.gz" ])
+    file = Tempfile.new([ "world-archive", ".zip" ])
     file.binmode
     file.write("dummy archive")
     file.rewind
-    Rack::Test::UploadedFile.new(file.path, "application/gzip", original_filename: "world.tar.gz")
+    Rack::Test::UploadedFile.new(file.path, "application/zip", original_filename: "world.zip")
   end
 
   def inertia_headers

@@ -79,6 +79,9 @@ This repository is a single-host Minecraft server manager built with Rails 8, Do
 
 ## Execution Rules
 - Use Docker for Ruby and Rails commands.
+- Before running tests, re-check `docs/single_host_setup.md` and follow its current Docker-based test procedure.
+- Before implementation, re-check the relevant contract, task doc, or accepted spec instead of relying on prior assumptions or session memory.
+- When the execution order or priority is ambiguous, confirm the intended priority with the user before proceeding.
 - Prefer Rails generators before manual scaffolding.
 - Prefer Rails-standard autoloading, reloading, initializer, and configuration patterns.
 - Keep Docker control isolated behind small service classes.

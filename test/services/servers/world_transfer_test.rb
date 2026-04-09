@@ -1,7 +1,6 @@
 require "test_helper"
-require "rubygems/package"
 require "tempfile"
-require "zlib"
+require "zip"
 
 class Servers::WorldTransferTest < ActiveSupport::TestCase
   FakeDockerClient = Struct.new(:server, :created_container, :removed_container_ids, :captured_incoming_entries, keyword_init: true) do
@@ -31,10 +30,11 @@ class Servers::WorldTransferTest < ActiveSupport::TestCase
       mounts = created_container.fetch(:mounts)
       command = created_container.fetch(:command).last
 
-      if command.include?("/staging/")
+      if command.include?("/staging/export-root")
         stage_dir = mounts.find { |mount| mount[:Target] == "/staging" }.fetch(:Source)
-        archive_name = command.match(%r{/staging/([^\s]+\.tar\.gz)})[1]
-        File.binwrite(File.join(stage_dir, archive_name), "archive-body")
+        export_root = File.join(stage_dir, "export-root")
+        FileUtils.mkdir_p(File.join(export_root, "world"))
+        File.binwrite(File.join(export_root, "world", "level.dat"), "archive-body")
       else
         incoming_dir = mounts.find { |mount| mount[:Target] == "/incoming" }.fetch(:Source)
         self.captured_incoming_entries = Dir.glob(File.join(incoming_dir, "**", "*"), File::FNM_DOTMATCH)
@@ -77,11 +77,11 @@ class Servers::WorldTransferTest < ActiveSupport::TestCase
       staging_root: staging_root,
     ).call
 
-    assert_equal "application/gzip", result.content_type
-    assert_equal "archive-body", result.data
-    assert_match(/\Amain-survival-world-\d{14}\.tar\.gz\z/, result.filename)
+    assert_equal "application/zip", result.content_type
+    assert_match(/\Amain-survival-world-\d{14}\.zip\z/, result.filename)
     assert_equal [ "helper-001" ], docker_client.removed_container_ids
     assert_equal false, staging_root.join("export-request").exist?
+    assert_equal({ "world/level.dat" => "archive-body" }, unzip_archive_entries(result.data))
   ensure
     FileUtils.rm_rf(staging_root) if staging_root
   end
@@ -93,8 +93,8 @@ class Servers::WorldTransferTest < ActiveSupport::TestCase
     docker_client = FakeDockerClient.new(server: server, removed_container_ids: [])
     upload = Rack::Test::UploadedFile.new(
       build_world_archive("world/level.dat" => "seed-data", "server.properties" => "motd=test"),
-      "application/gzip",
-      original_filename: "world-backup.tar.gz",
+      "application/zip",
+      original_filename: "world-backup.zip",
     )
 
     result = Servers::ImportWorld.new(
@@ -121,8 +121,8 @@ class Servers::WorldTransferTest < ActiveSupport::TestCase
     docker_client = FakeDockerClient.new(server: server, removed_container_ids: [])
     upload = Rack::Test::UploadedFile.new(
       build_world_archive("../escape.txt" => "nope"),
-      "application/gzip",
-      original_filename: "world-backup.tar.gz",
+      "application/zip",
+      original_filename: "world-backup.zip",
     )
 
     error = assert_raises(Servers::WorldTransferOperation::InvalidArchiveError) do
@@ -142,21 +142,44 @@ class Servers::WorldTransferTest < ActiveSupport::TestCase
 
   private
     def build_world_archive(entries)
-      file = Tempfile.new([ "world-transfer", ".tar.gz" ])
+      file = Tempfile.new([ "world-transfer", ".zip" ])
       file.binmode
 
-      Zlib::GzipWriter.wrap(file) do |gzip|
-        Gem::Package::TarWriter.new(gzip) do |tar|
-          entries.each do |path, contents|
-            tar.mkdir(File.dirname(path), 0o755) unless File.dirname(path) == "."
-            tar.add_file_simple(path, 0o644, contents.bytesize) do |io|
-              io.write(contents)
+      Zip::File.open(file.path, create: true) do |zip_file|
+        entries.each do |path, contents|
+          directory = File.dirname(path)
+          if directory != "."
+            segments = []
+            directory.split("/").each do |segment|
+              segments << segment
+              entry_name = segments.join("/")
+              zip_file.mkdir(entry_name) unless zip_file.find_entry(entry_name)
             end
+          end
+
+          zip_file.get_output_stream(path) { |io| io.write(contents) }
+        end
+      end
+
+      file.path
+    end
+
+    def unzip_archive_entries(bytes)
+      entries = {}
+      Tempfile.create([ "world-transfer-export", ".zip" ]) do |file|
+        file.binmode
+        file.write(bytes)
+        file.flush
+
+        Zip::File.open(file.path) do |zip_file|
+          zip_file.each do |entry|
+            next if entry.directory?
+
+            entries[entry.name] = entry.get_input_stream.read
           end
         end
       end
 
-      file.close
-      file.path
+      entries
     end
 end
