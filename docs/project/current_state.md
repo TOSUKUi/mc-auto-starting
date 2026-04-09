@@ -40,6 +40,7 @@ Open todo work evidenced in `docs/task_board.md`:
 - `T-1200` is complete: the managed world transfer contract now fixes the owner/admin-only authority boundary, stopped-server requirement, `.tar.gz` archive shape, `tmp/world_transfers` staging path, and helper-container volume import/export order ahead of implementation.
 - `T-1201` is complete: owner/admin users can now export and replace a managed server world through the server detail flow, with stopped-server enforcement, `.tar.gz` validation, helper-container volume transfer, and request/service coverage exercised under `PARALLEL_WORKERS=1`.
 - The latest planning write-back added the next Phase 11 tasks for world transfer and repository-local bot runtime (`6cae399`).
+- `T-1203` is complete: the managed world transfer contract now fixes `.zip` as the next user-facing archive format for both export and import, keeps direct folder upload out of scope, and preserves the existing Rails-owned staging, stopped-server, and managed-volume boundaries for the follow-up implementation.
 
 ## Open Risks
 - The repository-local Discord bot runtime is not yet specified, so the bot remains an API contract without a checked-in process topology.
@@ -47,7 +48,7 @@ Open todo work evidenced in `docs/task_board.md`:
 
 ## Unknowns And Assumptions
 - No checked-in source marks any task as actively assigned or currently being implemented; this file therefore treats the remaining `todo` tasks as open follow-up work rather than active in-flight work.
-- `T-1202` is now the only remaining Phase 11 task on the active board; any follow-up on world transfer should be treated as post-acceptance refinement unless a new task is added.
+- `T-1202` is now the only remaining Phase 11 follow-up on the active board.
 
 ## Write-Back Targets
 - `AGENTS.md`: slim constitution and restart map only.

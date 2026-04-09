@@ -152,3 +152,43 @@ The implementation must use short-lived helper-container work rather than shelli
 - add helper-container support without widening Rails into arbitrary Docker control
 - add archive validation, staging cleanup, and operator-visible error handling
 - add request/service coverage for stopped-server enforcement and destructive import behavior
+
+## T-1203 Follow-Up Decision
+
+`T-1200` and `T-1201` remain the accepted first-pass implementation for managed world transfer. `T-1203` fixes the next-format contract that should be implemented when the product moves away from the operator-hostile `.tar.gz` UX.
+
+### Next user-facing archive contract
+
+- The next user-facing managed world transfer format should move to `.zip` for both export and import.
+- The operator-facing contract should not promise simultaneous `.tar.gz` and `.zip` support. If an implementation temporarily keeps `.tar.gz` compatibility during rollout, treat that as migration detail rather than as the durable product contract.
+- Export filenames should move to the same stable readable pattern used in the first pass, but with a `.zip` suffix such as `<hostname>-world-<timestamp>.zip`.
+- The archive root still represents the contents of the managed `/data` volume rather than only `/data/world`.
+
+Rationale:
+
+- `.zip` is materially easier for general users to open, inspect, and replace on common desktop systems.
+- Moving both directions together avoids a split mental model where download and upload use different archive types.
+- Keeping the full-volume archive boundary avoids reopening the already-accepted ownership and path-selection decisions from `T-1200`.
+
+### Import contract for the next format
+
+- Import should accept `.zip` only once the follow-up implementation lands.
+- The uploaded archive must still expand into a relative-path tree that can become the managed `/data` volume root.
+- Absolute paths, `..` traversal, device files, FIFOs, sockets, hard links, and symbolic links remain rejected.
+- Empty archives remain rejected.
+- The current compressed and expanded size limits remain unchanged unless a later task explicitly revises them.
+
+### UI, API, validation, and service boundary for the follow-up implementation
+
+- The server-detail flow remains the only in-scope operator surface.
+- Export should remain a direct download action, but the operator-facing copy and generated filename should describe a `.zip` download instead of `.tar.gz`.
+- Import should keep the same destructive replacement wording and stopped-server prerequisite, but the file-picker guidance, accepted extension, and validation errors should be updated to `.zip`.
+- The API contract should treat `.zip` as the only accepted operator-facing archive format for the follow-up implementation.
+- The service boundary remains Rails-owned staging plus short-lived helper-container work against the managed Docker volume; only the archive creation and extraction mechanics change from the first pass.
+- The implementation must preserve the existing authority boundary, managed-volume ownership checks, stopped-server requirement, best-effort staging cleanup, and keep-stopped-after-import behavior.
+
+### Explicit non-goals preserved by T-1203
+
+- Direct browser folder upload remains out of scope and requires a separate contract decision before any implementation starts.
+- This follow-up does not reopen bot-driven world transfer, background archive catalogs, or partial in-place edits to a running server.
+- This follow-up does not widen Rails into arbitrary host-side `docker` CLI procedures or non-managed volume handling.
